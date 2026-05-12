@@ -47,8 +47,10 @@ L’interface doit fonctionner comme un **studio de production** avec :
 - Tailwind CSS
 - Adobe Spectrum S2 comme base du design system
 - React Query (`@tanstack/react-query`) pour l’état serveur
-- Zustand pour l’état UI local
-- client API consommant le backend FastAPI local
+    - Zustand pour l’état UI local
+    - ProseMirror pour l’éditeur enrichi et l’autocomplete des références `@` (enrichi par des plugins custom)
+    - Three.js / React Three Fiber avec force-graph pour le graphe relationnel des personnages
+    - client API consommant le backend FastAPI local
 
 ### 2.2 Répartition des responsabilités
 - **React Router** : structure des routes, layouts, loaders, actions, navigation
@@ -311,7 +313,9 @@ Ce pattern doit rester stable sur les écrans métier.
 - `LinkedResourcesPanel`
 - `NarrativeOutline`
 - `BoardPreview`
-- `PanelPreview`
+    - `NarrativeSceneEditor` (ProseMirror customisé, blocs structurés, autocomplétion `@`)
+    - `CharacterRelationGraph` (Terrain Three.js / force-graph 3D pour les liens entre personnages)
+    - `PanelPreview`
 
 ### 6.3 Règles de conception des composants
 - réutilisables
@@ -502,17 +506,30 @@ Gérer les personnages et leurs liens narratifs.
 - référence orpheline
 - personnage archivé
 
+### Graphe relationnel 3D (Three.js / Force-Graph)
+Le graphe relationnel est un composant clé du MVP et doit être construit avec Three.js via React Three Fiber et react-force-graph.
+
+#### Objectifs visuels
+- représenter les personnages comme des nœuds
+- afficher les relations comme des liens colorés par type
+- permettre l’interaction (focus, sélection, zoom, pan)
+- afficher l’intensité de relation via épaisseur ou transparence
+- visualiser les interdépendances narratives
+
+#### Composant à construire
+- `CharacterRelationGraph` – composant 3D émit en React Three Fiber avec react-force-graph, dégradés purs via Three.js. Intégré dans le workspace Characters en plein écran.
+
 ---
 
-## 8.4 Storyline — `/projects/:projectId/story`
+## 8.4 Éditeur de Scène — ProseMirror (`/projects/:projectId/story`)
 
 ### Rôle
-Écrire et structurer l’histoire.
+Écriture et structuration de l’histoire au travers d’un éditeur ProseMirror enrichi, permettant l’autocomplétion des références typées `@`.
 
 ### Layout
-- gauche : tomes / chapitres / scènes
-- centre : éditeur de scène
-- droite : références, cohérence, warnings, aperçu narratif
+- gauche : tomes / chapitres / scènes
+- centre : éditeur de scène ProseMirror
+- droite : références, cohérence, warnings, aperçu narratif
 
 ### Modes de travail
 1. structure
@@ -520,19 +537,27 @@ Gérer les personnages et leurs liens narratifs.
 3. lecture
 4. validation
 
-### Contenu de l’éditeur de scène
+### Éditeur de scène ProseMirror
+L’éditeur est composé de blocs structurés avec des mentions `@` escamotables :
 - titre
 - résumé
 - contenu narratif
 - lieu
 - personnages présents
 - ordre
-- références `@`
+- références `@` (autocomplétion contextuelle)
 - notes éditoriales
 
+L’autocomplétion contextuelle est pilotée par un plugin ProseMirror custom. Elle permet :
+- la détection des préfixes `@chara:`, `@env:`, `@file:`, `@scene:`
+- le filtrage des suggestions par type et saisie partielle
+- l’insertion d’un nœud de référence typé sans briser le Markdown
+- la navigation vers l’entité cible au clic
+
 ### Composants
+- `SceneEditor` – composant principal ProseMirror encapsulant `texteditor`
+- `ReferenceAutocomplete` – plugin interne ProseMirror pour l’autocomplétion `@`
 - `Tabs`
-- `Textarea`
 - `Accordion`
 - `Badge`
 - `Alert`
