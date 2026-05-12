@@ -1,0 +1,8 @@
+# Shared local data
+kuti-data/db/*.sqlite
+kuti-data/db/*.sqlite-wal
+kuti-data/db/*.sqlite-shm
+kuti-data/db/*.sqlite-journal
+
+node_modules
+build

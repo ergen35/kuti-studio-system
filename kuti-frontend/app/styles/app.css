@@ -1,0 +1,198 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --font-ui: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --background: 243 239 232;
+  --foreground: 23 27 32;
+  --card: 250 247 242;
+  --card-foreground: 23 27 32;
+  --popover: 255 255 255;
+  --popover-foreground: 23 27 32;
+  --primary: 36 88 165;
+  --primary-foreground: 250 247 242;
+  --secondary: 225 218 207;
+  --secondary-foreground: 35 39 45;
+  --muted: 232 227 219;
+  --muted-foreground: 92 101 112;
+  --accent: 205 120 45;
+  --accent-foreground: 250 247 242;
+  --destructive: 167 68 59;
+  --destructive-foreground: 255 249 247;
+  --border: 207 198 188;
+  --input: 226 219 210;
+  --ring: 36 88 165;
+  --kuti-surface-1: 248 245 240;
+  --kuti-surface-2: 241 236 228;
+  --kuti-surface-3: 231 223 213;
+  --kuti-sidebar: 236 231 223;
+  --kuti-canvas: 245 241 235;
+  --kuti-inspector: 241 236 228;
+  --kuti-editor: 250 248 243;
+  --kuti-warning: 194 117 41;
+  --kuti-success: 70 122 80;
+  --kuti-draft: 106 115 130;
+  --kuti-active: 36 88 165;
+  --kuti-archived: 113 123 135;
+  --kuti-open: 181 116 42;
+  --kuti-resolved: 74 132 92;
+  --kuti-job-running: 36 88 165;
+  --kuti-job-failed: 167 68 59;
+  --kuti-job-done: 70 122 80;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: 15 18 22;
+  --foreground: 239 240 242;
+  --card: 21 25 31;
+  --card-foreground: 239 240 242;
+  --popover: 20 24 30;
+  --popover-foreground: 239 240 242;
+  --primary: 111 155 235;
+  --primary-foreground: 13 17 21;
+  --secondary: 33 39 48;
+  --secondary-foreground: 233 235 239;
+  --muted: 28 33 40;
+  --muted-foreground: 153 162 174;
+  --accent: 214 136 64;
+  --accent-foreground: 17 20 24;
+  --destructive: 192 88 77;
+  --destructive-foreground: 255 247 245;
+  --border: 41 48 58;
+  --input: 45 53 64;
+  --ring: 111 155 235;
+  --kuti-surface-1: 18 22 28;
+  --kuti-surface-2: 23 28 35;
+  --kuti-surface-3: 31 37 46;
+  --kuti-sidebar: 19 23 29;
+  --kuti-canvas: 15 18 22;
+  --kuti-inspector: 18 22 28;
+  --kuti-editor: 21 26 33;
+  --kuti-warning: 214 136 64;
+  --kuti-success: 88 152 98;
+  --kuti-draft: 142 153 172;
+  --kuti-active: 111 155 235;
+  --kuti-archived: 119 129 145;
+  --kuti-open: 214 136 64;
+  --kuti-resolved: 88 152 98;
+  --kuti-job-running: 111 155 235;
+  --kuti-job-failed: 192 88 77;
+  --kuti-job-done: 88 152 98;
+}
+
+html {
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-ui);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.65), transparent 24%),
+    radial-gradient(circle at 100% 0%, rgba(84, 114, 164, 0.12), transparent 28%),
+    linear-gradient(180deg, rgb(var(--background)) 0%, rgb(var(--background)) 100%);
+  color: rgb(var(--foreground));
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent 95%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgb(var(--primary) / 0.28);
+}
+
+code,
+pre,
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.kuti-panel {
+  border: 1px solid rgb(var(--border) / 0.92);
+  background: rgb(var(--kuti-surface-1) / 0.92);
+  box-shadow: 0 24px 70px -48px rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(18px);
+}
+
+.kuti-panel-strong {
+  border: 1px solid rgb(var(--border));
+  background: linear-gradient(180deg, rgb(var(--kuti-surface-2) / 0.96), rgb(var(--kuti-surface-1) / 0.96));
+  box-shadow: 0 28px 76px -52px rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(18px);
+}
+
+.kuti-chip {
+  border: 1px solid rgb(var(--border));
+  background: rgb(var(--kuti-surface-2) / 0.9);
+}
+
+.kuti-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--border)), transparent);
+}
+
+.kuti-texture {
+  position: relative;
+}
+
+.kuti-texture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 40%);
+  mix-blend-mode: overlay;
+}
+
+.kuti-command-dialog::backdrop,
+.kuti-mobile-dialog::backdrop {
+  background: rgba(10, 12, 16, 0.54);
+  backdrop-filter: blur(8px);
+}
+
+dialog {
+  max-width: calc(100vw - 1.5rem);
+}
+
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.kuti-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border)) transparent;
+}
+
+.kuti-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.kuti-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
