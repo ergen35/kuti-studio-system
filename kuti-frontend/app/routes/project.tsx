@@ -21,18 +21,14 @@ export default function ProjectRoute() {
       {project.error ? <ErrorState message={apiErrorMessage(project.error)} /> : null}
       {project.data ? (
         <>
-          <PageHeader
-            title={project.data.name}
-            description={`Project ${project.data.slug} lives at ${project.data.root_path}.`}
-            actions={<Badge>{project.data.status}</Badge>}
-          />
-          <div className="stats">
+          <PageHeader title={project.data.name} description={`Project ${project.data.slug} lives at ${project.data.root_path}.`} actions={<Badge>{project.data.status}</Badge>} />
+          <div className="mb-4 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
             <Stat value={characters.data?.items.length ?? "-"} label="Characters" />
             <Stat value={story.data?.scenes.length ?? "-"} label="Scenes" />
             <Stat value={warnings.data?.filter((item) => item.status === "open").length ?? "-"} label="Open warnings" />
             <Stat value={versions.data?.length ?? "-"} label="Versions" />
           </div>
-          <div className="grid three">
+          <div className="grid gap-3 lg:grid-cols-3">
             {[
               ["Characters", "Maintain cast profiles, relations and voice notes.", "characters"],
               ["Storyline", "Structure tomes, chapters, scenes and typed references.", "story"],
@@ -45,22 +41,21 @@ export default function ProjectRoute() {
             ].map(([title, desc, path]) => (
               <Card key={path}>
                 <SectionTitle title={title} />
-                <p className="meta">{desc}</p>
-                <Link className="button" to={`/projects/${projectId}/${path}`}>Open {title}</Link>
+                <p className="mb-3 text-xs leading-5 text-muted">{desc}</p>
+                <Link className="inline-flex min-h-9 items-center justify-center gap-2 rounded-[7px] border border-line bg-surface px-3 py-2 text-sm font-medium text-ink hover:bg-surface-2" to={`/projects/${projectId}/${path}`}>Open {title}</Link>
               </Card>
             ))}
           </div>
-          <div style={{ height: 16 }} />
-          <div className="grid two">
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
             <Card>
               <SectionTitle title="Recent warnings" meta={`${warnings.data?.length ?? 0} total`} />
-              {(warnings.data || []).slice(0, 5).map((warning) => <div className="list-item" key={warning.id}><strong>{warning.title}</strong><small>{warning.message}</small></div>)}
+              <div className="grid gap-2">{(warnings.data || []).slice(0, 5).map((warning) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={warning.id}><strong className="text-sm text-ink">{warning.title}</strong><small className="text-xs text-muted">{warning.message}</small></div>)}</div>
               {warnings.data?.length === 0 ? <EmptyState title="No warnings" description="Run a scan from the Warnings workspace." /> : null}
             </Card>
             <Card>
               <SectionTitle title="Recent production" meta={`${jobs.data?.length ?? 0} jobs · ${exports.data?.length ?? 0} exports`} />
-              <p className="meta">Updated {dateLabel(project.data.updated_at)}</p>
-              <p className="meta">Last opened {dateLabel(project.data.last_opened_at)}</p>
+              <p className="text-xs leading-5 text-muted">Updated {dateLabel(project.data.updated_at)}</p>
+              <p className="text-xs leading-5 text-muted">Last opened {dateLabel(project.data.last_opened_at)}</p>
             </Card>
           </div>
         </>
