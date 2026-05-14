@@ -1,0 +1,36 @@
+{
+  "title": "Studio de Génération",
+  "description": "Lancez des jobs de génération depuis les sources de l'histoire et les providers configurés.",
+  "panels": {
+    "create": {
+      "title": "Génération",
+      "sourceKind": "Type de source",
+      "source": "Source",
+      "selectSource": "Sélectionner source",
+      "model": "Modèle",
+      "defaultModel": "Défaut backend",
+      "notConfigured": "(non configuré)",
+      "mode": "Mode",
+      "separate": "séparé",
+      "grid": "grille",
+      "button": "Lancer le job"
+    },
+    "jobs": {
+      "title": "Jobs",
+      "sourceKind": "Type de source",
+      "progress": "Progression"
+    },
+    "boards": {
+      "title": "Planches"
+    }
+  },
+  "sources": {
+    "tome": "Tome",
+    "chapter": "Chapitre",
+    "scene": "Scène"
+  },
+  "empty": {
+    "noJob": "Aucun job de génération",
+    "noBoard": "Aucune planche générée"
+  }
+}

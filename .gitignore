@@ -1,4 +1,7 @@
 # Shared local data
+#
+kuti-data
+kuti-data/
 kuti-data/db/*.sqlite
 kuti-data/db/*.sqlite-wal
 kuti-data/db/*.sqlite-shm

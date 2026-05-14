@@ -1,0 +1,31 @@
+{
+  "title": "Bibliothèque de ressources",
+  "description": "Importez des fichiers locaux via le backend et liez-les aux entités du projet.",
+  "panels": {
+    "import": {
+      "title": "Import",
+      "sourcePath": "Chemin source",
+      "placeholder": "/home/user/reference.png",
+      "name": "Nom",
+      "tags": "Tags",
+      "button": "Importer la ressource"
+    },
+    "assets": {
+      "title": "Ressources",
+      "count": "{{count}} ressource",
+      "count_plural": "{{count}} ressources"
+    }
+  },
+  "actions": {
+    "open": "Ouvrir",
+    "archive": "Archiver"
+  },
+  "meta": {
+    "size": "octets",
+    "path": "Chemin"
+  },
+  "empty": {
+    "title": "Aucune ressource",
+    "description": "Importez un chemin de fichier local pour le copier dans le répertoire de ressources."
+  }
+}

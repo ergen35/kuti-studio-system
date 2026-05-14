@@ -1,0 +1,19 @@
+{
+  "title": "Warnings Center",
+  "description": "Run backend coherence checks and manage non-blocking continuity warnings.",
+  "actions": {
+    "scan": "Scan",
+    "resolve": "Resolve"
+  },
+  "table": {
+    "warning": "Warning",
+    "kind": "Kind",
+    "severity": "Severity",
+    "status": "Status",
+    "entity": "Entity"
+  },
+  "empty": {
+    "title": "No warnings",
+    "description": "The backend has no active warning records for this project."
+  }
+}

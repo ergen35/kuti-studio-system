@@ -1,0 +1,19 @@
+{
+  "title": "Centre d'Alertes",
+  "description": "Lancez des vérifications de cohérence et gérez les avertissements de continuité.",
+  "actions": {
+    "scan": "Scanner",
+    "resolve": "Résoudre"
+  },
+  "table": {
+    "warning": "Alerte",
+    "kind": "Type",
+    "severity": "Sévérité",
+    "status": "Statut",
+    "entity": "Entité"
+  },
+  "empty": {
+    "title": "Aucune alerte",
+    "description": "Le backend n'a aucun avertissement actif pour ce projet."
+  }
+}

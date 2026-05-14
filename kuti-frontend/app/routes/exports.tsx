@@ -1,44 +1,77 @@
 import { Download, PackagePlus } from "lucide-react";
-import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
-import { Badge, Button, dateLabel, EmptyState, ErrorState, Field, LinkButton, LoadingState, PageHeader, Panel } from "~/components/ui";
+import { Badge, Button, dateLabel, EmptyState, ErrorState, LinkButton, LoadingState, PageHeader, Panel } from "~/components/ui";
+import { FormField } from "~/components/FormField";
 import { api, apiErrorMessage, type ExportFormat, type ExportKind } from "~/lib/api";
 import { invalidateWorkspace, keys } from "~/lib/query";
+import { exportCreateSchema, type ExportCreateInput } from "~/lib/schemas";
 
 export default function ExportsRoute() {
   const { projectId = "" } = useParams();
+  const { t } = useTranslation(['exports', 'common']);
   const exports = useQuery({ queryKey: keys.exports(projectId), queryFn: () => api.exports(projectId) });
-  const [kind, setKind] = useState<ExportKind>("work");
-  const [format, setFormat] = useState<ExportFormat>("json");
-  const [label, setLabel] = useState("Work export");
-  const create = useMutation({ mutationFn: () => api.createExport(projectId, { kind, format, label }), onSuccess: () => invalidateWorkspace(projectId) });
+  
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ExportCreateInput>({
+    resolver: zodResolver(exportCreateSchema),
+    defaultValues: { kind: 'work', format: 'json', label: 'Work export' },
+  });
+  
+  const create = useMutation({ 
+    mutationFn: (data: ExportCreateInput) => api.createExport(projectId, { kind: data.kind as ExportKind, format: data.format as ExportFormat, label: data.label }), 
+    onSuccess: () => { reset(); invalidateWorkspace(projectId); }
+  });
+  const onSubmit = (data: ExportCreateInput) => create.mutate(data);
+
+  const kindOptions = [
+    { value: "work", label: t('panels.create.kinds.work') },
+    { value: "publication", label: t('panels.create.kinds.publication') },
+  ];
+
+  const formatOptions = [
+    { value: "json", label: t('panels.create.formats.json') },
+    { value: "tree", label: t('panels.create.formats.tree') },
+    { value: "zip", label: t('panels.create.formats.zip') },
+  ];
 
   return (
     <AppShell>
-      <PageHeader title="Exports" description="Generate backend work exports in JSON, tree or ZIP format." />
+      <PageHeader title={t('title')} description={t('description')} />
       <div className="grid gap-3 lg:grid-cols-2">
         <Panel>
-          <form className="grid gap-3" onSubmit={(e) => { e.preventDefault(); create.mutate(); }}>
-            <Field label="Kind"><select value={kind} onChange={(e) => setKind(e.target.value as ExportKind)}><option value="work">work</option><option value="publication">publication</option></select></Field>
-            <Field label="Format"><select value={format} onChange={(e) => setFormat(e.target.value as ExportFormat)}><option value="json">json</option><option value="tree">tree</option><option value="zip">zip</option></select></Field>
-            <Field label="Label"><input value={label} onChange={(e) => setLabel(e.target.value)} /></Field>
-            <Button variant="primary"><PackagePlus size={16} /> Create export</Button>
+          <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
+            <FormField label={t('panels.create.kind')} error={errors.kind}>
+              <select {...register('kind')}>
+                {kindOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+            </FormField>
+            <FormField label={t('panels.create.format')} error={errors.format}>
+              <select {...register('format')}>
+                {formatOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+            </FormField>
+            <FormField label={t('panels.create.label')} error={errors.label}>
+              <input {...register('label')} />
+            </FormField>
+            <Button variant="primary" disabled={isSubmitting || create.isPending}><PackagePlus size={16} /> {t('panels.create.button')}</Button>
             {create.error ? <ErrorState message={apiErrorMessage(create.error)} /> : null}
           </form>
         </Panel>
         <Panel>
-          <h2 className="mb-3 text-[15px] font-semibold text-ink">Artifacts</h2>
+          <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.artifacts.title')}</h2>
           {exports.isLoading ? <LoadingState /> : null}
           {exports.error ? <ErrorState message={apiErrorMessage(exports.error)} /> : null}
-          {exports.data?.length === 0 ? <EmptyState title="No export" /> : null}
+          {exports.data?.length === 0 ? <EmptyState title={t('empty.title')} /> : null}
           <div className="grid gap-2">
             {(exports.data || []).map((item) => (
               <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.id}>
                 <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{item.label}</strong><Badge tone={item.status}>{item.status}</Badge></div>
                 <small className="text-xs text-muted">{item.kind} · {item.format} · {dateLabel(item.created_at)}</small>
-                {item.artifact_path ? <LinkButton href={api.fileUrl(`/projects/${projectId}/exports/${item.id}/download`)}><Download size={15} /> Download</LinkButton> : null}
+                {item.artifact_path ? <LinkButton href={api.fileUrl(`/projects/${projectId}/exports/${item.id}/download`)}><Download size={15} /> {t('common:actions.download')}</LinkButton> : null}
               </div>
             ))}
           </div>

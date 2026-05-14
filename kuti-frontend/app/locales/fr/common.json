@@ -1,0 +1,94 @@
+{
+  "appName": "Kuti Studio",
+  "tagline": "Production narrative locale",
+  "nav": {
+    "back": "Retour",
+    "refresh": "Actualiser",
+    "switchLanguage": "Changer de langue"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "archive": "Archiver",
+    "open": "Ouvrir",
+    "clone": "Cloner",
+    "close": "Fermer",
+    "validate": "Valider",
+    "resolve": "Résoudre",
+    "scan": "Scanner",
+    "restore": "Restaurer",
+    "download": "Télécharger",
+    "add": "Ajouter",
+    "import": "Importer",
+    "update": "Mettre à jour",
+    "light": "Clair",
+    "dark": "Sombre",
+    "comfortable": "Confortable",
+    "compact": "Compact"
+  },
+  "status": {
+    "active": "Actif",
+    "draft": "Brouillon",
+    "archived": "Archivé",
+    "maintenance": "Maintenance",
+    "ok": "OK",
+    "pending": "En attente",
+    "running": "En cours",
+    "ready": "Prêt",
+    "failed": "Échec",
+    "resolved": "Résolu",
+    "open": "Ouvert",
+    "critical": "Critique",
+    "warning": "Avertissement",
+    "info": "Info"
+  },
+  "states": {
+    "loading": "Chargement",
+    "loadingDesc": "En attente de la réponse du backend local.",
+    "empty": "Aucune donnée",
+    "error": "Erreur"
+  },
+  "meta": {
+    "updated": "Mis à jour",
+    "opened": "Ouvert",
+    "never": "Jamais",
+    "by": "par",
+    "total": "total"
+  },
+  "sidebar": {
+    "projectHub": "Hub Projet",
+    "dashboard": "Tableau de bord",
+    "characters": "Personnages",
+    "storyline": "Histoire",
+    "generation": "Génération",
+    "assets": "Ressources",
+    "exports": "Exports",
+    "warnings": "Alertes",
+    "versions": "Versions",
+    "settings": "Paramètres"
+  },
+  "backend": {
+    "title": "Backend",
+    "connected": "Connecté",
+    "waiting": "En attente",
+    "version": "Version",
+    "lastCheck": "Dernière vérification",
+    "dataDir": "Répertoire de données",
+    "operational": "Opérationnel",
+    "service": "Service"
+  },
+  "workspace": {
+    "open": "Ouvrir {{name}}",
+    "description": "Description",
+    "actions": "Actions",
+    "details": "Détails"
+  },
+  "fields": {
+    "name": "Nom",
+    "status": "Statut",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le"
+  }
+}

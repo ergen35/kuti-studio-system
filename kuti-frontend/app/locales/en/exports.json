@@ -1,0 +1,28 @@
+{
+  "title": "Exports",
+  "description": "Generate backend work exports in JSON, tree or ZIP format.",
+  "panels": {
+    "create": {
+      "title": "Create export",
+      "kind": "Kind",
+      "kinds": {
+        "work": "work",
+        "publication": "publication"
+      },
+      "format": "Format",
+      "formats": {
+        "json": "json",
+        "tree": "tree",
+        "zip": "zip"
+      },
+      "label": "Label",
+      "button": "Create export"
+    },
+    "artifacts": {
+      "title": "Artifacts"
+    }
+  },
+  "empty": {
+    "title": "No export"
+  }
+}

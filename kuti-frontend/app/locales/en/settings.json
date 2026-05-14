@@ -1,0 +1,13 @@
+{
+  "title": "Project Settings",
+  "description": "Edit backend project metadata and coherence location settings.",
+  "fields": {
+    "name": "Name",
+    "status": "Status",
+    "allowedLocations": "Allowed locations",
+    "locationsPlaceholder": "Moon Docks, Lower City"
+  },
+  "actions": {
+    "save": "Save settings"
+  }
+}

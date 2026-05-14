@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "description": "Le projet {{slug}} se trouve à {{path}}.",
+    "lastOpened": "Dernier ouvert",
+    "updated": "Mis à jour"
+  },
+  "stats": {
+    "characters": "Personnages",
+    "scenes": "Scènes",
+    "warnings": "Alertes ouvertes",
+    "versions": "Versions"
+  },
+  "workspaces": {
+    "characters": {
+      "title": "Personnages",
+      "description": "Gérez les profils, relations et échantillons vocaux."
+    },
+    "storyline": {
+      "title": "Histoire",
+      "description": "Structurez les tomes, chapitres, scènes et références typées."
+    },
+    "generation": {
+      "title": "Génération",
+      "description": "Lancez des jobs de génération d'images ou vidéos depuis l'histoire."
+    },
+    "assets": {
+      "title": "Ressources",
+      "description": "Importez des fichiers locaux et liez-aux aux entités."
+    },
+    "warnings": {
+      "title": "Alertes",
+      "description": "Scannez et résolvez les avertissements de continuité."
+    },
+    "versions": {
+      "title": "Versions",
+      "description": "Créez des sauvegardes, comparez les branches et restaurez."
+    },
+    "exports": {
+      "title": "Exports",
+      "description": "Générez des exports JSON, arborescence ou ZIP."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Éditez les métadonnées et paramètres de cohérence."
+    }
+  },
+  "recent": {
+    "warnings": {
+      "title": "Alertes récentes",
+      "total": "{{count}} total",
+      "empty": {
+        "title": "Aucune alerte",
+        "description": "Lancez un scan depuis l'espace Alertes."
+      }
+    },
+    "production": {
+      "title": "Production récente",
+      "jobs": "jobs",
+      "exports": "exports"
+    }
+  }
+}

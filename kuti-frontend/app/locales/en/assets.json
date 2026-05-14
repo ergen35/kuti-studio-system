@@ -1,0 +1,31 @@
+{
+  "title": "Assets Library",
+  "description": "Import local files through the backend and link them to project entities.",
+  "panels": {
+    "import": {
+      "title": "Import",
+      "sourcePath": "Source path",
+      "placeholder": "/home/user/reference.png",
+      "name": "Name",
+      "tags": "Tags",
+      "button": "Import asset"
+    },
+    "assets": {
+      "title": "Assets",
+      "count": "{{count}} asset",
+      "count_plural": "{{count}} assets"
+    }
+  },
+  "actions": {
+    "open": "Open",
+    "archive": "Archive"
+  },
+  "meta": {
+    "size": "bytes",
+    "path": "Path"
+  },
+  "empty": {
+    "title": "No asset",
+    "description": "Import a local file path to copy it into the project assets directory."
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Kuti Studio",
+  "subtitle": "Production narrative locale",
+  "createProject": {
+    "title": "Créer un projet",
+    "meta": "Stocké dans kuti-data/projects",
+    "placeholder": "Nouveau projet manga",
+    "button": "Créer et ouvrir",
+    "success": "Projet créé avec succès"
+  },
+  "backend": {
+    "title": "Backend",
+    "status": {
+      "connected": "Connecté",
+      "waiting": "En attente"
+    }
+  },
+  "projects": {
+    "title": "Projets",
+    "count": "{{count}} projet",
+    "count_plural": "{{count}} projets",
+    "empty": {
+      "title": "Aucun projet",
+      "description": "Créez-en un depuis le formulaire ci-dessus pour initialiser le stockage via le backend."
+    },
+    "actions": {
+      "open": "Ouvrir",
+      "clone": "Cloner",
+      "archive": "Archiver",
+      "dashboard": "Tableau de bord"
+    },
+    "meta": {
+      "path": "Chemin",
+      "updated": "Mis à jour",
+      "opened": "Ouvert"
+    }
+  },
+  "errors": {
+    "createFailed": "Échec de la création du projet"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "title": "Histoire",
+  "description": "Construisez les tomes, chapitres et scènes. Les références typées comme @character:slug sont indexées par le backend.",
+  "panels": {
+    "outline": {
+      "title": "Plan",
+      "count": "{{count}} tome",
+      "count_plural": "{{count}} tomes"
+    },
+    "sceneEditor": {
+      "title": "Éditeur de scène"
+    },
+    "references": {
+      "title": "Références et cohérence",
+      "count": "{{count}} référence orpheline",
+      "count_plural": "{{count}} références orphelines",
+      "empty": {
+        "title": "Aucune référence orpheline",
+        "description": "Les références indexées depuis le contenu des scènes sont résolvables."
+      }
+    },
+    "metadata": {
+      "title": "Métadonnées"
+    }
+  },
+  "actions": {
+    "addTome": "Ajouter tome",
+    "addChapter": "Ajouter chapitre",
+    "addScene": "Ajouter scène",
+    "deleteScene": "Supprimer scène",
+    "saveScene": "Enregistrer la scène"
+  },
+  "fields": {
+    "title": "Titre",
+    "type": "Type",
+    "location": "Lieu",
+    "summary": "Résumé",
+    "content": "Contenu",
+    "characters": "Personnages",
+    "tags": "Tags",
+    "notes": "Notes"
+  },
+  "empty": {
+    "noTome": {
+      "title": "Aucun tome",
+      "description": "Créez un tome, puis ajoutez des chapitres et scènes."
+    },
+    "noSceneSelected": "Aucune scène sélectionnée"
+  },
+  "editor": {
+    "placeholder": "Écrivez le contenu avec des références @character:slug"
+  },
+  "meta": {
+    "noLocation": "Aucun lieu",
+    "noCharacters": "Aucun personnage"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "title": "Generation Studio",
+  "description": "Launch generation jobs from real story sources and configured backend providers.",
+  "panels": {
+    "create": {
+      "title": "Generation",
+      "sourceKind": "Source kind",
+      "source": "Source",
+      "selectSource": "Select source",
+      "model": "Model",
+      "defaultModel": "Backend default",
+      "notConfigured": "(not configured)",
+      "mode": "Mode",
+      "separate": "separate",
+      "grid": "grid",
+      "button": "Launch job"
+    },
+    "jobs": {
+      "title": "Jobs",
+      "sourceKind": "Source kind",
+      "progress": "Progress"
+    },
+    "boards": {
+      "title": "Boards"
+    }
+  },
+  "sources": {
+    "tome": "Tome",
+    "chapter": "Chapter",
+    "scene": "Scene"
+  },
+  "empty": {
+    "noJob": "No generation job",
+    "noBoard": "No board generated yet"
+  }
+}

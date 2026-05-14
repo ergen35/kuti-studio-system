@@ -4,7 +4,11 @@ import { useEffect } from "react";
 import type { Route } from "./+types/root";
 import { queryClient } from "~/lib/query";
 import { useUiStore } from "~/stores/ui";
+import { initI18n } from "~/i18n/config";
 import "~/styles/app.css";
+
+// Initialize i18n before app render
+void initI18n();
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

@@ -1,0 +1,94 @@
+{
+  "appName": "Kuti Studio",
+  "tagline": "Local narrative production",
+  "nav": {
+    "back": "Back",
+    "refresh": "Refresh",
+    "switchLanguage": "Switch language"
+  },
+  "actions": {
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "archive": "Archive",
+    "open": "Open",
+    "clone": "Clone",
+    "close": "Close",
+    "validate": "Validate",
+    "resolve": "Resolve",
+    "scan": "Scan",
+    "restore": "Restore",
+    "download": "Download",
+    "add": "Add",
+    "import": "Import",
+    "update": "Update",
+    "light": "Light",
+    "dark": "Dark",
+    "comfortable": "Comfortable",
+    "compact": "Compact"
+  },
+  "status": {
+    "active": "Active",
+    "draft": "Draft",
+    "archived": "Archived",
+    "maintenance": "Maintenance",
+    "ok": "OK",
+    "pending": "Pending",
+    "running": "Running",
+    "ready": "Ready",
+    "failed": "Failed",
+    "resolved": "Resolved",
+    "open": "Open",
+    "critical": "Critical",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "states": {
+    "loading": "Loading",
+    "loadingDesc": "Waiting for the local backend response.",
+    "empty": "No data",
+    "error": "Error"
+  },
+  "meta": {
+    "updated": "Updated",
+    "opened": "Opened",
+    "never": "Never",
+    "by": "by",
+    "total": "total"
+  },
+  "sidebar": {
+    "projectHub": "Project Hub",
+    "dashboard": "Dashboard",
+    "characters": "Characters",
+    "storyline": "Storyline",
+    "generation": "Generation",
+    "assets": "Assets",
+    "exports": "Exports",
+    "warnings": "Warnings",
+    "versions": "Versions",
+    "settings": "Settings"
+  },
+  "backend": {
+    "title": "Backend",
+    "connected": "Connected",
+    "waiting": "Waiting",
+    "version": "Version",
+    "lastCheck": "Last check",
+    "dataDir": "Data directory",
+    "operational": "Operational",
+    "service": "Service"
+  },
+  "workspace": {
+    "open": "Open {{name}}",
+    "description": "Description",
+    "actions": "Actions",
+    "details": "Details"
+  },
+  "fields": {
+    "name": "Name",
+    "status": "Status",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at"
+  }
+}

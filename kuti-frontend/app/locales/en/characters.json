@@ -1,0 +1,61 @@
+{
+  "title": "Characters",
+  "description": "Profiles, relations and voice notes are persisted directly through the backend.",
+  "panels": {
+    "cast": {
+      "title": "Cast",
+      "count": "{{count}} profile",
+      "count_plural": "{{count}} profiles"
+    },
+    "profile": {
+      "title": "Profile"
+    },
+    "inspector": {
+      "title": "Inspector",
+      "meta": "Relations"
+    }
+  },
+  "actions": {
+    "addCharacter": "Add character",
+    "archive": "Archive",
+    "delete": "Delete",
+    "saveProfile": "Save profile"
+  },
+  "fields": {
+    "name": "Name",
+    "alias": "Alias",
+    "narrativeRole": "Narrative role",
+    "description": "Description",
+    "physicalDescription": "Physical description",
+    "traits": "Traits",
+    "palette": "Palette",
+    "costumeElements": "Costume elements",
+    "personality": "Personality",
+    "narrativeArc": "Narrative arc",
+    "tags": "Tags"
+  },
+  "relations": {
+    "title": "Relations",
+    "count": "{{count}} relation",
+    "count_plural": "{{count}} relations",
+    "add": {
+      "title": "Add relation",
+      "target": "Target",
+      "selectTarget": "Select character",
+      "type": "Type",
+      "strength": "Strength"
+    }
+  },
+  "voiceSamples": {
+    "title": "Voice samples",
+    "count": "{{count}} sample",
+    "count_plural": "{{count}} samples"
+  },
+  "empty": {
+    "noSelection": "No selection",
+    "noCharacter": {
+      "title": "No character",
+      "description": "Create the first profile to start the cast."
+    }
+  }
+}

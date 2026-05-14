@@ -1,0 +1,13 @@
+{
+  "title": "Paramètres du Projet",
+  "description": "Éditez les métadonnées du projet et les lieux de cohérence.",
+  "fields": {
+    "name": "Nom",
+    "status": "Statut",
+    "allowedLocations": "Lieux autorisés",
+    "locationsPlaceholder": "Docks Lunaires, Basse Ville"
+  },
+  "actions": {
+    "save": "Enregistrer les paramètres"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Exports",
+  "description": "Générez des exports de travail en JSON, arborescence ou ZIP.",
+  "panels": {
+    "create": {
+      "title": "Créer export",
+      "kind": "Type",
+      "kinds": {
+        "work": "travail",
+        "publication": "publication"
+      },
+      "format": "Format",
+      "formats": {
+        "json": "json",
+        "tree": "arborescence",
+        "zip": "zip"
+      },
+      "label": "Libellé",
+      "button": "Créer l'export"
+    },
+    "artifacts": {
+      "title": "Artifacts"
+    }
+  },
+  "empty": {
+    "title": "Aucun export"
+  }
+}

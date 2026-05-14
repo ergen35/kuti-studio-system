@@ -1,0 +1,29 @@
+{
+  "title": "Historique des Versions",
+  "description": "Créez des sauvegardes, inspectez les branches et restaurez les états précédents.",
+  "panels": {
+    "create": {
+      "title": "Créer version",
+      "branch": "Branche",
+      "label": "Libellé",
+      "button": "Créer version"
+    },
+    "branches": {
+      "title": "Branches",
+      "count": "{{count}} conservée(s)",
+      "latest": "dernier"
+    }
+  },
+  "table": {
+    "version": "Version",
+    "branch": "Branche",
+    "created": "Créé"
+  },
+  "actions": {
+    "restore": "Restaurer"
+  },
+  "empty": {
+    "title": "Aucune version",
+    "description": "Créez une sauvegarde depuis le formulaire ci-dessus."
+  }
+}

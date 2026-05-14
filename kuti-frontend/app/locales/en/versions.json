@@ -1,0 +1,29 @@
+{
+  "title": "Version History",
+  "description": "Create snapshots, inspect retained branches and restore previous project states.",
+  "panels": {
+    "create": {
+      "title": "Create version",
+      "branch": "Branch",
+      "label": "Label",
+      "button": "Create version"
+    },
+    "branches": {
+      "title": "Branches",
+      "count": "{{count}} retained",
+      "latest": "latest"
+    }
+  },
+  "table": {
+    "version": "Version",
+    "branch": "Branch",
+    "created": "Created"
+  },
+  "actions": {
+    "restore": "Restore"
+  },
+  "empty": {
+    "title": "No version",
+    "description": "Create a checkpoint from the form above."
+  }
+}

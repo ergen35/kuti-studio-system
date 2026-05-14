@@ -1,0 +1,57 @@
+{
+  "title": "Storyline",
+  "description": "Build tomes, chapters and scenes. Typed references like @character:slug are indexed by the backend.",
+  "panels": {
+    "outline": {
+      "title": "Outline",
+      "count": "{{count}} tome",
+      "count_plural": "{{count}} tomes"
+    },
+    "sceneEditor": {
+      "title": "Scene editor"
+    },
+    "references": {
+      "title": "References and coherence",
+      "count": "{{count}} orphan reference",
+      "count_plural": "{{count}} orphan references",
+      "empty": {
+        "title": "No orphan reference",
+        "description": "References indexed from scene content are currently resolvable."
+      }
+    },
+    "metadata": {
+      "title": "Metadata"
+    }
+  },
+  "actions": {
+    "addTome": "Add tome",
+    "addChapter": "Add chapter",
+    "addScene": "Add scene",
+    "deleteScene": "Delete scene",
+    "saveScene": "Save scene"
+  },
+  "fields": {
+    "title": "Title",
+    "type": "Type",
+    "location": "Location",
+    "summary": "Summary",
+    "content": "Content",
+    "characters": "Characters",
+    "tags": "Tags",
+    "notes": "Notes"
+  },
+  "empty": {
+    "noTome": {
+      "title": "No tome",
+      "description": "Create a tome, then add chapters and scenes."
+    },
+    "noSceneSelected": "No scene selected"
+  },
+  "editor": {
+    "placeholder": "Write scene content with @character:slug references"
+  },
+  "meta": {
+    "noLocation": "No location",
+    "noCharacters": "No characters"
+  }
+}

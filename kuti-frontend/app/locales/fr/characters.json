@@ -1,0 +1,61 @@
+{
+  "title": "Personnages",
+  "description": "Les profils, relations et échantillons vocaux sont persistés directement via le backend.",
+  "panels": {
+    "cast": {
+      "title": "Distribution",
+      "count": "{{count}} profil",
+      "count_plural": "{{count}} profils"
+    },
+    "profile": {
+      "title": "Profil"
+    },
+    "inspector": {
+      "title": "Inspecteur",
+      "meta": "Relations"
+    }
+  },
+  "actions": {
+    "addCharacter": "Ajouter personnage",
+    "archive": "Archiver",
+    "delete": "Supprimer",
+    "saveProfile": "Enregistrer le profil"
+  },
+  "fields": {
+    "name": "Nom",
+    "alias": "Alias",
+    "narrativeRole": "Rôle narratif",
+    "description": "Description",
+    "physicalDescription": "Description physique",
+    "traits": "Traits",
+    "palette": "Palette",
+    "costumeElements": "Éléments de costume",
+    "personality": "Personnalité",
+    "narrativeArc": "Arc narratif",
+    "tags": "Tags"
+  },
+  "relations": {
+    "title": "Relations",
+    "count": "{{count}} relation",
+    "count_plural": "{{count}} relations",
+    "add": {
+      "title": "Ajouter relation",
+      "target": "Cible",
+      "selectTarget": "Sélectionner personnage",
+      "type": "Type",
+      "strength": "Force"
+    }
+  },
+  "voiceSamples": {
+    "title": "Échantillons vocaux",
+    "count": "{{count}} échantillon",
+    "count_plural": "{{count}} échantillons"
+  },
+  "empty": {
+    "noSelection": "Aucune sélection",
+    "noCharacter": {
+      "title": "Aucun personnage",
+      "description": "Créez le premier profil pour démarrer la distribution."
+    }
+  }
+}
