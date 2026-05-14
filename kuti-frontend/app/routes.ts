@@ -1,16 +1,14 @@
 import { index, route, type RouteConfig } from "@react-router/dev/routes";
 
 export default [
-  index("./routes/hub.tsx"),
-  route("projects/:projectId", "./routes/project.tsx", [
-    index("./routes/project.dashboard.tsx"),
-    route("characters", "./routes/project.characters.tsx"),
-    route("story", "./routes/project.story.tsx"),
-    route("generation", "./routes/project.generation.tsx"),
-    route("assets", "./routes/project.assets.tsx"),
-    route("exports", "./routes/project.exports.tsx"),
-    route("warnings", "./routes/project.warnings.tsx"),
-    route("versions", "./routes/project.versions.tsx"),
-    route("settings", "./routes/project.settings.tsx"),
-  ]),
+  index("routes/home.tsx"),
+  route("projects/:projectId", "routes/project.tsx"),
+  route("projects/:projectId/characters", "routes/characters.tsx"),
+  route("projects/:projectId/story", "routes/story.tsx"),
+  route("projects/:projectId/assets", "routes/assets.tsx"),
+  route("projects/:projectId/generation", "routes/generation.tsx"),
+  route("projects/:projectId/warnings", "routes/warnings.tsx"),
+  route("projects/:projectId/versions", "routes/versions.tsx"),
+  route("projects/:projectId/exports", "routes/exports.tsx"),
+  route("projects/:projectId/settings", "routes/settings.tsx"),
 ] satisfies RouteConfig;

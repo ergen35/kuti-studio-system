@@ -1,0 +1,20 @@
+import { Archive, Link2, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router";
+import { AppShell } from "~/components/layout";
+import { Badge, Button, EmptyState, ErrorState, Field, LoadingState, Panel, SectionTitle, dateLabel } from "~/components/ui";
+import { api, apiErrorMessage, csv } from "~/lib/api";
+import { invalidateWorkspace, keys } from "~/lib/query";
+
+export default function AssetsRoute() {
+  const { projectId = "" } = useParams();
+  const assets = useQuery({ queryKey: keys.assets(projectId), queryFn: () => api.assets(projectId) });
+  const [sourcePath, setSourcePath] = useState("");
+  const [name, setName] = useState("");
+  const [tags, setTags] = useState("");
+  const importAsset = useMutation({ mutationFn: () => api.importAsset(projectId, { source_path: sourcePath, name: name || undefined, tags_json: csv(tags) }), onSuccess: () => { setSourcePath(""); setName(""); setTags(""); invalidateWorkspace(projectId); } });
+  const archive = useMutation({ mutationFn: (id: string) => api.archiveAsset(projectId, id), onSuccess: () => invalidateWorkspace(projectId) });
+  const remove = useMutation({ mutationFn: (id: string) => api.deleteAsset(projectId, id), onSuccess: () => invalidateWorkspace(projectId) });
+  return <AppShell><div className="page-header"><div><h1>Assets Library</h1><p>Import local files through the backend and link them to project entities.</p></div></div><div className="workspace two"><Panel><SectionTitle title="Import" /><form className="form" onSubmit={(e) => { e.preventDefault(); importAsset.mutate(); }}><Field label="Source path"><input value={sourcePath} onChange={(e) => setSourcePath(e.target.value)} placeholder="/home/user/reference.png" /></Field><Field label="Name"><input value={name} onChange={(e) => setName(e.target.value)} /></Field><Field label="Tags"><input value={tags} onChange={(e) => setTags(e.target.value)} /></Field><Button variant="primary" disabled={!sourcePath || importAsset.isPending}><Plus size={16} /> Import asset</Button>{importAsset.error ? <ErrorState message={apiErrorMessage(importAsset.error)} /> : null}</form></Panel><Panel><SectionTitle title="Assets" meta={`${assets.data?.items.length ?? 0}`} />{assets.isLoading ? <LoadingState /> : null}{assets.error ? <ErrorState message={apiErrorMessage(assets.error)} /> : null}{assets.data?.items.length === 0 ? <EmptyState title="No asset" description="Import a local file path to copy it into the project assets directory." /> : null}<div className="grid two">{(assets.data?.items || []).map((asset) => <article className="card" key={asset.id}><div className="split-actions"><strong>{asset.name}</strong><Badge>{asset.status}</Badge></div><p className="meta">{asset.original_filename} · {asset.mime_type}</p><p className="meta">{asset.size_bytes} bytes · {dateLabel(asset.updated_at)}</p><div className="toolbar"><a className="button" href={api.fileUrl(`/projects/${projectId}/assets/${asset.id}/file`)} target="_blank" rel="noreferrer"><Link2 size={15} /> Open</a><Button onClick={() => archive.mutate(asset.id)}><Archive size={15} /> Archive</Button><Button variant="danger" onClick={() => remove.mutate(asset.id)}><Trash2 size={15} /></Button></div></article>)}</div></Panel></div></AppShell>;
+}

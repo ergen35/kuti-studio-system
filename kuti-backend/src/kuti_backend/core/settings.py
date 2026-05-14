@@ -22,7 +22,10 @@ class Settings(BaseSettings):
     environment: str = Field(default="development")
     locale: str = Field(default="en")
     data_dir: Path = Field(default_factory=default_data_dir)
-    trusted_origins_raw: str = Field(default="", validation_alias="TRUSTED_ORIGINS")
+    trusted_origins_raw: str = Field(
+        default="http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:5175,http://127.0.0.1:5175",
+        validation_alias="TRUSTED_ORIGINS",
+    )
 
     @property
     def project_data_dir(self) -> Path:

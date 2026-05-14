@@ -1,33 +1,20 @@
 import { reactRouter } from "@react-router/dev/vite";
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
-import { resolve } from "node:path";
+import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 
-function reactStatelySubpathResolver() {
-  return {
-    name: "react-stately-subpath-resolver",
-    resolveId(source: string) {
-      if (!source.startsWith("react-stately/")) {
-        return null;
-      }
-
-      const subpath = source.slice("react-stately/".length);
-      return resolve("node_modules/react-stately/dist/exports", `${subpath}.js`);
-    },
-  };
-}
-
 export default defineConfig({
-  plugins: [tailwindcss(), react(), reactRouter(), reactStatelySubpathResolver()],
-  ssr: {
-    noExternal: [
-      "@adobe/react-spectrum",
-      "react-aria",
-      "react-aria-components",
-      "react-stately",
-      "@spectrum-icons/ui",
-      "@spectrum-icons/workflow",
-    ],
+  plugins: [reactRouter()],
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      "~": fileURLToPath(new URL("./app", import.meta.url)),
+    },
   },
 });

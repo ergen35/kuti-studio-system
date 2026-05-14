@@ -6,3 +6,4 @@ kuti-data/db/*.sqlite-journal
 
 node_modules
 build
+.react-router
