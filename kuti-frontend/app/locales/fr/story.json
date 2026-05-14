@@ -1,5 +1,12 @@
 {
   "title": "Histoire",
+  "createChapter": {
+    "title": "Nouveau chapitre"
+  },
+  "createTome": {
+    "title": "Nouveau tome",
+    "titlePlaceholder": "Ex. La Prophétie Oubliée"
+  },
   "description": "Construisez les tomes, chapitres et scènes. Les références typées comme @character:slug sont indexées par le backend.",
   "panels": {
     "outline": {
@@ -28,7 +35,11 @@
     "addChapter": "Ajouter chapitre",
     "addScene": "Ajouter scène",
     "deleteScene": "Supprimer scène",
-    "saveScene": "Enregistrer la scène"
+    "saveScene": "Enregistrer la scène",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "creating": "Création..."
   },
   "fields": {
     "title": "Titre",
@@ -61,6 +72,81 @@
         "asset": "Asset"
       }
     }
+  },
+  "chapter": {
+    "select": "Sélectionner un chapitre",
+    "number": "Chapitre {{number}}",
+    "shortNumber": "C.{{number}}",
+    "stats": {
+      "scenes": "{{count}} scène",
+      "scenes_plural": "{{count}} scènes"
+    },
+    "scenes": "Scènes",
+    "synopsis": "Synopsis",
+    "navigation": {
+      "title": "Chapitres",
+      "empty": "Aucun chapitre"
+    },
+    "notFound": "Chapitre non trouvé",
+    "backToTome": "Retour au tome",
+    "empty": {
+      "noScenes": {
+        "title": "Aucune scène",
+        "description": "Ajoutez des scènes à ce chapitre."
+      }
+    }
+  },
+  "scene": {
+    "select": "Sélectionner une scène",
+    "number": "Scène {{number}}",
+    "shortNumber": "S.{{number}}",
+    "navigation": {
+      "title": "Scènes",
+      "empty": "Aucune scène"
+    },
+    "notFound": "Scène non trouvée",
+    "backToChapter": "Retour au chapitre",
+    "lastModified": "Dernière modification",
+    "unsavedChanges": "Modifications non enregistrées"
+  },
+  "tome": {
+    "select": "Sélectionner un tome",
+    "number": "Tome {{number}}",
+    "shortNumber": "T.{{number}}",
+    "stats": {
+      "chapters": "{{count}} chapitre",
+      "chapters_plural": "{{count}} chapitres",
+      "scenes": "{{count}} scène",
+      "scenes_plural": "{{count}} scènes"
+    },
+    "lastModified": "Dernière modification",
+    "scenesCount": "scène",
+    "scenesCount_plural": "scènes",
+    "noScenes": "Aucune scène",
+    "synopsis": "Synopsis",
+    "chapters": "Chapitres",
+    "navigation": {
+      "title": "Autres tomes",
+      "empty": "Aucun autre tome"
+    },
+    "notFound": "Tome non trouvé",
+    "backToStory": "Retour aux tomes"
+  },
+  "status": {
+    "draft": "En préparation",
+    "active": "En cours",
+    "archived": "Terminé"
+  },
+  "empty": {
+    "noTome": {
+      "title": "Aucun tome",
+      "description": "Créez un tome, puis ajoutez des chapitres et scènes."
+    },
+    "noChapter": {
+      "title": "Aucun chapitre",
+      "description": "Ajoutez des chapitres à ce tome."
+    },
+    "noSceneSelected": "Aucune scène sélectionnée"
   },
   "meta": {
     "noLocation": "Aucun lieu",

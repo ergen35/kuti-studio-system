@@ -1,145 +1,252 @@
-import { Plus, Save, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
-import { clsx } from "clsx";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "~/hooks/useTranslation";
-import { AppShell } from "~/components/layout";
-import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, PageHeader, SectionTitle, toCsv } from "~/components/ui";
-import { FormField } from "~/components/FormField";
-import { LexicalEditor } from "~/components/editor";
-import { api, apiErrorMessage, csv, type Scene } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
-import { sceneSchema, type SceneInput } from "~/lib/schemas";
-import "~/components/editor/styles.css";
+import { Plus, Library, X } from 'lucide-react';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useParams, useNavigate } from 'react-router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useTranslation } from '~/hooks/useTranslation';
+import { AppShell } from '~/components/layout';
+import { Button, ErrorState, LoadingState } from '~/components/ui';
+import { FormField } from '~/components/FormField';
+import { TomeCardGrid } from '~/components/story';
+import { api, apiErrorMessage } from '~/lib/api';
+import { invalidateWorkspace, keys } from '~/lib/query';
 
-const listItemClass = "grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5 text-left transition-colors hover:border-accent";
+// Schema for creating a new tome
+const createTomeSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+});
 
-export default function StoryRoute() {
-  const { projectId = "" } = useParams();
-  const { t } = useTranslation(['story', 'common']);
-  const story = useQuery({ queryKey: keys.story(projectId), queryFn: () => api.story(projectId) });
-  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
-  const selectedScene = useMemo(() => story.data?.scenes.find((scene) => scene.id === selectedSceneId) || story.data?.scenes[0] || null, [story.data, selectedSceneId]);
+type CreateTomeInput = z.infer<typeof createTomeSchema>;
 
-  const createTome = useMutation({ mutationFn: () => api.createTome(projectId, { title: `${t('sources.tome')} ${(story.data?.tomes.length || 0) + 1}`, order_index: story.data?.tomes.length || 0 }), onSuccess: () => invalidateWorkspace(projectId) });
-  const createChapter = useMutation({ mutationFn: (tome_id: string) => api.createChapter(projectId, { tome_id, title: `${t('sources.chapter')} ${(story.data?.chapters.length || 0) + 1}`, order_index: story.data?.chapters.length || 0 }), onSuccess: () => invalidateWorkspace(projectId) });
-  const createScene = useMutation({ mutationFn: ({ tome_id, chapter_id }: { tome_id: string; chapter_id: string }) => api.createScene(projectId, { tome_id, chapter_id, title: `${t('sources.scene')} ${(story.data?.scenes.length || 0) + 1}`, order_index: story.data?.scenes.length || 0 }), onSuccess: (scene) => { setSelectedSceneId(scene.id); invalidateWorkspace(projectId); } });
-  const updateScene = useMutation({ mutationFn: ({ id, body }: { id: string; body: Partial<Scene> }) => api.updateScene(projectId, id, body), onSuccess: () => invalidateWorkspace(projectId) });
-  const deleteScene = useMutation({ mutationFn: (id: string) => api.deleteScene(projectId, id), onSuccess: () => { setSelectedSceneId(null); invalidateWorkspace(projectId); } });
-
+// Create Tome Modal
+function CreateTomeModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: CreateTomeInput) => void;
+  isLoading: boolean;
+}) {
+  const { t } = useTranslation('story');
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateTomeInput>({
+    resolver: zodResolver(createTomeSchema),
+    defaultValues: { title: '' },
+  });
+  
+  const overlayRef = useRef<HTMLDivElement>(null);
+  
+  // Close on escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+  
+  // Reset form when opened
+  useEffect(() => {
+    if (isOpen) {
+      reset({ title: '' });
+    }
+  }, [isOpen, reset]);
+  
+  const handleFormSubmit = (data: CreateTomeInput) => {
+    onSubmit(data);
+  };
+  
+  if (!isOpen) return null;
+  
   return (
-    <AppShell>
-      <PageHeader title={t('title')} description={t('description')} />
-      {story.isLoading ? <LoadingState /> : null}
-      {story.error ? <ErrorState message={apiErrorMessage(story.error)} /> : null}
-      <div className="grid items-start gap-3 xl:grid-cols-[310px_minmax(0,1fr)_340px]">
-        <Panel>
-          <SectionTitle title={t('panels.outline.title')} meta={`${story.data?.tomes.length ?? 0} ${t('panels.outline.count', { count: story.data?.tomes.length ?? 0 })}`} actions={<Button variant="primary" onClick={() => createTome.mutate()}><Plus size={15} /></Button>} />
-          <div className="grid gap-2">
-            {(story.data?.tomes || []).map((tome) => {
-              const chapters = story.data?.chapters.filter((chapter) => chapter.tome_id === tome.id) || [];
-              return <div className={listItemClass} key={tome.id}>
-                <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{tome.title}</strong><Button onClick={() => createChapter.mutate(tome.id)}><Plus size={14} /></Button></div>
-                {chapters.map((chapter) => {
-                  const scenes = story.data?.scenes.filter((scene) => scene.chapter_id === chapter.id) || [];
-                  return <div key={chapter.id} className="mt-2 grid gap-1.5">
-                    <div className="flex items-center justify-between gap-2"><small className="text-xs text-muted">{chapter.title}</small><Button onClick={() => createScene.mutate({ tome_id: tome.id, chapter_id: chapter.id })}><Plus size={14} /></Button></div>
-                    {scenes.map((scene) => <button key={scene.id} className={clsx(listItemClass, "w-full", selectedScene?.id === scene.id && "border-accent shadow-[inset_3px_0_0_var(--accent)]")} onClick={() => setSelectedSceneId(scene.id)}><strong className="text-sm text-ink">{scene.title}</strong><small className="text-xs text-muted">{scene.slug}</small></button>)}
-                  </div>;
-                })}
-              </div>;
-            })}
+    <div 
+      ref={overlayRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm"
+      onClick={(e) => e.target === overlayRef.current && onClose()}
+    >
+      <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-surface shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/30">
+          <h2 className="text-lg font-semibold text-ink">
+            {t('createTome.title') || 'Nouveau tome'}
+          </h2>
+          <Button variant="ghost" onClick={onClose} className="p-1 h-auto">
+            <X size={20} />
+          </Button>
+        </div>
+        
+        {/* Form */}
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 space-y-4">
+          <FormField 
+            label={t('fields.title')} 
+            error={errors.title}
+          >
+            <input
+              {...register('title')}
+              autoFocus
+              className="w-full"
+              placeholder={t('createTome.titlePlaceholder') || 'Ex: La Prophétie Oubliée'}
+            />
+          </FormField>
+          
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button 
+              variant="ghost" 
+              onClick={onClose}
+              disabled={isLoading}
+              type="button"
+            >
+              {t('actions.cancel') || 'Annuler'}
+            </Button>
+            <Button 
+              variant="primary"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  {t('actions.creating') || 'Création...'}
+                </>
+              ) : (
+                t('actions.save') || 'Enregistrer'
+              )}
+            </Button>
           </div>
-          {story.data?.tomes.length === 0 ? <EmptyState title={t('empty.noTome.title')} description={t('empty.noTome.description')} /> : null}
-        </Panel>
-        <Panel>
-          <SectionTitle title={t('panels.sceneEditor.title')} meta={selectedScene?.slug} actions={selectedScene ? <Button variant="danger" onClick={() => deleteScene.mutate(selectedScene.id)}><Trash2 size={15} /></Button> : null} />
-          {selectedScene ? <SceneForm scene={selectedScene} saving={updateScene.isPending} onSave={(body) => updateScene.mutate({ id: selectedScene.id, body })} /> : <EmptyState title={t('empty.noSceneSelected')} />}
-          {updateScene.error ? <ErrorState message={apiErrorMessage(updateScene.error)} /> : null}
-        </Panel>
-        <Panel>
-          <SectionTitle title={t('panels.references.title')} meta={`${story.data?.orphan_references.length ?? 0} ${t('panels.references.count', { count: story.data?.orphan_references.length ?? 0 })}`} />
-          <div className="grid gap-2">{(story.data?.orphan_references || []).map((orphan) => <div className={listItemClass} key={orphan.reference.id}><strong className="text-sm text-ink">{orphan.reference.raw_token}</strong><small className="text-xs text-muted">{orphan.reason}</small></div>)}</div>
-          {(story.data?.orphan_references.length || 0) === 0 ? <EmptyState title={t('panels.references.empty.title')} description={t('panels.references.empty.description')} /> : null}
-          {selectedScene ? <><SectionTitle title={t('panels.metadata.title')} /><div className={listItemClass}><Badge>{selectedScene.status}</Badge><small className="text-xs text-muted">{selectedScene.location || t('meta.noLocation')}</small><small className="text-xs text-muted">{toCsv(selectedScene.characters_json) || t('meta.noCharacters')}</small></div></> : null}
-        </Panel>
+        </form>
       </div>
-    </AppShell>
+    </div>
   );
 }
 
-function SceneForm({ scene, saving, onSave }: { scene: Scene; saving: boolean; onSave: (body: Partial<Scene>) => void }) {
-  const { t } = useTranslation('story');
-  const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<SceneInput>({
-    resolver: zodResolver(sceneSchema),
-    defaultValues: {
-      title: scene.title,
-      scene_type: scene.scene_type,
-      location: scene.location,
-      summary: scene.summary,
-      content: scene.content,
-      characters_json: toCsv(scene.characters_json),
-      tags_json: toCsv(scene.tags_json),
-      notes: scene.notes,
-    },
+export default function StoryRoute() {
+  const { projectId = '' } = useParams();
+  const navigate = useNavigate();
+  const { t } = useTranslation(['story', 'common']);
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Fetch story data
+  const story = useQuery({ 
+    queryKey: keys.story(projectId), 
+    queryFn: () => api.story(projectId) 
   });
-
-  const onSubmit = (data: SceneInput) => onSave({
-    title: data.title,
-    scene_type: data.scene_type,
-    location: data.location,
-    summary: data.summary,
-    content: data.content,
-    characters_json: csv(data.characters_json),
-    tags_json: csv(data.tags_json),
-    notes: data.notes,
+  
+  // Create tome mutation
+  const createTome = useMutation({ 
+    mutationFn: (body: CreateTomeInput) => api.createTome(projectId, { 
+      title: body.title, 
+      order_index: story.data?.tomes.length || 0 
+    }), 
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+      setIsModalOpen(false);
+    }
   });
+  
+  // Calculate tome stats
+  const tomeStats = useMemo(() => {
+    if (!story.data) return [];
+    
+    const { tomes, chapters, scenes } = story.data;
+    
+    return tomes
+      .map((tome) => {
+        const tomeChapters = chapters.filter(c => c.tome_id === tome.id);
+        const tomeScenes = scenes.filter(s => s.tome_id === tome.id);
+        
+        // Calculate last modified date
+        const lastSceneUpdate = tomeScenes.length > 0 
+          ? Math.max(...tomeScenes.map(s => new Date(s.updated_at).getTime()))
+          : new Date(tome.updated_at).getTime();
+        
+        return {
+          ...tome,
+          chapterCount: tomeChapters.length,
+          sceneCount: tomeScenes.length,
+          lastModified: new Date(lastSceneUpdate),
+        };
+      })
+      .sort((a, b) => a.order_index - b.order_index);
+  }, [story.data]);
+  
+  const handleSelectTome = (tomeId: string) => {
+    navigate(`/projects/${projectId}/story/${tomeId}`);
+  };
+  
+  const handleCreateClick = () => {
+    setIsModalOpen(true);
+  };
+  
+  const handleCreateSubmit = (data: CreateTomeInput) => {
+    createTome.mutate(data);
+  };
 
   return (
-    <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
-      <FormField label={t('fields.title')} error={errors.title}>
-        <input {...register('title')} />
-      </FormField>
-      <div className="grid gap-3 lg:grid-cols-2">
-        <FormField label={t('fields.type')} error={errors.scene_type}>
-          <input {...register('scene_type')} />
-        </FormField>
-        <FormField label={t('fields.location')} error={errors.location}>
-          <input {...register('location')} />
-        </FormField>
+    <AppShell>
+      {/* Header with decorative element */}
+      <div className="flex items-start justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-accent/10 text-accent">
+              <Library size={20} />
+            </div>
+            <h1 className="text-2xl font-semibold text-ink">{t('title')}</h1>
+          </div>
+          <p className="text-muted max-w-xl">{t('description')}</p>
+        </div>
+        <Button 
+          variant="primary" 
+          onClick={handleCreateClick}
+          className="shrink-0"
+        >
+          <Plus size={16} /> {t('actions.addTome')}
+        </Button>
       </div>
-      <FormField label={t('fields.summary')} error={errors.summary}>
-        <textarea {...register('summary')} />
-      </FormField>
-      <FormField label={t('fields.content')} error={errors.content}>
-        <Controller
-          name="content"
-          control={control}
-          render={({ field }) => (
-            <LexicalEditor
-              initialValue={field.value}
-              onChange={field.onChange}
-              placeholder={t('editor.placeholder')}
-              minHeight="420px"
-            />
-          )}
+      
+      {/* Error states */}
+      {createTome.error && (
+        <div className="mb-4">
+          <ErrorState message={apiErrorMessage(createTome.error)} />
+        </div>
+      )}
+      
+      {/* Loading state */}
+      {story.isLoading && <LoadingState />}
+      
+      {/* Error state */}
+      {story.error && (
+        <ErrorState message={apiErrorMessage(story.error)} />
+      )}
+      
+      {/* Tome card grid */}
+      {story.data && (
+        <TomeCardGrid
+          tomes={tomeStats}
+          onSelect={handleSelectTome}
+          onCreate={handleCreateClick}
+          isLoading={story.isLoading}
         />
-      </FormField>
-      <div className="grid gap-3 lg:grid-cols-2">
-        <FormField label={t('fields.characters')} error={errors.characters_json}>
-          <input {...register('characters_json')} />
-        </FormField>
-        <FormField label={t('fields.tags')} error={errors.tags_json}>
-          <input {...register('tags_json')} />
-        </FormField>
-      </div>
-      <FormField label={t('fields.notes')} error={errors.notes}>
-        <textarea {...register('notes')} />
-      </FormField>
-      <Button variant="primary" disabled={saving || isSubmitting}><Save size={16} /> {t('actions.saveScene')}</Button>
-    </form>
+      )}
+      
+      {/* Create Tome Modal */}
+      <CreateTomeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateSubmit}
+        isLoading={createTome.isPending}
+      />
+    </AppShell>
   );
 }

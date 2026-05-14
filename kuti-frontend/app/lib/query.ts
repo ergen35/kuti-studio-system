@@ -27,6 +27,7 @@ export const keys = {
   exports: (projectId: string) => ["exports", projectId] as const,
   generationJobs: (projectId: string) => ["generationJobs", projectId] as const,
   generationBoards: (projectId: string) => ["generationBoards", projectId] as const,
+  generationJob: (projectId: string, jobId: string | null) => ["generationJob", projectId, jobId] as const,
 };
 
 export function invalidateProject(projectId: string) {

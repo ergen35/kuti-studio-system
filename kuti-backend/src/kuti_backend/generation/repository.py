@@ -39,6 +39,7 @@ from kuti_backend.generation.schemas import (
 from kuti_backend.projects.models import Project
 from kuti_backend.projects.repository import slugify
 from kuti_backend.story.models import Chapter, Scene, Tome
+from kuti_backend.characters.models import Character
 from kuti_backend.versions.models import Version
 
 

@@ -206,3 +206,44 @@ def create_voice_sample_route(session: SessionDep, project_id: str, character_id
     voice_sample = create_voice_sample(session, project_id, character_id, payload)
     rebuild_warnings(session, project_id)
     return voice_sample
+
+
+# Character image generation
+from kuti_backend.characters.generation import create_character_image_job
+from kuti_backend.generation.schemas import GenerationJobRead
+
+
+@router.post("/projects/{project_id}/characters/{character_id}/generate-image", response_model=GenerationJobRead, status_code=status.HTTP_201_CREATED)
+def generate_character_image_route(
+    request: Request,
+    session: SessionDep,
+    project_id: str,
+    character_id: str,
+    strategy: str = "portrait",
+    style: str = "realistic",
+    image_count: int = 1,
+    model_key: str | None = None,
+) -> GenerationJobRead:
+    _project_or_404(session, project_id)
+    _character_or_404(session, project_id, character_id)
+    
+    from kuti_backend.core.settings import get_settings
+    settings = get_settings()
+    
+    try:
+        job = create_character_image_job(
+            session=session,
+            settings=settings,
+            project_id=project_id,
+            character_id=character_id,
+            strategy=strategy,
+            style=style,
+            image_count=min(max(image_count, 1), 4),  # Clamp 1-4
+            model_key=model_key,
+        )
+        return GenerationJobRead.model_validate(job)
+    except ValueError as exc:
+        from kuti_backend.api.errors import raise_api_error, CHARACTER_NOT_FOUND
+        if str(exc) == "character_not_found":
+            raise_api_error(404, CHARACTER_NOT_FOUND)
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

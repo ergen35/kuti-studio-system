@@ -19,7 +19,11 @@
     "addCharacter": "Ajouter personnage",
     "archive": "Archiver",
     "delete": "Supprimer",
-    "saveProfile": "Enregistrer le profil"
+    "saveProfile": "Enregistrer le profil",
+    "backToGrid": "Retour aux personnages",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "creating": "Création..."
   },
   "fields": {
     "name": "Nom",
@@ -36,6 +40,7 @@
   },
   "relations": {
     "title": "Relations",
+    "empty": "Aucune relation",
     "count": "{{count}} relation",
     "count_plural": "{{count}} relations",
     "add": {
@@ -51,11 +56,71 @@
     "count": "{{count}} échantillon",
     "count_plural": "{{count}} échantillons"
   },
+  "status": {
+    "active": "Actif",
+    "draft": "Brouillon",
+    "archived": "Archivé"
+  },
+  "cards": {
+    "noRole": "Aucun rôle défini",
+    "viewProfile": "Voir la fiche"
+  },
+  "sidepanel": {
+    "otherCharacters": "Distribution",
+    "noOthers": "Aucun autre personnage",
+    "searchPlaceholder": "Rechercher...",
+    "noResults": "Aucun personnage trouvé"
+  },
+  "createModal": {
+    "title": "Nouveau personnage",
+    "namePlaceholder": "Ex: Jean Valjean",
+    "rolePlaceholder": "Ex: Protagoniste"
+  },
+  "filters": {
+    "all": "Tous"
+  },
+  "pagination": {
+    "prev": "Préc",
+    "next": "Suiv"
+  },
   "empty": {
     "noSelection": "Aucune sélection",
     "noCharacter": {
       "title": "Aucun personnage",
       "description": "Créez le premier profil pour démarrer la distribution."
     }
+  },
+  "generation": {
+    "generatePortrait": "Générer un portrait",
+    "generate": "Générer",
+    "generating": "Génération...",
+    "regenerate": "Regénérer",
+    "modalTitle": "Générer une image",
+    "results": "Résultats",
+    "preview": "Aperçu du prompt",
+    "download": "Télécharger",
+    "selected": "Sélectionné",
+    "insufficientData": "Données insuffisantes. Ajoutez description et traits physiques.",
+    "strategy": {
+      "label": "Cadrage",
+      "portrait": "Portrait",
+      "full_body": "Plein pied",
+      "concept": "Concept Art",
+      "portraitDesc": "Portrait professionnel, sujet seul, composition centrée, visage détaillé, yeux expressifs",
+      "fullBodyDesc": "Illustration plein pied, figure complète, pose debout, tenue détaillée",
+      "conceptDesc": "Concept art de personnage, atmosphérique, décor immersif, composition dramatique"
+    },
+    "style": {
+      "label": "Style artistique",
+      "realistic": "Réaliste",
+      "anime": "Anime",
+      "illustration": "Illustration",
+      "watercolor": "Aquarelle",
+      "realisticDesc": "peinture digitale, réaliste, détaillé, 8k, artstation",
+      "animeDesc": "style anime, illustration manga, cell shading, couleurs vives",
+      "illustrationDesc": "illustration de livre, stylisé, art professionnel, haute qualité",
+      "watercolorDesc": "peinture à l'aquarelle, couleurs douces, artistique, style média traditionnel"
+    },
+    "imageCount": "Nombre de variations"
   }
 }

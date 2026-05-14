@@ -1,0 +1,53 @@
+/* Wrapper */
+.lexical-editor-wrapper {
+  position: relative;
+}
+
+/* Container */
+.lexical-editor-container {
+  position: relative;
+}
+
+/* Éditeur contentEditable */
+.lexical-content-editable {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--surface);
+  color: var(--ink);
+  min-height: inherit;
+  outline: none;
+  cursor: text;
+}
+
+.lexical-content-editable:focus {
+  border-color: var(--accent);
+}
+
+/* Placeholder */
+.lexical-placeholder {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Paragraphs */
+.editor-paragraph {
+  margin: 0 0 0.75em;
+}
+
+.editor-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Sélection */
+.lexical-content-editable ::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}

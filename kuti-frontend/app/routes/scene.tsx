@@ -1,0 +1,405 @@
+import { useMemo, useState, useCallback } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useParams, Link, useNavigate } from 'react-router';
+import { clsx } from 'clsx';
+import { ArrowLeft, FileText, Save, Clock, Trash2 } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useTranslation } from '~/hooks/useTranslation';
+import { AppShell } from '~/components/layout';
+import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field, toCsv } from '~/components/ui';
+import { LexicalEditor } from '~/components/editor';
+import '~/components/editor/styles.css';
+import type { Tome, Chapter, Scene } from '~/lib/api';
+import { api, apiErrorMessage, csv } from '~/lib/api';
+import { invalidateWorkspace, keys } from '~/lib/query';
+import { StoryBreadcrumb } from '~/components/story';
+
+const sceneSchema = z.object({
+  title: z.string().min(1, 'titleRequired'),
+  scene_type: z.string().optional(),
+  location: z.string().optional(),
+  summary: z.string().optional(),
+  content: z.string().optional(),
+  characters_json: z.string().optional(),
+  tags_json: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+type SceneInput = z.infer<typeof sceneSchema>;
+
+// Sidepanel with scenes in this chapter
+function SceneNavigationPanel({ 
+  scenes, 
+  currentSceneId,
+  projectId,
+  tomeId,
+  chapterId,
+}: { 
+  scenes: Scene[]; 
+  currentSceneId: string;
+  projectId: string;
+  tomeId: string;
+  chapterId: string;
+}) {
+  const { t } = useTranslation('story');
+  const navigate = useNavigate();
+  
+  const sortedScenes = [...scenes].sort((a, b) => a.order_index - b.order_index);
+  
+  return (
+    <Panel className="!p-3">
+      <SectionTitle 
+        title={t('scene.navigation.title') || 'Scènes du chapitre'} 
+        meta={String(sortedScenes.length)}
+      />
+      
+      <div className="space-y-2 mt-3">
+        {sortedScenes.map((scene, index) => {
+          const isCurrent = scene.id === currentSceneId;
+          return (
+            <button
+              key={scene.id}
+              onClick={() => navigate(`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`)}
+              className={clsx(
+                "w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-all",
+                isCurrent 
+                  ? "border-accent bg-accent/10 shadow-[inset_3px_0_0_var(--accent)]"
+                  : "border-line bg-surface-2/30 hover:border-accent hover:bg-surface-2/60"
+              )}
+            >
+              <span className={clsx(
+                "text-xs font-bold",
+                isCurrent ? "text-accent" : "text-accent/70"
+              )}>
+                {t('scene.shortNumber', { number: index + 1 })}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className={clsx(
+                  "text-sm truncate",
+                  isCurrent ? "font-medium text-ink" : "text-ink"
+                )}>
+                  {scene.title}
+                </p>
+              </div>
+              {isCurrent && (
+                <span className="w-2 h-2 rounded-full bg-accent" />
+              )}
+              {!isCurrent && (
+                <svg className="text-muted w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              )}
+            </button>
+          );
+        })}
+        
+        {sortedScenes.length === 0 && (
+          <p className="text-sm text-muted text-center py-4">
+            {t('scene.navigation.empty') || 'Aucune scène'}
+          </p>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
+export default function SceneRoute() {
+  const { projectId = '', tomeId = '', chapterId = '', sceneId = '' } = useParams();
+  const navigate = useNavigate();
+  const { t } = useTranslation(['story', 'common']);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Fetch story data
+  const story = useQuery({ 
+    queryKey: keys.story(projectId), 
+    queryFn: () => api.story(projectId) 
+  });
+  
+  // Get scene
+  const scene = useMemo(() => {
+    return story.data?.scenes.find(s => s.id === sceneId);
+  }, [story.data, sceneId]);
+  
+  // Get chapter and tome
+  const context = useMemo(() => {
+    if (!story.data || !scene) return null;
+    
+    const chapter = story.data.chapters.find(c => c.id === scene.chapter_id);
+    const tome = story.data.tomes.find(t => t.id === scene.tome_id);
+    const chapterScenes = story.data.scenes
+      .filter(s => s.chapter_id === scene.chapter_id)
+      .sort((a, b) => a.order_index - b.order_index);
+    
+    return { chapter, tome, chapterScenes };
+  }, [story.data, scene]);
+  
+  // Calculate scene number
+  const sceneNumber = useMemo(() => {
+    if (!context?.chapterScenes || !scene) return 0;
+    const index = context.chapterScenes.findIndex(s => s.id === sceneId);
+    return index + 1;
+  }, [context, sceneId, scene]);
+  
+  // Calculate chapter and tome numbers
+  const { chapterNumber, tomeNumber } = useMemo(() => {
+    if (!story.data || !context?.chapter || !context?.tome) return { chapterNumber: 0, tomeNumber: 0 };
+    
+    const tomeIndex = story.data.tomes.findIndex(t => t.id === context.tome?.id);
+    const chapterIndex = story.data.chapters
+      .filter(c => c.tome_id === context.tome?.id)
+      .sort((a, b) => a.order_index - b.order_index)
+      .findIndex(c => c.id === context.chapter?.id);
+    
+    return { 
+      tomeNumber: tomeIndex + 1, 
+      chapterNumber: chapterIndex + 1 
+    };
+  }, [story.data, context]);
+  
+  // Update scene mutation
+  const updateScene = useMutation({
+    mutationFn: (body: Partial<Scene>) => api.updateScene(projectId, sceneId, body),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+      setIsSaving(false);
+    },
+  });
+  
+  const deleteScene = useMutation({
+    mutationFn: () => api.deleteScene(projectId, sceneId),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+      navigate(`/projects/${projectId}/story/${tomeId}/chapters/${scene?.chapter_id}`);
+    },
+  });
+  
+  const { register, handleSubmit, control, watch, formState: { errors, isDirty } } = useForm<SceneInput>({
+    resolver: zodResolver(sceneSchema),
+    defaultValues: useMemo(() => ({
+      title: scene?.title || '',
+      scene_type: scene?.scene_type || '',
+      location: scene?.location || '',
+      summary: scene?.summary || '',
+      content: scene?.content || '',
+      characters_json: toCsv(scene?.characters_json),
+      tags_json: toCsv(scene?.tags_json),
+      notes: scene?.notes || '',
+    }), [scene]),
+  });
+  
+  // Reset form when scene changes
+  const watchedSceneId = watch('title');
+  
+  const onSubmit = useCallback((data: SceneInput) => {
+    setIsSaving(true);
+    updateScene.mutate({
+      title: data.title,
+      scene_type: data.scene_type,
+      location: data.location,
+      summary: data.summary,
+      content: data.content,
+      characters_json: csv(data.characters_json || ''),
+      tags_json: csv(data.tags_json || ''),
+      notes: data.notes,
+    });
+  }, [updateScene]);
+  
+  if (story.isLoading) {
+    return (
+      <AppShell>
+        <LoadingState />
+      </AppShell>
+    );
+  }
+  
+  if (story.error) {
+    return (
+      <AppShell>
+        <ErrorState message={apiErrorMessage(story.error)} />
+      </AppShell>
+    );
+  }
+  
+  if (!scene || !context || !context.chapter || !context.tome) {
+    return (
+      <AppShell>
+        <EmptyState title={t('scene.notFound') || 'Scène non trouvée'} />
+      </AppShell>
+    );
+  }
+  
+  const { chapter, tome, chapterScenes } = context;
+  if (!chapter || !tome) return null;
+  const formattedDate = new Date(scene.updated_at).toLocaleDateString(t('locale') || 'fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  return (
+    <AppShell>
+      {/* Breadcrumb */}
+      <StoryBreadcrumb
+        projectId={projectId}
+        tomes={story.data?.tomes || []}
+        chapters={story.data?.chapters || []}
+        scenes={story.data?.scenes || []}
+        currentTomeId={tomeId}
+        currentChapterId={chapter.id}
+        currentSceneId={sceneId}
+        tomeNumber={tomeNumber}
+        chapterNumber={chapterNumber}
+        sceneNumber={sceneNumber}
+      />
+      
+      {/* Back link - mobile only */}
+      <div className="mb-4 lg:hidden">
+        <Link 
+          to={`/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`}
+          className="inline-flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+        >
+          <ArrowLeft size={16} /> {t('scene.backToChapter') || 'Retour au chapitre'}
+        </Link>
+      </div>
+      
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid items-start gap-4 lg:grid-cols-[1fr_280px]">
+          {/* Main content */}
+          <div className="space-y-4">
+            {/* Scene header */}
+            <Panel className="overflow-hidden">
+              <div className="flex items-start gap-4 p-4 -m-3.5 mb-4 bg-surface-2/20 border-b border-line">
+                <div className="p-3 rounded-lg bg-accent/10 text-accent">
+                  <FileText size={24} />
+                </div>
+                <div className="flex-1">
+                  <span className="text-xs font-bold tracking-widest uppercase text-accent/70">
+                    {t('scene.number', { number: sceneNumber })}
+                  </span>
+                  
+                  <Field label={t('fields.title')}>
+                    <input
+                      {...register('title')}
+                      className="text-lg font-semibold w-full"
+                    />
+                  </Field>
+                  {errors.title && (
+                    <span className="text-danger text-xs">{errors.title.message}</span>
+                  )}
+                  
+                  <p className="text-sm text-muted font-mono mt-1">{scene.slug}</p>
+                  
+                  <div className="flex flex-wrap items-center gap-3 mt-3">
+                    <div className="flex items-center gap-1.5 text-xs text-muted">
+                      <Clock size={12} />
+                      <span>{t('scene.lastModified')}: {formattedDate}</span>
+                    </div>
+                    <Badge tone={scene.status}>{t(`status.${scene.status}`)}</Badge>
+                  </div>
+                </div>
+              </div>
+            </Panel>
+            
+            {/* Scene editor */}
+            <Panel>
+              <SectionTitle title={t('panels.sceneEditor.title')} />
+              
+              <div className="space-y-4 mt-3">
+                {/* Type & Location */}
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <Field label={t('fields.type')}>
+                    <input {...register('scene_type')} placeholder="dialogue, action, description..." />
+                  </Field>
+                  <Field label={t('fields.location')}>
+                    <input {...register('location')} placeholder="Lieu de la scène" />
+                  </Field>
+                </div>
+                
+                {/* Summary */}
+                <Field label={t('fields.summary')}>
+                  <textarea {...register('summary')} rows={3} placeholder="Résumé de la scène..." />
+                </Field>
+                
+                {/* Content - Lexical Editor */}
+                <div>
+                  <label className="text-xs text-muted block mb-1.5">{t('fields.content')}</label>
+                  <Controller
+                    name="content"
+                    control={control}
+                    render={({ field }) => (
+                      <LexicalEditor
+                        initialValue={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder={t('editor.placeholder')}
+                        minHeight="400px"
+                      />
+                    )}
+                  />
+                </div>
+                
+                {/* Characters & Tags */}
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <Field label={t('fields.characters')}>
+                    <input {...register('characters_json')} placeholder="@character:jean, @character:marie..." />
+                  </Field>
+                  <Field label={t('fields.tags')}>
+                    <input {...register('tags_json')} placeholder="romantique, combat, révélation..." />
+                  </Field>
+                </div>
+                
+                {/* Notes */}
+                <Field label={t('fields.notes')}>
+                  <textarea {...register('notes')} rows={3} placeholder="Notes internes..." />
+                </Field>
+              </div>
+            </Panel>
+            
+            {/* Actions */}
+            <div className="flex justify-between items-center">
+              <Button 
+                variant="danger" 
+                type="button"
+                onClick={() => deleteScene.mutate()}
+                disabled={deleteScene.isPending}
+              >
+                <Trash2 size={16} />
+                {t('actions.deleteScene')}
+              </Button>
+              
+              <div className="flex items-center gap-4">
+                {isDirty && (
+                  <span className="text-xs text-warning">{t('scene.unsavedChanges') || 'Modifications non enregistrées'}</span>
+                )}
+                <Button 
+                  variant="primary" 
+                  type="submit"
+                  disabled={updateScene.isPending || isSaving}
+                >
+                  <Save size={16} />
+                  {updateScene.isPending || isSaving ? t('actions.saving') || 'Enregistrement...' : t('actions.saveScene')}
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Side panel */}
+          <div className="space-y-4">
+            {chapterScenes && (
+              <SceneNavigationPanel
+                scenes={chapterScenes}
+                currentSceneId={sceneId}
+                projectId={projectId}
+                tomeId={tomeId}
+                chapterId={chapter.id}
+              />
+            )}
+          </div>
+        </div>
+      </form>
+    </AppShell>
+  );
+}

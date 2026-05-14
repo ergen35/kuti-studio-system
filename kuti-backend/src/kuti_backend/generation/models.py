@@ -14,6 +14,7 @@ class GenerationSourceKind(StrEnum):
     chapter = "chapter"
     tome = "tome"
     panel = "panel"
+    custom = "custom"
 
 
 class GenerationStrategy(StrEnum):

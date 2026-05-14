@@ -19,7 +19,11 @@
     "addCharacter": "Add character",
     "archive": "Archive",
     "delete": "Delete",
-    "saveProfile": "Save profile"
+    "saveProfile": "Save profile",
+    "backToGrid": "Back to characters",
+    "cancel": "Cancel",
+    "save": "Save",
+    "creating": "Creating..."
   },
   "fields": {
     "name": "Name",
@@ -36,6 +40,7 @@
   },
   "relations": {
     "title": "Relations",
+    "empty": "No relations",
     "count": "{{count}} relation",
     "count_plural": "{{count}} relations",
     "add": {
@@ -51,11 +56,71 @@
     "count": "{{count}} sample",
     "count_plural": "{{count}} samples"
   },
+  "status": {
+    "active": "Active",
+    "draft": "Draft",
+    "archived": "Archived"
+  },
+  "cards": {
+    "noRole": "No role defined",
+    "viewProfile": "View profile"
+  },
+  "sidepanel": {
+    "otherCharacters": "Cast",
+    "noOthers": "No other characters",
+    "searchPlaceholder": "Search characters...",
+    "noResults": "No characters found"
+  },
+  "createModal": {
+    "title": "New character",
+    "namePlaceholder": "e.g. Jean Valjean",
+    "rolePlaceholder": "e.g. Protagonist"
+  },
+  "filters": {
+    "all": "All"
+  },
+  "pagination": {
+    "prev": "Prev",
+    "next": "Next"
+  },
   "empty": {
     "noSelection": "No selection",
     "noCharacter": {
       "title": "No character",
       "description": "Create the first profile to start the cast."
     }
+  },
+  "generation": {
+    "generatePortrait": "Generate portrait",
+    "generate": "Generate",
+    "generating": "Generating...",
+    "regenerate": "Regenerate",
+    "modalTitle": "Generate character image",
+    "results": "Results",
+    "preview": "Prompt preview",
+    "download": "Download",
+    "selected": "Selected",
+    "insufficientData": "Insufficient data. Add description and physical traits.",
+    "strategy": {
+      "label": "Framing",
+      "portrait": "Portrait",
+      "full_body": "Full Body",
+      "concept": "Concept Art",
+      "portraitDesc": "Professional character portrait, solo figure, centered composition, detailed face, expressive eyes",
+      "fullBodyDesc": "Full body character illustration, complete figure, standing pose, detailed outfit",
+      "conceptDesc": "Character concept art, atmospheric, scenic background, dramatic composition"
+    },
+    "style": {
+      "label": "Art style",
+      "realistic": "Realistic",
+      "anime": "Anime",
+      "illustration": "Illustration",
+      "watercolor": "Watercolor",
+      "realisticDesc": "digital painting, realistic, detailed, 8k, artstation",
+      "animeDesc": "anime style, manga illustration, cel shaded, vibrant colors",
+      "illustrationDesc": "book illustration, stylized, professional art, high quality",
+      "watercolorDesc": "watercolor painting, soft colors, artistic, traditional media style"
+    },
+    "imageCount": "Number of variations"
   }
 }

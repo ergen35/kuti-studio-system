@@ -1,5 +1,12 @@
 {
   "title": "Storyline",
+  "createChapter": {
+    "title": "New chapter"
+  },
+  "createTome": {
+    "title": "New tome",
+    "titlePlaceholder": "e.g. The Lost Prophecy"
+  },
   "description": "Build tomes, chapters and scenes. Typed references like @character:slug are indexed by the backend.",
   "panels": {
     "outline": {
@@ -28,7 +35,11 @@
     "addChapter": "Add chapter",
     "addScene": "Add scene",
     "deleteScene": "Delete scene",
-    "saveScene": "Save scene"
+    "saveScene": "Save scene",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "creating": "Creating..."
   },
   "fields": {
     "title": "Title",
@@ -61,6 +72,81 @@
         "asset": "Asset"
       }
     }
+  },
+  "chapter": {
+    "select": "Select a chapter",
+    "number": "Chapter {{number}}",
+    "shortNumber": "C.{{number}}",
+    "stats": {
+      "scenes": "{{count}} scene",
+      "scenes_plural": "{{count}} scenes"
+    },
+    "scenes": "Scenes",
+    "synopsis": "Synopsis",
+    "navigation": {
+      "title": "Chapters",
+      "empty": "No chapters"
+    },
+    "notFound": "Chapter not found",
+    "backToTome": "Back to tome",
+    "empty": {
+      "noScenes": {
+        "title": "No scenes",
+        "description": "Add scenes to this chapter."
+      }
+    }
+  },
+  "scene": {
+    "select": "Select a scene",
+    "number": "Scene {{number}}",
+    "shortNumber": "S.{{number}}",
+    "navigation": {
+      "title": "Scenes",
+      "empty": "No scenes"
+    },
+    "notFound": "Scene not found",
+    "backToChapter": "Back to chapter",
+    "lastModified": "Last modified",
+    "unsavedChanges": "Unsaved changes"
+  },
+  "tome": {
+    "select": "Select a tome",
+    "number": "Tome {{number}}",
+    "shortNumber": "T.{{number}}",
+    "stats": {
+      "chapters": "{{count}} chapter",
+      "chapters_plural": "{{count}} chapters",
+      "scenes": "{{count}} scene",
+      "scenes_plural": "{{count}} scenes"
+    },
+    "lastModified": "Last modified",
+    "scenesCount": "scene",
+    "scenesCount_plural": "scenes",
+    "noScenes": "No scenes",
+    "synopsis": "Synopsis",
+    "chapters": "Chapters",
+    "navigation": {
+      "title": "Other tomes",
+      "empty": "No other tomes"
+    },
+    "notFound": "Tome not found",
+    "backToStory": "Back to tomes"
+  },
+  "status": {
+    "draft": "In preparation",
+    "active": "In progress",
+    "archived": "Completed"
+  },
+  "empty": {
+    "noTome": {
+      "title": "No tome",
+      "description": "Create a tome, then add chapters and scenes."
+    },
+    "noChapter": {
+      "title": "No chapter",
+      "description": "Add chapters to this tome."
+    },
+    "noSceneSelected": "No scene selected"
   },
   "meta": {
     "noLocation": "No location",

@@ -7,6 +7,8 @@
     "switchLanguage": "Switch language"
   },
   "actions": {
+    "close": "Close",
+    "openMenu": "Open menu",
     "save": "Save",
     "create": "Create",
     "cancel": "Cancel",
