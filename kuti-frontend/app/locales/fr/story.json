@@ -48,7 +48,19 @@
     "noSceneSelected": "Aucune scène sélectionnée"
   },
   "editor": {
-    "placeholder": "Écrivez le contenu avec des références @character:slug"
+    "placeholder": "Écrivez le contenu de la scène... Utilisez @ pour référencer",
+    "autocomplete": {
+      "noResults": "Aucun résultat",
+      "loading": "Chargement...",
+      "startTyping": "Commencez à taper...",
+      "types": {
+        "character": "Personnage",
+        "scene": "Scène",
+        "chapter": "Chapitre",
+        "tome": "Tome",
+        "asset": "Asset"
+      }
+    }
   },
   "meta": {
     "noLocation": "Aucun lieu",

@@ -170,3 +170,8 @@ class StorySummaryResponse(BaseModel):
     chapters: list[ChapterRead]
     scenes: list[SceneRead]
     orphan_references: list[StoryOrphanReferenceRead] = Field(default_factory=list)
+
+
+class ReferenceSuggestionResponse(BaseModel):
+    slug: str
+    label: str

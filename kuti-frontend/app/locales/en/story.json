@@ -48,7 +48,19 @@
     "noSceneSelected": "No scene selected"
   },
   "editor": {
-    "placeholder": "Write scene content with @character:slug references"
+    "placeholder": "Write scene content... Use @ to reference",
+    "autocomplete": {
+      "noResults": "No results",
+      "loading": "Loading...",
+      "startTyping": "Start typing...",
+      "types": {
+        "character": "Character",
+        "scene": "Scene",
+        "chapter": "Chapter",
+        "tome": "Tome",
+        "asset": "Asset"
+      }
+    }
   },
   "meta": {
     "noLocation": "No location",

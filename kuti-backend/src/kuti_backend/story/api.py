@@ -47,6 +47,7 @@ from kuti_backend.story.schemas import (
     StoryReferenceRead,
     StorySummaryResponse,
     StorySuggestionRead,
+    ReferenceSuggestionResponse,
     TomeCreate,
     TomeRead,
     TomeUpdate,
@@ -229,3 +230,50 @@ def delete_scene_route(session: SessionDep, project_id: str, scene_id: str) -> N
     scene = _scene_or_404(session, project_id, scene_id)
     delete_scene(session, scene)
     rebuild_warnings(session, project_id)
+
+
+from kuti_backend.characters.models import Character
+from kuti_backend.assets.models import Asset
+
+@router.get("/projects/{project_id}/references/{type}", response_model=list[ReferenceSuggestionResponse])
+def read_reference_suggestions(
+    session: SessionDep,
+    project_id: str,
+    type: str,
+    q: str = Query(default=""),
+) -> list[ReferenceSuggestionResponse]:
+    _project_or_404(session, project_id)
+    
+    results: list[ReferenceSuggestionResponse] = []
+    
+    if type == "character":
+        from kuti_backend.characters.repository import list_characters
+        characters = list_characters(session, project_id)
+        filtered = [c for c in characters if q.lower() in c.slug.lower() or q.lower() in c.name.lower()]
+        results = [ReferenceSuggestionResponse(slug=c.slug, label=c.name) for c in filtered[:10]]
+    
+    elif type == "scene":
+        from kuti_backend.story.repository import list_scenes
+        scenes = list_scenes(session, project_id)
+        filtered = [s for s in scenes if q.lower() in s.slug.lower() or q.lower() in s.title.lower()]
+        results = [ReferenceSuggestionResponse(slug=s.slug, label=s.title) for s in filtered[:10]]
+    
+    elif type == "chapter":
+        from kuti_backend.story.repository import list_chapters
+        chapters = list_chapters(session, project_id)
+        filtered = [c for c in chapters if q.lower() in c.slug.lower() or q.lower() in c.title.lower()]
+        results = [ReferenceSuggestionResponse(slug=c.slug, label=c.title) for c in filtered[:10]]
+    
+    elif type == "tome":
+        from kuti_backend.story.repository import list_tomes
+        tomes = list_tomes(session, project_id)
+        filtered = [t for t in tomes if q.lower() in t.slug.lower() or q.lower() in t.title.lower()]
+        results = [ReferenceSuggestionResponse(slug=t.slug, label=t.title) for t in filtered[:10]]
+    
+    elif type == "asset":
+        from kuti_backend.assets.repository import list_assets
+        assets = list_assets(session, project_id)
+        filtered = [a for a in assets if q.lower() in a.slug.lower() or q.lower() in a.name.lower()]
+        results = [ReferenceSuggestionResponse(slug=a.slug, label=a.name) for a in filtered[:10]]
+    
+    return results

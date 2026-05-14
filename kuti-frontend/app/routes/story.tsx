@@ -3,15 +3,17 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { clsx } from "clsx";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, PageHeader, SectionTitle, toCsv } from "~/components/ui";
 import { FormField } from "~/components/FormField";
+import { LexicalEditor } from "~/components/editor";
 import { api, apiErrorMessage, csv, type Scene } from "~/lib/api";
 import { invalidateWorkspace, keys } from "~/lib/query";
 import { sceneSchema, type SceneInput } from "~/lib/schemas";
+import "~/components/editor/styles.css";
 
 const listItemClass = "grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5 text-left transition-colors hover:border-accent";
 
@@ -71,7 +73,7 @@ export default function StoryRoute() {
 
 function SceneForm({ scene, saving, onSave }: { scene: Scene; saving: boolean; onSave: (body: Partial<Scene>) => void }) {
   const { t } = useTranslation('story');
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SceneInput>({
+  const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<SceneInput>({
     resolver: zodResolver(sceneSchema),
     defaultValues: {
       title: scene.title,
@@ -113,7 +115,18 @@ function SceneForm({ scene, saving, onSave }: { scene: Scene; saving: boolean; o
         <textarea {...register('summary')} />
       </FormField>
       <FormField label={t('fields.content')} error={errors.content}>
-        <textarea className="!min-h-[420px] font-mono text-sm" {...register('content')} placeholder={t('editor.placeholder')} />
+        <Controller
+          name="content"
+          control={control}
+          render={({ field }) => (
+            <LexicalEditor
+              initialValue={field.value}
+              onChange={field.onChange}
+              placeholder={t('editor.placeholder')}
+              minHeight="420px"
+            />
+          )}
+        />
       </FormField>
       <div className="grid gap-3 lg:grid-cols-2">
         <FormField label={t('fields.characters')} error={errors.characters_json}>
