@@ -11,6 +11,7 @@ from kuti_backend.core.settings import get_settings
 from kuti_backend.generation.api import router as generation_router
 from kuti_backend.generation.schemas import ModelProviderRead
 from kuti_backend.projects.api import router as projects_router
+from kuti_backend.scene_generation.api import router as scene_generation_router
 from kuti_backend.story.api import router as story_router
 from kuti_backend.versions.api import router as versions_router
 from kuti_backend.warnings.api import router as warnings_router
@@ -21,6 +22,7 @@ router.include_router(assets_router)
 router.include_router(characters_router)
 router.include_router(exports_router)
 router.include_router(generation_router)
+router.include_router(scene_generation_router)
 router.include_router(story_router)
 router.include_router(versions_router)
 router.include_router(warnings_router)

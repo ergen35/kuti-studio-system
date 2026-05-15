@@ -2,16 +2,17 @@ import { useTranslation } from '~/hooks/useTranslation';
 import { CharacterCard } from './CharacterCard';
 import { EmptyState, Button } from '~/components/ui';
 import { Plus } from 'lucide-react';
-import type { Character } from '~/lib/api';
+import type { Character, CharacterImage } from '~/lib/api';
 
 interface CharacterCardGridProps {
   characters: Character[];
+  imagesByCharacter?: Record<string, CharacterImage[]>;
   onSelect: (character: Character) => void;
   onCreate?: () => void;
   isLoading?: boolean;
 }
 
-export function CharacterCardGrid({ characters, onSelect, onCreate, isLoading }: CharacterCardGridProps) {
+export function CharacterCardGrid({ characters, imagesByCharacter = {}, onSelect, onCreate, isLoading }: CharacterCardGridProps) {
   const { t } = useTranslation('characters');
   
   if (isLoading) {
@@ -46,13 +47,20 @@ export function CharacterCardGrid({ characters, onSelect, onCreate, isLoading }:
   
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-      {characters.map((character) => (
-        <CharacterCard
-          key={character.id}
-          character={character}
-          onClick={() => onSelect(character)}
-        />
-      ))}
+      {characters.map((character) => {
+        // Get the most recent image for this character (first in the sorted array)
+        const characterImages = imagesByCharacter[character.id];
+        const latestImage = characterImages?.[0] || null;
+        
+        return (
+          <CharacterCard
+            key={character.id}
+            character={character}
+            image={latestImage}
+            onClick={() => onSelect(character)}
+          />
+        );
+      })}
     </div>
   );
 }

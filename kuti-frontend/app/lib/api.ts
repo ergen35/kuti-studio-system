@@ -120,10 +120,26 @@ export type VoiceSample = {
   created_at: string;
 };
 
+export type CharacterImage = {
+  id: string;
+  project_id: string;
+  character_id: string;
+  file_path: string;
+  file_name: string;
+  file_size: number | null;
+  mime_type: string;
+  prompt: string;
+  strategy: string | null;
+  style: string | null;
+  variation_index: number | null;
+  created_at: string;
+};
+
 export type CharacterDetail = Character & {
   relationships_summary: string | null;
   relations: CharacterRelation[];
   voice_samples: VoiceSample[];
+  images?: CharacterImage[];
 };
 
 export type Tome = {
@@ -341,6 +357,58 @@ export type GenerationJob = {
   board: GenerationBoard | null;
 };
 
+// =============================================================================
+// Scene Generation Types (Manga)
+// =============================================================================
+
+export type SceneGenerationConfig = {
+  id: string;
+  project_id: string;
+  name: string;
+  is_default: boolean;
+  system_prompt: string;
+  style_preset: "shonen" | "shojo" | "seinen" | "generic";
+  color_mode: "bw" | "color" | "spot_color";
+  default_image_count: number;
+  allow_multi_page: boolean;
+  metadata_json: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SceneMangaPage = {
+  id: string;
+  project_id: string;
+  scene_id: string;
+  tome_id: string;
+  chapter_id: string;
+  job_id: string;
+  board_id: string;
+  panel_id: string;
+  page_number: number;
+  label: string;
+  status: "draft" | "selected" | "rejected";
+  image_url: string | null;
+  caption: string | null;
+  prompt: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SceneGenerationListResponse = {
+  scene_id: string;
+  pages: SceneMangaPage[];
+  total_pages: number;
+};
+
+export type PromptPreviewResponse = {
+  system_prompt: string;
+  scene_section: string;
+  full_prompt: string;
+  character_summaries: { slug: string; name: string; has_reference: boolean; summary: string }[];
+  warnings: string[];
+};
+
 export const api = {
   health: () => request<Record<string, unknown>>("/health"),
   models: () => request<ModelProvider[]>("/models"),
@@ -361,6 +429,10 @@ export const api = {
   createRelation: (projectId: string, characterId: string, body: { source_character_id: string; target_character_id: string; relation_type: string; strength: number; narrative_dependency?: string; notes?: string }) => request<CharacterRelation>(`/projects/${projectId}/characters/${characterId}/relations`, { method: "POST", body }),
   createVoiceSample: (projectId: string, characterId: string, body: { label: string; asset_path?: string; voice_notes?: string }) => request<VoiceSample>(`/projects/${projectId}/characters/${characterId}/voice-samples`, { method: "POST", body }),
   generateCharacterImage: (projectId: string, characterId: string, body: { strategy?: string; style?: string; image_count?: number; model_key?: string }) => request<GenerationJob>(`/projects/${projectId}/characters/${characterId}/generate-image`, { method: "POST", body }),
+  characterImages: (projectId: string, characterId: string) => request<{ items: CharacterImage[] }>(`/projects/${projectId}/characters/${characterId}/images`),
+  projectCharacterImages: (projectId: string) => request<Record<string, CharacterImage[]>>(`/projects/${projectId}/characters/images`),
+  deleteCharacterImage: (projectId: string, characterId: string, imageId: string) => request<void>(`/projects/${projectId}/characters/${characterId}/images/${imageId}`, { method: "DELETE" }),
+  characterImageUrl: (projectId: string, characterId: string, imageId: string) => `${API_BASE_URL}/api/projects/${projectId}/characters/${characterId}/images/${imageId}/file`,
   generationJob: (projectId: string, jobId: string) => request<GenerationJob>(`/projects/${projectId}/generation/jobs/${jobId}`),
   generationPanelImageUrl: (projectId: string, boardId: string, panelId: string) => `${API_BASE_URL}/api/projects/${projectId}/generation/boards/${boardId}/panels/${panelId}/image`,
 
@@ -399,6 +471,20 @@ export const api = {
   createGenerationJob: (projectId: string, body: { source_kind: string; source_id: string; strategy: string; model_key?: string; mode?: string; selection_ids?: string[]; grid_rows?: number; grid_cols?: number; image_count?: number; title?: string; summary?: string }) => request<GenerationJob>(`/projects/${projectId}/generation/jobs`, { method: "POST", body }),
   validateBoard: (projectId: string, boardId: string, body?: { note?: string }) => request<GenerationBoard>(`/projects/${projectId}/generation/boards/${boardId}/validate`, { method: "POST", body: body ?? {} }),
   updatePanel: (projectId: string, boardId: string, panelId: string, body: { status?: string; caption?: string; title?: string }) => request<GenerationPanel>(`/projects/${projectId}/generation/boards/${boardId}/panels/${panelId}`, { method: "PATCH", body }),
+
+  // Scene Generation (Manga)
+  sceneGenerationConfigs: (projectId: string, sceneId: string) => request<SceneGenerationConfig[]>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs`),
+  createSceneGenerationConfig: (projectId: string, sceneId: string, body: { name: string; is_default?: boolean; system_prompt: string; style_preset?: string; color_mode?: string; default_image_count?: number; allow_multi_page?: boolean; metadata_json?: Record<string, unknown> }) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs`, { method: "POST", body }),
+  updateSceneGenerationConfig: (projectId: string, sceneId: string, configId: string, body: Partial<Omit<SceneGenerationConfig, 'id' | 'project_id' | 'created_at' | 'updated_at'>>) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}`, { method: "PATCH", body }),
+  deleteSceneGenerationConfig: (projectId: string, sceneId: string, configId: string) => request<void>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}`, { method: "DELETE" }),
+  setDefaultSceneGenerationConfig: (projectId: string, sceneId: string, configId: string) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}/set-default`, { method: "POST" }),
+  
+  generateSceneManga: (projectId: string, sceneId: string, body: { config_id?: string; image_count?: number; style_override?: Record<string, unknown>; character_image_refs?: Record<string, string>; additional_context?: string }) => request<{ job_id: string; status: string; message: string }>(`/projects/${projectId}/story/scenes/${sceneId}/generate`, { method: "POST", body }),
+  previewScenePrompt: (projectId: string, sceneId: string, body: { config_id?: string; character_image_refs?: Record<string, string>; additional_context?: string }) => request<PromptPreviewResponse>(`/projects/${projectId}/story/scenes/${sceneId}/preview-prompt`, { method: "POST", body }),
+  
+  sceneMangaPages: (projectId: string, sceneId: string) => request<SceneGenerationListResponse>(`/projects/${projectId}/story/scenes/${sceneId}/manga-pages`),
+  updateSceneMangaPage: (projectId: string, sceneId: string, pageId: string, body: { label?: string; status?: 'draft' | 'selected' | 'rejected' }) => request<SceneMangaPage>(`/projects/${projectId}/story/scenes/${sceneId}/manga-pages/${pageId}`, { method: "PATCH", body }),
+  deleteSceneMangaPage: (projectId: string, sceneId: string, pageId: string) => request<void>(`/projects/${projectId}/story/scenes/${sceneId}/manga-pages/${pageId}`, { method: "DELETE" }),
 
   fileUrl: (path: string) => `${API_BASE_URL}/api${path}`,
 };

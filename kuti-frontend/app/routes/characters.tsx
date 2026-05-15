@@ -11,7 +11,7 @@ import { Button, ErrorState, LoadingState } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { CharacterCardGrid } from '~/components/characters';
 import { api, apiErrorMessage } from '~/lib/api';
-import { invalidateWorkspace, keys } from '~/lib/query';
+import { invalidateWorkspace, invalidateProject, keys, queryClient } from '~/lib/query';
 
 // Schema for creating a new character
 const createCharacterSchema = z.object({
@@ -155,6 +155,13 @@ export default function CharactersRoute() {
     queryFn: () => api.characters(projectId) 
   });
   
+  // Fetch character images for all characters
+  const characterImages = useQuery({
+    queryKey: keys.characterImages(projectId, 'all'),
+    queryFn: () => api.projectCharacterImages(projectId),
+  });
+  
+  // Create mutation
   // Create mutation
   const create = useMutation({
     mutationFn: (body: CreateCharacterInput) => api.createCharacter(projectId, body),
@@ -162,6 +169,15 @@ export default function CharactersRoute() {
       invalidateWorkspace(projectId);
       // Navigate to the new character's detail page
       navigate(`/projects/${projectId}/characters/${character.id}`);
+    },
+  });
+  
+  // Delete character image mutation (for grid updates)
+  const deleteImageMutation = useMutation({
+    mutationFn: ({ characterId, imageId }: { characterId: string; imageId: string }) => 
+      api.deleteCharacterImage(projectId, characterId, imageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.characterImages(projectId, 'all') });
     },
   });
   
@@ -222,6 +238,7 @@ export default function CharactersRoute() {
       {characters.data && (
         <CharacterCardGrid
           characters={characters.data.items}
+          imagesByCharacter={characterImages.data || {}}
           onSelect={(char) => handleSelect(char.id)}
           onCreate={handleCreateClick}
           isLoading={characters.isLoading}

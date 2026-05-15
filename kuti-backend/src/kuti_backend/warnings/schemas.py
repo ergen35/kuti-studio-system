@@ -23,6 +23,7 @@ class WarningKind(StrEnum):
     invalid_location = "invalid_location"
     timeline_incoherence = "timeline_incoherence"
     orphan_reference = "orphan_reference"
+    orphan_character_image = "orphan_character_image"
 
 
 class WarningRead(BaseModel):

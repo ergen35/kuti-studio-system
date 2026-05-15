@@ -28,6 +28,9 @@ export const keys = {
   generationJobs: (projectId: string) => ["generationJobs", projectId] as const,
   generationBoards: (projectId: string) => ["generationBoards", projectId] as const,
   generationJob: (projectId: string, jobId: string | null) => ["generationJob", projectId, jobId] as const,
+  characterImages: (projectId: string, characterId: string) => ["characterImages", projectId, characterId] as const,
+  sceneGenerationConfigs: (projectId: string, sceneId: string) => ["sceneGenerationConfigs", projectId, sceneId] as const,
+  sceneMangaPages: (projectId: string, sceneId: string) => ["sceneMangaPages", projectId, sceneId] as const,
 };
 
 export function invalidateProject(projectId: string) {
@@ -48,6 +51,7 @@ export function invalidateWorkspace(projectId: string) {
     keys.exports(projectId),
     keys.generationJobs(projectId),
     keys.generationBoards(projectId),
+    keys.characterImages(projectId, 'all'),
   ]) {
     void queryClient.invalidateQueries({ queryKey: key });
   }

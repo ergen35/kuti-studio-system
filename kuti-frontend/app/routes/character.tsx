@@ -6,14 +6,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Save, Archive, Trash2, UserRoundPlus, ArrowLeft, ChevronRight, 
-  ChevronLeft, Search, ChevronDown, Users, AudioWaveform, Link2 
+  ChevronLeft, Search, ChevronDown, Users, AudioWaveform, Link2, Image as ImageIcon
 } from 'lucide-react';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, toCsv } from '~/components/ui';
 import { FormField } from '~/components/FormField';
-import { CharacterAvatar, CharacterImageGenerator } from '~/components/characters';
-import { api, apiErrorMessage, csv, type Character, type CharacterDetail, type CharacterRelation, type VoiceSample } from '~/lib/api';
+import { CharacterAvatar, CharacterImageGallery, CharacterImageGenerator, ImageLightbox } from '~/components/characters';
+import { api, apiErrorMessage, csv, type Character, type CharacterDetail, type CharacterImage, type CharacterRelation, type VoiceSample } from '~/lib/api';
 import { invalidateWorkspace, keys, queryClient } from '~/lib/query';
 import { characterSchema, relationSchema, type CharacterInput, type RelationInput } from '~/lib/schemas';
 
@@ -75,6 +75,10 @@ function CharacterSidePanel({
   projectId,
   relations,
   voiceSamples,
+  images,
+  imageLoading,
+  onDeleteImage,
+  onImageClick,
   relationMutation,
 }: {
   characters: Character[];
@@ -82,6 +86,10 @@ function CharacterSidePanel({
   projectId: string;
   relations: CharacterRelation[];
   voiceSamples: VoiceSample[];
+  images: CharacterImage[];
+  imageLoading: boolean;
+  onDeleteImage?: (image: CharacterImage) => void;
+  onImageClick: (image: CharacterImage, index: number) => void;
   relationMutation: UseMutationResult<CharacterRelation, Error, RelationInput, unknown>;
 }) {
   const { t } = useTranslation('characters');
@@ -278,6 +286,32 @@ function CharacterSidePanel({
           </p>
         )}
       </AccordionSection>
+      
+      {/* Character images accordion */}
+      <AccordionSection 
+        title={t('images.title') || 'Images générées'} 
+        icon={ImageIcon}
+        meta={imageLoading || !images ? '...' : String(images.length)}
+      >
+        {imageLoading || !images ? (
+          <div className="animate-pulse space-y-2">
+            <div className="h-20 bg-surface-2 rounded" />
+            <div className="h-20 bg-surface-2 rounded" />
+          </div>
+        ) : images.length > 0 ? (
+          <CharacterImageGallery 
+            images={images}
+            projectId={projectId}
+            characterId={currentCharacterId}
+            onImageClick={onImageClick}
+            onDelete={onDeleteImage}
+          />
+        ) : (
+          <p className="text-sm text-muted text-center py-4">
+            {t('images.empty') || 'Aucune image générée'}
+          </p>
+        )}
+      </AccordionSection>
     </div>
   );
 }
@@ -329,6 +363,46 @@ export default function CharacterRoute() {
       invalidateWorkspace(projectId);
     },
   });
+  
+  // Fetch character images
+  const imagesQuery = useQuery({
+    queryKey: keys.characterImages(projectId, characterId),
+    queryFn: () => api.characterImages(projectId, characterId),
+    select: (data) => data.items,
+  });
+  
+  // Delete image mutation
+  const deleteImageMutation = useMutation({
+    mutationFn: (imageId: string) => api.deleteCharacterImage(projectId, characterId, imageId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: keys.characterImages(projectId, characterId) });
+    },
+  });
+  
+  // Lightbox state
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const lightboxImage = selectedImageIndex !== null ? (imagesQuery.data?.[selectedImageIndex] || null) : null;
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  
+  const handleImageClick = (image: CharacterImage, index: number) => {
+    setSelectedImageIndex(index);
+    setIsLightboxOpen(true);
+  };
+  
+  const handleLightboxNavigate = (index: number) => {
+    setSelectedImageIndex(index);
+  };
+  
+  const handleCloseLightbox = () => {
+    setIsLightboxOpen(false);
+    setSelectedImageIndex(null);
+  };
+  
+  const handleDeleteImage = (image: CharacterImage) => {
+    if (confirm('Supprimer cette image ?')) {
+      deleteImageMutation.mutate(image.id);
+    }
+  };
   
   if (character.isLoading || allCharacters.isLoading) {
     return (
@@ -415,7 +489,23 @@ export default function CharacterRoute() {
           projectId={projectId}
           relations={character.data.relations}
           voiceSamples={character.data.voice_samples}
+          images={imagesQuery.data || []}
+          imageLoading={imagesQuery.isLoading}
+          onDeleteImage={handleDeleteImage}
+          onImageClick={handleImageClick}
           relationMutation={relation}
+        />
+        
+        {/* Lightbox */}
+        <ImageLightbox
+          image={lightboxImage}
+          isOpen={isLightboxOpen}
+          onClose={handleCloseLightbox}
+          images={imagesQuery.data || []}
+          currentIndex={selectedImageIndex ?? 0}
+          onNavigate={handleLightboxNavigate}
+          projectId={projectId}
+          characterId={characterId}
         />
       </div>
     </AppShell>

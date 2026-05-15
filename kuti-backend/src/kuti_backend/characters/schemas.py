@@ -134,3 +134,24 @@ class CharacterDetail(CharacterRead):
 
 class CharacterListResponse(BaseModel):
     items: list[CharacterRead]
+
+
+class CharacterImageRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    project_id: str
+    character_id: str
+    file_path: str
+    file_name: str
+    file_size: int | None
+    mime_type: str
+    prompt: str
+    strategy: str | None
+    style: str | None
+    variation_index: int | None
+    created_at: datetime
+
+
+class CharacterImageListResponse(BaseModel):
+    items: list[CharacterImageRead]

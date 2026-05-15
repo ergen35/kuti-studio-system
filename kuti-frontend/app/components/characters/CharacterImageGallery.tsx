@@ -1,96 +1,109 @@
 import { useState } from 'react';
-import { Download, Check } from 'lucide-react';
 import { clsx } from 'clsx';
-import { useTranslation } from '~/hooks/useTranslation';
-import { Button } from '~/components/ui';
-import type { GenerationPanel } from '~/lib/api';
+import { Image, Trash2 } from 'lucide-react';
+import type { CharacterImage } from '~/lib/api';
 import { api } from '~/lib/api';
 
+
+
 interface CharacterImageGalleryProps {
-  panels: GenerationPanel[];
+  images: CharacterImage[];
   projectId: string;
-  boardId: string;
+  characterId: string;
+  onImageClick: (image: CharacterImage, index: number) => void;
+  onDelete?: (image: CharacterImage) => void;
 }
 
-export function CharacterImageGallery({ panels, projectId, boardId }: CharacterImageGalleryProps) {
-  const { t } = useTranslation('characters');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export function CharacterImageGallery({ images = [], projectId, characterId, onImageClick, onDelete }: CharacterImageGalleryProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // Sort panels by order
-  const sortedPanels = [...panels].sort((a, b) => a.order_index - b.order_index);
+  // Build image URL from backend
+  const getImageUrl = (imageId: string) => api.characterImageUrl(projectId, characterId, imageId);
 
-  const handleDownload = (panel: GenerationPanel) => {
-    const url = api.generationPanelImageUrl(projectId, boardId, panel.id);
-    window.open(url, '_blank');
+  // Get readable strategy name
+  const getStrategyLabel = (strategy: string | null) => {
+    if (!strategy) return '';
+    const labels: Record<string, string> = {
+      portrait: 'Portrait',
+      full_body: 'Corps',
+      concept: 'Concept',
+    };
+    return labels[strategy] || strategy;
   };
 
+  // Get readable style name
+  const getStyleLabel = (style: string | null) => {
+    if (!style) return '';
+    const labels: Record<string, string> = {
+      realistic: 'Réaliste',
+      anime: 'Anime',
+      illustration: 'Illustration',
+      watercolor: 'Aquarelle',
+    };
+    return labels[style] || style;
+  };
+
+  if (images.length === 0) {
+    return (
+      <div className="text-center py-6">
+        <Image size={32} className="mx-auto text-muted/50 mb-2" />
+        <p className="text-sm text-muted">Aucune image générée</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-medium text-ink">
-        {t('generation.results') || 'Résultats'} ({panels.length})
-      </h3>
-      
-      <div className="grid grid-cols-2 gap-3">
-        {sortedPanels.map((panel) => {
-          const isSelected = selectedId === panel.id;
-          const imageUrl = api.generationPanelImageUrl(projectId, boardId, panel.id);
+    <div className="grid grid-cols-2 gap-2">
+      {images.map((image, index) => (
+        <div
+          key={image.id}
+          className={clsx(
+            "relative aspect-square rounded-lg overflow-hidden cursor-pointer",
+            "border border-line bg-surface-2",
+            "transition-all duration-200 hover:border-accent hover:shadow-sm"
+          )}
+          onMouseEnter={() => setHoveredId(image.id)}
+          onMouseLeave={() => setHoveredId(null)}
+          onClick={() => onImageClick(image, index)}
+        >
+          <img
+            src={getImageUrl(image.id)}
+            alt={image.file_name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
           
-          return (
-            <div
-              key={panel.id}
-              className={clsx(
-                "relative group rounded-lg border overflow-hidden cursor-pointer transition-all",
-                isSelected 
-                  ? "border-accent ring-2 ring-accent/20" 
-                  : "border-line hover:border-accent/50"
-              )}
-              onClick={() => setSelectedId(panel.id)}
-            >
-              {/* Image thumbnail */}
-              <div className="aspect-square bg-surface-2">
-                <img
-                  src={imageUrl}
-                  alt={panel.title}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              
-              {/* Overlay */}
-              <div className={clsx(
-                "absolute inset-0 bg-ink/50 flex flex-col items-center justify-center gap-2 transition-opacity",
-                isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              )}>
-                <Button 
-                  variant="primary" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDownload(panel);
-                  }}
-                  className="text-xs py-1.5 px-3"
-                >
-                  <Download size={14} />
-                  {t('generation.download') || 'Télécharger'}
-                </Button>
-                
-                {isSelected && (
-                  <div className="flex items-center gap-1 text-accent text-sm">
-                    <Check size={14} />
-                    <span>{t('generation.selected') || 'Sélectionné'}</span>
-                  </div>
+          {/* Hover overlay with metadata */}
+          {hoveredId === image.id && (
+            <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm flex flex-col justify-end p-2">
+              <div className="flex items-center gap-1 flex-wrap">
+                {image.strategy && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
+                    {getStrategyLabel(image.strategy)}
+                  </span>
+                )}
+                {image.style && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
+                    {getStyleLabel(image.style)}
+                  </span>
                 )}
               </div>
-              
-              {/* Variation number */}
-              <div className="absolute top-2 left-2">
-                <span className="text-xs font-medium px-2 py-1 rounded-full bg-ink/60 text-white">
-                  #{panel.order_index + 1}
-                </span>
-              </div>
+              {onDelete && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(image);
+                  }}
+                  className="absolute top-2 right-2 p-1.5 rounded bg-surface/90 text-danger hover:bg-danger hover:text-white transition-colors"
+                  aria-label="Supprimer"
+                >
+                  <Trash2 size={12} />
+                </button>
+              )}
             </div>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

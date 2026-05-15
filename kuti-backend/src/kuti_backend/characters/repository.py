@@ -44,6 +44,12 @@ def get_character(session: Session, project_id: str, character_id: str) -> Chara
     return session.scalar(stmt)
 
 
+def get_character_by_slug(session: Session, project_id: str, slug: str) -> Character | None:
+    """Get a character by its slug."""
+    stmt = select(Character).where(Character.project_id == project_id, Character.slug == slug)
+    return session.scalar(stmt)
+
+
 def _character_exists(session: Session, project_id: str, character_id: str) -> bool:
     stmt = select(Character.id).where(Character.project_id == project_id, Character.id == character_id)
     return session.scalar(stmt) is not None

@@ -1,12 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
-import { ArrowLeft, BookOpen, FileText, Film, ChevronRight, Pencil, X, Check } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, Film, ChevronRight, Pencil, X, Check, Plus, MapPin } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useState } from 'react';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field } from '~/components/ui';
@@ -20,6 +19,94 @@ const editChapterSchema = z.object({
 });
 
 type EditChapterInput = z.infer<typeof editChapterSchema>;
+
+// Schema for creating a new scene
+const createSceneSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  location: z.string().optional(),
+});
+
+type CreateSceneInput = z.infer<typeof createSceneSchema>;
+
+// Create Scene Modal
+interface CreateSceneModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: CreateSceneInput) => void;
+  isLoading: boolean;
+}
+
+function CreateSceneModal({ isOpen, onClose, onSubmit, isLoading }: CreateSceneModalProps) {
+  const { t } = useTranslation('story');
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateSceneInput>({
+    resolver: zodResolver(createSceneSchema),
+    defaultValues: { title: '', location: '' },
+  });
+
+  const handleFormSubmit = (data: CreateSceneInput) => {
+    onSubmit(data);
+    reset();
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm">
+      <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-surface shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/30">
+          <h2 className="text-lg font-semibold text-ink">
+            {t('scenes.createTitle') || 'Nouvelle scène'}
+          </h2>
+          <Button variant="ghost" onClick={handleClose} className="p-1 h-auto">
+            <X size={18} />
+          </Button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 space-y-4">
+          <Field label={t('fields.title') || 'Titre'}>
+            <input
+              {...register('title')}
+              autoFocus
+              placeholder={t('placeholders.sceneTitle') || 'Titre de la scène'}
+              className="w-full"
+            />
+          </Field>
+          {errors.title && (
+            <span className="text-danger text-xs">{errors.title.message}</span>
+          )}
+
+          <Field label={t('fields.location') || 'Lieu'}>
+            <div className="relative">
+              <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+              <input
+                {...register('location')}
+                placeholder={t('placeholders.sceneLocation') || 'Lieu de la scène'}
+                className="w-full pl-10"
+              />
+            </div>
+          </Field>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="ghost" type="button" onClick={handleClose} disabled={isLoading}>
+              {t('actions.cancel') || 'Annuler'}
+            </Button>
+            <Button variant="primary" disabled={isLoading}>
+              {isLoading ? t('actions.creating') || 'Création...' : t('actions.create') || 'Créer'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 // Sidepanel with chapters in this tome
 function ChapterNavigationPanel({ 
@@ -98,6 +185,7 @@ export default function ChapterRoute() {
   const { t } = useTranslation(['story', 'common']);
   
   const [isEditing, setIsEditing] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   // Fetch story data
   const story = useQuery({ 
@@ -156,6 +244,18 @@ export default function ChapterRoute() {
     },
   });
   
+  // Create scene mutation
+  const createScene = useMutation({
+    mutationFn: (body: { tome_id: string; chapter_id: string; title: string; location?: string; order_index: number }) => 
+      api.createScene(projectId, body),
+    onSuccess: (scene) => {
+      invalidateWorkspace(projectId);
+      setIsCreateModalOpen(false);
+      // Navigate to scene editor
+      navigate(`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`);
+    },
+  });
+  
   const { register, handleSubmit, formState: { errors } } = useForm<EditChapterInput>({
     resolver: zodResolver(editChapterSchema),
     defaultValues: { title: chapter?.title || '' },
@@ -163,6 +263,20 @@ export default function ChapterRoute() {
   
   const onSubmit = (data: EditChapterInput) => {
     updateChapter.mutate({ title: data.title });
+  };
+  
+  const handleCreateScene = (data: CreateSceneInput) => {
+    // Calculate order_index based on existing scenes in this chapter
+    const existingScenes = story.data?.scenes.filter(s => s.chapter_id === chapterId) || [];
+    const maxOrderIndex = existingScenes.reduce((max, s) => Math.max(max, s.order_index), 0);
+    
+    createScene.mutate({
+      tome_id: tomeId,
+      chapter_id: chapterId,
+      title: data.title,
+      location: data.location || undefined,
+      order_index: maxOrderIndex + 1,
+    });
   };
   
   if (story.isLoading) {
@@ -304,6 +418,16 @@ export default function ChapterRoute() {
             <SectionTitle 
               title={t('chapter.scenes') || 'Scènes'} 
               meta={`${scenes.length}`}
+              actions={
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="p-1.5 h-auto"
+                  title={t('scenes.add') || 'Ajouter une scène'}
+                >
+                  <Plus size={18} className="text-accent" />
+                </Button>
+              }
             />
             
             <div className="space-y-2 mt-3">
@@ -351,6 +475,14 @@ export default function ChapterRoute() {
           )}
         </div>
       </div>
+      
+      {/* Create Scene Modal */}
+      <CreateSceneModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateScene}
+        isLoading={createScene.isPending}
+      />
     </AppShell>
   );
 }

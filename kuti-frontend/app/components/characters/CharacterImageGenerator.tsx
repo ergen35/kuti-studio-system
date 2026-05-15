@@ -7,7 +7,7 @@ import type { Character } from '~/lib/api';
 import { api, apiErrorMessage } from '~/lib/api';
 import { invalidateWorkspace, keys } from '~/lib/query';
 import { Button, Badge, ErrorState, Field } from '~/components/ui';
-import { CharacterImageGallery } from './CharacterImageGallery';
+import { GenerationPanelGrid } from './GenerationPanelGrid';
 
 interface CharacterImageGeneratorProps {
   character: Character;
@@ -122,7 +122,7 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
 
       {/* Gallery of results */}
       {(activeJob.data?.board?.panels?.length || 0) > 0 && (
-        <CharacterImageGallery 
+        <GenerationPanelGrid 
           panels={activeJob.data!.board!.panels}
           projectId={projectId}
           boardId={activeJob.data!.board!.id}

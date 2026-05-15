@@ -173,11 +173,19 @@ def _extract_image_bytes(payload: object, timeout_seconds: float) -> tuple[bytes
                 url = entry.get("url") or entry.get("image_url")
                 if isinstance(url, str) and url.strip():
                     try:
-                        with urlopen(url, timeout=timeout_seconds) as image_response:
+                        img_request = Request(
+                            url,
+                            headers={
+                                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+                            },
+                        )
+                        with urlopen(img_request, timeout=timeout_seconds) as image_response:
                             content = image_response.read()
                             mime = image_response.headers.get_content_type() or mimetypes.guess_type(url)[0] or _payload_mime_type(entry) or "image/png"
                             return content, mime
-                    except (HTTPError, URLError, OSError):
+                    except (HTTPError, URLError, OSError) as e:
+                        import logging
+                        logging.getLogger(__name__).error(f"[ImageAPI] Failed to download image: {url}, error: {e}")
                         continue
 
     return None, None
@@ -243,12 +251,11 @@ def generate_media_artifact(
             "tools": [{"type": "image_generation"}],
         }
     elif provider.key == ModelKey.gpt_images_2.value:
-        endpoint = f"{provider.base_url.rstrip('/')}/v1/images/generations"
+        endpoint = f"{provider.base_url.rstrip('/')}/images/generations"
         request_payload = {
             "model": provider.api_model or provider.key,
             "prompt": prompt,
             "size": size,
-            "response_format": "b64_json",
             "n": 1,
         }
     elif provider.key == ModelKey.seedance_2.value:
@@ -273,15 +280,30 @@ def generate_media_artifact(
             "Authorization": f"Bearer {provider.api_key}",
             "Content-Type": "application/json",
             "Accept": "application/json",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
         },
         method="POST",
     )
 
+    # Debug logging for troubleshooting
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"[ImageAPI] Request to {endpoint}")
+    logger.info(f"[ImageAPI] Model: {request_payload.get('model')}")
+    logger.info(f"[ImageAPI] API Key present: {bool(provider.api_key)}")
+    
     try:
         with urlopen(request, timeout=timeout_seconds) as response:
             raw_body = response.read()
             charset = response.headers.get_content_charset() or "utf-8"
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+    except HTTPError as exc:
+        error_body = exc.read().decode('utf-8', errors='replace') if exc.read else str(exc)
+        logger.error(f"[ImageAPI] HTTP Error {exc.code}: {exc.reason}")
+        logger.error(f"[ImageAPI] Error body: {error_body}")
+        logger.error(f"[ImageAPI] Endpoint: {endpoint}")
+        raise ValueError("generation_provider_failed") from exc
+    except (URLError, TimeoutError, OSError) as exc:
+        logger.error(f"[ImageAPI] Connection error: {exc}")
         raise ValueError("generation_provider_failed") from exc
 
     try:
@@ -354,6 +376,7 @@ def generate_media_artifact(
 
     image_bytes, mime_type = _extract_image_bytes(payload, timeout_seconds)
     if image_bytes is None:
+        logger.error(f"[ImageAPI] Failed to extract image from response: {payload}")
         raise ValueError("generation_provider_invalid_response")
 
     resolved_mime_type = mime_type or "image/png"

@@ -137,6 +137,30 @@ def _repair_sqlite_schema(engine: Engine) -> None:
                 text('CREATE UNIQUE INDEX IF NOT EXISTS "uq_scenes_project_slug" ON "scenes" ("project_id", "slug")')
             )
 
+        # Create character_images table if not exists (for existing databases)
+        if "character_images" not in existing_tables:
+            connection.execute(text('''
+                CREATE TABLE "character_images" (
+                    "id" VARCHAR(36) NOT NULL PRIMARY KEY,
+                    "project_id" VARCHAR(36) NOT NULL,
+                    "character_id" VARCHAR(36) NOT NULL,
+                    "board_panel_id" VARCHAR(36),
+                    "file_path" TEXT NOT NULL,
+                    "file_name" VARCHAR(255) NOT NULL,
+                    "file_size" INTEGER,
+                    "mime_type" VARCHAR(64) DEFAULT 'image/png',
+                    "prompt" TEXT DEFAULT '',
+                    "strategy" VARCHAR(32),
+                    "style" VARCHAR(32),
+                    "variation_index" INTEGER,
+                    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE ("character_id", "file_name")
+                )
+            '''))
+            connection.execute(text('CREATE INDEX "ix_character_images_project_id" ON "character_images" ("project_id")'))
+            connection.execute(text('CREATE INDEX "ix_character_images_character_id" ON "character_images" ("character_id")'))
+            connection.execute(text('CREATE INDEX "ix_character_images_board_panel_id" ON "character_images" ("board_panel_id")'))
+
 
 def get_session(request: Request) -> Iterator[Session]:
     session_factory = getattr(request.app.state, "session_factory", None)
@@ -156,6 +180,7 @@ def init_database(settings: Settings) -> Engine:
     import kuti_backend.characters.models  # noqa: F401
     import kuti_backend.generation.models  # noqa: F401
     import kuti_backend.exports.models  # noqa: F401
+    import kuti_backend.scene_generation.models  # noqa: F401
     import kuti_backend.story.models  # noqa: F401
     import kuti_backend.versions.models  # noqa: F401
     import kuti_backend.warnings.models  # noqa: F401

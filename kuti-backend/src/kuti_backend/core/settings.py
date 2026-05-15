@@ -40,6 +40,10 @@ class Settings(BaseSettings):
         return self.data_dir / "generation"
 
     @property
+    def assets_dir(self) -> Path:
+        return self.data_dir / "assets"
+
+    @property
     def openapi_path(self) -> str:
         return "/api/openapi.json"
 
@@ -82,4 +86,5 @@ def get_settings() -> Settings:
     settings.project_data_dir.mkdir(parents=True, exist_ok=True)
     settings.exports_dir.mkdir(parents=True, exist_ok=True)
     settings.generation_dir.mkdir(parents=True, exist_ok=True)
+    settings.assets_dir.mkdir(parents=True, exist_ok=True)
     return settings

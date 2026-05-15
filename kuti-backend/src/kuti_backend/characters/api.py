@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from kuti_backend.core.database import get_session
@@ -27,6 +28,8 @@ from kuti_backend.characters.schemas import (
     CharacterCreate,
     CharacterDetail,
     CharacterDuplicate,
+    CharacterImageListResponse,
+    CharacterImageRead,
     CharacterListResponse,
     CharacterRead,
     CharacterRelationCreate,
@@ -36,6 +39,7 @@ from kuti_backend.characters.schemas import (
     VoiceSampleCreate,
     VoiceSampleRead,
 )
+from kuti_backend.characters.models import CharacterImage
 from kuti_backend.api.errors import (
     CHARACTER_NAME_CONFLICT,
     CHARACTER_NOT_FOUND,
@@ -70,6 +74,28 @@ def _character_or_404(session: Session, project_id: str, character_id: str):
 def read_characters(session: SessionDep, project_id: str) -> CharacterListResponse:
     _project_or_404(session, project_id)
     return CharacterListResponse(items=list_characters(session, project_id))
+
+
+@router.get("/projects/{project_id}/characters/images", response_model=dict[str, list[CharacterImageRead]])
+def read_project_character_images(session: SessionDep, project_id: str) -> dict[str, list[CharacterImageRead]]:
+    """Get all character images for a project, keyed by character_id."""
+    _project_or_404(session, project_id)
+    
+    images = (
+        session.query(CharacterImage)
+        .filter(CharacterImage.project_id == project_id)
+        .order_by(CharacterImage.character_id, CharacterImage.created_at.desc())
+        .all()
+    )
+    
+    # Group by character_id
+    result: dict[str, list[CharacterImageRead]] = {}
+    for img in images:
+        if img.character_id not in result:
+            result[img.character_id] = []
+        result[img.character_id].append(CharacterImageRead.model_validate(img))
+    
+    return result
 
 
 @router.post("/projects/{project_id}/characters", response_model=CharacterRead, status_code=status.HTTP_201_CREATED)
@@ -247,3 +273,57 @@ def generate_character_image_route(
         if str(exc) == "character_not_found":
             raise_api_error(404, CHARACTER_NOT_FOUND)
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/projects/{project_id}/characters/{character_id}/images", response_model=CharacterImageListResponse)
+def list_character_images(session: SessionDep, project_id: str, character_id: str) -> CharacterImageListResponse:
+    """List all generated images for a character."""
+    _project_or_404(session, project_id)
+    _character_or_404(session, project_id, character_id)
+    
+    images = (
+        session.query(CharacterImage)
+        .filter(CharacterImage.project_id == project_id)
+        .filter(CharacterImage.character_id == character_id)
+        .order_by(CharacterImage.created_at.desc())
+        .all()
+    )
+    return CharacterImageListResponse(items=[CharacterImageRead.model_validate(img) for img in images])
+
+
+@router.delete("/projects/{project_id}/characters/{character_id}/images/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_character_image_route(session: SessionDep, project_id: str, character_id: str, image_id: str) -> None:
+    """Delete a character image."""
+    _project_or_404(session, project_id)
+    _character_or_404(session, project_id, character_id)
+    
+    image = session.get(CharacterImage, image_id)
+    if image is None or image.project_id != project_id or image.character_id != character_id:
+        from kuti_backend.api.errors import raise_api_error
+        raise_api_error(404, "image_not_found")
+    
+    # Delete file from disk
+    from pathlib import Path
+    try:
+        file_path = Path(image.file_path)
+        if file_path.exists():
+            file_path.unlink()
+    except (OSError, ValueError):
+        pass
+    
+    session.delete(image)
+    session.commit()
+
+
+@router.get("/projects/{project_id}/characters/{character_id}/images/{image_id}/file")
+def read_character_image_file(session: SessionDep, project_id: str, character_id: str, image_id: str):
+    """Serve a character image file."""
+    _project_or_404(session, project_id)
+    _character_or_404(session, project_id, character_id)
+    
+    image = session.get(CharacterImage, image_id)
+    if image is None or image.project_id != project_id or image.character_id != character_id:
+        from kuti_backend.api.errors import raise_api_error
+        raise_api_error(404, "image_not_found")
+    
+    return FileResponse(image.file_path, media_type=image.mime_type, filename=image.file_name)

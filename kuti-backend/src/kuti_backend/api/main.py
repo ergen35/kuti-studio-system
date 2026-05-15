@@ -28,6 +28,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             allow_headers=["*"],
         )
     app.include_router(router, prefix="/api")
+    
+    # Start background workers
+    from kuti_backend.background import start_orphan_checker_thread
+    start_orphan_checker_thread(interval_seconds=3600)  # Check every hour
+    
     return app
 
 

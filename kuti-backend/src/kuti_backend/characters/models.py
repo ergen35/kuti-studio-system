@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, ForeignKey, JSON, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from kuti_backend.projects.models import Base, utcnow
@@ -56,4 +56,30 @@ class VoiceSample(Base):
     asset_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     label: Mapped[str] = mapped_column(String(255), nullable=False)
     voice_notes: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
+
+
+class CharacterImage(Base):
+    """Stores generated images for a character."""
+
+    __tablename__ = "character_images"
+    __table_args__ = (UniqueConstraint("character_id", "file_name", name="uq_character_images_file_name"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    character_id: Mapped[str] = mapped_column(String(36), ForeignKey("characters.id"), index=True, nullable=False)
+    board_panel_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("generation_board_panels.id"), index=True, nullable=True)
+
+    # File info
+    file_path: Mapped[str] = mapped_column(Text, nullable=False)
+    file_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    file_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    mime_type: Mapped[str] = mapped_column(String(64), default="image/png")
+
+    # Generation metadata
+    prompt: Mapped[str] = mapped_column(Text, default="")
+    strategy: Mapped[str | None] = mapped_column(String(32), nullable=True)  # portrait/full_body/concept
+    style: Mapped[str | None] = mapped_column(String(32), nullable=True)  # realistic/anime/...
+    variation_index: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
