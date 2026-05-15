@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
-import { ArrowLeft, FileText, Save, Clock, Trash2 } from 'lucide-react';
+import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,6 +15,7 @@ import type { Tome, Chapter, Scene } from '~/lib/api';
 import { api, apiErrorMessage, csv } from '~/lib/api';
 import { invalidateWorkspace, keys } from '~/lib/query';
 import { StoryBreadcrumb } from '~/components/story';
+import { SceneGenerationModal, SceneMangaGallery } from '~/components/scene';
 
 const sceneSchema = z.object({
   title: z.string().min(1, 'titleRequired'),
@@ -110,11 +111,19 @@ export default function SceneRoute() {
   const navigate = useNavigate();
   const { t } = useTranslation(['story', 'common']);
   const [isSaving, setIsSaving] = useState(false);
+  const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
   
   // Fetch story data
   const story = useQuery({ 
     queryKey: keys.story(projectId), 
     queryFn: () => api.story(projectId) 
+  });
+
+  // Fetch characters for this project
+  const characters = useQuery({
+    queryKey: keys.characters(projectId),
+    queryFn: () => api.characters(projectId).then(r => r.items),
+    enabled: !!projectId,
   });
   
   // Get scene
@@ -388,6 +397,22 @@ export default function SceneRoute() {
           
           {/* Side panel */}
           <div className="space-y-4">
+            {/* Manga Generation Section */}
+            <Panel>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-ink">Planches Manga</h3>
+                <Button 
+                  variant="ghost" 
+                  className="p-1.5 h-auto"
+                  onClick={() => setIsGenerationModalOpen(true)}
+                  title="Générer une planche"
+                >
+                  <Sparkles size={18} className="text-accent" />
+                </Button>
+              </div>
+              <SceneMangaGallery projectId={projectId} sceneId={sceneId} />
+            </Panel>
+
             {chapterScenes && (
               <SceneNavigationPanel
                 scenes={chapterScenes}
@@ -400,6 +425,16 @@ export default function SceneRoute() {
           </div>
         </div>
       </form>
+
+      {/* Generation Modal */}
+      <SceneGenerationModal
+        projectId={projectId}
+        scene={scene}
+        characters={characters.data || []}
+        characterImages={{}}
+        isOpen={isGenerationModalOpen}
+        onClose={() => setIsGenerationModalOpen(false)}
+      />
     </AppShell>
   );
 }

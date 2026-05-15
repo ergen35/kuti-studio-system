@@ -63,7 +63,6 @@ export function SceneGenerationModal({
         character_image_refs: selectedCharacterImages,
         additional_context: additionalContext || undefined,
       }),
-    enabled: showPreview,
   });
 
   // Generate mutation

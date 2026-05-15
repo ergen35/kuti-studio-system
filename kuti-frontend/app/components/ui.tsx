@@ -78,9 +78,9 @@ const toneClasses: Record<string, string> = {
   info: "border-accent/45 text-accent",
 };
 
-export function Badge({ children, tone }: { children: ReactNode; tone?: string }) {
+export function Badge({ children, tone, className }: { children: ReactNode; tone?: string; className?: string }) {
   const key = (tone || String(children)).toLowerCase();
-  return <span className={clsx("inline-flex min-h-5 w-fit items-center rounded-full border border-line px-2 py-0.5 text-xs leading-tight text-muted", toneClasses[key])}>{children}</span>;
+  return <span className={clsx("inline-flex min-h-5 w-fit items-center rounded-full border border-line px-2 py-0.5 text-xs leading-tight text-muted", toneClasses[key], className)}>{children}</span>;
 }
 
 export function EmptyState({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {

@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from kuti_backend.api.dependencies import get_session
+from kuti_backend.core.database import get_session
 from kuti_backend.scene_generation import (
     repository as scene_gen_repo,
     service as scene_gen_service,
@@ -23,9 +23,11 @@ from kuti_backend.scene_generation.schemas import (
     SceneGenerationListResponse,
 )
 from kuti_backend.projects.repository import get_project
-
+from typing import Annotated
 
 router = APIRouter(prefix="/projects/{project_id}/story/scenes/{scene_id}")
+
+SessionDep = Annotated[Session, Depends(get_session)]
 
 
 # =============================================================================
@@ -35,7 +37,7 @@ router = APIRouter(prefix="/projects/{project_id}/story/scenes/{scene_id}")
 @router.get("/generation-configs", response_model=list[SceneGenerationConfigRead])
 def list_generation_configs(
     project_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> list[SceneGenerationConfigRead]:
     """List all generation configs for a project."""
     # Verify project exists
@@ -55,7 +57,7 @@ def list_generation_configs(
 def create_generation_config(
     project_id: str,
     data: SceneGenerationConfigCreate,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneGenerationConfigRead:
     """Create a new generation config."""
     project = get_project(session, project_id)
@@ -71,7 +73,7 @@ def create_generation_config(
 def get_generation_config(
     project_id: str,
     config_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneGenerationConfigRead:
     """Get a specific generation config."""
     config = scene_gen_repo.get_config(session, project_id, config_id)
@@ -85,7 +87,7 @@ def update_generation_config(
     project_id: str,
     config_id: str,
     data: SceneGenerationConfigUpdate,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneGenerationConfigRead:
     """Update a generation config."""
     config = scene_gen_repo.update_config(session, project_id, config_id, data)
@@ -99,7 +101,7 @@ def update_generation_config(
 def delete_generation_config(
     project_id: str,
     config_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> None:
     """Delete a generation config."""
     deleted = scene_gen_repo.delete_config(session, project_id, config_id)
@@ -112,7 +114,7 @@ def delete_generation_config(
 def set_default_config(
     project_id: str,
     config_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneGenerationConfigRead:
     """Set a config as the default for the project."""
     config = scene_gen_repo.set_default_config(session, project_id, config_id)
@@ -131,7 +133,7 @@ async def generate_scene_manga(
     project_id: str,
     scene_id: str,
     request: SceneGenerateRequest,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneGenerateResponse:
     """Generate manga page(s) from a scene.
     
@@ -153,7 +155,7 @@ async def preview_generation_prompt(
     project_id: str,
     scene_id: str,
     request: PromptPreviewRequest,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> PromptPreviewResponse:
     """Preview the prompt that would be generated without actually running generation.
     
@@ -181,11 +183,10 @@ async def preview_generation_prompt(
 def list_scene_manga_pages(
     project_id: str,
     scene_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneGenerationListResponse:
     """List all manga pages generated for this scene."""
     from kuti_backend.story.repository import get_scene
-    from kuti_backend.generation.repository import get_board
     
     # Verify scene exists
     scene = get_scene(session, project_id, scene_id)
@@ -232,7 +233,7 @@ def get_scene_manga_page(
     project_id: str,
     scene_id: str,
     page_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneMangaPageRead:
     """Get a specific manga page."""
     page = scene_gen_repo.get_page(session, project_id, page_id)
@@ -269,7 +270,7 @@ def update_scene_manga_page(
     scene_id: str,
     page_id: str,
     data: SceneMangaPageUpdate,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> SceneMangaPageRead:
     """Update a manga page (label, status, etc.)."""
     page = scene_gen_repo.update_page(session, project_id, page_id, data)
@@ -286,7 +287,7 @@ def delete_scene_manga_page(
     project_id: str,
     scene_id: str,
     page_id: str,
-    session: Session = Depends(get_session),
+    session: SessionDep,
 ) -> None:
     """Delete a manga page reference (does not delete the underlying image)."""
     page = scene_gen_repo.get_page(session, project_id, page_id)
