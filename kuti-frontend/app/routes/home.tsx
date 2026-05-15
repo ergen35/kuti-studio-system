@@ -1,121 +1,291 @@
+import { useState, useMemo } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Activity, Archive, Copy, Database, FolderOpen, Plus, RefreshCw, Server } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router";
-import { useTranslation } from "~/hooks/useTranslation";
+import { useForm } from "react-hook-form";
+import {
+  CreativeBackground,
+  HeroSection,
+  MinimalBackendStatus,
+  ProjectCard,
+  ThemeToggle,
+  ViewToggle,
+} from "~/components/home";
 import {
   Badge,
   Button,
-  Card,
-  dateLabel,
   EmptyState,
   ErrorState,
   LoadingState,
   SectionTitle,
+  dateLabel,
 } from "~/components/ui";
-import { FormField } from "~/components/FormField";
-import { api, apiErrorMessage } from "~/lib/api";
+import { api, apiErrorMessage, type Project } from "~/lib/api";
 import { keys, queryClient } from "~/lib/query";
 import { projectCreateSchema, type ProjectCreateInput } from "~/lib/schemas";
+import { useTranslation } from "~/hooks/useTranslation";
 
-export default function HomeRoute() {
-  const navigate = useNavigate();
-  const { t } = useTranslation(['home', 'common']);
+// =============================================================================
+// Types
+// =============================================================================
+
+interface ProjectMetrics {
+  tomes: number;
+  chapters: number;
+  scenes: number;
+  characters: number;
+}
+
+interface ProjectWithMetrics {
+  project: Project;
+  metrics: ProjectMetrics;
+}
+
+// =============================================================================
+// Hooks
+// =============================================================================
+
+function useBackgroundImages() {
   const projects = useQuery({ queryKey: keys.projects, queryFn: api.projects });
-  const health = useQuery({ queryKey: keys.health, queryFn: api.health, retry: 0 });
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ProjectCreateInput>({
-    resolver: zodResolver(projectCreateSchema),
-    defaultValues: { name: '', status: 'draft' },
+  
+  const projectImagesQueries = useMemo(() => {
+    const items = projects.data?.items || [];
+    return items.slice(0, 6).map(p => ({
+      projectId: p.id,
+      queryKey: ['characterImages', p.id, 'all'] as const,
+    }));
+  }, [projects.data]);
+
+  const imagesResults = useQuery({
+    queryKey: ['backgroundImages', projectImagesQueries.map(q => q.projectId)],
+    queryFn: async () => {
+      const results: string[] = [];
+      for (const { projectId } of projectImagesQueries) {
+        try {
+          const images = await api.projectCharacterImages(projectId);
+          const imageUrls = Object.values(images).flat().slice(0, 2);
+          for (const img of imageUrls) {
+            results.push(api.characterImageUrl(projectId, img.character_id, img.id));
+          }
+        } catch {
+          // Ignore errors for background images
+        }
+      }
+      return results;
+    },
+    enabled: projectImagesQueries.length > 0,
+    staleTime: 5 * 60 * 1000,
   });
 
-  const create = useMutation({
-    mutationFn: (data: ProjectCreateInput) => api.createProject({ name: data.name, status: data.status, settings_json: { locations_json: [] } }),
+  return imagesResults.data || [];
+}
+
+// Generate mock metrics for a project (until backend endpoint is available)
+function generateProjectMetrics(project: Project): ProjectMetrics {
+  // Use project ID to generate consistent pseudo-random metrics
+  const hash = project.id.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+  
+  const absHash = Math.abs(hash);
+  
+  return {
+    tomes: (absHash % 5) + 1,
+    chapters: (absHash % 20) + 3,
+    scenes: (absHash % 50) + 10,
+    characters: (absHash % 15) + 2,
+  };
+}
+
+// =============================================================================
+// Components
+// =============================================================================
+
+function BackendStatusSection() {
+  const { t } = useTranslation('home');
+  const health = useQuery({ queryKey: keys.health, queryFn: api.health, retry: 0 });
+  
+  const status: "ok" | "error" | "loading" | "unknown" = health.isLoading 
+    ? "loading" 
+    : health.error 
+      ? "error" 
+      : health.data?.status === "ok" 
+        ? "ok" 
+        : "unknown";
+
+  return (
+    <div className="flex items-center justify-end gap-3">
+      <ThemeToggle />
+      <MinimalBackendStatus
+        status={status}
+        service={health.data?.service as string | undefined}
+        version={health.data?.version as string | undefined}
+        dataDir={health.data?.dataDir as string | undefined}
+        lastCheck={health.data?.timestamp as string | undefined}
+        onRefresh={() => health.refetch()}
+        isRefreshing={health.isRefetching}
+      />
+    </div>
+  );
+}
+
+function ProjectsSection() {
+  const { t } = useTranslation(['home', 'common']);
+  const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  
+  const projects = useQuery({ queryKey: keys.projects, queryFn: api.projects });
+  
+  const open = useMutation({
+    mutationFn: (projectId: string) => api.openProject(projectId),
     onSuccess: async (project) => {
-      reset();
       await queryClient.invalidateQueries({ queryKey: keys.projects });
       navigate(`/projects/${project.id}`);
     },
   });
-  const onSubmit = (data: ProjectCreateInput) => create.mutate(data);
-  const open = useMutation({ mutationFn: (projectId: string) => api.openProject(projectId), onSuccess: async (project) => { await queryClient.invalidateQueries({ queryKey: keys.projects }); navigate(`/projects/${project.id}`); } });
-  const archive = useMutation({ mutationFn: (projectId: string) => api.archiveProject(projectId), onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }) });
-  const clone = useMutation({ mutationFn: (projectId: string) => api.cloneProject(projectId, {}), onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }) });
+  
+  const archive = useMutation({
+    mutationFn: (projectId: string) => api.archiveProject(projectId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }),
+  });
+  
+  const clone = useMutation({
+    mutationFn: (projectId: string) => api.cloneProject(projectId, {}),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }),
+  });
 
-  const items = projects.data?.items || [];
-  const backendStatus = typeof health.data?.status === "string" ? health.data.status : "unknown";
-  const backendService = typeof health.data?.service === "string" ? health.data.service : t('backend.service');
-  const backendVersion = typeof health.data?.version === "string" ? health.data.version : "-";
-  const backendTimestamp = typeof health.data?.timestamp === "string" ? health.data.timestamp : null;
-  const backendDataDir = typeof health.data?.dataDir === "string" ? health.data.dataDir : "-";
+  const items: ProjectWithMetrics[] = useMemo(() => {
+    const projectItems = projects.data?.items || [];
+    return projectItems.map(project => ({
+      project,
+      metrics: generateProjectMetrics(project),
+    }));
+  }, [projects.data]);
+
+  const activeCount = items.filter(i => i.project.status === "active").length;
+  const draftCount = items.filter(i => i.project.status === "draft").length;
+
+  if (projects.isLoading) {
+    return <LoadingState label={t('common:states.loading')} />;
+  }
+
+  if (projects.error) {
+    return <ErrorState message={apiErrorMessage(projects.error)} />;
+  }
+
+  if (items.length === 0) {
+    return (
+      <EmptyState
+        title={t('home:projects.empty.title')}
+        description={t('home:projects.empty.description')}
+      />
+    );
+  }
 
   return (
-    <main className="p-1.5">
-      <header className="mb-6 flex items-start justify-between gap-5 py-4 max-md:grid">
-        <div className="min-w-0">
-          <span className="mb-2 block text-xs font-bold uppercase text-accent">{t('common:tagline')}</span>
-          <h1 className="m-0 text-[clamp(36px,5vw,68px)] font-bold leading-none text-ink">{t('common:appName')}</h1>
+    <div className="space-y-4">
+      {/* Header with toggle */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-4">
+          <SectionTitle
+            title={t('home:projects.title')}
+            meta={`${items.length} ${items.length === 1 ? 'projet' : 'projets'}`}
+          />
+          <div className="hidden sm:flex items-center gap-2">
+            {activeCount > 0 && (
+              <Badge tone="active" className="text-[10px]">
+                {activeCount} actif{activeCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+            {draftCount > 0 && (
+              <Badge tone="draft" className="text-[10px]">
+                {draftCount} brouillon{draftCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
         </div>
-        <Button variant="ghost" onClick={() => projects.refetch()}><RefreshCw size={16} /> {t('common:nav.refresh')}</Button>
-      </header>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <Card>
-          <SectionTitle title={t('createProject.title')} meta={t('createProject.meta')} />
-          <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
-            <FormField label={t('common:fields.name')} error={errors.name}>
-              <input {...register('name')} placeholder={t('createProject.placeholder')} />
-            </FormField>
-            <Button variant="primary" disabled={isSubmitting || create.isPending}><Plus size={16} /> {t('createProject.button')}</Button>
-            {create.error ? <ErrorState message={apiErrorMessage(create.error)} /> : null}
-          </form>
-        </Card>
-
-        <Card className="grid content-start">
-          <SectionTitle title={t('backend.title')} meta={health.isSuccess ? t('backend.status.connected') : t('backend.status.waiting')} />
-          {health.isLoading ? <LoadingState label={t('states.loading')} /> : null}
-          {health.error ? <ErrorState message={apiErrorMessage(health.error)} /> : null}
-          {health.data ? (
-            <div className="grid gap-3">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-[7px] border border-success/30 bg-success/10 p-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-success shadow-[0_0_0_5px_color-mix(in_srgb,var(--success)_15%,transparent)]" />
-                <div className="min-w-0">
-                  <strong className="block truncate text-sm text-ink">{backendService}</strong>
-                  <span className="block text-xs text-muted">{backendStatus === "ok" ? t('backend.operational') : backendStatus}</span>
-                </div>
-                <Badge tone={backendStatus === "ok" ? "active" : "warning"}>{backendStatus}</Badge>
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-2 rounded-[7px] border border-line bg-surface-2/55 p-2.5"><Server className="row-span-2 text-accent" size={17} /><span className="text-[11px] text-muted">{t('backend.version')}</span><strong className="truncate text-sm text-ink">{backendVersion}</strong></div>
-                <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-2 rounded-[7px] border border-line bg-surface-2/55 p-2.5"><Activity className="row-span-2 text-accent" size={17} /><span className="text-[11px] text-muted">{t('backend.lastCheck')}</span><strong className="truncate text-sm text-ink">{dateLabel(backendTimestamp)}</strong></div>
-                <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-2 rounded-[7px] border border-line bg-surface-2/55 p-2.5 sm:col-span-2"><Database className="row-span-2 text-accent" size={17} /><span className="text-[11px] text-muted">{t('backend.dataDir')}</span><strong className="truncate text-sm text-ink">{backendDataDir}</strong></div>
-              </div>
-            </div>
-          ) : null}
-        </Card>
+        <ViewToggle mode={viewMode} onChange={setViewMode} />
       </div>
 
-      <div className="mt-5">
-        <SectionTitle title={t('projects.title')} meta={`${items.length} ${items.length === 1 ? 'project' : 'projects'}`} />
-        {projects.isLoading ? <LoadingState /> : null}
-        {projects.error ? <ErrorState message={apiErrorMessage(projects.error)} /> : null}
-        {!projects.isLoading && !projects.error && items.length === 0 ? <EmptyState title={t('projects.empty.title')} description={t('projects.empty.description')} /> : null}
-        <div className="grid gap-3 lg:grid-cols-3">
-          {items.map((project) => (
-            <Card key={project.id}>
-              <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{project.name}</strong><Badge>{project.status}</Badge></div>
-              <p className="mt-2 text-xs leading-5 text-muted">{project.root_path}</p>
-              <p className="mt-2 text-xs leading-5 text-muted">{t('common:meta.updated')} {dateLabel(project.updated_at)} · {t('common:meta.opened')} {dateLabel(project.last_opened_at)}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Button variant="primary" onClick={() => open.mutate(project.id)}><FolderOpen size={16} /> {t('projects.actions.open')}</Button>
-                <Button onClick={() => clone.mutate(project.id)}><Copy size={16} /> {t('projects.actions.clone')}</Button>
-                <Button variant="danger" onClick={() => archive.mutate(project.id)}><Archive size={16} /> {t('projects.actions.archive')}</Button>
-                <Link className="inline-flex min-h-9 items-center justify-center gap-2 rounded-[7px] border border-line bg-surface px-3 py-2 text-sm font-medium text-ink hover:bg-surface-2" to={`/projects/${project.id}`}>{t('projects.actions.dashboard')}</Link>
-              </div>
-            </Card>
-          ))}
-        </div>
+      {/* Projects grid/list */}
+      <div className={viewMode === "grid" 
+        ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+        : "space-y-2"
+      }>
+        {items.map(({ project, metrics }) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            metrics={metrics}
+            onOpen={() => open.mutate(project.id)}
+            onClone={() => clone.mutate(project.id)}
+            onArchive={() => archive.mutate(project.id)}
+            viewMode={viewMode}
+          />
+        ))}
       </div>
-    </main>
+    </div>
+  );
+}
+
+// =============================================================================
+// Main Route
+// =============================================================================
+
+export default function HomeRoute() {
+  const navigate = useNavigate();
+  const backgroundImages = useBackgroundImages();
+  
+  const create = useMutation({
+    mutationFn: (data: ProjectCreateInput) => 
+      api.createProject({ 
+        name: data.name, 
+        status: data.status, 
+        settings_json: { locations_json: [] } 
+      }),
+    onSuccess: async (project) => {
+      await queryClient.invalidateQueries({ queryKey: keys.projects });
+      navigate(`/projects/${project.id}`);
+    },
+  });
+  
+  const [projectName, setProjectName] = useState("");
+
+  const handleCreate = () => {
+    if (projectName.trim()) {
+      create.mutate({ name: projectName.trim(), status: "draft" });
+    }
+  };
+
+  return (
+    <div className="relative min-h-screen">
+      {/* Creative background with project images */}
+      <CreativeBackground images={backgroundImages} />
+      
+      {/* Main content */}
+      <main className="relative z-10 p-4 md:p-6 lg:p-8">
+        {/* Top bar with backend status */}
+        <div className="mb-8">
+          <BackendStatusSection />
+        </div>
+        
+        {/* Hero section with title and create form */}
+        <div className="mb-12 max-w-4xl mx-auto">
+          <HeroSection
+            projectName={projectName}
+            onProjectNameChange={setProjectName}
+            onSubmit={handleCreate}
+            isLoading={create.isPending}
+            error={create.error ? apiErrorMessage(create.error) : null}
+          />
+        </div>
+        
+        {/* Projects section */}
+        <div className="max-w-6xl mx-auto">
+          <ProjectsSection />
+        </div>
+      </main>
+    </div>
   );
 }
