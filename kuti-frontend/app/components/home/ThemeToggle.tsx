@@ -10,7 +10,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/80 backdrop-blur-sm border border-line/50 hover:border-accent/50 transition-colors"
+      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/95 backdrop-blur-sm border border-line/60 hover:border-accent/60 hover:bg-surface shadow-sm transition-colors"
       title={theme === "light" ? "Passer en mode sombre" : "Passer en mode clair"}
     >
       {theme === "light" ? (

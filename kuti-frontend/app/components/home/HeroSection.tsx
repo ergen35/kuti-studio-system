@@ -28,9 +28,9 @@ export function HeroSection({
   return (
     <div className="relative">
       {/* Glassmorphism container */}
-      <div className="relative rounded-2xl bg-surface/80 backdrop-blur-md border border-line/50 p-8 md:p-12 shadow-2xl">
+      <div className="relative rounded-2xl bg-surface/90 backdrop-blur-md border border-line/60 p-8 md:p-12 shadow-xl">
         {/* Decorative accent */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/5 via-transparent to-accent/5 pointer-events-none" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/10 via-transparent to-accent/10 pointer-events-none" />
         
         <div className="relative text-center max-w-2xl mx-auto">
           {/* Icon */}
@@ -75,7 +75,7 @@ export function HeroSection({
       </div>
       
       {/* Subtle glow effect */}
-      <div className="absolute -inset-1 bg-gradient-to-r from-accent/20 via-accent/5 to-accent/20 rounded-2xl blur-xl opacity-50 -z-10" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-accent/15 via-accent/5 to-accent/15 rounded-2xl blur-xl opacity-60 -z-10" />
     </div>
   );
 }

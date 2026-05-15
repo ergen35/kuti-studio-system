@@ -34,15 +34,17 @@ export function CreativeBackground({ images, className }: CreativeBackgroundProp
   return (
     <div className={clsx("fixed inset-0 -z-10 overflow-hidden", className)}>
       <div className="absolute inset-0 bg-surface" />
-      <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 auto-rows-fr gap-1 p-1 opacity-[0.08]">
+      <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 auto-rows-fr gap-1 p-1 opacity-[0.25] dark:opacity-[0.10]">
         {gridItems.map((item) => (
           <div key={item.id} className={clsx("relative overflow-hidden", item.colSpan === 2 && "col-span-2", item.rowSpan === 2 && "row-span-2")}>
             <img src={item.src} alt="" className="absolute inset-0 w-full h-full object-cover grayscale" />
           </div>
         ))}
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-surface/60 via-surface/40 to-surface/80" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(var(--surface-rgb),0.4)_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-surface/25 via-surface/15 to-surface/40" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--surface)_100%)] opacity-15" />
+      {/* Warm overlay for light theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-100/10 via-transparent to-amber-50/5 dark:hidden pointer-events-none" />
     </div>
   );
 }

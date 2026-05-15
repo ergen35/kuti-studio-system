@@ -24,20 +24,20 @@
 
 :root {
   color-scheme: light;
-  --bg: #f4f1eb;
-  --surface: #fffdf8;
-  --surface-2: #ebe6dc;
-  --surface-3: #ded7ca;
-  --ink: #241f1a;
-  --muted: #72685c;
-  --line: #d7cec0;
+  --bg: #f7f4ef;
+  --surface: #fffdfa;
+  --surface-2: #f0ebe3;
+  --surface-3: #e5ddd4;
+  --ink: #2a2420;
+  --muted: #756b60;
+  --line: #dcd4ca;
   --accent: #2f6f73;
   --accent-ink: #f7fffd;
   --danger: #a13d36;
   --warning: #9b6b21;
   --success: #357153;
   --draft: #6f6479;
-  --shadow: 0 14px 34px rgb(38 31 23 / 0.08);
+  --shadow: 0 14px 34px rgb(45 35 28 / 0.08);
 }
 
 :root[data-theme="dark"] {

@@ -37,8 +37,8 @@ export function ProjectCard({
   return (
     <div
       className={clsx(
-        "group relative rounded-xl border bg-surface/80 backdrop-blur-sm transition-all duration-200",
-        "hover:border-accent/50 hover:shadow-lg hover:-translate-y-0.5",
+        "group relative rounded-xl border bg-surface/90 backdrop-blur-sm transition-all duration-200",
+        "hover:border-accent/60 hover:shadow-lg hover:-translate-y-0.5",
         isGrid ? "p-5" : "p-4 flex items-center gap-4"
       )}
       onMouseEnter={() => setShowActions(true)}

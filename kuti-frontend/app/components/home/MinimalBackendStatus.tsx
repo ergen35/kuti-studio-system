@@ -39,7 +39,7 @@ export function MinimalBackendStatus({
       <div className="flex items-center gap-3">
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/80 backdrop-blur-sm border border-line/50 hover:border-accent/50 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/95 backdrop-blur-sm border border-line/60 hover:border-accent/60 hover:bg-surface shadow-sm transition-colors"
         >
           <span className={config.pulse ? "relative flex h-2 w-2" : ""}>
             <span className={config.pulse ? `animate-ping absolute inline-flex h-full w-full rounded-full ${config.color} opacity-75` : ""} />
