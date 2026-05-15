@@ -44,7 +44,7 @@ export function CreativeBackground({ images, className }: CreativeBackgroundProp
       <div className="absolute inset-0 bg-gradient-to-b from-surface/25 via-surface/15 to-surface/40" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--surface)_100%)] opacity-15" />
       {/* Warm overlay for light theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-100/10 via-transparent to-amber-50/5 dark:hidden pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-50/20 via-transparent to-amber-50/10 dark:hidden pointer-events-none" />
     </div>
   );
 }
