@@ -6,16 +6,76 @@
 /* Container */
 .lexical-editor-container {
   position: relative;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* Toolbar */
+.lexical-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 8px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toolbar-btn:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+.toolbar-btn.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toolbar-btn:disabled:hover {
+  background: transparent;
+  color: var(--muted);
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+  margin: 0 4px;
+}
+
+/* Content area */
+.lexical-editor-content {
+  position: relative;
 }
 
 /* Éditeur contentEditable */
 .lexical-content-editable {
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  padding: 12px;
+  padding: 16px;
   font-family: inherit;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.7;
   background: var(--surface);
   color: var(--ink);
   min-height: inherit;
@@ -24,19 +84,23 @@
 }
 
 .lexical-content-editable:focus {
-  border-color: var(--accent);
+  outline: none;
 }
 
 /* Placeholder */
 .lexical-placeholder {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 16px;
+  left: 16px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
   pointer-events: none;
   opacity: 0.6;
 }
+
+/* ============================================
+   TYPOGRAPHY STYLES
+   ============================================ */
 
 /* Paragraphs */
 .editor-paragraph {
@@ -47,7 +111,149 @@
   margin-bottom: 0;
 }
 
-/* Sélection */
+/* Headings */
+.editor-h1 {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.5em;
+  color: var(--ink);
+}
+
+.editor-h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0.75em 0 0.5em;
+  color: var(--ink);
+}
+
+.editor-h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0.75em 0 0.5em;
+  color: var(--ink);
+}
+
+/* Lists */
+.editor-ul,
+.editor-ol {
+  margin: 0.75em 0;
+  padding-left: 1.5em;
+}
+
+.editor-ul {
+  list-style-type: disc;
+}
+
+.editor-ol {
+  list-style-type: decimal;
+}
+
+.editor-listitem {
+  margin: 0.25em 0;
+}
+
+/* Quote */
+.editor-quote {
+  margin: 1em 0;
+  padding: 0.75em 1em;
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.editor-quote p {
+  margin: 0;
+}
+
+/* Code */
+.editor-code {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 0.875em;
+  background: var(--surface-3);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Links */
+.editor-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editor-link:hover {
+  text-decoration: none;
+}
+
+/* ============================================
+   NESTED ELEMENTS
+   ============================================ */
+
+.editor-h1 + .editor-paragraph,
+.editor-h2 + .editor-paragraph,
+.editor-h3 + .editor-paragraph {
+  margin-top: 0.5em;
+}
+
+.editor-blockquote + .editor-paragraph,
+.editor-ul + .editor-paragraph,
+.editor-ol + .editor-paragraph {
+  margin-top: 1em;
+}
+
+/* ============================================
+   SELECTION & HIGHLIGHTING
+   ============================================ */
+
 .lexical-content-editable ::selection {
   background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--ink);
+}
+
+/* Focus styles for accessibility */
+.lexical-editor-container:focus-within {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+  .lexical-toolbar {
+    padding: 6px;
+  }
+  
+  .toolbar-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .toolbar-separator {
+    height: 16px;
+    margin: 0 2px;
+  }
+  
+  .lexical-content-editable {
+    padding: 12px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .editor-h1 {
+    font-size: 1.75em;
+  }
+  
+  .editor-h2 {
+    font-size: 1.375em;
+  }
+  
+  .editor-h3 {
+    font-size: 1.125em;
+  }
 }

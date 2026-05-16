@@ -20,7 +20,6 @@ class WarningStatus(StrEnum):
 
 class WarningKind(StrEnum):
     missing_character_reference = "missing_character_reference"
-    invalid_location = "invalid_location"
     timeline_incoherence = "timeline_incoherence"
     orphan_reference = "orphan_reference"
     orphan_character_image = "orphan_character_image"

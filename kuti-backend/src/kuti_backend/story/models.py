@@ -49,8 +49,6 @@ class Scene(Base):
     chapter_id: Mapped[str] = mapped_column(String(36), ForeignKey("chapters.id"), index=True, nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    scene_type: Mapped[str] = mapped_column(String(64), nullable=False, default="")
-    location: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     summary: Mapped[str] = mapped_column(Text, nullable=False, default="")
     content: Mapped[str] = mapped_column(Text, nullable=False, default="")
     notes: Mapped[str] = mapped_column(Text, nullable=False, default="")

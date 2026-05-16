@@ -125,7 +125,7 @@ def _png_chunk(chunk_type: bytes, data: bytes) -> bytes:
 def _build_scene_snapshot_png(source: dict[str, object]) -> bytes:
     width = 512
     height = 768
-    seed = hashlib.sha256("|".join(str(source.get(key, "")) for key in ("label", "location", "summary", "content")).encode("utf-8")).digest()
+    seed = hashlib.sha256("|".join(str(source.get(key, "")) for key in ("label", "summary", "content")).encode("utf-8")).digest()
 
     def _rgb(offset: int) -> tuple[int, int, int]:
         return seed[offset % len(seed)], seed[(offset + 7) % len(seed)], seed[(offset + 13) % len(seed)]
@@ -222,7 +222,7 @@ def _source_summary(
         assert scene is not None
         return {
             **source,
-            "location": scene.location,
+
             "summary": scene.summary,
             "characters_json": deepcopy(scene.characters_json),
             "tags_json": deepcopy(scene.tags_json),
@@ -365,7 +365,7 @@ def _job_prompt(
 
 def _grid_items(source: dict[str, object], source_kind: GenerationSourceKind, selection_ids: list[str]) -> list[dict[str, str]]:
     if source_kind == GenerationSourceKind.scene:
-        return [{"title": str(source.get("label", "Scene")), "subtitle": str(source.get("summary") or source.get("location") or "Scene")}]
+        return [{"title": str(source.get("label", "Scene")), "subtitle": str(source.get("summary") or "Scene")}]
 
     if source_kind == GenerationSourceKind.chapter:
         items = [item for item in source.get("scenes", []) if isinstance(item, dict)]

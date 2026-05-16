@@ -19,8 +19,6 @@ import { SceneGenerationModal, SceneMangaGallery } from '~/components/scene';
 
 const sceneSchema = z.object({
   title: z.string().min(1, 'titleRequired'),
-  scene_type: z.string().optional(),
-  location: z.string().optional(),
   summary: z.string().optional(),
   content: z.string().optional(),
   characters_json: z.string().optional(),
@@ -188,8 +186,6 @@ export default function SceneRoute() {
     resolver: zodResolver(sceneSchema),
     defaultValues: useMemo(() => ({
       title: scene?.title || '',
-      scene_type: scene?.scene_type || '',
-      location: scene?.location || '',
       summary: scene?.summary || '',
       content: scene?.content || '',
       characters_json: toCsv(scene?.characters_json),
@@ -205,8 +201,6 @@ export default function SceneRoute() {
     setIsSaving(true);
     updateScene.mutate({
       title: data.title,
-      scene_type: data.scene_type,
-      location: data.location,
       summary: data.summary,
       content: data.content,
       characters_json: csv(data.characters_json || ''),
@@ -318,16 +312,6 @@ export default function SceneRoute() {
               <SectionTitle title={t('panels.sceneEditor.title')} />
               
               <div className="space-y-4 mt-3">
-                {/* Type & Location */}
-                <div className="grid gap-4 lg:grid-cols-2">
-                  <Field label={t('fields.type')}>
-                    <input {...register('scene_type')} placeholder="dialogue, action, description..." />
-                  </Field>
-                  <Field label={t('fields.location')}>
-                    <input {...register('location')} placeholder="Lieu de la scène" />
-                  </Field>
-                </div>
-                
                 {/* Summary */}
                 <Field label={t('fields.summary')}>
                   <textarea {...register('summary')} rows={3} placeholder="Résumé de la scène..." />
@@ -344,7 +328,7 @@ export default function SceneRoute() {
                         initialValue={field.value || ''}
                         onChange={field.onChange}
                         placeholder={t('editor.placeholder')}
-                        minHeight="400px"
+                        minHeight="600px"
                       />
                     )}
                   />

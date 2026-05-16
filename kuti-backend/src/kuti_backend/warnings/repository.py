@@ -13,18 +13,15 @@ from kuti_backend.story.repository import list_orphans, list_scenes, list_chapte
 from kuti_backend.warnings.models import Warning
 from kuti_backend.warnings.schemas import WarningKind, WarningSeverity, WarningStatus, WarningUpdate
 
-
 def _project_or_404(session: Session, project_id: str) -> Project:
     project = session.get(Project, project_id)
     if project is None:
         raise ValueError("project_not_found")
     return project
 
-
 def _fingerprint(*parts: object) -> str:
     payload = "::".join(str(part) for part in parts)
     return sha256(payload.encode("utf-8")).hexdigest()
-
 
 def _warning(
     *,
@@ -70,16 +67,13 @@ def _warning(
     warning.updated_at = datetime.now(UTC)
     return warning
 
-
 def list_warnings(session: Session, project_id: str) -> list[Warning]:
     stmt = select(Warning).where(Warning.project_id == project_id).order_by(Warning.status.asc(), Warning.severity.desc(), Warning.updated_at.desc())
     return list(session.scalars(stmt))
 
-
 def get_warning(session: Session, project_id: str, warning_id: str) -> Warning | None:
     stmt = select(Warning).where(Warning.project_id == project_id, Warning.id == warning_id)
     return session.scalar(stmt)
-
 
 def update_warning(session: Session, warning: Warning, payload: WarningUpdate) -> Warning:
     warning.status = payload.status.value
@@ -91,10 +85,8 @@ def update_warning(session: Session, warning: Warning, payload: WarningUpdate) -
     session.refresh(warning)
     return warning
 
-
 def _existing_by_fingerprint(session: Session, project_id: str) -> dict[str, Warning]:
     return {warning.fingerprint: warning for warning in list_warnings(session, project_id)}
-
 
 def _scene_character_warnings(session: Session, project_id: str, existing: dict[str, Warning], warnings: list[Warning]) -> None:
     characters = list(session.scalars(select(Character).where(Character.project_id == project_id)))
@@ -122,39 +114,6 @@ def _scene_character_warnings(session: Session, project_id: str, existing: dict[
                         existing=existing.get(fingerprint),
                     )
                 )
-
-
-def _location_warnings(session: Session, project_id: str, existing: dict[str, Warning], warnings: list[Warning]) -> None:
-    project = _project_or_404(session, project_id)
-    allowed_locations = {
-        str(item).strip().lower()
-        for item in (project.settings_json or {}).get("locations_json", [])
-        if str(item).strip()
-    }
-    if not allowed_locations:
-        return
-
-    for scene in list_scenes(session, project_id):
-        location = scene.location.strip()
-        if not location:
-            continue
-        if location.lower() not in allowed_locations:
-            fingerprint = _fingerprint("invalid_location", scene.id, location.lower())
-            warnings.append(
-                _warning(
-                    project_id=project_id,
-                    kind=WarningKind.invalid_location,
-                    severity=WarningSeverity.warning,
-                    title=f"Unknown location in {scene.title}",
-                    message=f'Scene "{scene.title}" uses location "{location}" which is not declared in project settings.',
-                    entity_kind="scene",
-                    entity_id=scene.id,
-                    fingerprint=fingerprint,
-                    metadata_json={"scene_id": scene.id, "scene_title": scene.title, "location": location},
-                    existing=existing.get(fingerprint),
-                )
-            )
-
 
 def _timeline_warnings(session: Session, project_id: str, existing: dict[str, Warning], warnings: list[Warning]) -> None:
     for tome in list_tomes(session, project_id):
@@ -203,14 +162,12 @@ def _timeline_warnings(session: Session, project_id: str, existing: dict[str, Wa
                         )
                     )
 
-
 def rebuild_warnings(session: Session, project_id: str) -> list[Warning]:
     _project_or_404(session, project_id)
     existing = _existing_by_fingerprint(session, project_id)
     warnings: list[Warning] = []
 
     _scene_character_warnings(session, project_id, existing, warnings)
-    _location_warnings(session, project_id, existing, warnings)
     _timeline_warnings(session, project_id, existing, warnings)
 
     for orphan in list_orphans(session, project_id):

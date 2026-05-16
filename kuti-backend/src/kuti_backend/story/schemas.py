@@ -88,8 +88,6 @@ class SceneBase(BaseModel):
     chapter_id: str
     title: str = Field(min_length=1, max_length=255)
     slug: str | None = Field(default=None, min_length=1, max_length=255)
-    scene_type: str = Field(default="", max_length=64)
-    location: str = Field(default="", max_length=255)
     summary: str = ""
     content: str = ""
     notes: str = ""
@@ -108,8 +106,6 @@ class SceneUpdate(BaseModel):
     chapter_id: str | None = None
     title: str | None = Field(default=None, min_length=1, max_length=255)
     slug: str | None = Field(default=None, min_length=1, max_length=255)
-    scene_type: str | None = Field(default=None, max_length=64)
-    location: str | None = Field(default=None, max_length=255)
     summary: str | None = None
     content: str | None = None
     notes: str | None = None
@@ -128,8 +124,6 @@ class SceneRead(BaseModel):
     chapter_id: str
     title: str
     slug: str
-    scene_type: str
-    location: str
     summary: str
     content: str
     notes: str

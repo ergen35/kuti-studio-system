@@ -168,8 +168,7 @@ def format_scene_content(scene: Scene) -> str:
     # Scene header
     lines.append(f'Scène: "{scene.title}"')
     
-    if scene.location:
-        lines.append(f"Lieu: {scene.location}")
+
     
     if scene.summary:
         lines.append(f"Résumé: {scene.summary}")

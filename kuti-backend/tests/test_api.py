@@ -601,7 +601,7 @@ def test_warning_generation_update_and_rebuild(tmp_path: Path, monkeypatch) -> N
 
     project = client.post(
         "/api/projects",
-        json={"name": "Continuity Desk", "settings_json": {"locations_json": ["Dockside"]}},
+        json={"name": "Continuity Desk"},
     ).json()
     project_id = project["id"]
 
@@ -617,7 +617,6 @@ def test_warning_generation_update_and_rebuild(tmp_path: Path, monkeypatch) -> N
             "tome_id": tome["id"],
             "chapter_id": chapter["id"],
             "title": "Fault Line",
-            "location": "Unknown Quarter",
             "characters_json": ["Ghost"],
             "content": "An echo of @character:ghost crosses the stage.",
             "order_index": 1,
@@ -635,7 +634,6 @@ def test_warning_generation_update_and_rebuild(tmp_path: Path, monkeypatch) -> N
     kinds = {item["kind"] for item in warning_items}
     assert kinds == {
         "missing_character_reference",
-        "invalid_location",
         "timeline_incoherence",
         "orphan_reference",
     }
@@ -658,19 +656,13 @@ def test_warning_generation_update_and_rebuild(tmp_path: Path, monkeypatch) -> N
 
     open_warnings = client.get(f"/api/projects/{project_id}/warnings", params={"status": "open"})
     assert open_warnings.status_code == 200
-    assert {item["kind"] for item in open_warnings.json()} == {"invalid_location", "timeline_incoherence"}
+    assert {item["kind"] for item in open_warnings.json()} == {"timeline_incoherence"}
 
     all_warnings = client.get(f"/api/projects/{project_id}/warnings")
     assert all_warnings.status_code == 200
     statuses = {item["kind"]: item["status"] for item in all_warnings.json()}
     assert statuses["missing_character_reference"] == "resolved"
     assert statuses["orphan_reference"] == "resolved"
-
-    patched_project = client.patch(
-        f"/api/projects/{project_id}",
-        json={"settings_json": {"locations_json": ["Dockside", "Unknown Quarter"]}},
-    )
-    assert patched_project.status_code == 200
 
     rescanned = client.post(f"/api/projects/{project_id}/warnings/scan")
     assert rescanned.status_code == 200
@@ -686,7 +678,7 @@ def test_export_workflow_generates_artifacts(tmp_path: Path, monkeypatch) -> Non
 
     project = client.post(
         "/api/projects",
-        json={"name": "Export House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Export House"},
     ).json()
     project_id = project["id"]
 
@@ -771,7 +763,7 @@ def test_generation_studio_creates_board_and_panels(tmp_path: Path, monkeypatch)
 
     project = client.post(
         "/api/projects",
-        json={"name": "Generation House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Generation House"},
     ).json()
     project_id = project["id"]
 
@@ -866,7 +858,7 @@ def test_generation_studio_uses_sora_2_with_source_image(tmp_path: Path, monkeyp
 
     project = client.post(
         "/api/projects",
-        json={"name": "Sora House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Sora House"},
     ).json()
     project_id = project["id"]
 
@@ -881,7 +873,6 @@ def test_generation_studio_uses_sora_2_with_source_image(tmp_path: Path, monkeyp
             "tome_id": tome["id"],
             "chapter_id": chapter["id"],
             "title": "Scene One",
-            "location": "Studio",
             "summary": "Ari tests the lighting.",
             "content": "Ari enters the studio and studies the cabinet.",
         },
@@ -919,7 +910,7 @@ def test_generation_studio_uses_seedance_2(tmp_path: Path, monkeypatch) -> None:
 
     project = client.post(
         "/api/projects",
-        json={"name": "Seedance House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Seedance House"},
     ).json()
     project_id = project["id"]
 
@@ -934,7 +925,6 @@ def test_generation_studio_uses_seedance_2(tmp_path: Path, monkeypatch) -> None:
             "tome_id": tome["id"],
             "chapter_id": chapter["id"],
             "title": "Scene One",
-            "location": "Studio",
             "summary": "Ari tests the lighting.",
             "content": "Ari enters the studio and studies the cabinet.",
         },
@@ -974,7 +964,7 @@ def test_generation_studio_supports_panel_follow_up(tmp_path: Path, monkeypatch)
 
     project = client.post(
         "/api/projects",
-        json={"name": "Panel Follow-up House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Panel Follow-up House"},
     ).json()
     project_id = project["id"]
 
@@ -1030,7 +1020,7 @@ def test_generation_studio_propagates_provider_failure(tmp_path: Path, monkeypat
 
     project = client.post(
         "/api/projects",
-        json={"name": "Generation House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Generation House"},
     ).json()
     project_id = project["id"]
 
@@ -1090,7 +1080,7 @@ def test_generation_job_requires_configured_image_model(tmp_path: Path, monkeypa
 
     project = client.post(
         "/api/projects",
-        json={"name": "Generation House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Generation House"},
     ).json()
     project_id = project["id"]
 
@@ -1133,7 +1123,7 @@ def test_generation_studio_supports_chapter_and_tome_grid_planches(tmp_path: Pat
 
     project = client.post(
         "/api/projects",
-        json={"name": "Grid House", "settings_json": {"locations_json": ["Studio"]}},
+        json={"name": "Grid House"},
     ).json()
     project_id = project["id"]
 

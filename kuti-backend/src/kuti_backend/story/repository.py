@@ -266,8 +266,6 @@ def create_scene(session: Session, project_id: str, payload: SceneCreate) -> Sce
         chapter_id=payload.chapter_id,
         title=payload.title,
         slug=slug,
-        scene_type=payload.scene_type,
-        location=payload.location,
         summary=payload.summary,
         content=payload.content,
         notes=payload.notes,
@@ -295,10 +293,6 @@ def update_scene(session: Session, project_id: str, scene: Scene, payload: Scene
         scene.title = payload.title
     if payload.slug is not None:
         scene.slug = _unique_slug(session, Scene, slugify(payload.slug), project_id, ignore_id=scene.id)
-    if payload.scene_type is not None:
-        scene.scene_type = payload.scene_type
-    if payload.location is not None:
-        scene.location = payload.location
     if payload.summary is not None:
         scene.summary = payload.summary
     if payload.content is not None:

@@ -5,14 +5,35 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { 
-  $getRoot, 
-  $createParagraphNode, 
-  $createTextNode, 
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+import {
+  $getRoot,
+  $createParagraphNode,
+  $createTextNode,
   type EditorState,
   type LexicalNode,
 } from 'lexical';
 import { ParagraphNode, TextNode } from 'lexical';
+import {
+  HeadingNode,
+  QuoteNode,
+} from '@lexical/rich-text';
+import { CodeNode } from '@lexical/code';
+import {
+  ListNode,
+  ListItemNode,
+} from '@lexical/list';
+import {
+  LinkNode,
+  AutoLinkNode,
+} from '@lexical/link';
+import {
+  TRANSFORMERS,
+} from '@lexical/markdown';
+import { EditorToolbar } from './EditorToolbar';
 
 interface LexicalEditorProps {
   initialValue: string;
@@ -22,13 +43,36 @@ interface LexicalEditorProps {
   id?: string;
 }
 
-// Configuration minimale
+// Extended configuration with rich text support
 const editorConfig = {
   namespace: 'kuti-editor',
   theme: {
     paragraph: 'editor-paragraph',
+    heading: {
+      h1: 'editor-h1',
+      h2: 'editor-h2',
+      h3: 'editor-h3',
+    },
+    list: {
+      ul: 'editor-ul',
+      ol: 'editor-ol',
+    },
+    listitem: 'editor-listitem',
+    quote: 'editor-quote',
+    code: 'editor-code',
+    link: 'editor-link',
   },
-  nodes: [ParagraphNode, TextNode],
+  nodes: [
+    ParagraphNode,
+    TextNode,
+    HeadingNode,
+    QuoteNode,
+    CodeNode,
+    ListNode,
+    ListItemNode,
+    LinkNode,
+    AutoLinkNode,
+  ],
   onError: (error: Error) => {
     console.error('Lexical error:', error);
   },
@@ -40,7 +84,6 @@ function InitialValuePlugin({ initialValue }: { initialValue: string }) {
   const hasInitialized = useRef(false);
 
   useEffect(() => {
-    // Ne charger que la première fois
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
@@ -48,7 +91,7 @@ function InitialValuePlugin({ initialValue }: { initialValue: string }) {
       const root = $getRoot();
       root.clear();
 
-      // Parser le texte en paragraphes
+      // Parse text into paragraphs
       const lines = initialValue.split('\n');
       for (const line of lines) {
         const paragraph = $createParagraphNode();
@@ -58,7 +101,7 @@ function InitialValuePlugin({ initialValue }: { initialValue: string }) {
         root.append(paragraph);
       }
     });
-  }, [editor]); // Ne pas dépendre de initialValue pour éviter les rechargements
+  }, [editor]);
 
   return null;
 }
@@ -73,11 +116,8 @@ function CustomOnChangePlugin({ onChange }: { onChange: (value: string) => void 
         const root = $getRoot();
         const paragraphs: string[] = [];
         
-        root.getChildren().forEach((paragraph: LexicalNode) => {
-          if (paragraph.getType() === 'paragraph') {
-            const text = paragraph.getTextContent();
-            paragraphs.push(text);
-          }
+        root.getChildren().forEach((node: LexicalNode) => {
+          paragraphs.push(node.getTextContent());
         });
         
         onChange(paragraphs.join('\n'));
@@ -100,19 +140,26 @@ export function LexicalEditor({
     <div className="lexical-editor-wrapper" style={{ minHeight }} id={id}>
       <LexicalComposer initialConfig={editorConfig}>
         <div className="lexical-editor-container">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="lexical-content-editable"
-                aria-placeholder={placeholder}
-                placeholder={
-                  <div className="lexical-placeholder">{placeholder}</div>
-                }
-              />
-            }
-            ErrorBoundary={({ children }) => <div>{children}</div>}
-          />
+          <EditorToolbar />
+          <div className="lexical-editor-content" style={{ minHeight: `calc(${minHeight} - 48px)` }}>
+            <RichTextPlugin
+              contentEditable={
+                <ContentEditable
+                  className="lexical-content-editable"
+                  aria-placeholder={placeholder}
+                  placeholder={
+                    <div className="lexical-placeholder">{placeholder}</div>
+                  }
+                />
+              }
+              ErrorBoundary={({ children }) => <div>{children}</div>}
+            />
+          </div>
           <HistoryPlugin />
+          <ListPlugin />
+          <LinkPlugin />
+          <TabIndentationPlugin />
+          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
           <InitialValuePlugin initialValue={initialValue} />
           <CustomOnChangePlugin onChange={onChange} />
         </div>
