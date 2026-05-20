@@ -87,7 +87,7 @@ export const app = new Elysia({
     mapJsonSchema: { zod: z.toJSONSchema },
     path: "/openapi",
     specPath: "/openapi/doc.json",
-    enabled: process.env.NODE_ENV === "DEVELOPMENT",
+    enabled: process.env.NODE_ENV === "development",
   }))
   .use(authModule)
   .use(uploadModule)
@@ -862,7 +862,7 @@ yarn typecheck
 Backend:
 
 ```env
-NODE_ENV=DEVELOPMENT
+NODE_ENV=development
 PORT=3500
 TRUSTED_ORIGINS=http://localhost:5173
 
