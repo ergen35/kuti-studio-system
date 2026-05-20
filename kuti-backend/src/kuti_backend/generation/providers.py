@@ -288,6 +288,22 @@ def generate_media_artifact(
     # Debug logging for troubleshooting
     import logging
     logger = logging.getLogger(__name__)
+    
+    # Print full request details
+    print("=" * 60)
+    print(f"POST {endpoint}")
+    print("-" * 60)
+    print("HEADERS:")
+    print(json.dumps({
+        "Authorization": f"Bearer {provider.api_key[:20]}..." if provider.api_key else None,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }, indent=2))
+    print("-" * 60)
+    print("BODY:")
+    print(json.dumps(request_payload, indent=2))
+    print("=" * 60)
+    
     logger.info(f"[ImageAPI] Request to {endpoint}")
     logger.info(f"[ImageAPI] Model: {request_payload.get('model')}")
     logger.info(f"[ImageAPI] API Key present: {bool(provider.api_key)}")
