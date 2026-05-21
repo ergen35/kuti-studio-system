@@ -20,8 +20,12 @@ import {
   SectionTitle,
   dateLabel,
 } from "~/components/ui";
-import { apiErrorMessage, API_BASE_URL, type Project } from "~/lib/api";
-import { useProjects, useCreateProject } from "~/hooks/use-api";
+import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
+import type { Project } from "~/lib/backend/types.gen";
+import {
+  listProjectsOptions,
+  createProjectMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
 import { keys, queryClient } from "~/lib/query";
 import { projectCreateSchema } from "~/lib/schemas";
 import type { ProjectCreateInput } from "~/lib/schemas";
@@ -48,7 +52,7 @@ interface ProjectWithMetrics {
 // =============================================================================
 
 function useBackgroundImages() {
-  const projects = useProjects();
+  const projects = useQuery(listProjectsOptions());
   
   const projectImagesQueries = useMemo(() => {
     const items = projects.data?.items || [];
@@ -149,8 +153,9 @@ function ProjectsSection() {
   const { t } = useTranslation(['home', 'common']);
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const queryClient = useQueryClient();
   
-  const projects = useProjects();
+  const projects = useQuery(listProjectsOptions());
   
   const open = useMutation({
     mutationFn: async (projectId: string) => {
@@ -272,14 +277,14 @@ function ProjectsSection() {
 export default function HomeRoute() {
   const navigate = useNavigate();
   const backgroundImages = useBackgroundImages();
+  const queryClient = useQueryClient();
   
-  const create = useCreateProject({
-    mutation: {
-      onSuccess: async (data) => {
-        await queryClient.invalidateQueries({ queryKey: keys.projects });
-        const project = data as Project;
-        navigate(`/projects/${project.id}`);
-      },
+  const create = useMutation({
+    ...createProjectMutation(),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: keys.projects });
+      const project = data as unknown as Project;
+      navigate(`/projects/${project.id}`);
     },
   });
   

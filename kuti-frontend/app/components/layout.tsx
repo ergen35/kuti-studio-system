@@ -3,8 +3,7 @@ import { NavLink, Outlet, useParams, useLocation } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { clsx } from "clsx";
 import { type ReactNode, useState, useEffect, useRef } from "react";
-import { api } from "~/lib/api";
-import { keys } from "~/lib/query";
+import { getProjectOptions } from "~/lib/backend/@tanstack/react-query.gen";
 import { useUiStore } from "~/stores/ui";
 import { useTranslation } from "~/hooks/useTranslation";
 import { Button } from "~/components/ui";
@@ -47,8 +46,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
   const { isOpen, setIsOpen, toggle } = useMobileSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const project = useQuery({
-    queryKey: projectId ? keys.project(projectId) : ["no-project"],
-    queryFn: () => api.project(projectId!),
+    ...getProjectOptions({ path: { projectId: projectId ?? '' } }),
     enabled: Boolean(projectId),
   });
 

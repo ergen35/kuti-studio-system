@@ -10,8 +10,8 @@ import { AppShell } from '~/components/layout';
 import { Button, ErrorState, LoadingState } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { CharacterCardGrid } from '~/components/characters';
-import { apiErrorMessage, API_BASE_URL } from '~/lib/api';
-import { useCharacters, useCreateCharacter } from '~/hooks/use-api';
+import { apiErrorMessage } from '~/lib/errors';
+import { listCharactersOptions, createCharacterMutation } from '~/lib/backend/@tanstack/react-query.gen';
 import { queryClient } from '~/lib/query';
 
 
@@ -152,7 +152,7 @@ export default function CharactersRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch all characters
-  const characters = useCharacters(projectId);
+  const characters = useQuery(listCharactersOptions({ path: { project_id: projectId } }));
   
   // Fetch character images for all characters
   const characterImages = useQuery({
@@ -168,7 +168,7 @@ export default function CharactersRoute() {
   });
   
   // Create mutation
-  const create = useCreateCharacter();
+  const create = useMutation(createCharacterMutation());
   
   // Delete character image mutation (for grid updates)
   const deleteImageMutation = useMutation({

@@ -2,7 +2,10 @@ import { useTranslation } from '~/hooks/useTranslation';
 import { CharacterCard } from './CharacterCard';
 import { EmptyState, Button } from '~/components/ui';
 import { Plus } from 'lucide-react';
-import type { Character, CharacterImage } from '~/lib/api';
+import type { ListCharactersResponse, ListCharacterImagesResponse } from '~/lib/backend';
+
+type Character = ListCharactersResponse[number];
+type CharacterImage = ListCharacterImagesResponse[number];
 
 interface CharacterCardGridProps {
   characters: Character[];

@@ -9,8 +9,8 @@ import { z } from 'zod';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field } from '~/components/ui';
-import type { Tome, Chapter, Scene } from '~/lib/api';
-import { api, apiErrorMessage } from '~/lib/api';
+import type { Tome, Chapter, Scene } from '~/lib/backend/types.gen';
+import { apiErrorMessage } from '~/lib/errors';
 import { invalidateWorkspace, keys } from '~/lib/query';
 import { StoryBreadcrumb } from '~/components/story';
 

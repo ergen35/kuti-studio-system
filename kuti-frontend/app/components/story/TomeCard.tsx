@@ -1,6 +1,8 @@
 import { BookOpen, Film, Clock } from 'lucide-react';
 import { useTranslation } from '~/hooks/useTranslation';
-import type { Tome } from '~/lib/api';
+import type { GetStorySummaryResponse } from '~/lib/backend';
+
+type Tome = GetStorySummaryResponse['tomes'][number];
 
 interface TomeCardProps {
   tome: Tome & {

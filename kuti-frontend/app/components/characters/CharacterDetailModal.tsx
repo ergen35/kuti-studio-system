@@ -7,8 +7,11 @@ import { CharacterAvatar } from './CharacterAvatar';
 import { FormField } from '~/components/FormField';
 import { Button, Panel, SectionTitle, Badge, toCsv } from '~/components/ui';
 import { characterSchema, relationSchema, type CharacterInput, type RelationInput } from '~/lib/schemas';
-import { csv } from '~/lib/api';
-import type { Character, CharacterDetail } from '~/lib/api';
+import { csv } from '~/lib/utils';
+import type { ListCharactersResponse, GetCharacterResponse } from '~/lib/backend';
+
+type Character = ListCharactersResponse[number];
+type CharacterDetail = GetCharacterResponse;
 
 interface CharacterDetailModalProps {
   character: Character;
@@ -44,33 +47,33 @@ export function CharacterDetailModal({
     resolver: zodResolver(characterSchema),
     defaultValues: {
       name: character.name,
-      alias: character.alias || '',
-      narrative_role: character.narrative_role || '',
+      alias: (character.alias as string | undefined) || '',
+      narrative_role: (character.narrativeRole as string | undefined) || '',
       description: character.description,
-      physical_description: character.physical_description,
-      key_traits_json: toCsv(character.key_traits_json),
-      color_palette_json: toCsv(character.color_palette_json),
-      costume_elements_json: toCsv(character.costume_elements_json),
+      physical_description: character.physicalDescription,
+      key_traits_json: toCsv(character.keyTraitsJson),
+      color_palette_json: toCsv(character.colorPaletteJson),
+      costume_elements_json: toCsv(character.costumeElementsJson),
       personality: character.personality,
-      narrative_arc: character.narrative_arc,
-      tags_json: toCsv(character.tags_json),
+      narrative_arc: character.narrativeArc,
+      tags_json: toCsv(character.tagsJson),
     },
   });
-  
+
   // Reset form when character changes
   useEffect(() => {
     reset({
       name: character.name,
-      alias: character.alias || '',
-      narrative_role: character.narrative_role || '',
+      alias: (character.alias as string | undefined) || '',
+      narrative_role: (character.narrativeRole as string | undefined) || '',
       description: character.description,
-      physical_description: character.physical_description,
-      key_traits_json: toCsv(character.key_traits_json),
-      color_palette_json: toCsv(character.color_palette_json),
-      costume_elements_json: toCsv(character.costume_elements_json),
+      physical_description: character.physicalDescription,
+      key_traits_json: toCsv(character.keyTraitsJson),
+      color_palette_json: toCsv(character.colorPaletteJson),
+      costume_elements_json: toCsv(character.costumeElementsJson),
       personality: character.personality,
-      narrative_arc: character.narrative_arc,
-      tags_json: toCsv(character.tags_json),
+      narrative_arc: character.narrativeArc,
+      tags_json: toCsv(character.tagsJson),
     });
   }, [character, reset]);
   
@@ -118,7 +121,7 @@ export function CharacterDetailModal({
         <div className="relative flex items-center gap-4 p-6 border-b border-line bg-surface-2/30">
           <CharacterAvatar
             name={character.name}
-            colorPalette={character.color_palette_json}
+            colorPalette={character.colorPaletteJson}
             size="md"
           />
           <div className="flex-1">
@@ -212,10 +215,10 @@ export function CharacterDetailModal({
                     {detail.relations.map((rel) => (
                       <div key={rel.id} className="p-3 rounded-lg bg-surface-2/50 border border-line/50">
                         <div className="flex items-center justify-between">
-                          <Badge>{rel.relation_type}</Badge>
+                          <Badge>{rel.relationType}</Badge>
                           <span className="text-xs text-muted">{rel.strength}%</span>
                         </div>
-                        <p className="text-xs text-muted mt-1">{rel.target_character_id}</p>
+                        <p className="text-xs text-muted mt-1">{rel.targetCharacterId}</p>
                       </div>
                     ))}
                   </div>
@@ -235,14 +238,14 @@ export function CharacterDetailModal({
               <Panel className="!p-4">
                 <SectionTitle 
                   title={t('voiceSamples.title')} 
-                  meta={detail ? `${detail.voice_samples.length} ${t('voiceSamples.count', { count: detail.voice_samples.length })}` : ''}
+                  meta={detail ? `${detail.voiceSamples.length} ${t('voiceSamples.count', { count: detail.voiceSamples.length })}` : ''}
                 />
-                {detail && detail.voice_samples.length > 0 ? (
+                {detail && detail.voiceSamples.length > 0 ? (
                   <div className="space-y-2 mt-3">
-                    {detail.voice_samples.map((sample) => (
+                    {detail.voiceSamples.map((sample) => (
                       <div key={sample.id} className="p-3 rounded-lg bg-surface-2/50 border border-line/50">
                         <p className="text-sm font-medium text-ink">{sample.label}</p>
-                        <p className="text-xs text-muted">{sample.voice_notes || sample.asset_path}</p>
+                        <p className="text-xs text-muted">{sample.voiceNotes || sample.assetPath}</p>
                       </div>
                     ))}
                   </div>

@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router';
 import { ChevronRight, Check, ChevronDown } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTranslation } from '~/hooks/useTranslation';
-import type { Tome, Chapter, Scene } from '~/lib/api';
+import type { GetStorySummaryResponse } from '~/lib/backend';
+
+type Tome = GetStorySummaryResponse['tomes'][number];
+type Chapter = GetStorySummaryResponse['chapters'][number];
+type Scene = GetStorySummaryResponse['scenes'][number];
 
 interface StoryBreadcrumbProps {
   projectId: string;
@@ -121,20 +125,20 @@ export function StoryBreadcrumb({
   const [openDropdown, setOpenDropdown] = useState<'tome' | 'chapter' | 'scene' | null>(null);
   
   // Sort items
-  const sortedTomes = [...tomes].sort((a, b) => a.order_index - b.order_index);
-  
+  const sortedTomes = [...tomes].sort((a, b) => a.orderIndex - b.orderIndex);
+
   // Current tome chapters
-  const tomeChapters = currentTomeId 
+  const tomeChapters = currentTomeId
     ? chapters
-        .filter(c => c.tome_id === currentTomeId)
-        .sort((a, b) => a.order_index - b.order_index)
+        .filter(c => c.tomeId === currentTomeId)
+        .sort((a, b) => a.orderIndex - b.orderIndex)
     : [];
-  
+
   // Current chapter scenes
   const chapterScenes = currentChapterId && scenes
     ? scenes
-        .filter(s => s.chapter_id === currentChapterId)
-        .sort((a, b) => a.order_index - b.order_index)
+        .filter(s => s.chapterId === currentChapterId)
+        .sort((a, b) => a.orderIndex - b.orderIndex)
     : [];
   
   // Build tome items

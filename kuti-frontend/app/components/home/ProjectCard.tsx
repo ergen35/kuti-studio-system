@@ -4,7 +4,7 @@ import { useState } from "react";
 import { clsx } from "clsx";
 import { FolderOpen, Copy, Archive, MoreHorizontal, BookOpen, Film, Users } from "lucide-react";
 import { Button, Badge, dateLabel } from "~/components/ui";
-import type { Project } from "~/lib/api";
+import type { Project } from "~/lib/backend/types.gen";
 
 interface ProjectMetrics {
   tomes: number;

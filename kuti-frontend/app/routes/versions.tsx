@@ -1,5 +1,5 @@
 import { RotateCcw, Save } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,29 +7,40 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, EmptyState, ErrorState, LoadingState, PageHeader, Panel, dateLabel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { apiErrorMessage } from "~/lib/api";
-import { useVersions, useBranches, useCreateVersion, useRestoreVersion } from "~/hooks/use-api";
-import { queryClient } from "~/lib/query";
+import { apiErrorMessage } from "~/lib/errors";
+import {
+  listVersionsOptions,
+  listBranchesOptions,
+  createVersionMutation,
+  restoreVersionMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
 import { versionCreateSchema, type VersionCreateInput } from "~/lib/schemas";
 
 export default function VersionsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['versions', 'common']);
-  const versions = useVersions(projectId);
-  const branches = useBranches(projectId);
+  const queryClient = useQueryClient();
+  const versions = useQuery({ ...listVersionsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
+  const branches = useQuery({ ...listBranchesOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<VersionCreateInput>({
     resolver: zodResolver(versionCreateSchema),
     defaultValues: { branch: 'main', label: 'Checkpoint' },
   });
   
-  const create = useCreateVersion();
+  const create = useMutation({
+    ...createVersionMutation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listVersions"] });
+      queryClient.invalidateQueries({ queryKey: ["listBranches"] });
+    },
+  });
   const onSubmit = (data: VersionCreateInput) => create.mutate({
-    path: { project_id: projectId },
-    body: { label: data.label, branch_name: data.branch }
-  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readVersionsApiProjectsProjectIdVersionsGet"] }); } });
+    path: { projectId: projectId },
+    body: { label: data.label, branchName: data.branch }
+  }, { onSuccess: () => reset() });
   
-  const restore = useRestoreVersion();
+  const restore = useMutation(restoreVersionMutation());
 
   return (
     <AppShell>
@@ -49,7 +60,7 @@ export default function VersionsRoute() {
         </Panel>
         <Panel>
           <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.branches.title')}</h2>
-          <div className="grid gap-2">{(branches.data || []).map((item) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.branch_name}><strong className="text-sm text-ink">{item.branch_name}</strong><small className="text-xs text-muted">{item.version_count} {t('panels.branches.count', { count: item.version_count })} · {t('panels.branches.latest')} {dateLabel(item.latest_created_at)}</small></div>)}</div>
+          <div className="grid gap-2">{(branches.data || []).map((item: { branchName: string; versionCount: number; latestCreatedAt: string }) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.branchName}><strong className="text-sm text-ink">{item.branchName}</strong><small className="text-xs text-muted">{item.versionCount} {t('panels.branches.count', { count: item.versionCount })} · {t('panels.branches.latest')} {dateLabel(item.latestCreatedAt)}</small></div>)}</div>
         </Panel>
       </div>
       <div className="mt-3">
@@ -59,7 +70,7 @@ export default function VersionsRoute() {
         <div className="overflow-x-auto rounded-[7px] border border-line bg-surface shadow-card">
           <table className="w-full border-collapse text-left text-sm">
             <thead><tr className="border-b border-line text-xs text-muted"><th className="p-2.5 font-semibold">{t('table.version')}</th><th className="p-2.5 font-semibold">{t('table.branch')}</th><th className="p-2.5 font-semibold">{t('table.created')}</th><th className="p-2.5" /></tr></thead>
-            <tbody>{(versions.data || []).map((version) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.version_index}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branch_name}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.created_at)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate({ path: { project_id: projectId, version_id: version.id } })}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
+            <tbody>{(versions.data || []).map((version: { id: string; label: string; summary?: string; versionIndex: number; branchName: string; createdAt: string }) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.versionIndex}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branchName}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.createdAt)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate({ path: { projectId: projectId, versionId: version.id } })}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
           </table>
         </div>
       </div>

@@ -13,22 +13,31 @@ import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, toCsv } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { CharacterAvatar, CharacterImageGallery, CharacterImageGenerator, ImageLightbox } from '~/components/characters';
-import { apiErrorMessage, csv, type Character, type CharacterImage, type CharacterRelation, type VoiceSample } from '~/lib/api';
+import { apiErrorMessage } from '~/lib/errors';
+import { csv } from '~/lib/utils';
 import { queryClient } from '~/lib/query';
+import type { GetCharacterResponse, ListCharactersResponse, ListCharacterImagesResponse, UpdateCharacterData } from '~/lib/backend';
 import {
-  useCharacter,
-  useCharacters,
-  useCharacterImages,
-  useUpdateCharacter,
-  useArchiveCharacter,
-  useDeleteCharacter,
-  useCreateRelation,
-} from '~/hooks/use-api';
+  getCharacterOptions,
+  listCharactersOptions,
+  listCharacterImagesOptions,
+  updateCharacterMutation,
+  archiveCharacterMutation,
+  deleteCharacterMutation,
+  createRelationMutation,
+  deleteCharacterImageMutation,
+} from '~/lib/backend/@tanstack/react-query.gen';
 import { characterSchema, relationSchema, type CharacterInput, type RelationInput } from '~/lib/schemas';
 
 const ITEMS_PER_PAGE = 10;
 
 const sidePanelItemClass = "flex items-center gap-3 w-full p-2.5 rounded-lg border border-line bg-surface-2/30 text-left transition-all hover:border-accent hover:bg-surface-2/60";
+
+// Derived types from SDK
+type CharacterFromList = ListCharactersResponse[number];
+type CharacterImageFromList = ListCharacterImagesResponse[number];
+type CharacterRelationFromSDK = GetCharacterResponse['relations'][number];
+type VoiceSampleFromSDK = GetCharacterResponse['voiceSamples'][number];
 
 // Accordion section component
 function AccordionSection({ 
@@ -90,16 +99,16 @@ function CharacterSidePanel({
   onImageClick,
   relationMutation,
 }: {
-  characters: Character[];
+  characters: CharacterFromList[];
   currentCharacterId: string;
   projectId: string;
-  relations: CharacterRelation[];
-  voiceSamples: VoiceSample[];
-  images: CharacterImage[];
+  relations: CharacterRelationFromSDK[];
+  voiceSamples: VoiceSampleFromSDK[];
+  images: CharacterImageFromList[];
   imageLoading: boolean;
-  onDeleteImage?: (image: CharacterImage) => void;
-  onImageClick: (image: CharacterImage, index: number) => void;
-  relationMutation: UseMutationResult<CharacterRelation, Error, RelationInput, unknown>;
+  onDeleteImage?: (image: CharacterImageFromList) => void;
+  onImageClick: (image: CharacterImageFromList, index: number) => void;
+  relationMutation: UseMutationResult<unknown, Error, RelationInput, unknown>;
 }) {
   const { t } = useTranslation('characters');
   const navigate = useNavigate();
@@ -117,8 +126,8 @@ function CharacterSidePanel({
       const query = searchQuery.toLowerCase();
       result = result.filter(c => 
         c.name.toLowerCase().includes(query) ||
-        (c.narrative_role && c.narrative_role.toLowerCase().includes(query)) ||
-        (c.alias && c.alias.toLowerCase().includes(query))
+        (c.narrativeRole && typeof c.narrativeRole === 'string' && c.narrativeRole.toLowerCase().includes(query)) ||
+        (c.alias && typeof c.alias === 'string' && c.alias.toLowerCase().includes(query))
       );
     }
     
@@ -195,12 +204,14 @@ function CharacterSidePanel({
               >
                 <CharacterAvatar
                   name={char.name}
-                  colorPalette={char.color_palette_json}
+                  colorPalette={char.colorPaletteJson}
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-ink truncate">{char.name}</p>
-                  <p className="text-xs text-muted truncate">{char.narrative_role || char.slug}</p>
+                  <p className="text-xs text-muted truncate">
+                    {typeof char.narrativeRole === 'string' ? char.narrativeRole : char.slug}
+                  </p>
                 </div>
                 <ChevronRight size={14} className="text-muted" />
               </button>
@@ -250,10 +261,10 @@ function CharacterSidePanel({
                 className="p-2.5 rounded-lg bg-surface-2/50 border border-line/50"
               >
                 <div className="flex items-center justify-between">
-                  <Badge>{rel.relation_type}</Badge>
+                  <Badge>{rel.relationType}</Badge>
                   <span className="text-xs text-muted">{rel.strength}%</span>
                 </div>
-                <p className="text-xs text-muted mt-1 truncate">→ {rel.target_character_id}</p>
+                <p className="text-xs text-muted mt-1 truncate">→ {rel.targetCharacterId}</p>
               </div>
             ))}
           </div>
@@ -266,10 +277,10 @@ function CharacterSidePanel({
         {/* Add relation form */}
         <RelationQuickAdd
           characters={characters.filter(c => c.id !== currentCharacterId)}
-          onSubmit={((relationData: { target_character_id: string; relation_type: string; strength: number }) => {
+          onSubmit={((relationData: { targetCharacterId: string; relationType: string; strength: number }) => {
             relationMutation.mutate({ 
-              path: { project_id: projectId, character_id: currentCharacterId }, 
-              body: { source_character_id: currentCharacterId, ...relationData }
+              path: { projectId, characterId: currentCharacterId }, 
+              body: { sourceCharacterId: currentCharacterId, ...relationData }
             } as never);
           }) as never}
           submitting={relationMutation.isPending}
@@ -290,7 +301,9 @@ function CharacterSidePanel({
                 className="p-2.5 rounded-lg bg-surface-2/50 border border-line/50"
               >
                 <p className="text-sm font-medium text-ink">{sample.label}</p>
-                <p className="text-xs text-muted truncate">{sample.voice_notes || sample.asset_path}</p>
+                <p className="text-xs text-muted truncate">
+                  {sample.voiceNotes || (typeof sample.assetPath === 'string' ? sample.assetPath : '')}
+                </p>
               </div>
             ))}
           </div>
@@ -335,40 +348,75 @@ export default function CharacterRoute() {
   const navigate = useNavigate();
   const { t } = useTranslation(['characters', 'common']);
   
-  // Fetch current character detail
-  const character = useCharacter(projectId, characterId);
+  // Fetch current character detail using SDK
+  const character = useQuery({
+    ...getCharacterOptions({
+      path: { projectId, characterId }
+    }),
+  });
   
-  // Fetch all characters for sidepanel
-  const allCharacters = useCharacters(projectId);
+  // Fetch all characters for sidepanel using SDK
+  const allCharacters = useQuery({
+    ...listCharactersOptions({
+      path: { projectId }
+    })
+  });
   
-  // Mutations
-  const update = useUpdateCharacter();
-  const archive = useArchiveCharacter();
-  const remove = useDeleteCharacter();
-  const relation = useCreateRelation();
-  
-  // Fetch character images
-  const imagesQuery = useCharacterImages(projectId, characterId);
-  
-  // Delete image mutation
-  const deleteImageMutation = useMutation({
-    mutationFn: async (imageId: string) => {
-      const { deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete } = await import('~/lib/backend');
-      await deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete({
-        path: { project_id: projectId, character_id: characterId, image_id: imageId }
-      });
-    },
+  // Mutations using SDK
+  const updateConfig = updateCharacterMutation();
+  const update = useMutation({
+    ...updateConfig,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['readCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGet'] });
+      queryClient.invalidateQueries({ queryKey: ['getCharacter'] });
+    }
+  });
+  
+  const archiveConfig = archiveCharacterMutation();
+  const archive = useMutation({
+    ...archiveConfig,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getCharacter'] });
+    }
+  });
+  
+  const deleteConfig = deleteCharacterMutation();
+  const remove = useMutation({
+    ...deleteConfig,
+    onSuccess: () => {
+      navigate(`/projects/${projectId}/characters`);
+    }
+  });
+  
+  const relationConfig = createRelationMutation();
+  const relation = useMutation({
+    ...relationConfig,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getCharacter'] });
+    }
+  });
+  
+  // Fetch character images using SDK
+  const imagesQuery = useQuery({
+    ...listCharacterImagesOptions({
+      path: { projectId, characterId }
+    })
+  });
+  
+  // Delete image mutation using SDK
+  const deleteImageConfig = deleteCharacterImageMutation();
+  const deleteImageMutation = useMutation({
+    ...deleteImageConfig,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listCharacterImages'] });
     },
   });
   
   // Lightbox state
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const lightboxImage = selectedImageIndex !== null ? ((imagesQuery.data as unknown as CharacterImage[])?.[selectedImageIndex] || null) : null;
+  const lightboxImage = selectedImageIndex !== null ? (imagesQuery.data?.[selectedImageIndex] || null) : null;
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
-  const handleImageClick = (image: CharacterImage, index: number) => {
+  const handleImageClick = (image: CharacterImageFromList, index: number) => {
     setSelectedImageIndex(index);
     setIsLightboxOpen(true);
   };
@@ -382,9 +430,11 @@ export default function CharacterRoute() {
     setSelectedImageIndex(null);
   };
   
-  const handleDeleteImage = (image: CharacterImage) => {
+  const handleDeleteImage = (image: CharacterImageFromList) => {
     if (confirm('Supprimer cette image ?')) {
-      deleteImageMutation.mutate(image.id);
+      deleteImageMutation.mutate({
+        path: { projectId, characterId, imageId: image.id }
+      });
     }
   };
   
@@ -412,6 +462,8 @@ export default function CharacterRoute() {
     );
   }
 
+  const characterData = character.data;
+
   return (
     <AppShell>
       {/* Back link */}
@@ -430,17 +482,17 @@ export default function CharacterRoute() {
           {/* Header with avatar */}
           <div className="flex items-start gap-4 p-4 border-b border-line bg-surface-2/20 -m-3.5 mb-4">
             <CharacterAvatar
-              name={character.data.name}
-              colorPalette={character.data.color_palette_json}
+              name={characterData.name}
+              colorPalette={characterData.colorPaletteJson}
               size="lg"
             />
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-semibold text-ink truncate">{character.data.name}</h1>
-              <p className="text-sm text-muted font-mono">{character.data.slug}</p>
+              <h1 className="text-xl font-semibold text-ink truncate">{characterData.name}</h1>
+              <p className="text-sm text-muted font-mono">{characterData.slug}</p>
               <div className="flex items-center gap-2 mt-2">
-                <Badge>{character.data.status}</Badge>
-                {character.data.narrative_role && (
-                  <span className="text-xs text-muted">· {character.data.narrative_role}</span>
+                <Badge>{characterData.status}</Badge>
+                {typeof characterData.narrativeRole === 'string' && characterData.narrativeRole && (
+                  <span className="text-xs text-muted">· {characterData.narrativeRole}</span>
                 )}
               </div>
             </div>
@@ -449,18 +501,18 @@ export default function CharacterRoute() {
           {/* Image Generator */}
           <div className="mb-4">
             <CharacterImageGenerator 
-              character={character.data as unknown as import('~/lib/api').Character}
+              character={characterData as unknown as CharacterFromList}
               projectId={projectId}
             />
           </div>
           
           {/* Form */}
           <CharacterForm
-            initialData={character.data as unknown as Character}
+            initialData={characterData}
             saving={update.isPending}
-            onSave={(body) => update.mutate({ path: { project_id: projectId, character_id: characterId }, body })}
-            onArchive={() => archive.mutate({ path: { project_id: projectId, character_id: characterId } })}
-            onDelete={() => remove.mutate({ path: { project_id: projectId, character_id: characterId } })}
+            onSave={(body) => update.mutate({ path: { projectId, characterId }, body })}
+            onArchive={() => archive.mutate({ path: { projectId, characterId } })}
+            onDelete={() => remove.mutate({ path: { projectId, characterId } })}
             archiving={archive.isPending}
             deleting={remove.isPending}
           />
@@ -468,16 +520,16 @@ export default function CharacterRoute() {
         
         {/* Sidepanel with accordion */}
         <CharacterSidePanel
-          characters={(allCharacters.data?.items || []) as Character[]}
+          characters={allCharacters.data || []}
           currentCharacterId={characterId}
           projectId={projectId}
-          relations={(character.data?.relations || []) as CharacterRelation[]}
-          voiceSamples={(character.data?.voice_samples || []) as VoiceSample[]}
-          images={(imagesQuery.data as unknown as { items: CharacterImage[] })?.items || []}
+          relations={characterData.relations || []}
+          voiceSamples={characterData.voiceSamples || []}
+          images={imagesQuery.data || []}
           imageLoading={imagesQuery.isLoading}
           onDeleteImage={handleDeleteImage}
           onImageClick={handleImageClick}
-          relationMutation={relation as unknown as UseMutationResult<CharacterRelation, Error, import('~/lib/schemas').RelationInput, unknown>}
+          relationMutation={relation as unknown as UseMutationResult<unknown, Error, RelationInput, unknown>}
         />
         
         {/* Lightbox */}
@@ -485,7 +537,7 @@ export default function CharacterRoute() {
           image={lightboxImage}
           isOpen={isLightboxOpen}
           onClose={handleCloseLightbox}
-          images={(imagesQuery.data as unknown as { items: CharacterImage[] })?.items || []}
+          images={imagesQuery.data || []}
           currentIndex={selectedImageIndex ?? 0}
           onNavigate={handleLightboxNavigate}
           projectId={projectId}
@@ -497,6 +549,8 @@ export default function CharacterRoute() {
 }
 
 // Character form component
+type UpdateCharacterBody = UpdateCharacterData['body'];
+
 function CharacterForm({
   initialData,
   saving,
@@ -506,9 +560,9 @@ function CharacterForm({
   archiving,
   deleting,
 }: {
-  initialData: Character;
+  initialData: GetCharacterResponse;
   saving: boolean;
-  onSave: (body: Partial<Character>) => void;
+  onSave: (body: UpdateCharacterBody) => void;
   onArchive: () => void;
   onDelete: () => void;
   archiving: boolean;
@@ -519,31 +573,31 @@ function CharacterForm({
     resolver: zodResolver(characterSchema),
     defaultValues: {
       name: initialData.name,
-      alias: initialData.alias || '',
-      narrative_role: initialData.narrative_role || '',
+      alias: typeof initialData.alias === 'string' ? initialData.alias : '',
+      narrative_role: typeof initialData.narrativeRole === 'string' ? initialData.narrativeRole : '',
       description: initialData.description,
-      physical_description: initialData.physical_description,
-      key_traits_json: toCsv(initialData.key_traits_json),
-      color_palette_json: toCsv(initialData.color_palette_json),
-      costume_elements_json: toCsv(initialData.costume_elements_json),
+      physical_description: initialData.physicalDescription,
+      key_traits_json: toCsv(initialData.keyTraitsJson),
+      color_palette_json: toCsv(initialData.colorPaletteJson),
+      costume_elements_json: toCsv(initialData.costumeElementsJson),
       personality: initialData.personality,
-      narrative_arc: initialData.narrative_arc,
-      tags_json: toCsv(initialData.tags_json),
+      narrative_arc: initialData.narrativeArc,
+      tags_json: toCsv(initialData.tagsJson),
     },
   });
 
   const onSubmit = (data: CharacterInput) => onSave({
     name: data.name,
     alias: data.alias,
-    narrative_role: data.narrative_role,
+    narrativeRole: data.narrative_role,
     description: data.description,
-    physical_description: data.physical_description,
-    key_traits_json: csv(data.key_traits_json),
-    color_palette_json: csv(data.color_palette_json),
-    costume_elements_json: csv(data.costume_elements_json),
+    physicalDescription: data.physical_description,
+    keyTraitsJson: csv(data.key_traits_json),
+    colorPaletteJson: csv(data.color_palette_json),
+    costumeElementsJson: csv(data.costume_elements_json),
     personality: data.personality,
-    narrative_arc: data.narrative_arc,
-    tags_json: csv(data.tags_json),
+    narrativeArc: data.narrative_arc,
+    tagsJson: csv(data.tags_json),
   });
 
   return (
@@ -615,8 +669,8 @@ function RelationQuickAdd({
   onSubmit, 
   submitting
 }: { 
-  characters: Character[]; 
-  onSubmit: (data: RelationInput) => void;
+  characters: CharacterFromList[]; 
+  onSubmit: (data: { targetCharacterId: string; relationType: string; strength: number }) => void;
   submitting: boolean;
 }) {
   const { t } = useTranslation('characters');
@@ -628,7 +682,11 @@ function RelationQuickAdd({
   const target = watch('target_character_id');
   
   const handleFormSubmit = (data: RelationInput) => {
-    onSubmit(data);
+    onSubmit({
+      targetCharacterId: data.target_character_id,
+      relationType: data.relation_type,
+      strength: data.strength
+    });
     reset({ target_character_id: '', relation_type: 'ally', strength: 50 });
   };
   

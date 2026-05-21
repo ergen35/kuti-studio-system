@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import { Image, Trash2 } from 'lucide-react';
-import type { CharacterImage } from '~/lib/api';
-import { api } from '~/lib/api';
+import { characterImageUrl } from '~/lib/image-urls';
+import type { ListCharacterImagesResponse } from '~/lib/backend';
 
-
+type CharacterImage = ListCharacterImagesResponse[number];
 
 interface CharacterImageGalleryProps {
   images: CharacterImage[];
@@ -18,7 +18,7 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Build image URL from backend
-  const getImageUrl = (imageId: string) => api.characterImageUrl(projectId, characterId, imageId);
+  const getImageUrl = (imageId: string) => characterImageUrl(projectId, characterId, imageId);
 
   // Get readable strategy name
   const getStrategyLabel = (strategy: string | null) => {

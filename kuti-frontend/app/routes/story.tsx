@@ -10,8 +10,8 @@ import { AppShell } from '~/components/layout';
 import { Button, ErrorState, LoadingState } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { TomeCardGrid } from '~/components/story';
-import { apiErrorMessage } from '~/lib/api';
-import { useStory, useCreateTome } from '~/hooks/use-api';
+import { apiErrorMessage } from '~/lib/errors';
+import { getStorySummaryOptions, createTomeMutation } from '~/lib/backend/@tanstack/react-query.gen';
 import { queryClient } from '~/lib/query';
 
 // Schema for creating a new tome
@@ -139,10 +139,10 @@ export default function StoryRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch story data
-  const story = useStory(projectId);
-  
+  const story = useQuery(getStorySummaryOptions({ path: { project_id: projectId } }));
+
   // Create tome mutation
-  const createTome = useCreateTome();
+  const createTome = useMutation(createTomeMutation());
   
   const handleCreateSubmit = (data: CreateTomeInput) => {
     createTome.mutate(

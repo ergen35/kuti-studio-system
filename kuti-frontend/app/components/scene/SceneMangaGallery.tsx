@@ -15,9 +15,15 @@ import {
   Maximize2,
 } from "lucide-react";
 import { Button, Badge, EmptyState, LoadingState, ErrorState } from "~/components/ui";
-import type { SceneMangaPage } from "~/lib/api";
-import { api, apiErrorMessage } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import type { SceneMangaPage } from "~/lib/backend/types.gen";
+import {
+  listSceneMangaPagesOptions,
+  updateSceneMangaPageMutation,
+  deleteSceneMangaPageMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
+import { apiErrorMessage } from "~/lib/errors";
+import { invalidateWorkspace } from "~/lib/query";
+import { client } from "~/lib/backend-client";
 
 interface SceneMangaGalleryProps {
   projectId: string;
@@ -28,29 +34,25 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  // Fetch pages
+  // Fetch pages using SDK
   const pagesQuery = useQuery({
-    queryKey: keys.sceneMangaPages(projectId, sceneId),
-    queryFn: () => api.sceneMangaPages(projectId, sceneId),
+    ...listSceneMangaPagesOptions({
+      client,
+      path: { projectId, sceneId },
+    }),
   });
 
-  // Update page mutation
+  // Update page mutation using SDK
   const updatePage = useMutation({
-    mutationFn: ({
-      pageId,
-      data,
-    }: {
-      pageId: string;
-      data: { label?: string; status?: "draft" | "selected" | "rejected" };
-    }) => api.updateSceneMangaPage(projectId, sceneId, pageId, data),
+    ...updateSceneMangaPageMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
     },
   });
 
-  // Delete page mutation
+  // Delete page mutation using SDK
   const deletePage = useMutation({
-    mutationFn: (pageId: string) => api.deleteSceneMangaPage(projectId, sceneId, pageId),
+    ...deleteSceneMangaPageMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
     },
@@ -124,10 +126,15 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               setSelectedPageId(page.id);
               setLightboxOpen(true);
             }}
-            onUpdate={(data) => updatePage.mutate({ pageId: page.id, data })}
-            onDelete={() => deletePage.mutate(page.id)}
+            onUpdate={(data) => updatePage.mutate({
+              path: { projectId, sceneId, pageId: page.id },
+              body: data,
+            })}
+            onDelete={() => deletePage.mutate({
+              path: { projectId, sceneId, pageId: page.id },
+            })}
             isUpdating={updatePage.isPending}
-            isDeleting={deletePage.isPending && deletePage.variables === page.id}
+            isDeleting={deletePage.isPending && deletePage.variables?.path.pageId === page.id}
           />
         ))}
       </div>
@@ -159,8 +166,8 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
                 className="text-white hover:bg-white/10"
                 onClick={() => {
                   const link = document.createElement("a");
-                  link.href = selectedPage.image_url || "";
-                  link.download = `t${selectedPage.tome_id}-c${selectedPage.chapter_id}-s${selectedPage.scene_id}-${selectedPage.page_number}.png`;
+                  link.href = selectedPage.imageUrl || "";
+                  link.download = `t${selectedPage.tomeId}-c${selectedPage.chapterId}-s${selectedPage.sceneId}-${selectedPage.pageNumber}.png`;
                   link.click();
                 }}
               >
@@ -197,10 +204,10 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
             )}
 
             {/* Image */}
-            {selectedPage.image_url && (
+            {selectedPage.imageUrl && (
               <img
-                src={selectedPage.image_url}
-                alt={`Planche ${selectedPage.page_number}`}
+                src={selectedPage.imageUrl}
+                alt={`Planche ${selectedPage.pageNumber}`}
                 className="max-h-full max-w-full object-contain rounded-lg"
               />
             )}
@@ -213,8 +220,8 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               className={selectedPage.status === "selected" ? "" : "text-white hover:bg-white/10"}
               onClick={() =>
                 updatePage.mutate({
-                  pageId: selectedPage.id,
-                  data: { status: "selected" },
+                  path: { projectId, sceneId, pageId: selectedPage.id },
+                  body: { status: "selected" },
                 })
               }
               disabled={updatePage.isPending}
@@ -227,8 +234,8 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               className={selectedPage.status === "rejected" ? "" : "text-white hover:bg-white/10"}
               onClick={() =>
                 updatePage.mutate({
-                  pageId: selectedPage.id,
-                  data: { status: "rejected" },
+                  path: { projectId, sceneId, pageId: selectedPage.id },
+                  body: { status: "rejected" },
                 })
               }
               disabled={updatePage.isPending}
@@ -239,7 +246,9 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
             <Button
               variant="ghost"
               className="text-white hover:bg-white/10"
-              onClick={() => deletePage.mutate(selectedPage.id)}
+              onClick={() => deletePage.mutate({
+                path: { projectId, sceneId, pageId: selectedPage.id },
+              })}
               disabled={deletePage.isPending}
             >
               {deletePage.isPending ? (
@@ -284,10 +293,10 @@ function PageThumbnail({
       onMouseLeave={() => setShowActions(false)}
     >
       {/* Image */}
-      {page.image_url ? (
+      {page.imageUrl ? (
         <img
-          src={page.image_url}
-          alt={`Planche ${page.page_number}`}
+          src={page.imageUrl}
+          alt={`Planche ${page.pageNumber}`}
           className="w-full h-full object-cover"
           onClick={onSelect}
         />
@@ -316,7 +325,7 @@ function PageThumbnail({
       {/* Page Number */}
       <div className="absolute top-2 right-2">
         <span className="text-xs font-medium text-white bg-ink/50 px-1.5 py-0.5 rounded">
-          P.{page.page_number}
+          P.{page.pageNumber}
         </span>
       </div>
 

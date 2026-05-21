@@ -4,38 +4,27 @@ import { useParams } from "react-router";
 import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, EmptyState, ErrorState, LoadingState, PageHeader } from "~/components/ui";
-import { apiErrorMessage } from "~/lib/api";
-import { useWarnings } from "~/hooks/use-api";
-import { queryClient } from "~/lib/query";
+import { apiErrorMessage } from "~/lib/errors";
+import {
+  listWarningsOptions,
+  scanWarningsMutation,
+  updateWarningMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
 
 export default function WarningsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['warnings', 'common']);
-  const warnings = useWarnings(projectId);
-  const scan = useMutation({
-    mutationFn: async () => {
-      const { scanWarningsApiProjectsProjectIdWarningsScanPost } = await import('~/lib/backend');
-      await scanWarningsApiProjectsProjectIdWarningsScanPost({ path: { project_id: projectId } });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['readWarningsApiProjectsProjectIdWarningsGet'] });
-    },
-  });
-  const resolve = useMutation({
-    mutationFn: async (warningId: string) => {
-      const { patchWarningApiProjectsProjectIdWarningsWarningIdPatch } = await import('~/lib/backend');
-      await patchWarningApiProjectsProjectIdWarningsWarningIdPatch({ 
-        path: { project_id: projectId, warning_id: warningId },
-        body: { status: "resolved" }
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['readWarningsApiProjectsProjectIdWarningsGet'] });
-    },
-  });
-  
-  const handleResolve = (warningId: string) => resolve.mutate(warningId);
-  const handleScan = () => scan.mutate();
+  const warnings = useQuery({ ...listWarningsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const scan = useMutation(scanWarningsMutation());
+  const resolve = useMutation(updateWarningMutation());
+
+  const handleResolve = (warningId: string) => {
+    resolve.mutate({
+      path: { project_id: projectId, warning_id: warningId },
+      body: { status: "resolved", note: undefined }
+    });
+  };
+  const handleScan = () => scan.mutate({ path: { project_id: projectId }, body: {} });
 
   return (
     <AppShell>

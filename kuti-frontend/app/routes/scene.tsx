@@ -1,5 +1,4 @@
 import { useMemo, useState, useCallback } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
 import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles } from 'lucide-react';
@@ -11,11 +10,18 @@ import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field, toCsv } from '~/components/ui';
 import { LexicalEditor } from '~/components/editor';
 import '~/components/editor/styles.css';
-import type { Tome, Chapter, Scene } from '~/lib/api';
-import { api, apiErrorMessage, csv } from '~/lib/api';
-import { invalidateWorkspace, keys } from '~/lib/query';
+import type { GetStorySummaryResponse } from '~/lib/backend';
+import { apiErrorMessage } from '~/lib/errors';
+import { csv } from '~/lib/utils';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getStorySummaryOptions, updateSceneMutation, deleteSceneMutation, listCharactersOptions } from '~/lib/backend/@tanstack/react-query.gen';
 import { StoryBreadcrumb } from '~/components/story';
 import { SceneGenerationModal, SceneMangaGallery } from '~/components/scene';
+
+type Tome = GetStorySummaryResponse['tomes'][number];
+type Chapter = GetStorySummaryResponse['chapters'][number];
+type Scene = GetStorySummaryResponse['scenes'][number];
 
 const sceneSchema = z.object({
   title: z.string().min(1, 'titleRequired'),
@@ -45,7 +51,7 @@ function SceneNavigationPanel({
   const { t } = useTranslation('story');
   const navigate = useNavigate();
   
-  const sortedScenes = [...scenes].sort((a, b) => a.order_index - b.order_index);
+  const sortedScenes = [...scenes].sort((a, b) => a.orderIndex - b.orderIndex);
   
   return (
     <Panel className="!p-3">
@@ -107,78 +113,79 @@ function SceneNavigationPanel({
 export default function SceneRoute() {
   const { projectId = '', tomeId = '', chapterId = '', sceneId = '' } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { t } = useTranslation(['story', 'common']);
   const [isSaving, setIsSaving] = useState(false);
   const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
-  
+
   // Fetch story data
-  const story = useQuery({ 
-    queryKey: keys.story(projectId), 
-    queryFn: () => api.story(projectId) 
+  const story = useQuery({
+    ...getStorySummaryOptions({ path: { projectId } }),
   });
 
   // Fetch characters for this project
   const characters = useQuery({
-    queryKey: keys.characters(projectId),
-    queryFn: () => api.characters(projectId).then(r => r.items),
+    ...listCharactersOptions({ path: { projectId } }),
     enabled: !!projectId,
   });
-  
+
   // Get scene
   const scene = useMemo(() => {
     return story.data?.scenes.find(s => s.id === sceneId);
   }, [story.data, sceneId]);
-  
+
   // Get chapter and tome
   const context = useMemo(() => {
     if (!story.data || !scene) return null;
-    
-    const chapter = story.data.chapters.find(c => c.id === scene.chapter_id);
-    const tome = story.data.tomes.find(t => t.id === scene.tome_id);
+
+    const chapter = story.data.chapters.find(c => c.id === scene.chapterId);
+    const tome = story.data.tomes.find(t => t.id === scene.tomeId);
     const chapterScenes = story.data.scenes
-      .filter(s => s.chapter_id === scene.chapter_id)
-      .sort((a, b) => a.order_index - b.order_index);
-    
+      .filter(s => s.chapterId === scene.chapterId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+
     return { chapter, tome, chapterScenes };
   }, [story.data, scene]);
-  
+
   // Calculate scene number
   const sceneNumber = useMemo(() => {
     if (!context?.chapterScenes || !scene) return 0;
     const index = context.chapterScenes.findIndex(s => s.id === sceneId);
     return index + 1;
   }, [context, sceneId, scene]);
-  
+
   // Calculate chapter and tome numbers
   const { chapterNumber, tomeNumber } = useMemo(() => {
     if (!story.data || !context?.chapter || !context?.tome) return { chapterNumber: 0, tomeNumber: 0 };
-    
+
     const tomeIndex = story.data.tomes.findIndex(t => t.id === context.tome?.id);
     const chapterIndex = story.data.chapters
-      .filter(c => c.tome_id === context.tome?.id)
-      .sort((a, b) => a.order_index - b.order_index)
+      .filter(c => c.tomeId === context.tome?.id)
+      .sort((a, b) => a.orderIndex - b.orderIndex)
       .findIndex(c => c.id === context.chapter?.id);
-    
-    return { 
-      tomeNumber: tomeIndex + 1, 
-      chapterNumber: chapterIndex + 1 
+
+    return {
+      tomeNumber: tomeIndex + 1,
+      chapterNumber: chapterIndex + 1
     };
   }, [story.data, context]);
-  
-  // Update scene mutation
+
+  // Mutations using SDK
+  const updateSceneConfig = updateSceneMutation();
   const updateScene = useMutation({
-    mutationFn: (body: Partial<Scene>) => api.updateScene(projectId, sceneId, body),
+    ...updateSceneConfig,
     onSuccess: () => {
-      invalidateWorkspace(projectId);
+      queryClient.invalidateQueries({ queryKey: ['story', projectId] });
       setIsSaving(false);
     },
   });
-  
+
+  const deleteSceneConfig = deleteSceneMutation();
   const deleteScene = useMutation({
-    mutationFn: () => api.deleteScene(projectId, sceneId),
+    ...deleteSceneConfig,
     onSuccess: () => {
-      invalidateWorkspace(projectId);
-      navigate(`/projects/${projectId}/story/${tomeId}/chapters/${scene?.chapter_id}`);
+      queryClient.invalidateQueries({ queryKey: ['story', projectId] });
+      navigate(`/projects/${projectId}/story/${tomeId}/chapters/${scene?.chapterId}`);
     },
   });
   
@@ -188,26 +195,30 @@ export default function SceneRoute() {
       title: scene?.title || '',
       summary: scene?.summary || '',
       content: scene?.content || '',
-      characters_json: toCsv(scene?.characters_json),
-      tags_json: toCsv(scene?.tags_json),
+      characters_json: toCsv(scene?.charactersJson),
+      tags_json: toCsv(scene?.tagsJson),
       notes: scene?.notes || '',
     }), [scene]),
   });
-  
+
   // Reset form when scene changes
   const watchedSceneId = watch('title');
-  
+
   const onSubmit = useCallback((data: SceneInput) => {
     setIsSaving(true);
     updateScene.mutate({
-      title: data.title,
-      summary: data.summary,
-      content: data.content,
-      characters_json: csv(data.characters_json || ''),
-      tags_json: csv(data.tags_json || ''),
-      notes: data.notes,
+      // @ts-expect-error - SDK types missing path params
+      path: { projectId, sceneId },
+      body: {
+        title: data.title,
+        summary: data.summary,
+        content: data.content,
+        charactersJson: csv(data.characters_json || ''),
+        tagsJson: csv(data.tags_json || ''),
+        notes: data.notes,
+      },
     });
-  }, [updateScene]);
+  }, [updateScene, projectId, sceneId]);
   
   if (story.isLoading) {
     return (
@@ -235,7 +246,7 @@ export default function SceneRoute() {
   
   const { chapter, tome, chapterScenes } = context;
   if (!chapter || !tome) return null;
-  const formattedDate = new Date(scene.updated_at).toLocaleDateString(t('locale') || 'fr-FR', {
+  const formattedDate = new Date(scene.updatedAt).toLocaleDateString(t('locale') || 'fr-FR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -353,10 +364,11 @@ export default function SceneRoute() {
             
             {/* Actions */}
             <div className="flex justify-between items-center">
-              <Button 
-                variant="danger" 
+              <Button
+                variant="danger"
                 type="button"
-                onClick={() => deleteScene.mutate()}
+                // @ts-expect-error - SDK types missing path params
+                onClick={() => deleteScene.mutate({ path: { projectId, sceneId } })}
                 disabled={deleteScene.isPending}
               >
                 <Trash2 size={16} />

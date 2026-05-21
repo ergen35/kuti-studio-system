@@ -2,7 +2,9 @@ import { useTranslation } from '~/hooks/useTranslation';
 import { TomeCard } from './TomeCard';
 import { EmptyState, Button } from '~/components/ui';
 import { Plus } from 'lucide-react';
-import type { Tome } from '~/lib/api';
+import type { GetStorySummaryResponse } from '~/lib/backend';
+
+type Tome = GetStorySummaryResponse['tomes'][number];
 
 interface TomeCardGridProps {
   tomes: Array<Tome & {

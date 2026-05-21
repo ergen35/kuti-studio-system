@@ -3,14 +3,15 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Sparkles, X, Loader2, Wand2, ImageIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTranslation } from '~/hooks/useTranslation';
-import type { Character } from '~/lib/api';
-import { api, apiErrorMessage } from '~/lib/api';
+import type { ListCharactersResponse } from '~/lib/backend';
+import { apiErrorMessage } from '~/lib/errors';
+import { generateCharacterImageMutation, getGenerationJobOptions } from '~/lib/backend/@tanstack/react-query.gen';
 import { invalidateWorkspace, keys } from '~/lib/query';
 import { Button, Badge, ErrorState, Field } from '~/components/ui';
 import { GenerationPanelGrid } from './GenerationPanelGrid';
 
 interface CharacterImageGeneratorProps {
-  character: Character;
+  character: ListCharactersResponse[number];
   projectId: string;
 }
 
@@ -20,6 +21,34 @@ type Style = 'realistic' | 'anime' | 'illustration' | 'watercolor';
 const STRATEGIES: Strategy[] = ['portrait', 'full_body', 'concept'];
 const STYLES: Style[] = ['realistic', 'anime', 'illustration', 'watercolor'];
 
+type GenerationPanelType = {
+  id: string;
+  boardId: string;
+  stepId: string | unknown;
+  orderIndex: number;
+  title: string;
+  caption: string;
+  prompt: string;
+  status: 'ready' | 'generating' | 'failed' | 'pending' | 'draft' | 'selected' | 'rejected' | 'replaced';
+  imagePath: string;
+  imageName: string;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type GenerationBoardType = {
+  id: string;
+  panels: GenerationPanelType[];
+};
+
+type GenerationJobResponse = {
+  id: string;
+  status: string;
+  progress: number;
+  board?: GenerationBoardType;
+};
+
 export function CharacterImageGenerator({ character, projectId }: CharacterImageGeneratorProps) {
   const { t } = useTranslation('characters');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,38 +57,52 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
   const [imageCount, setImageCount] = useState(2);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
-  // Generate mutation
+  // Generate mutation using SDK
+  const genMutationConfig = generateCharacterImageMutation();
   const generateMutation = useMutation({
     mutationFn: (body: { strategy: string; style: string; image_count: number }) =>
-      api.generateCharacterImage(projectId, character.id, body),
+      genMutationConfig.mutationFn!({
+        path: { projectId, characterId: character.id },
+        query: {
+          strategy: body.strategy,
+          style: body.style,
+          imageCount: body.image_count,
+        },
+      }),
     onSuccess: (job) => {
-      setActiveJobId(job.id);
+      if (job && typeof job === 'object' && 'id' in job) {
+        setActiveJobId((job as GenerationJobResponse).id);
+      }
       invalidateWorkspace(projectId);
     },
   });
 
-  // Poll active job status
+  // Poll active job status using SDK
   const activeJob = useQuery({
-    queryKey: keys.generationJob(projectId, activeJobId),
-    queryFn: () => api.generationJob(projectId, activeJobId!),
+    ...getGenerationJobOptions({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      path: { projectId, jobId: activeJobId! } as any,
+    }),
+    select: (data) => data as unknown as GenerationJobResponse,
     enabled: Boolean(activeJobId),
     refetchInterval: (query: { state?: { data?: { status?: string } } }) => {
       const status = query.state?.data?.status;
       if (status === 'ready' || status === 'failed') return false;
       return 2000;
     },
+    staleTime: 0,
   });
 
   // Build preview prompt
   const previewPrompt = useMemo(() => {
     const parts: string[] = [];
     if (character.description) parts.push(character.description);
-    if (character.physical_description) parts.push(`Physical: ${character.physical_description}`);
-    if (character.costume_elements_json?.length) {
-      parts.push(`Wearing: ${character.costume_elements_json.slice(0, 5).join(', ')}`);
+    if (character.physicalDescription) parts.push(`Physical: ${character.physicalDescription}`);
+    if (character.costumeElementsJson?.length) {
+      parts.push(`Wearing: ${character.costumeElementsJson.slice(0, 5).join(', ')}`);
     }
-    if (character.color_palette_json?.length) {
-      parts.push(`Colors: ${character.color_palette_json.slice(0, 3).join(', ')}`);
+    if (character.colorPaletteJson?.length) {
+      parts.push(`Colors: ${character.colorPaletteJson.slice(0, 3).join(', ')}`);
     }
     
     const strategyPrefix = {
@@ -172,7 +215,7 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
             <div className="p-4 space-y-4">
               {/* Error */}
               {generateMutation.error && (
-                <ErrorState message={apiErrorMessage(generateMutation.error)} />
+                <ErrorState message={apiErrorMessage(generateMutation.error as unknown)} />
               )}
 
               {/* Strategy */}
@@ -256,7 +299,7 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
               </div>
 
               {/* Insufficient data warning */}
-              {(!character.description && !character.physical_description) && (
+              {(!character.description && !character.physicalDescription) && (
                 <div className="p-3 rounded-lg bg-warning/10 border border-warning/30 text-sm text-warning">
                   {t('generation.insufficientData') || 'Données insuffisantes. Enrichissez la fiche avec description et traits physiques.'}
                 </div>

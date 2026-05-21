@@ -1,28 +1,29 @@
 import { Link, useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "~/components/layout";
-import { apiErrorMessage } from "~/lib/api";
+import { apiErrorMessage } from "~/lib/errors";
 import {
-  useProject,
-  useCharacters,
-  useStory,
-  useWarnings,
-  useVersions,
-  useExports,
-  useGenerationJobs,
-} from "~/hooks/use-api";
+  getProjectOptions,
+  listCharactersOptions,
+  getStorySummaryOptions,
+  listWarningsOptions,
+  listVersionsOptions,
+  listExportsOptions,
+  listGenerationJobsOptions,
+} from "~/lib/backend/@tanstack/react-query.gen";
 import { useTranslation } from "~/hooks/useTranslation";
 import { Badge, Card, EmptyState, ErrorState, LoadingState, PageHeader, SectionTitle, Stat, dateLabel } from "~/components/ui";
 
 export default function ProjectRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['project', 'common']);
-  const project = useProject(projectId);
-  const characters = useCharacters(projectId);
-  const story = useStory(projectId);
-  const warnings = useWarnings(projectId);
-  const versions = useVersions(projectId);
-  const exports = useExports(projectId);
-  const jobs = useGenerationJobs(projectId);
+  const project = useQuery({ ...getProjectOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const characters = useQuery({ ...listCharactersOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const story = useQuery({ ...getStorySummaryOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const warnings = useQuery({ ...listWarningsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const versions = useQuery({ ...listVersionsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const exports = useQuery({ ...listExportsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const jobs = useQuery({ ...listGenerationJobsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
 
   const workspaces = [
     { key: "characters", title: t('workspaces.characters.title'), desc: t('workspaces.characters.description') },

@@ -7,9 +7,15 @@ import { X, Sparkles, Eye, Loader2, AlertCircle, ChevronDown, ChevronUp } from "
 import { useTranslation } from "~/hooks/useTranslation";
 import { Button, Badge, ErrorState, LoadingState } from "~/components/ui";
 import { CharacterImageSelector } from "./CharacterImageSelector";
-import type { Scene, SceneGenerationConfig, Character, CharacterImage } from "~/lib/api";
-import { api, apiErrorMessage } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import type { Scene, SceneGenerationConfig, Character, CharacterImage } from "~/lib/backend/types.gen";
+import {
+  listSceneConfigsOptions,
+  generateSceneMangaMutation,
+  previewPromptMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
+import { apiErrorMessage } from "~/lib/errors";
+import { invalidateWorkspace } from "~/lib/query";
+import { client } from "~/lib/backend-client";
 
 interface SceneGenerationModalProps {
   projectId: string;
@@ -39,17 +45,16 @@ export function SceneGenerationModal({
 
   // Fetch configs
   const configs = useQuery({
-    queryKey: keys.sceneGenerationConfigs(projectId, scene.id),
-    queryFn: () => api.sceneGenerationConfigs(projectId, scene.id),
+    ...listSceneConfigsOptions({ client, path: { projectId, sceneId: scene.id } }),
     enabled: isOpen,
   });
 
   // Set default config when loaded
   useEffect(() => {
     if (configs.data && configs.data.length > 0 && !selectedConfigId) {
-      const defaultConfig = configs.data.find((c) => c.is_default) || configs.data[0];
+      const defaultConfig = configs.data.find((c) => c.isDefault) || configs.data[0];
       setSelectedConfigId(defaultConfig.id);
-      setImageCount(defaultConfig.default_image_count);
+      setImageCount(defaultConfig.defaultImageCount);
     }
   }, [configs.data, selectedConfigId]);
 
@@ -57,23 +62,12 @@ export function SceneGenerationModal({
 
   // Preview mutation
   const preview = useMutation({
-    mutationFn: () =>
-      api.previewScenePrompt(projectId, scene.id, {
-        config_id: selectedConfigId || undefined,
-        character_image_refs: selectedCharacterImages,
-        additional_context: additionalContext || undefined,
-      }),
+    ...previewPromptMutation(),
   });
 
   // Generate mutation
   const generate = useMutation({
-    mutationFn: () =>
-      api.generateSceneManga(projectId, scene.id, {
-        config_id: selectedConfigId || undefined,
-        image_count: imageCount,
-        character_image_refs: selectedCharacterImages,
-        additional_context: additionalContext || undefined,
-      }),
+    ...generateSceneMangaMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
       onClose();
@@ -127,23 +121,23 @@ export function SceneGenerationModal({
                     const config = configs.data?.find((c) => c.id === e.target.value);
                     setSelectedConfigId(e.target.value);
                     if (config) {
-                      setImageCount(config.default_image_count);
+                      setImageCount(config.defaultImageCount);
                     }
                   }}
                   className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
                 >
                   {configs.data.map((config) => (
                     <option key={config.id} value={config.id}>
-                      {config.name} {config.is_default ? "(Défaut)" : ""}
+                      {config.name} {config.isDefault ? "(Défaut)" : ""}
                     </option>
                   ))}
                 </select>
                 {selectedConfig && (
                   <div className="flex items-center gap-2 text-xs">
-                    <Badge tone={selectedConfig.color_mode === "bw" ? "default" : "info"}>
-                      {selectedConfig.color_mode === "bw" ? "Noir & Blanc" : "Couleur"}
+                    <Badge tone={selectedConfig.colorMode === "bw" ? "default" : "info"}>
+                      {selectedConfig.colorMode === "bw" ? "Noir & Blanc" : "Couleur"}
                     </Badge>
-                    <Badge tone="default">{selectedConfig.style_preset}</Badge>
+                    <Badge tone="default">{selectedConfig.stylePreset}</Badge>
                   </div>
                 )}
               </div>

@@ -1,6 +1,6 @@
 import { Save } from "lucide-react";
 import { useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,14 +8,20 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Button, ErrorState, LoadingState, PageHeader, Panel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { api, apiErrorMessage, csv, type ProjectStatus } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import { apiErrorMessage } from "~/lib/errors";
+import { csv } from "~/lib/utils";
+import type { ProjectStatus } from "~/lib/backend/types.gen";
+import { getProjectOptions, updateProjectMutation } from "~/lib/backend/@tanstack/react-query.gen";
 import { projectSettingsSchema, type ProjectSettingsInput } from "~/lib/schemas";
 
 export default function SettingsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['settings', 'common']);
-  const project = useQuery({ queryKey: keys.project(projectId), queryFn: () => api.project(projectId) });
+  const queryClient = useQueryClient();
+  const project = useQuery({
+    ...getProjectOptions({ path: { projectId: projectId } }),
+    enabled: !!projectId,
+  });
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ProjectSettingsInput>({
     resolver: zodResolver(projectSettingsSchema),
     defaultValues: { name: '', status: 'draft', locations: '' },
@@ -23,24 +29,32 @@ export default function SettingsRoute() {
 
   useEffect(() => {
     if (project.data) {
-      const raw = project.data.settings_json.locations_json;
+      // @ts-expect-error - settingsJson might have different structure
+      const raw = project.data.settingsJson?.locationsJson;
       reset({
         name: project.data.name,
-        status: project.data.status,
+        status: project.data.status as ProjectStatus,
         locations: Array.isArray(raw) ? raw.join(", ") : '',
       });
     }
   }, [project.data, reset]);
 
-  const update = useMutation({ 
-    mutationFn: (data: ProjectSettingsInput) => api.updateProject(projectId, { 
-      name: data.name || project.data?.name, 
-      status: data.status, 
-      settings_json: { ...(project.data?.settings_json || {}), locations_json: csv(data.locations || '') } 
-    }), 
-    onSuccess: () => invalidateWorkspace(projectId) 
+  const update = useMutation({
+    ...updateProjectMutation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getProject"] });
+      queryClient.invalidateQueries({ queryKey: ["listProjects"] });
+    }
   });
-  const onSubmit = (data: ProjectSettingsInput) => update.mutate(data);
+  const onSubmit = (data: ProjectSettingsInput) => update.mutate({
+    path: { projectId: projectId },
+    body: {
+      name: data.name || project.data?.name,
+      status: data.status,
+      // @ts-expect-error - settingsJson structure
+      settingsJson: { ...(project.data?.settingsJson || {}), locationsJson: csv(data.locations || '') }
+    }
+  });
 
   const statusOptions = [
     { value: "draft", label: t('common:status.draft') },

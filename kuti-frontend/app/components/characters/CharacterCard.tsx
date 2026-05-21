@@ -1,6 +1,10 @@
 import { useTranslation } from '~/hooks/useTranslation';
 import { CharacterAvatar } from './CharacterAvatar';
-import { api, type Character, type CharacterImage } from '~/lib/api';
+import { characterImageUrl } from '~/lib/image-urls';
+import type { ListCharactersResponse, ListCharacterImagesResponse } from '~/lib/backend';
+
+type Character = ListCharactersResponse[number];
+type CharacterImage = ListCharacterImagesResponse[number];
 
 interface CharacterCardProps {
   character: Character;
@@ -10,9 +14,9 @@ interface CharacterCardProps {
 }
 
 const statusConfig = {
-  active: { bg: 'bg-success/15', text: 'text-success', border: 'border-success/30', label: 'Active' },
-  draft: { bg: 'bg-draft/15', text: 'text-draft', border: 'border-draft/30', label: 'Draft' },
-  archived: { bg: 'bg-muted/15', text: 'text-muted', border: 'border-muted/30', label: 'Archived' },
+  active: { bg: 'bg-emerald-500/15', text: 'text-emerald-500', border: 'border-emerald-500/30', label: 'Active' },
+  draft: { bg: 'bg-amber-500/15', text: 'text-amber-500', border: 'border-amber-500/30', label: 'Draft' },
+  archived: { bg: 'bg-gray-500/15', text: 'text-gray-500', border: 'border-gray-500/30', label: 'Archived' },
 } as const;
 
 export function CharacterCard({ character, image, onClick, className = '' }: CharacterCardProps) {
@@ -20,7 +24,7 @@ export function CharacterCard({ character, image, onClick, className = '' }: Cha
   const status = statusConfig[character.status] || statusConfig.draft;
   
   // Format role text - truncate if too long
-  const roleText = character.narrative_role || character.alias || t('cards.noRole');
+  const roleText = character.narrativeRole || (character.alias as string | undefined) || t('cards.noRole');
   const displayRole = roleText.length > 35 ? roleText.slice(0, 32) + '...' : roleText;
   
   // Custom card style when image is present - more like trading cards
@@ -67,7 +71,7 @@ export function CharacterCard({ character, image, onClick, className = '' }: Cha
               {/* Image area - takes most of the card */}
               <div className="relative aspect-[3/4] overflow-hidden">
                 <img
-                  src={api.characterImageUrl(character.project_id, character.id, image.id)}
+                  src={characterImageUrl(character.projectId, character.id, image.id)}
                   alt={character.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
@@ -123,7 +127,7 @@ export function CharacterCard({ character, image, onClick, className = '' }: Cha
                 
                 <CharacterAvatar
                   name={character.name}
-                  colorPalette={character.color_palette_json}
+                  colorPalette={character.colorPaletteJson}
                   size="lg"
                   className="group-hover:scale-105 transition-transform duration-300"
                 />

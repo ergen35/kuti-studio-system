@@ -1,5 +1,5 @@
 import { Download, PackagePlus } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,26 +7,34 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, dateLabel, EmptyState, ErrorState, LinkButton, LoadingState, PageHeader, Panel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { apiErrorMessage, API_BASE_URL } from "~/lib/api";
-import { useExports, useCreateExport } from "~/hooks/use-api";
-import { queryClient } from "~/lib/query";
+import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
+import {
+  listExportsOptions,
+  createExportMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
 import { exportCreateSchema, type ExportCreateInput } from "~/lib/schemas";
 
 export default function ExportsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['exports', 'common']);
-  const exports = useExports(projectId);
+  const queryClient = useQueryClient();
+  const exports = useQuery({ ...listExportsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ExportCreateInput>({
     resolver: zodResolver(exportCreateSchema),
     defaultValues: { kind: 'work', format: 'json', label: 'Work export' },
   });
   
-  const create = useCreateExport();
+  const create = useMutation({
+    ...createExportMutation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listExports"] });
+    },
+  });
   const onSubmit = (data: ExportCreateInput) => create.mutate({
-    path: { project_id: projectId },
+    path: { projectId: projectId },
     body: { kind: data.kind as "work" | "publication", format: data.format as "json" | "tree" | "zip", label: data.label }
-  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readExportsApiProjectsProjectIdExportsGet"] }); } });
+  }, { onSuccess: () => reset() });
 
   const kindOptions = [
     { value: "work", label: t('panels.create.kinds.work') },
@@ -71,8 +79,8 @@ export default function ExportsRoute() {
             {(exports.data || []).map((item) => (
               <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.id}>
                 <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{item.label}</strong><Badge tone={item.status}>{item.status}</Badge></div>
-                <small className="text-xs text-muted">{item.kind} · {item.format} · {dateLabel(item.created_at)}</small>
-                {item.artifact_path ? <LinkButton href={`${API_BASE_URL}/api/projects/${projectId}/exports/${item.id}/download`}><Download size={15} /> {t('common:actions.download')}</LinkButton> : null}
+                <small className="text-xs text-muted">{item.kind} · {item.format} · {dateLabel(item.createdAt)}</small>
+                {item.artifactPath ? <LinkButton href={`${API_BASE_URL}/api/projects/${projectId}/exports/${item.id}/download`}><Download size={15} /> {t('common:actions.download')}</LinkButton> : null}
               </div>
             ))}
           </div>

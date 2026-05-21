@@ -1,14 +1,14 @@
 import { useEffect, useCallback } from 'react';
 import { clsx } from 'clsx';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
-import type { CharacterImage } from '~/lib/api';
-import { api } from '~/lib/api';
+import type { ListCharacterImagesResponse } from '~/lib/backend';
+import { characterImageUrl } from '~/lib/image-urls';
 
 interface ImageLightboxProps {
-  image: CharacterImage | null;
+  image: ListCharacterImagesResponse[number] | null;
   isOpen: boolean;
   onClose: () => void;
-  images?: CharacterImage[];
+  images?: ListCharacterImagesResponse[number][];
   currentIndex?: number;
   onNavigate?: (index: number) => void;
   projectId: string;
@@ -50,7 +50,7 @@ export function ImageLightbox({
   }, [isOpen, handleKeyDown]);
 
   // Get image URL - use the character image file endpoint
-  const getImageUrl = (imageId: string) => api.characterImageUrl(projectId, characterId, imageId);
+  const getImageUrl = (imageId: string) => characterImageUrl(projectId, characterId, imageId);
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -73,7 +73,7 @@ export function ImageLightbox({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = image.file_name;
+      a.download = image.fileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -134,26 +134,26 @@ export function ImageLightbox({
       >
         <img
           src={getImageUrl(image.id)}
-          alt={image.file_name}
+          alt={image.fileName}
           className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
         />
         
         {/* Info panel */}
         <div className="mt-4 max-w-2xl px-4 text-center">
           <p className="text-sm text-white/60 mb-2">
-            {formatDate(image.created_at)}
+            {formatDate(image.createdAt)}
           </p>
           
-          {(image.strategy || image.style) && (
+          {(!!image.strategy || !!image.style) && (
             <div className="flex items-center justify-center gap-2 mb-3">
-              {image.strategy && (
+              {!!image.strategy && (
                 <span className="px-2 py-1 rounded-full text-xs bg-accent/30 text-white">
-                  {image.strategy}
+                  {String(image.strategy)}
                 </span>
               )}
-              {image.style && (
+              {!!image.style && (
                 <span className="px-2 py-1 rounded-full text-xs bg-accent/30 text-white">
-                  {image.style}
+                  {String(image.style)}
                 </span>
               )}
             </div>

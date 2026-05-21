@@ -9,10 +9,11 @@ import { z } from 'zod';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field } from '~/components/ui';
-import type { Tome, Chapter, Scene } from '~/lib/api';
-import { api, apiErrorMessage } from '~/lib/api';
+import { apiErrorMessage } from '~/lib/errors';
 import { invalidateWorkspace, keys } from '~/lib/query';
 import { StoryBreadcrumb } from '~/components/story';
+import { getStorySummary, updateChapter, createScene } from '~/lib/backend/sdk.gen';
+import type { GetStorySummaryResponse, CreateSceneData } from '~/lib/backend';
 
 const editChapterSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -108,6 +109,11 @@ function CreateSceneModal({ isOpen, onClose, onSubmit, isLoading }: CreateSceneM
   );
 }
 
+// SDK types from GetStorySummaryResponse
+type Tome = GetStorySummaryResponse['tomes'][number];
+type Chapter = GetStorySummaryResponse['chapters'][number];
+type Scene = GetStorySummaryResponse['scenes'][number];
+
 // Sidepanel with chapters in this tome
 function ChapterNavigationPanel({ 
   chapters, 
@@ -123,8 +129,8 @@ function ChapterNavigationPanel({
   const { t } = useTranslation('story');
   const navigate = useNavigate();
   
-  // Sort chapters by order_index
-  const sortedChapters = [...chapters].sort((a, b) => a.order_index - b.order_index);
+  // Sort chapters by orderIndex
+  const sortedChapters = [...chapters].sort((a, b) => a.orderIndex - b.orderIndex);
   
   return (
     <Panel className="!p-3">
@@ -188,9 +194,14 @@ export default function ChapterRoute() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   // Fetch story data
-  const story = useQuery({ 
-    queryKey: keys.story(projectId), 
-    queryFn: () => api.story(projectId) 
+  const story = useQuery({
+    queryKey: keys.story(projectId),
+    queryFn: async () => {
+      const { data } = await getStorySummary({
+        path: { projectId },
+      });
+      return data;
+    },
   });
   
   // Get current chapter
@@ -208,12 +219,12 @@ export default function ChapterRoute() {
     if (!chapter || !story.data) return null;
     
     const scenes = story.data.scenes
-      .filter(s => s.chapter_id === chapterId)
-      .sort((a, b) => a.order_index - b.order_index);
+      .filter(s => s.chapterId === chapterId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
     
     const tomeChapters = story.data.chapters
-      .filter(c => c.tome_id === tomeId)
-      .sort((a, b) => a.order_index - b.order_index);
+      .filter(c => c.tomeId === tomeId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
     
     return { chapter, scenes, tomeChapters };
   }, [chapter, story.data, chapterId, tomeId]);
@@ -222,8 +233,8 @@ export default function ChapterRoute() {
   const chapterNumber = useMemo(() => {
     if (!story.data || !chapter) return 0;
     const tomeChapters = story.data.chapters
-      .filter(c => c.tome_id === tomeId)
-      .sort((a, b) => a.order_index - b.order_index);
+      .filter(c => c.tomeId === tomeId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
     const index = tomeChapters.findIndex(c => c.id === chapterId);
     return index + 1;
   }, [story.data, chapterId, tomeId, chapter]);
@@ -236,18 +247,37 @@ export default function ChapterRoute() {
   }, [story.data, tomeId, tome]);
   
   // Update chapter mutation
-  const updateChapter = useMutation({
-    mutationFn: (body: { title: string }) => api.updateChapter(projectId, chapterId, body),
+  const updateChapterMut = useMutation({
+    mutationFn: async (body: { title: string }) => {
+      const { data } = await updateChapter({
+        path: { projectId, chapterId },
+        body,
+        throwOnError: true,
+      });
+      return data;
+    },
     onSuccess: () => {
       invalidateWorkspace(projectId);
       setIsEditing(false);
     },
   });
-  
+
   // Create scene mutation
-  const createScene = useMutation({
-    mutationFn: (body: { tome_id: string; chapter_id: string; title: string; location?: string; order_index: number }) => 
-      api.createScene(projectId, body),
+  const createSceneMut = useMutation({
+    mutationFn: async (body: { tomeId: string; chapterId: string; title: string; location?: string; orderIndex: number }) => {
+      const { data } = await createScene({
+        path: { projectId },
+        body: {
+          tomeId: body.tomeId,
+          chapterId: body.chapterId,
+          title: body.title,
+          location: body.location,
+          orderIndex: body.orderIndex,
+        } as CreateSceneData['body'],
+        throwOnError: true,
+      });
+      return data;
+    },
     onSuccess: (scene) => {
       invalidateWorkspace(projectId);
       setIsCreateModalOpen(false);
@@ -262,20 +292,20 @@ export default function ChapterRoute() {
   });
   
   const onSubmit = (data: EditChapterInput) => {
-    updateChapter.mutate({ title: data.title });
+    updateChapterMut.mutate({ title: data.title });
   };
   
   const handleCreateScene = (data: CreateSceneInput) => {
-    // Calculate order_index based on existing scenes in this chapter
-    const existingScenes = story.data?.scenes.filter(s => s.chapter_id === chapterId) || [];
-    const maxOrderIndex = existingScenes.reduce((max, s) => Math.max(max, s.order_index), 0);
+    // Calculate orderIndex based on existing scenes in this chapter
+    const existingScenes = story.data?.scenes.filter(s => s.chapterId === chapterId) || [];
+    const maxOrderIndex = existingScenes.reduce((max, s) => Math.max(max, s.orderIndex), 0);
     
-    createScene.mutate({
-      tome_id: tomeId,
-      chapter_id: chapterId,
+    createSceneMut.mutate({
+      tomeId,
+      chapterId,
       title: data.title,
       location: data.location || undefined,
-      order_index: maxOrderIndex + 1,
+      orderIndex: maxOrderIndex + 1,
     });
   };
   
@@ -362,13 +392,13 @@ export default function ChapterRoute() {
                         variant="ghost" 
                         type="button"
                         onClick={() => setIsEditing(false)}
-                        disabled={updateChapter.isPending}
+                        disabled={updateChapterMut.isPending}
                       >
                         <X size={16} />
                       </Button>
                       <Button 
                         variant="primary"
-                        disabled={updateChapter.isPending}
+                        disabled={updateChapterMut.isPending}
                       >
                         <Check size={16} />
                       </Button>
@@ -481,7 +511,7 @@ export default function ChapterRoute() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateScene}
-        isLoading={createScene.isPending}
+        isLoading={createSceneMut.isPending}
       />
     </AppShell>
   );

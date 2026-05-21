@@ -1,6 +1,6 @@
 import { Check, ImagePlus, RefreshCw } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,18 +8,25 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, Card, EmptyState, ErrorState, LoadingState, PageHeader, Panel, dateLabel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { apiErrorMessage, API_BASE_URL } from "~/lib/api";
-import { useStory, useGenerationJobs, useGenerationBoards, useModels, useCreateGenerationJob, useValidateBoard } from "~/hooks/use-api";
-import { queryClient } from "~/lib/query";
+import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
+import {
+  getStorySummaryOptions,
+  listGenerationJobsOptions,
+  listGenerationBoardsOptions,
+  listModelsOptions,
+  createGenerationJobMutation,
+  validateGenerationBoardMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
 import { generationJobSchema, type GenerationJobInput } from "~/lib/schemas";
 
 export default function GenerationRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['generation', 'common']);
-  const story = useStory(projectId);
-  const models = useModels();
-  const jobs = useGenerationJobs(projectId);
-  const boards = useGenerationBoards(projectId);
+  const queryClient = useQueryClient();
+  const story = useQuery({ ...getStorySummaryOptions({ path: { projectId: projectId } }), enabled: !!projectId });
+  const models = useQuery({ ...listModelsOptions(), staleTime: 5 * 60 * 1000 });
+  const jobs = useQuery({ ...listGenerationJobsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
+  const boards = useQuery({ ...listGenerationBoardsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset, control, setValue } = useForm<GenerationJobInput>({
     resolver: zodResolver(generationJobSchema),
@@ -42,21 +49,27 @@ export default function GenerationRoute() {
     story.data?.scenes || [], 
   [sourceKind, story.data]);
   
-  const create = useCreateGenerationJob();
+  const create = useMutation({
+    ...createGenerationJobMutation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listGenerationJobs"] });
+      queryClient.invalidateQueries({ queryKey: ["listGenerationBoards"] });
+    },
+  });
   const onSubmit = (data: GenerationJobInput) => create.mutate({
-    path: { project_id: projectId },
+    path: { projectId: projectId },
     body: {
-      source_kind: data.source_kind,
-      source_id: data.source_id,
+      sourceKind: data.source_kind,
+      sourceId: data.source_id,
       strategy: "direct",
-      model_key: data.model_key || undefined,
+      modelKey: data.model_key || undefined,
       mode: data.mode,
-      grid_rows: data.mode === "grid" ? 2 : undefined,
-      grid_cols: data.mode === "grid" ? 2 : undefined
+      gridRows: data.mode === "grid" ? 2 : undefined,
+      gridCols: data.mode === "grid" ? 2 : undefined
     }
-  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readGenerationJobsApiProjectsProjectIdGenerationJobsGet"] }); } });
+  }, { onSuccess: () => reset() });
   
-  const validate = useValidateBoard();
+  const validate = useMutation(validateGenerationBoardMutation());
 
   const sourceOptions = [
     { value: "scene", label: t('sources.scene') },
@@ -102,23 +115,20 @@ export default function GenerationRoute() {
           {jobs.isLoading ? <LoadingState /> : null}
           {jobs.error ? <ErrorState message={apiErrorMessage(jobs.error)} /> : null}
           {jobs.data?.length === 0 ? <EmptyState title={t('empty.noJob')} /> : null}
-          <div className="grid gap-2">{(jobs.data || []).map((job) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={job.id}><div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{job.title}</strong><Badge tone={job.status}>{job.status}</Badge></div><small className="text-xs text-muted">{t('panels.jobs.sourceKind')}: {job.source_kind} · {job.progress}%</small><small className="text-xs text-muted">{job.model_name || job.entrypoint}</small></div>)}</div>
+          <div className="grid gap-2">{(jobs.data || []).map((job: { id: string; title: string; status: string; sourceKind?: string; progress?: number; modelName?: string; entrypoint?: string }) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={job.id}><div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{job.title}</strong><Badge tone={job.status}>{job.status}</Badge></div><small className="text-xs text-muted">{t('panels.jobs.sourceKind')}: {job.sourceKind} · {job.progress}%</small><small className="text-xs text-muted">{job.modelName || job.entrypoint}</small></div>)}</div>
         </Panel>
       </div>
       <Panel className="mt-3">
         <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.boards.title')}</h2>
         <div className="grid gap-3 lg:grid-cols-3">
-          {(boards.data || []).map((board) => (
+          {(boards.data || []).map((board: { id: string; title: string; status: string; sourceKind?: string; createdAt?: string; panels?: Array<{ id: string; title: string }> }) => (
             <Card key={board.id}>
               <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{board.title}</strong><Badge tone={board.status}>{board.status}</Badge></div>
-              <p className="mt-2 text-xs text-muted">{board.source_kind} · {dateLabel(board.created_at)}</p>
+              <p className="mt-2 text-xs text-muted">{board.sourceKind} · {dateLabel(board.createdAt)}</p>
               {board.panels?.[0] ? <img className="mt-3 aspect-[4/5] w-full rounded-[7px] border border-line bg-surface-2 object-cover" src={`${API_BASE_URL}/api/projects/${projectId}/generation/boards/${board.id}/panels/${board.panels[0].id}/image`} alt={board.panels[0].title} /> : null}
               <div className="mt-3 flex flex-wrap items-center gap-2"><Button onClick={() => {
-              const mutationOptions = validate as unknown as { mutationFn?: (opts: { path: { project_id: string; board_id: string } }) => Promise<unknown> };
-              if (mutationOptions.mutationFn) {
-                mutationOptions.mutationFn({ path: { project_id: projectId, board_id: board.id } });
-              }
-            }}><Check size={15} /> {t('common:actions.validate')}</Button></div>
+                validate.mutate({ path: { projectId: projectId, boardId: board.id } });
+              }}><Check size={15} /> {t('common:actions.validate')}</Button></div>
             </Card>
           ))}
         </div>
