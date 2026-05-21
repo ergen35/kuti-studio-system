@@ -104,3 +104,7 @@ export const updatePanelBodySchema = z.object({
 export type GenerationJobResponse = z.infer<typeof generationJobResponseSchema>;
 export type GenerationBoardResponse = z.infer<typeof generationBoardResponseSchema>;
 export type CreateGenerationJobBody = z.infer<typeof createGenerationJobBodySchema>;
+
+export const validateBoardBodySchema = z.object({
+  note: z.string().optional(),
+});

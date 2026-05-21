@@ -3,9 +3,9 @@
  * Remplace les routes /health, /config, /models du backend v1
  */
 
+import { config, getPublicModelCatalog } from "@lib/config";
 import { Elysia } from "elysia";
 import { z } from "zod";
-import { config, getPublicModelCatalog } from "@lib/config";
 
 // ============================================================================
 // DTOs
@@ -112,20 +112,3 @@ export const healthModule = new Elysia({
       },
     }
   )
-
-  // OpenAPI JSON spec for hey-openapi-ts
-  .get(
-    "/openapi.json",
-    ({ app }) => {
-      // @ts-ignore - accéder au schéma OpenAPI généré par @elysiajs/swagger
-      const openApi = app.swagger;
-      return openApi || {};
-    },
-    {
-      detail: {
-        operationId: "getOpenApiSpec",
-        summary: "OpenAPI specification for client generation",
-        tags: ["Health"],
-      },
-    }
-  );

@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { archiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePost, archiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePost, archiveProjectRouteApiProjectsProjectIdArchivePost, cloneProjectRouteApiProjectsProjectIdClonePost, compareVersionsRouteApiProjectsProjectIdVersionsComparePost, configApiConfigGet, createAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPost, createChapterRouteApiProjectsProjectIdStoryChaptersPost, createCharacterRouteApiProjectsProjectIdCharactersPost, createExportRouteApiProjectsProjectIdExportsPost, createGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPost, createGenerationJobRouteApiProjectsProjectIdGenerationJobsPost, createProjectRouteApiProjectsPost, createRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPost, createSceneRouteApiProjectsProjectIdStoryScenesPost, createTomeRouteApiProjectsProjectIdStoryTomesPost, createVersionRouteApiProjectsProjectIdVersionsPost, createVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPost, deleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDelete, deleteAssetRouteApiProjectsProjectIdAssetsAssetIdDelete, deleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDelete, deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete, deleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDelete, deleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDelete, deleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDelete, deleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDelete, deleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDelete, deleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDelete, downloadExportApiProjectsProjectIdExportsExportIdDownloadGet, downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGet, duplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePost, exportProjectRouteApiProjectsProjectIdExportGet, generateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePost, generateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePost, getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGet, getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGet, healthApiHealthGet, importAssetRouteApiProjectsProjectIdAssetsImportPost, listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGet, listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGet, listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGet, modelsApiModelsGet, openProjectRouteApiProjectsProjectIdOpenPost, type Options, patchProjectApiProjectsProjectIdPatch, patchWarningApiProjectsProjectIdWarningsWarningIdPatch, previewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPost, readAssetApiProjectsProjectIdAssetsAssetIdGet, readAssetFileApiProjectsProjectIdAssetsAssetIdFileGet, readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGet, readAssetsApiProjectsProjectIdAssetsGet, readChaptersApiProjectsProjectIdStoryChaptersGet, readCharacterApiProjectsProjectIdCharactersCharacterIdGet, readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGet, readCharactersApiProjectsProjectIdCharactersGet, readExportApiProjectsProjectIdExportsExportIdGet, readExportsApiProjectsProjectIdExportsGet, readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGet, readGenerationBoardsApiProjectsProjectIdGenerationBoardsGet, readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGet, readGenerationJobsApiProjectsProjectIdGenerationJobsGet, readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGet, readProjectApiProjectsProjectIdGet, readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet, readProjectsApiProjectsGet, readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGet, readScenesApiProjectsProjectIdStoryScenesGet, readStoryApiProjectsProjectIdStoryGet, readStoryReferencesApiProjectsProjectIdStoryReferencesGet, readStorySuggestionsApiProjectsProjectIdStorySuggestionsGet, readTomesApiProjectsProjectIdStoryTomesGet, readVersionApiProjectsProjectIdVersionsVersionIdGet, readVersionBranchesApiProjectsProjectIdVersionsBranchesGet, readVersionsApiProjectsProjectIdVersionsGet, readWarningsApiProjectsProjectIdWarningsGet, restoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePost, scanWarningsApiProjectsProjectIdWarningsScanPost, setDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPost, updateAssetRouteApiProjectsProjectIdAssetsAssetIdPatch, updateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatch, updateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatch, updateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatch, updateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatch, updateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatch, updateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatch, updateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatch, updateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatch, validateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePost } from '../sdk.gen';
-import type { ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostData, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostError, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostResponse, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostData, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostError, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostResponse, ArchiveProjectRouteApiProjectsProjectIdArchivePostData, ArchiveProjectRouteApiProjectsProjectIdArchivePostError, ArchiveProjectRouteApiProjectsProjectIdArchivePostResponse, CloneProjectRouteApiProjectsProjectIdClonePostData, CloneProjectRouteApiProjectsProjectIdClonePostError, CloneProjectRouteApiProjectsProjectIdClonePostResponse, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostData, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostError, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostResponse, ConfigApiConfigGetData, ConfigApiConfigGetResponse, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostData, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostError, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostResponse, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostData, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostError, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostResponse, CreateCharacterRouteApiProjectsProjectIdCharactersPostData, CreateCharacterRouteApiProjectsProjectIdCharactersPostError, CreateCharacterRouteApiProjectsProjectIdCharactersPostResponse, CreateExportRouteApiProjectsProjectIdExportsPostData, CreateExportRouteApiProjectsProjectIdExportsPostError, CreateExportRouteApiProjectsProjectIdExportsPostResponse, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostData, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostError, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostResponse, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostData, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostError, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostResponse, CreateProjectRouteApiProjectsPostData, CreateProjectRouteApiProjectsPostError, CreateProjectRouteApiProjectsPostResponse, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostData, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostError, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostResponse, CreateSceneRouteApiProjectsProjectIdStoryScenesPostData, CreateSceneRouteApiProjectsProjectIdStoryScenesPostError, CreateSceneRouteApiProjectsProjectIdStoryScenesPostResponse, CreateTomeRouteApiProjectsProjectIdStoryTomesPostData, CreateTomeRouteApiProjectsProjectIdStoryTomesPostError, CreateTomeRouteApiProjectsProjectIdStoryTomesPostResponse, CreateVersionRouteApiProjectsProjectIdVersionsPostData, CreateVersionRouteApiProjectsProjectIdVersionsPostError, CreateVersionRouteApiProjectsProjectIdVersionsPostResponse, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostData, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostError, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostResponse, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteData, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteError, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteResponse, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteData, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteError, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteResponse, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteData, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteError, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteResponse, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteData, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteError, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteResponse, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteData, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteError, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteResponse, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteData, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteError, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteResponse, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteData, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteError, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteResponse, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteData, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteError, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteResponse, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteData, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteError, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteResponse, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteData, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteError, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteResponse, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetData, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetError, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetData, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetError, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostData, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostError, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostResponse, ExportProjectRouteApiProjectsProjectIdExportGetData, ExportProjectRouteApiProjectsProjectIdExportGetError, ExportProjectRouteApiProjectsProjectIdExportGetResponse, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostData, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostError, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostResponse, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostData, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostError, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostResponse, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetData, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetError, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetResponse, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetData, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetError, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ImportAssetRouteApiProjectsProjectIdAssetsImportPostData, ImportAssetRouteApiProjectsProjectIdAssetsImportPostError, ImportAssetRouteApiProjectsProjectIdAssetsImportPostResponse, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetData, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetError, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetResponse, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetData, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetError, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetResponse, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetData, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetError, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetResponse, ModelsApiModelsGetData, ModelsApiModelsGetResponse, OpenProjectRouteApiProjectsProjectIdOpenPostData, OpenProjectRouteApiProjectsProjectIdOpenPostError, OpenProjectRouteApiProjectsProjectIdOpenPostResponse, PatchProjectApiProjectsProjectIdPatchData, PatchProjectApiProjectsProjectIdPatchError, PatchProjectApiProjectsProjectIdPatchResponse, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchData, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchError, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchResponse, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostData, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostError, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostResponse, ReadAssetApiProjectsProjectIdAssetsAssetIdGetData, ReadAssetApiProjectsProjectIdAssetsAssetIdGetError, ReadAssetApiProjectsProjectIdAssetsAssetIdGetResponse, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetData, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetError, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetData, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetError, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetResponse, ReadAssetsApiProjectsProjectIdAssetsGetData, ReadAssetsApiProjectsProjectIdAssetsGetError, ReadAssetsApiProjectsProjectIdAssetsGetResponse, ReadChaptersApiProjectsProjectIdStoryChaptersGetData, ReadChaptersApiProjectsProjectIdStoryChaptersGetError, ReadChaptersApiProjectsProjectIdStoryChaptersGetResponse, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetData, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetError, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetResponse, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetData, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetError, ReadCharactersApiProjectsProjectIdCharactersGetData, ReadCharactersApiProjectsProjectIdCharactersGetError, ReadCharactersApiProjectsProjectIdCharactersGetResponse, ReadExportApiProjectsProjectIdExportsExportIdGetData, ReadExportApiProjectsProjectIdExportsExportIdGetError, ReadExportApiProjectsProjectIdExportsExportIdGetResponse, ReadExportsApiProjectsProjectIdExportsGetData, ReadExportsApiProjectsProjectIdExportsGetError, ReadExportsApiProjectsProjectIdExportsGetResponse, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetData, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetError, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetResponse, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetData, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetError, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetResponse, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetData, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetError, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetResponse, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetData, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetError, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetResponse, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetData, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetError, ReadProjectApiProjectsProjectIdGetData, ReadProjectApiProjectsProjectIdGetError, ReadProjectApiProjectsProjectIdGetResponse, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetData, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetError, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetResponse, ReadProjectsApiProjectsGetData, ReadProjectsApiProjectsGetResponse, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetData, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetError, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetResponse, ReadScenesApiProjectsProjectIdStoryScenesGetData, ReadScenesApiProjectsProjectIdStoryScenesGetError, ReadScenesApiProjectsProjectIdStoryScenesGetResponse, ReadStoryApiProjectsProjectIdStoryGetData, ReadStoryApiProjectsProjectIdStoryGetError, ReadStoryApiProjectsProjectIdStoryGetResponse, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetData, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetError, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetResponse, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetData, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetError, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetResponse, ReadTomesApiProjectsProjectIdStoryTomesGetData, ReadTomesApiProjectsProjectIdStoryTomesGetError, ReadTomesApiProjectsProjectIdStoryTomesGetResponse, ReadVersionApiProjectsProjectIdVersionsVersionIdGetData, ReadVersionApiProjectsProjectIdVersionsVersionIdGetError, ReadVersionApiProjectsProjectIdVersionsVersionIdGetResponse, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetData, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetError, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetResponse, ReadVersionsApiProjectsProjectIdVersionsGetData, ReadVersionsApiProjectsProjectIdVersionsGetError, ReadVersionsApiProjectsProjectIdVersionsGetResponse, ReadWarningsApiProjectsProjectIdWarningsGetData, ReadWarningsApiProjectsProjectIdWarningsGetError, ReadWarningsApiProjectsProjectIdWarningsGetResponse, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostData, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostError, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostResponse, ScanWarningsApiProjectsProjectIdWarningsScanPostData, ScanWarningsApiProjectsProjectIdWarningsScanPostError, ScanWarningsApiProjectsProjectIdWarningsScanPostResponse, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostData, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostError, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostResponse, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchData, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchError, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchResponse, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchData, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchError, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchResponse, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchData, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchError, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchResponse, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchData, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchError, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchResponse, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchData, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchError, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchResponse, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchData, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchError, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchResponse, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchData, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchError, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchResponse, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchData, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchError, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchResponse, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchData, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchError, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchResponse, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostData, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostError, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostResponse } from '../types.gen';
+import { archiveAsset, archiveCharacter, archiveProject, cloneProject, compareVersions, createAssetLink, createChapter, createCharacter, createExport, createGenerationJob, createProject, createRelation, createScene, createSceneConfig, createTome, createVersion, createVoiceSample, deleteAsset, deleteAssetLink, deleteChapter, deleteCharacter, deleteCharacterImage, deleteScene, deleteSceneConfig, deleteSceneMangaPage, deleteTome, downloadBoardArtifact, downloadExport, exportProject, generateCharacterImage, generateSceneManga, getApiInngest, getAsset, getAssetFile, getCharacter, getCharacterImageFile, getConfig, getExport, getGenerationBoard, getGenerationJob, getGenerationPanelImage, getHealth, getHealthz, getProject, getProjectCharacterImages, getReferenceSuggestions, getStorySummary, getVersion, importAsset, listAssets, listBranches, listChapters, listCharacterImages, listCharacters, listExports, listGenerationBoards, listGenerationJobs, listModels, listProjects, listSceneConfigs, listSceneMangaPages, listScenes, listTomes, listVersions, listWarnings, openProject, type Options, postApiInngest, previewPrompt, putApiInngest, restoreVersion, scanWarnings, setDefaultConfig, updateAsset, updateChapter, updateCharacter, updateGenerationPanel, updateProject, updateScene, updateSceneConfig, updateSceneMangaPage, updateTome, updateWarning, validateGenerationBoard } from '../sdk.gen';
+import type { ArchiveAssetData, ArchiveAssetResponse, ArchiveCharacterData, ArchiveCharacterResponse, ArchiveProjectData, ArchiveProjectResponse, CloneProjectData, CloneProjectResponse, CompareVersionsData, CompareVersionsResponse, CreateAssetLinkData, CreateAssetLinkResponse, CreateChapterData, CreateChapterResponse, CreateCharacterData, CreateCharacterResponse, CreateExportData, CreateExportResponse, CreateGenerationJobData, CreateGenerationJobResponse, CreateProjectData, CreateProjectResponse, CreateRelationData, CreateRelationResponse, CreateSceneConfigData, CreateSceneConfigResponse, CreateSceneData, CreateSceneResponse, CreateTomeData, CreateTomeResponse, CreateVersionData, CreateVersionResponse, CreateVoiceSampleData, CreateVoiceSampleResponse, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponse, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponse, GetCharacterData, GetCharacterImageFileData, GetCharacterResponse, GetConfigData, GetConfigResponse, GetExportData, GetExportResponse, GetGenerationBoardData, GetGenerationBoardResponse, GetGenerationJobData, GetGenerationJobResponse, GetGenerationPanelImageData, GetHealthData, GetHealthResponse, GetHealthzData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponse, GetProjectData, GetProjectResponse, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponse, GetVersionData, GetVersionResponse, ImportAssetData, ImportAssetResponse, ListAssetsData, ListAssetsResponse, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponse, ListCharactersData, ListCharactersResponse, ListExportsData, ListExportsResponse, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponse, ListProjectsData, ListProjectsResponse, ListSceneConfigsData, ListSceneConfigsResponse, ListSceneMangaPagesData, ListSceneMangaPagesResponse, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponse, OpenProjectData, OpenProjectResponse, PostApiInngestData, PreviewPromptData, PreviewPromptResponse, PutApiInngestData, RestoreVersionData, RestoreVersionResponse, ScanWarningsData, ScanWarningsResponse, SetDefaultConfigData, SetDefaultConfigResponse, UpdateAssetData, UpdateAssetResponse, UpdateChapterData, UpdateChapterResponse, UpdateCharacterData, UpdateCharacterResponse, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponse, UpdateSceneConfigData, UpdateSceneConfigResponse, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponse, UpdateSceneResponse, UpdateTomeData, UpdateTomeResponse, UpdateWarningData, UpdateWarningResponse, ValidateGenerationBoardData, ValidateGenerationBoardResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -39,14 +39,14 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     return [params];
 };
 
-export const readProjectsApiProjectsGetQueryKey = (options?: Options<ReadProjectsApiProjectsGetData>) => createQueryKey('readProjectsApiProjectsGet', options);
+export const getHealthQueryKey = (options?: Options<GetHealthData>) => createQueryKey('getHealth', options);
 
 /**
- * Read Projects
+ * Health check endpoint
  */
-export const readProjectsApiProjectsGetOptions = (options?: Options<ReadProjectsApiProjectsGetData>) => queryOptions<ReadProjectsApiProjectsGetResponse, DefaultError, ReadProjectsApiProjectsGetResponse, ReturnType<typeof readProjectsApiProjectsGetQueryKey>>({
+export const getHealthOptions = (options?: Options<GetHealthData>) => queryOptions<GetHealthResponse, DefaultError, GetHealthResponse, ReturnType<typeof getHealthQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readProjectsApiProjectsGet({
+        const { data } = await getHealth({
             ...options,
             ...queryKey[0],
             signal,
@@ -54,34 +54,17 @@ export const readProjectsApiProjectsGetOptions = (options?: Options<ReadProjects
         });
         return data;
     },
-    queryKey: readProjectsApiProjectsGetQueryKey(options)
+    queryKey: getHealthQueryKey(options)
 });
 
-/**
- * Create Project Route
- */
-export const createProjectRouteApiProjectsPostMutation = (options?: Partial<Options<CreateProjectRouteApiProjectsPostData>>): UseMutationOptions<CreateProjectRouteApiProjectsPostResponse, CreateProjectRouteApiProjectsPostError, Options<CreateProjectRouteApiProjectsPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateProjectRouteApiProjectsPostResponse, CreateProjectRouteApiProjectsPostError, Options<CreateProjectRouteApiProjectsPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createProjectRouteApiProjectsPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readProjectApiProjectsProjectIdGetQueryKey = (options: Options<ReadProjectApiProjectsProjectIdGetData>) => createQueryKey('readProjectApiProjectsProjectIdGet', options);
+export const getHealthzQueryKey = (options?: Options<GetHealthzData>) => createQueryKey('getHealthz', options);
 
 /**
- * Read Project
+ * Simple health check
  */
-export const readProjectApiProjectsProjectIdGetOptions = (options: Options<ReadProjectApiProjectsProjectIdGetData>) => queryOptions<ReadProjectApiProjectsProjectIdGetResponse, ReadProjectApiProjectsProjectIdGetError, ReadProjectApiProjectsProjectIdGetResponse, ReturnType<typeof readProjectApiProjectsProjectIdGetQueryKey>>({
+export const getHealthzOptions = (options?: Options<GetHealthzData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getHealthzQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readProjectApiProjectsProjectIdGet({
+        const { data } = await getHealthz({
             ...options,
             ...queryKey[0],
             signal,
@@ -89,85 +72,17 @@ export const readProjectApiProjectsProjectIdGetOptions = (options: Options<ReadP
         });
         return data;
     },
-    queryKey: readProjectApiProjectsProjectIdGetQueryKey(options)
+    queryKey: getHealthzQueryKey(options)
 });
 
-/**
- * Patch Project
- */
-export const patchProjectApiProjectsProjectIdPatchMutation = (options?: Partial<Options<PatchProjectApiProjectsProjectIdPatchData>>): UseMutationOptions<PatchProjectApiProjectsProjectIdPatchResponse, PatchProjectApiProjectsProjectIdPatchError, Options<PatchProjectApiProjectsProjectIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<PatchProjectApiProjectsProjectIdPatchResponse, PatchProjectApiProjectsProjectIdPatchError, Options<PatchProjectApiProjectsProjectIdPatchData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await patchProjectApiProjectsProjectIdPatch({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const getConfigQueryKey = (options?: Options<GetConfigData>) => createQueryKey('getConfig', options);
 
 /**
- * Archive Project Route
+ * Get application configuration
  */
-export const archiveProjectRouteApiProjectsProjectIdArchivePostMutation = (options?: Partial<Options<ArchiveProjectRouteApiProjectsProjectIdArchivePostData>>): UseMutationOptions<ArchiveProjectRouteApiProjectsProjectIdArchivePostResponse, ArchiveProjectRouteApiProjectsProjectIdArchivePostError, Options<ArchiveProjectRouteApiProjectsProjectIdArchivePostData>> => {
-    const mutationOptions: UseMutationOptions<ArchiveProjectRouteApiProjectsProjectIdArchivePostResponse, ArchiveProjectRouteApiProjectsProjectIdArchivePostError, Options<ArchiveProjectRouteApiProjectsProjectIdArchivePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await archiveProjectRouteApiProjectsProjectIdArchivePost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Clone Project Route
- */
-export const cloneProjectRouteApiProjectsProjectIdClonePostMutation = (options?: Partial<Options<CloneProjectRouteApiProjectsProjectIdClonePostData>>): UseMutationOptions<CloneProjectRouteApiProjectsProjectIdClonePostResponse, CloneProjectRouteApiProjectsProjectIdClonePostError, Options<CloneProjectRouteApiProjectsProjectIdClonePostData>> => {
-    const mutationOptions: UseMutationOptions<CloneProjectRouteApiProjectsProjectIdClonePostResponse, CloneProjectRouteApiProjectsProjectIdClonePostError, Options<CloneProjectRouteApiProjectsProjectIdClonePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await cloneProjectRouteApiProjectsProjectIdClonePost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Open Project Route
- */
-export const openProjectRouteApiProjectsProjectIdOpenPostMutation = (options?: Partial<Options<OpenProjectRouteApiProjectsProjectIdOpenPostData>>): UseMutationOptions<OpenProjectRouteApiProjectsProjectIdOpenPostResponse, OpenProjectRouteApiProjectsProjectIdOpenPostError, Options<OpenProjectRouteApiProjectsProjectIdOpenPostData>> => {
-    const mutationOptions: UseMutationOptions<OpenProjectRouteApiProjectsProjectIdOpenPostResponse, OpenProjectRouteApiProjectsProjectIdOpenPostError, Options<OpenProjectRouteApiProjectsProjectIdOpenPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await openProjectRouteApiProjectsProjectIdOpenPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const exportProjectRouteApiProjectsProjectIdExportGetQueryKey = (options: Options<ExportProjectRouteApiProjectsProjectIdExportGetData>) => createQueryKey('exportProjectRouteApiProjectsProjectIdExportGet', options);
-
-/**
- * Export Project Route
- */
-export const exportProjectRouteApiProjectsProjectIdExportGetOptions = (options: Options<ExportProjectRouteApiProjectsProjectIdExportGetData>) => queryOptions<ExportProjectRouteApiProjectsProjectIdExportGetResponse, ExportProjectRouteApiProjectsProjectIdExportGetError, ExportProjectRouteApiProjectsProjectIdExportGetResponse, ReturnType<typeof exportProjectRouteApiProjectsProjectIdExportGetQueryKey>>({
+export const getConfigOptions = (options?: Options<GetConfigData>) => queryOptions<GetConfigResponse, DefaultError, GetConfigResponse, ReturnType<typeof getConfigQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await exportProjectRouteApiProjectsProjectIdExportGet({
+        const { data } = await getConfig({
             ...options,
             ...queryKey[0],
             signal,
@@ -175,17 +90,17 @@ export const exportProjectRouteApiProjectsProjectIdExportGetOptions = (options: 
         });
         return data;
     },
-    queryKey: exportProjectRouteApiProjectsProjectIdExportGetQueryKey(options)
+    queryKey: getConfigQueryKey(options)
 });
 
-export const readAssetsApiProjectsProjectIdAssetsGetQueryKey = (options: Options<ReadAssetsApiProjectsProjectIdAssetsGetData>) => createQueryKey('readAssetsApiProjectsProjectIdAssetsGet', options);
+export const listModelsQueryKey = (options?: Options<ListModelsData>) => createQueryKey('listModels', options);
 
 /**
- * Read Assets
+ * List available AI model providers
  */
-export const readAssetsApiProjectsProjectIdAssetsGetOptions = (options: Options<ReadAssetsApiProjectsProjectIdAssetsGetData>) => queryOptions<ReadAssetsApiProjectsProjectIdAssetsGetResponse, ReadAssetsApiProjectsProjectIdAssetsGetError, ReadAssetsApiProjectsProjectIdAssetsGetResponse, ReturnType<typeof readAssetsApiProjectsProjectIdAssetsGetQueryKey>>({
+export const listModelsOptions = (options?: Options<ListModelsData>) => queryOptions<ListModelsResponse, DefaultError, ListModelsResponse, ReturnType<typeof listModelsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readAssetsApiProjectsProjectIdAssetsGet({
+        const { data } = await listModels({
             ...options,
             ...queryKey[0],
             signal,
@@ -193,51 +108,17 @@ export const readAssetsApiProjectsProjectIdAssetsGetOptions = (options: Options<
         });
         return data;
     },
-    queryKey: readAssetsApiProjectsProjectIdAssetsGetQueryKey(options)
+    queryKey: listModelsQueryKey(options)
 });
 
-/**
- * Import Asset Route
- */
-export const importAssetRouteApiProjectsProjectIdAssetsImportPostMutation = (options?: Partial<Options<ImportAssetRouteApiProjectsProjectIdAssetsImportPostData>>): UseMutationOptions<ImportAssetRouteApiProjectsProjectIdAssetsImportPostResponse, ImportAssetRouteApiProjectsProjectIdAssetsImportPostError, Options<ImportAssetRouteApiProjectsProjectIdAssetsImportPostData>> => {
-    const mutationOptions: UseMutationOptions<ImportAssetRouteApiProjectsProjectIdAssetsImportPostResponse, ImportAssetRouteApiProjectsProjectIdAssetsImportPostError, Options<ImportAssetRouteApiProjectsProjectIdAssetsImportPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await importAssetRouteApiProjectsProjectIdAssetsImportPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const listProjectsQueryKey = (options?: Options<ListProjectsData>) => createQueryKey('listProjects', options);
 
 /**
- * Delete Asset Route
+ * List all projects
  */
-export const deleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteMutation = (options?: Partial<Options<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteData>>): UseMutationOptions<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteResponse, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteError, Options<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteResponse, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteError, Options<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteAssetRouteApiProjectsProjectIdAssetsAssetIdDelete({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readAssetApiProjectsProjectIdAssetsAssetIdGetQueryKey = (options: Options<ReadAssetApiProjectsProjectIdAssetsAssetIdGetData>) => createQueryKey('readAssetApiProjectsProjectIdAssetsAssetIdGet', options);
-
-/**
- * Read Asset
- */
-export const readAssetApiProjectsProjectIdAssetsAssetIdGetOptions = (options: Options<ReadAssetApiProjectsProjectIdAssetsAssetIdGetData>) => queryOptions<ReadAssetApiProjectsProjectIdAssetsAssetIdGetResponse, ReadAssetApiProjectsProjectIdAssetsAssetIdGetError, ReadAssetApiProjectsProjectIdAssetsAssetIdGetResponse, ReturnType<typeof readAssetApiProjectsProjectIdAssetsAssetIdGetQueryKey>>({
+export const listProjectsOptions = (options?: Options<ListProjectsData>) => queryOptions<ListProjectsResponse, DefaultError, ListProjectsResponse, ReturnType<typeof listProjectsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readAssetApiProjectsProjectIdAssetsAssetIdGet({
+        const { data } = await listProjects({
             ...options,
             ...queryKey[0],
             signal,
@@ -245,16 +126,16 @@ export const readAssetApiProjectsProjectIdAssetsAssetIdGetOptions = (options: Op
         });
         return data;
     },
-    queryKey: readAssetApiProjectsProjectIdAssetsAssetIdGetQueryKey(options)
+    queryKey: listProjectsQueryKey(options)
 });
 
 /**
- * Update Asset Route
+ * Create a new project
  */
-export const updateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchMutation = (options?: Partial<Options<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchData>>): UseMutationOptions<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchResponse, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchError, Options<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchResponse, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchError, Options<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchData>> = {
+export const createProjectMutation = (options?: Partial<Options<CreateProjectData>>): UseMutationOptions<CreateProjectResponse, DefaultError, Options<CreateProjectData>> => {
+    const mutationOptions: UseMutationOptions<CreateProjectResponse, DefaultError, Options<CreateProjectData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await updateAssetRouteApiProjectsProjectIdAssetsAssetIdPatch({
+            const { data } = await createProject({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -265,31 +146,14 @@ export const updateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchMutation = (o
     return mutationOptions;
 };
 
-/**
- * Archive Asset Route
- */
-export const archiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostMutation = (options?: Partial<Options<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostData>>): UseMutationOptions<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostResponse, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostError, Options<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostData>> => {
-    const mutationOptions: UseMutationOptions<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostResponse, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostError, Options<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await archiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readAssetFileApiProjectsProjectIdAssetsAssetIdFileGetQueryKey = (options: Options<ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetData>) => createQueryKey('readAssetFileApiProjectsProjectIdAssetsAssetIdFileGet', options);
+export const getProjectQueryKey = (options: Options<GetProjectData>) => createQueryKey('getProject', options);
 
 /**
- * Read Asset File
+ * Get a project by ID
  */
-export const readAssetFileApiProjectsProjectIdAssetsAssetIdFileGetOptions = (options: Options<ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetData>) => queryOptions<unknown, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetError, unknown, ReturnType<typeof readAssetFileApiProjectsProjectIdAssetsAssetIdFileGetQueryKey>>({
+export const getProjectOptions = (options: Options<GetProjectData>) => queryOptions<GetProjectResponse, DefaultError, GetProjectResponse, ReturnType<typeof getProjectQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readAssetFileApiProjectsProjectIdAssetsAssetIdFileGet({
+        const { data } = await getProject({
             ...options,
             ...queryKey[0],
             signal,
@@ -297,17 +161,85 @@ export const readAssetFileApiProjectsProjectIdAssetsAssetIdFileGetOptions = (opt
         });
         return data;
     },
-    queryKey: readAssetFileApiProjectsProjectIdAssetsAssetIdFileGetQueryKey(options)
+    queryKey: getProjectQueryKey(options)
 });
 
-export const readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetQueryKey = (options: Options<ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetData>) => createQueryKey('readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGet', options);
+/**
+ * Update a project
+ */
+export const updateProjectMutation = (options?: Partial<Options<UpdateProjectData>>): UseMutationOptions<UpdateProjectResponse, DefaultError, Options<UpdateProjectData>> => {
+    const mutationOptions: UseMutationOptions<UpdateProjectResponse, DefaultError, Options<UpdateProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
- * Read Asset Links
+ * Mark project as opened
  */
-export const readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetOptions = (options: Options<ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetData>) => queryOptions<ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetResponse, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetError, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetResponse, ReturnType<typeof readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetQueryKey>>({
+export const openProjectMutation = (options?: Partial<Options<OpenProjectData>>): UseMutationOptions<OpenProjectResponse, DefaultError, Options<OpenProjectData>> => {
+    const mutationOptions: UseMutationOptions<OpenProjectResponse, DefaultError, Options<OpenProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await openProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Archive a project
+ */
+export const archiveProjectMutation = (options?: Partial<Options<ArchiveProjectData>>): UseMutationOptions<ArchiveProjectResponse, DefaultError, Options<ArchiveProjectData>> => {
+    const mutationOptions: UseMutationOptions<ArchiveProjectResponse, DefaultError, Options<ArchiveProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await archiveProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Clone a project
+ */
+export const cloneProjectMutation = (options?: Partial<Options<CloneProjectData>>): UseMutationOptions<CloneProjectResponse, DefaultError, Options<CloneProjectData>> => {
+    const mutationOptions: UseMutationOptions<CloneProjectResponse, DefaultError, Options<CloneProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await cloneProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const exportProjectQueryKey = (options: Options<ExportProjectData>) => createQueryKey('exportProject', options);
+
+/**
+ * Export project data
+ */
+export const exportProjectOptions = (options: Options<ExportProjectData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof exportProjectQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGet({
+        const { data } = await exportProject({
             ...options,
             ...queryKey[0],
             signal,
@@ -315,51 +247,17 @@ export const readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetOptions = (o
         });
         return data;
     },
-    queryKey: readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetQueryKey(options)
+    queryKey: exportProjectQueryKey(options)
 });
 
-/**
- * Create Asset Link Route
- */
-export const createAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostMutation = (options?: Partial<Options<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostData>>): UseMutationOptions<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostResponse, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostError, Options<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostResponse, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostError, Options<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const listCharactersQueryKey = (options: Options<ListCharactersData>) => createQueryKey('listCharacters', options);
 
 /**
- * Delete Asset Link Route
+ * List all characters
  */
-export const deleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteMutation = (options?: Partial<Options<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteData>>): UseMutationOptions<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteResponse, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteError, Options<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteResponse, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteError, Options<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDelete({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readCharactersApiProjectsProjectIdCharactersGetQueryKey = (options: Options<ReadCharactersApiProjectsProjectIdCharactersGetData>) => createQueryKey('readCharactersApiProjectsProjectIdCharactersGet', options);
-
-/**
- * Read Characters
- */
-export const readCharactersApiProjectsProjectIdCharactersGetOptions = (options: Options<ReadCharactersApiProjectsProjectIdCharactersGetData>) => queryOptions<ReadCharactersApiProjectsProjectIdCharactersGetResponse, ReadCharactersApiProjectsProjectIdCharactersGetError, ReadCharactersApiProjectsProjectIdCharactersGetResponse, ReturnType<typeof readCharactersApiProjectsProjectIdCharactersGetQueryKey>>({
+export const listCharactersOptions = (options: Options<ListCharactersData>) => queryOptions<ListCharactersResponse, DefaultError, ListCharactersResponse, ReturnType<typeof listCharactersQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readCharactersApiProjectsProjectIdCharactersGet({
+        const { data } = await listCharacters({
             ...options,
             ...queryKey[0],
             signal,
@@ -367,16 +265,16 @@ export const readCharactersApiProjectsProjectIdCharactersGetOptions = (options: 
         });
         return data;
     },
-    queryKey: readCharactersApiProjectsProjectIdCharactersGetQueryKey(options)
+    queryKey: listCharactersQueryKey(options)
 });
 
 /**
- * Create Character Route
+ * Create a character
  */
-export const createCharacterRouteApiProjectsProjectIdCharactersPostMutation = (options?: Partial<Options<CreateCharacterRouteApiProjectsProjectIdCharactersPostData>>): UseMutationOptions<CreateCharacterRouteApiProjectsProjectIdCharactersPostResponse, CreateCharacterRouteApiProjectsProjectIdCharactersPostError, Options<CreateCharacterRouteApiProjectsProjectIdCharactersPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateCharacterRouteApiProjectsProjectIdCharactersPostResponse, CreateCharacterRouteApiProjectsProjectIdCharactersPostError, Options<CreateCharacterRouteApiProjectsProjectIdCharactersPostData>> = {
+export const createCharacterMutation = (options?: Partial<Options<CreateCharacterData>>): UseMutationOptions<CreateCharacterResponse, DefaultError, Options<CreateCharacterData>> => {
+    const mutationOptions: UseMutationOptions<CreateCharacterResponse, DefaultError, Options<CreateCharacterData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createCharacterRouteApiProjectsProjectIdCharactersPost({
+            const { data } = await createCharacter({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -387,16 +285,14 @@ export const createCharacterRouteApiProjectsProjectIdCharactersPostMutation = (o
     return mutationOptions;
 };
 
-export const readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetQueryKey = (options: Options<ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetData>) => createQueryKey('readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet', options);
+export const getProjectCharacterImagesQueryKey = (options: Options<GetProjectCharacterImagesData>) => createQueryKey('getProjectCharacterImages', options);
 
 /**
- * Read Project Character Images
- *
- * Get all character images for a project, keyed by character_id.
+ * Get all character images for project
  */
-export const readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetOptions = (options: Options<ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetData>) => queryOptions<ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetResponse, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetError, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetResponse, ReturnType<typeof readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetQueryKey>>({
+export const getProjectCharacterImagesOptions = (options: Options<GetProjectCharacterImagesData>) => queryOptions<GetProjectCharacterImagesResponse, DefaultError, GetProjectCharacterImagesResponse, ReturnType<typeof getProjectCharacterImagesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet({
+        const { data } = await getProjectCharacterImages({
             ...options,
             ...queryKey[0],
             signal,
@@ -404,16 +300,16 @@ export const readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetOp
         });
         return data;
     },
-    queryKey: readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetQueryKey(options)
+    queryKey: getProjectCharacterImagesQueryKey(options)
 });
 
 /**
- * Delete Character Route
+ * Delete a character
  */
-export const deleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteMutation = (options?: Partial<Options<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteData>>): UseMutationOptions<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteResponse, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteError, Options<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteResponse, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteError, Options<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteData>> = {
+export const deleteCharacterMutation = (options?: Partial<Options<DeleteCharacterData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteCharacterData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteCharacterData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDelete({
+            const { data } = await deleteCharacter({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -424,14 +320,14 @@ export const deleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDelete
     return mutationOptions;
 };
 
-export const readCharacterApiProjectsProjectIdCharactersCharacterIdGetQueryKey = (options: Options<ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetData>) => createQueryKey('readCharacterApiProjectsProjectIdCharactersCharacterIdGet', options);
+export const getCharacterQueryKey = (options: Options<GetCharacterData>) => createQueryKey('getCharacter', options);
 
 /**
- * Read Character
+ * Get character details
  */
-export const readCharacterApiProjectsProjectIdCharactersCharacterIdGetOptions = (options: Options<ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetData>) => queryOptions<ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetResponse, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetError, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetResponse, ReturnType<typeof readCharacterApiProjectsProjectIdCharactersCharacterIdGetQueryKey>>({
+export const getCharacterOptions = (options: Options<GetCharacterData>) => queryOptions<GetCharacterResponse, DefaultError, GetCharacterResponse, ReturnType<typeof getCharacterQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readCharacterApiProjectsProjectIdCharactersCharacterIdGet({
+        const { data } = await getCharacter({
             ...options,
             ...queryKey[0],
             signal,
@@ -439,16 +335,16 @@ export const readCharacterApiProjectsProjectIdCharactersCharacterIdGetOptions = 
         });
         return data;
     },
-    queryKey: readCharacterApiProjectsProjectIdCharactersCharacterIdGetQueryKey(options)
+    queryKey: getCharacterQueryKey(options)
 });
 
 /**
- * Update Character Route
+ * Update a character
  */
-export const updateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchMutation = (options?: Partial<Options<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchData>>): UseMutationOptions<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchResponse, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchError, Options<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchResponse, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchError, Options<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchData>> = {
+export const updateCharacterMutation = (options?: Partial<Options<UpdateCharacterData>>): UseMutationOptions<UpdateCharacterResponse, DefaultError, Options<UpdateCharacterData>> => {
+    const mutationOptions: UseMutationOptions<UpdateCharacterResponse, DefaultError, Options<UpdateCharacterData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await updateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatch({
+            const { data } = await updateCharacter({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -460,12 +356,12 @@ export const updateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchM
 };
 
 /**
- * Duplicate Character Route
+ * Archive a character
  */
-export const duplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostMutation = (options?: Partial<Options<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostData>>): UseMutationOptions<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostResponse, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostError, Options<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostData>> => {
-    const mutationOptions: UseMutationOptions<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostResponse, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostError, Options<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostData>> = {
+export const archiveCharacterMutation = (options?: Partial<Options<ArchiveCharacterData>>): UseMutationOptions<ArchiveCharacterResponse, DefaultError, Options<ArchiveCharacterData>> => {
+    const mutationOptions: UseMutationOptions<ArchiveCharacterResponse, DefaultError, Options<ArchiveCharacterData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await duplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePost({
+            const { data } = await archiveCharacter({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -477,12 +373,12 @@ export const duplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDup
 };
 
 /**
- * Archive Character Route
+ * Create a character relation
  */
-export const archiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostMutation = (options?: Partial<Options<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostData>>): UseMutationOptions<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostResponse, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostError, Options<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostData>> => {
-    const mutationOptions: UseMutationOptions<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostResponse, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostError, Options<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostData>> = {
+export const createRelationMutation = (options?: Partial<Options<CreateRelationData>>): UseMutationOptions<CreateRelationResponse, DefaultError, Options<CreateRelationData>> => {
+    const mutationOptions: UseMutationOptions<CreateRelationResponse, DefaultError, Options<CreateRelationData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await archiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePost({
+            const { data } = await createRelation({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -494,12 +390,12 @@ export const archiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchi
 };
 
 /**
- * Create Relation Route
+ * Create a voice sample
  */
-export const createRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostMutation = (options?: Partial<Options<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostData>>): UseMutationOptions<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostResponse, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostError, Options<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostResponse, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostError, Options<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostData>> = {
+export const createVoiceSampleMutation = (options?: Partial<Options<CreateVoiceSampleData>>): UseMutationOptions<CreateVoiceSampleResponse, DefaultError, Options<CreateVoiceSampleData>> => {
+    const mutationOptions: UseMutationOptions<CreateVoiceSampleResponse, DefaultError, Options<CreateVoiceSampleData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPost({
+            const { data } = await createVoiceSample({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -511,12 +407,12 @@ export const createRelationRouteApiProjectsProjectIdCharactersCharacterIdRelatio
 };
 
 /**
- * Delete Relation Route
+ * Generate character images
  */
-export const deleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteMutation = (options?: Partial<Options<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteData>>): UseMutationOptions<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteResponse, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteError, Options<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteResponse, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteError, Options<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteData>> = {
+export const generateCharacterImageMutation = (options?: Partial<Options<GenerateCharacterImageData>>): UseMutationOptions<unknown, DefaultError, Options<GenerateCharacterImageData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<GenerateCharacterImageData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDelete({
+            const { data } = await generateCharacterImage({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -527,67 +423,14 @@ export const deleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelatio
     return mutationOptions;
 };
 
-/**
- * Update Relation Route
- */
-export const updateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchMutation = (options?: Partial<Options<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchData>>): UseMutationOptions<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchResponse, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchError, Options<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchResponse, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchError, Options<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatch({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const listCharacterImagesQueryKey = (options: Options<ListCharacterImagesData>) => createQueryKey('listCharacterImages', options);
 
 /**
- * Create Voice Sample Route
+ * List character images
  */
-export const createVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostMutation = (options?: Partial<Options<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostData>>): UseMutationOptions<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostResponse, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostError, Options<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostResponse, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostError, Options<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Generate Character Image Route
- */
-export const generateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostMutation = (options?: Partial<Options<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostData>>): UseMutationOptions<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostResponse, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostError, Options<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostData>> => {
-    const mutationOptions: UseMutationOptions<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostResponse, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostError, Options<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await generateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetQueryKey = (options: Options<ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetData>) => createQueryKey('listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGet', options);
-
-/**
- * List Character Images
- *
- * List all generated images for a character.
- */
-export const listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetOptions = (options: Options<ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetData>) => queryOptions<ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetResponse, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetError, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetResponse, ReturnType<typeof listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetQueryKey>>({
+export const listCharacterImagesOptions = (options: Options<ListCharacterImagesData>) => queryOptions<ListCharacterImagesResponse, DefaultError, ListCharacterImagesResponse, ReturnType<typeof listCharacterImagesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGet({
+        const { data } = await listCharacterImages({
             ...options,
             ...queryKey[0],
             signal,
@@ -595,18 +438,16 @@ export const listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesG
         });
         return data;
     },
-    queryKey: listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetQueryKey(options)
+    queryKey: listCharacterImagesQueryKey(options)
 });
 
 /**
- * Delete Character Image Route
- *
- * Delete a character image.
+ * Delete a character image
  */
-export const deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteMutation = (options?: Partial<Options<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteData>>): UseMutationOptions<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteResponse, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteError, Options<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteResponse, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteError, Options<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteData>> = {
+export const deleteCharacterImageMutation = (options?: Partial<Options<DeleteCharacterImageData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteCharacterImageData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteCharacterImageData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete({
+            const { data } = await deleteCharacterImage({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -617,16 +458,14 @@ export const deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdI
     return mutationOptions;
 };
 
-export const readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetQueryKey = (options: Options<ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetData>) => createQueryKey('readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGet', options);
+export const getCharacterImageFileQueryKey = (options: Options<GetCharacterImageFileData>) => createQueryKey('getCharacterImageFile', options);
 
 /**
- * Read Character Image File
- *
- * Serve a character image file.
+ * Get character image file
  */
-export const readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetOptions = (options: Options<ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetData>) => queryOptions<unknown, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetError, unknown, ReturnType<typeof readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetQueryKey>>({
+export const getCharacterImageFileOptions = (options: Options<GetCharacterImageFileData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getCharacterImageFileQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGet({
+        const { data } = await getCharacterImageFile({
             ...options,
             ...queryKey[0],
             signal,
@@ -634,17 +473,17 @@ export const readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImag
         });
         return data;
     },
-    queryKey: readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetQueryKey(options)
+    queryKey: getCharacterImageFileQueryKey(options)
 });
 
-export const readExportsApiProjectsProjectIdExportsGetQueryKey = (options: Options<ReadExportsApiProjectsProjectIdExportsGetData>) => createQueryKey('readExportsApiProjectsProjectIdExportsGet', options);
+export const getStorySummaryQueryKey = (options: Options<GetStorySummaryData>) => createQueryKey('getStorySummary', options);
 
 /**
- * Read Exports
+ * Get story summary
  */
-export const readExportsApiProjectsProjectIdExportsGetOptions = (options: Options<ReadExportsApiProjectsProjectIdExportsGetData>) => queryOptions<ReadExportsApiProjectsProjectIdExportsGetResponse, ReadExportsApiProjectsProjectIdExportsGetError, ReadExportsApiProjectsProjectIdExportsGetResponse, ReturnType<typeof readExportsApiProjectsProjectIdExportsGetQueryKey>>({
+export const getStorySummaryOptions = (options: Options<GetStorySummaryData>) => queryOptions<GetStorySummaryResponse, DefaultError, GetStorySummaryResponse, ReturnType<typeof getStorySummaryQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readExportsApiProjectsProjectIdExportsGet({
+        const { data } = await getStorySummary({
             ...options,
             ...queryKey[0],
             signal,
@@ -652,158 +491,52 @@ export const readExportsApiProjectsProjectIdExportsGetOptions = (options: Option
         });
         return data;
     },
-    queryKey: readExportsApiProjectsProjectIdExportsGetQueryKey(options)
+    queryKey: getStorySummaryQueryKey(options)
+});
+
+export const getReferenceSuggestionsQueryKey = (options?: Options<GetReferenceSuggestionsData>) => createQueryKey('getReferenceSuggestions', options);
+
+/**
+ * Get reference suggestions
+ */
+export const getReferenceSuggestionsOptions = (options?: Options<GetReferenceSuggestionsData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getReferenceSuggestionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getReferenceSuggestions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getReferenceSuggestionsQueryKey(options)
+});
+
+export const listTomesQueryKey = (options: Options<ListTomesData>) => createQueryKey('listTomes', options);
+
+/**
+ * List tomes
+ */
+export const listTomesOptions = (options: Options<ListTomesData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listTomesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listTomes({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listTomesQueryKey(options)
 });
 
 /**
- * Create Export Route
+ * Create a tome
  */
-export const createExportRouteApiProjectsProjectIdExportsPostMutation = (options?: Partial<Options<CreateExportRouteApiProjectsProjectIdExportsPostData>>): UseMutationOptions<CreateExportRouteApiProjectsProjectIdExportsPostResponse, CreateExportRouteApiProjectsProjectIdExportsPostError, Options<CreateExportRouteApiProjectsProjectIdExportsPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateExportRouteApiProjectsProjectIdExportsPostResponse, CreateExportRouteApiProjectsProjectIdExportsPostError, Options<CreateExportRouteApiProjectsProjectIdExportsPostData>> = {
+export const createTomeMutation = (options?: Partial<Options<CreateTomeData>>): UseMutationOptions<CreateTomeResponse, DefaultError, Options<CreateTomeData>> => {
+    const mutationOptions: UseMutationOptions<CreateTomeResponse, DefaultError, Options<CreateTomeData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createExportRouteApiProjectsProjectIdExportsPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readExportApiProjectsProjectIdExportsExportIdGetQueryKey = (options: Options<ReadExportApiProjectsProjectIdExportsExportIdGetData>) => createQueryKey('readExportApiProjectsProjectIdExportsExportIdGet', options);
-
-/**
- * Read Export
- */
-export const readExportApiProjectsProjectIdExportsExportIdGetOptions = (options: Options<ReadExportApiProjectsProjectIdExportsExportIdGetData>) => queryOptions<ReadExportApiProjectsProjectIdExportsExportIdGetResponse, ReadExportApiProjectsProjectIdExportsExportIdGetError, ReadExportApiProjectsProjectIdExportsExportIdGetResponse, ReturnType<typeof readExportApiProjectsProjectIdExportsExportIdGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readExportApiProjectsProjectIdExportsExportIdGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readExportApiProjectsProjectIdExportsExportIdGetQueryKey(options)
-});
-
-export const downloadExportApiProjectsProjectIdExportsExportIdDownloadGetQueryKey = (options: Options<DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetData>) => createQueryKey('downloadExportApiProjectsProjectIdExportsExportIdDownloadGet', options);
-
-/**
- * Download Export
- */
-export const downloadExportApiProjectsProjectIdExportsExportIdDownloadGetOptions = (options: Options<DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetData>) => queryOptions<unknown, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetError, unknown, ReturnType<typeof downloadExportApiProjectsProjectIdExportsExportIdDownloadGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await downloadExportApiProjectsProjectIdExportsExportIdDownloadGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: downloadExportApiProjectsProjectIdExportsExportIdDownloadGetQueryKey(options)
-});
-
-export const readGenerationJobsApiProjectsProjectIdGenerationJobsGetQueryKey = (options: Options<ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetData>) => createQueryKey('readGenerationJobsApiProjectsProjectIdGenerationJobsGet', options);
-
-/**
- * Read Generation Jobs
- */
-export const readGenerationJobsApiProjectsProjectIdGenerationJobsGetOptions = (options: Options<ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetData>) => queryOptions<ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetResponse, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetError, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetResponse, ReturnType<typeof readGenerationJobsApiProjectsProjectIdGenerationJobsGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readGenerationJobsApiProjectsProjectIdGenerationJobsGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readGenerationJobsApiProjectsProjectIdGenerationJobsGetQueryKey(options)
-});
-
-/**
- * Create Generation Job Route
- */
-export const createGenerationJobRouteApiProjectsProjectIdGenerationJobsPostMutation = (options?: Partial<Options<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostData>>): UseMutationOptions<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostResponse, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostError, Options<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostResponse, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostError, Options<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createGenerationJobRouteApiProjectsProjectIdGenerationJobsPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetQueryKey = (options: Options<ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetData>) => createQueryKey('readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGet', options);
-
-/**
- * Read Generation Job
- */
-export const readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetOptions = (options: Options<ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetData>) => queryOptions<ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetResponse, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetError, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetResponse, ReturnType<typeof readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetQueryKey(options)
-});
-
-export const readGenerationBoardsApiProjectsProjectIdGenerationBoardsGetQueryKey = (options: Options<ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetData>) => createQueryKey('readGenerationBoardsApiProjectsProjectIdGenerationBoardsGet', options);
-
-/**
- * Read Generation Boards
- */
-export const readGenerationBoardsApiProjectsProjectIdGenerationBoardsGetOptions = (options: Options<ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetData>) => queryOptions<ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetResponse, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetError, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetResponse, ReturnType<typeof readGenerationBoardsApiProjectsProjectIdGenerationBoardsGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readGenerationBoardsApiProjectsProjectIdGenerationBoardsGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readGenerationBoardsApiProjectsProjectIdGenerationBoardsGetQueryKey(options)
-});
-
-export const readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetQueryKey = (options: Options<ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetData>) => createQueryKey('readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGet', options);
-
-/**
- * Read Generation Board
- */
-export const readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetOptions = (options: Options<ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetData>) => queryOptions<ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetResponse, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetError, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetResponse, ReturnType<typeof readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetQueryKey(options)
-});
-
-/**
- * Validate Generation Board Route
- */
-export const validateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostMutation = (options?: Partial<Options<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostData>>): UseMutationOptions<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostResponse, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostError, Options<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostData>> => {
-    const mutationOptions: UseMutationOptions<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostResponse, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostError, Options<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await validateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePost({
+            const { data } = await createTome({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -815,12 +548,12 @@ export const validateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoa
 };
 
 /**
- * Update Generation Panel Route
+ * Delete a tome
  */
-export const updateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchMutation = (options?: Partial<Options<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchData>>): UseMutationOptions<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchResponse, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchError, Options<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchResponse, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchError, Options<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchData>> = {
+export const deleteTomeMutation = (options?: Partial<Options<DeleteTomeData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteTomeData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteTomeData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await updateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatch({
+            const { data } = await deleteTome({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -831,14 +564,31 @@ export const updateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoard
     return mutationOptions;
 };
 
-export const downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetQueryKey = (options: Options<DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetData>) => createQueryKey('downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGet', options);
+/**
+ * Update a tome
+ */
+export const updateTomeMutation = (options?: Partial<Options<UpdateTomeData>>): UseMutationOptions<UpdateTomeResponse, DefaultError, Options<UpdateTomeData>> => {
+    const mutationOptions: UseMutationOptions<UpdateTomeResponse, DefaultError, Options<UpdateTomeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateTome({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listChaptersQueryKey = (options?: Options<ListChaptersData>) => createQueryKey('listChapters', options);
 
 /**
- * Download Generation Board
+ * List chapters
  */
-export const downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetOptions = (options: Options<DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetData>) => queryOptions<unknown, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetError, unknown, ReturnType<typeof downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetQueryKey>>({
+export const listChaptersOptions = (options?: Options<ListChaptersData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listChaptersQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGet({
+        const { data } = await listChapters({
             ...options,
             ...queryKey[0],
             signal,
@@ -846,17 +596,68 @@ export const downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdD
         });
         return data;
     },
-    queryKey: downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetQueryKey(options)
+    queryKey: listChaptersQueryKey(options)
 });
 
-export const readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetQueryKey = (options: Options<ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetData>) => createQueryKey('readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGet', options);
+/**
+ * Create a chapter
+ */
+export const createChapterMutation = (options?: Partial<Options<CreateChapterData>>): UseMutationOptions<CreateChapterResponse, DefaultError, Options<CreateChapterData>> => {
+    const mutationOptions: UseMutationOptions<CreateChapterResponse, DefaultError, Options<CreateChapterData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createChapter({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
- * Read Generation Panel Image
+ * Delete a chapter
  */
-export const readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetOptions = (options: Options<ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetData>) => queryOptions<unknown, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetError, unknown, ReturnType<typeof readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetQueryKey>>({
+export const deleteChapterMutation = (options?: Partial<Options<DeleteChapterData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteChapterData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteChapterData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteChapter({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update a chapter
+ */
+export const updateChapterMutation = (options?: Partial<Options<UpdateChapterData>>): UseMutationOptions<UpdateChapterResponse, DefaultError, Options<UpdateChapterData>> => {
+    const mutationOptions: UseMutationOptions<UpdateChapterResponse, DefaultError, Options<UpdateChapterData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateChapter({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listScenesQueryKey = (options?: Options<ListScenesData>) => createQueryKey('listScenes', options);
+
+/**
+ * List scenes
+ */
+export const listScenesOptions = (options?: Options<ListScenesData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listScenesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGet({
+        const { data } = await listScenes({
             ...options,
             ...queryKey[0],
             signal,
@@ -864,19 +665,68 @@ export const readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardId
         });
         return data;
     },
-    queryKey: readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetQueryKey(options)
+    queryKey: listScenesQueryKey(options)
 });
 
-export const listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetQueryKey = (options: Options<ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetData>) => createQueryKey('listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGet', options);
+/**
+ * Create a scene
+ */
+export const createSceneMutation = (options?: Partial<Options<CreateSceneData>>): UseMutationOptions<CreateSceneResponse, DefaultError, Options<CreateSceneData>> => {
+    const mutationOptions: UseMutationOptions<CreateSceneResponse, DefaultError, Options<CreateSceneData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createScene({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
- * List Generation Configs
- *
- * List all generation configs for a project.
+ * Delete a scene
  */
-export const listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetOptions = (options: Options<ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetData>) => queryOptions<ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetResponse, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetError, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetResponse, ReturnType<typeof listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetQueryKey>>({
+export const deleteSceneMutation = (options?: Partial<Options<DeleteSceneData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteSceneData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteSceneData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteScene({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update a scene
+ */
+export const updateSceneMutation = (options?: Partial<Options<UpdateSceneData>>): UseMutationOptions<UpdateSceneResponse, DefaultError, Options<UpdateSceneData>> => {
+    const mutationOptions: UseMutationOptions<UpdateSceneResponse, DefaultError, Options<UpdateSceneData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateScene({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listGenerationJobsQueryKey = (options: Options<ListGenerationJobsData>) => createQueryKey('listGenerationJobs', options);
+
+/**
+ * List generation jobs
+ */
+export const listGenerationJobsOptions = (options: Options<ListGenerationJobsData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listGenerationJobsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGet({
+        const { data } = await listGenerationJobs({
             ...options,
             ...queryKey[0],
             signal,
@@ -884,18 +734,16 @@ export const listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerati
         });
         return data;
     },
-    queryKey: listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetQueryKey(options)
+    queryKey: listGenerationJobsQueryKey(options)
 });
 
 /**
- * Create Generation Config
- *
- * Create a new generation config.
+ * Create a generation job
  */
-export const createGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostMutation = (options?: Partial<Options<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostData>>): UseMutationOptions<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostResponse, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostError, Options<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostResponse, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostError, Options<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostData>> = {
+export const createGenerationJobMutation = (options?: Partial<Options<CreateGenerationJobData>>): UseMutationOptions<CreateGenerationJobResponse, DefaultError, Options<CreateGenerationJobData>> => {
+    const mutationOptions: UseMutationOptions<CreateGenerationJobResponse, DefaultError, Options<CreateGenerationJobData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPost({
+            const { data } = await createGenerationJob({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -906,35 +754,14 @@ export const createGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerat
     return mutationOptions;
 };
 
-/**
- * Delete Generation Config
- *
- * Delete a generation config.
- */
-export const deleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteMutation = (options?: Partial<Options<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteData>>): UseMutationOptions<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteResponse, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteError, Options<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteResponse, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteError, Options<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDelete({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetQueryKey = (options: Options<GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetData>) => createQueryKey('getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGet', options);
+export const getGenerationJobQueryKey = (options?: Options<GetGenerationJobData>) => createQueryKey('getGenerationJob', options);
 
 /**
- * Get Generation Config
- *
- * Get a specific generation config.
+ * Get a generation job
  */
-export const getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetOptions = (options: Options<GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetData>) => queryOptions<GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetResponse, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetError, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetResponse, ReturnType<typeof getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetQueryKey>>({
+export const getGenerationJobOptions = (options?: Options<GetGenerationJobData>) => queryOptions<GetGenerationJobResponse, DefaultError, GetGenerationJobResponse, ReturnType<typeof getGenerationJobQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGet({
+        const { data } = await getGenerationJob({
             ...options,
             ...queryKey[0],
             signal,
@@ -942,100 +769,17 @@ export const getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGeneration
         });
         return data;
     },
-    queryKey: getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetQueryKey(options)
+    queryKey: getGenerationJobQueryKey(options)
 });
 
-/**
- * Update Generation Config
- *
- * Update a generation config.
- */
-export const updateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchMutation = (options?: Partial<Options<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchData>>): UseMutationOptions<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchResponse, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchError, Options<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchResponse, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchError, Options<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatch({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const listGenerationBoardsQueryKey = (options: Options<ListGenerationBoardsData>) => createQueryKey('listGenerationBoards', options);
 
 /**
- * Set Default Config
- *
- * Set a config as the default for the project.
+ * List generation boards
  */
-export const setDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostMutation = (options?: Partial<Options<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostData>>): UseMutationOptions<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostResponse, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostError, Options<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostData>> => {
-    const mutationOptions: UseMutationOptions<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostResponse, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostError, Options<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await setDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Generate Scene Manga
- *
- * Generate manga page(s) from a scene.
- *
- * This creates a generation job that will be processed asynchronously.
- * The job ID can be used to poll for status via the regular generation API.
- */
-export const generateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostMutation = (options?: Partial<Options<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostData>>): UseMutationOptions<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostResponse, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostError, Options<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostData>> => {
-    const mutationOptions: UseMutationOptions<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostResponse, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostError, Options<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await generateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Preview Generation Prompt
- *
- * Preview the prompt that would be generated without actually running generation.
- *
- * Useful for debugging and verifying character references before committing credits.
- */
-export const previewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostMutation = (options?: Partial<Options<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostData>>): UseMutationOptions<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostResponse, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostError, Options<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostData>> => {
-    const mutationOptions: UseMutationOptions<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostResponse, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostError, Options<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await previewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetQueryKey = (options: Options<ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetData>) => createQueryKey('listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGet', options);
-
-/**
- * List Scene Manga Pages
- *
- * List all manga pages generated for this scene.
- */
-export const listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetOptions = (options: Options<ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetData>) => queryOptions<ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetResponse, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetError, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetResponse, ReturnType<typeof listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetQueryKey>>({
+export const listGenerationBoardsOptions = (options: Options<ListGenerationBoardsData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listGenerationBoardsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGet({
+        const { data } = await listGenerationBoards({
             ...options,
             ...queryKey[0],
             signal,
@@ -1043,38 +787,17 @@ export const listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPages
         });
         return data;
     },
-    queryKey: listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetQueryKey(options)
+    queryKey: listGenerationBoardsQueryKey(options)
 });
 
-/**
- * Delete Scene Manga Page
- *
- * Delete a manga page reference (does not delete the underlying image).
- */
-export const deleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteMutation = (options?: Partial<Options<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteData>>): UseMutationOptions<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteResponse, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteError, Options<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteResponse, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteError, Options<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDelete({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetQueryKey = (options: Options<GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetData>) => createQueryKey('getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGet', options);
+export const getGenerationBoardQueryKey = (options?: Options<GetGenerationBoardData>) => createQueryKey('getGenerationBoard', options);
 
 /**
- * Get Scene Manga Page
- *
- * Get a specific manga page.
+ * Get a generation board
  */
-export const getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetOptions = (options: Options<GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetData>) => queryOptions<GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetResponse, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetError, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetResponse, ReturnType<typeof getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetQueryKey>>({
+export const getGenerationBoardOptions = (options?: Options<GetGenerationBoardData>) => queryOptions<GetGenerationBoardResponse, DefaultError, GetGenerationBoardResponse, ReturnType<typeof getGenerationBoardQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGet({
+        const { data } = await getGenerationBoard({
             ...options,
             ...queryKey[0],
             signal,
@@ -1082,18 +805,16 @@ export const getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPa
         });
         return data;
     },
-    queryKey: getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetQueryKey(options)
+    queryKey: getGenerationBoardQueryKey(options)
 });
 
 /**
- * Update Scene Manga Page
- *
- * Update a manga page (label, status, etc.).
+ * Validate a board
  */
-export const updateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchMutation = (options?: Partial<Options<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchData>>): UseMutationOptions<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchResponse, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchError, Options<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchResponse, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchError, Options<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchData>> = {
+export const validateGenerationBoardMutation = (options?: Partial<Options<ValidateGenerationBoardData>>): UseMutationOptions<ValidateGenerationBoardResponse, DefaultError, Options<ValidateGenerationBoardData>> => {
+    const mutationOptions: UseMutationOptions<ValidateGenerationBoardResponse, DefaultError, Options<ValidateGenerationBoardData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await updateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatch({
+            const { data } = await validateGenerationBoard({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1104,14 +825,31 @@ export const updateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPage
     return mutationOptions;
 };
 
-export const readStoryApiProjectsProjectIdStoryGetQueryKey = (options: Options<ReadStoryApiProjectsProjectIdStoryGetData>) => createQueryKey('readStoryApiProjectsProjectIdStoryGet', options);
+/**
+ * Update a panel
+ */
+export const updateGenerationPanelMutation = (options?: Partial<Options<UpdateGenerationPanelData>>): UseMutationOptions<unknown, DefaultError, Options<UpdateGenerationPanelData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<UpdateGenerationPanelData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateGenerationPanel({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getGenerationPanelImageQueryKey = (options?: Options<GetGenerationPanelImageData>) => createQueryKey('getGenerationPanelImage', options);
 
 /**
- * Read Story
+ * Get panel image
  */
-export const readStoryApiProjectsProjectIdStoryGetOptions = (options: Options<ReadStoryApiProjectsProjectIdStoryGetData>) => queryOptions<ReadStoryApiProjectsProjectIdStoryGetResponse, ReadStoryApiProjectsProjectIdStoryGetError, ReadStoryApiProjectsProjectIdStoryGetResponse, ReturnType<typeof readStoryApiProjectsProjectIdStoryGetQueryKey>>({
+export const getGenerationPanelImageOptions = (options?: Options<GetGenerationPanelImageData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getGenerationPanelImageQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readStoryApiProjectsProjectIdStoryGet({
+        const { data } = await getGenerationPanelImage({
             ...options,
             ...queryKey[0],
             signal,
@@ -1119,17 +857,17 @@ export const readStoryApiProjectsProjectIdStoryGetOptions = (options: Options<Re
         });
         return data;
     },
-    queryKey: readStoryApiProjectsProjectIdStoryGetQueryKey(options)
+    queryKey: getGenerationPanelImageQueryKey(options)
 });
 
-export const readStorySuggestionsApiProjectsProjectIdStorySuggestionsGetQueryKey = (options: Options<ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetData>) => createQueryKey('readStorySuggestionsApiProjectsProjectIdStorySuggestionsGet', options);
+export const downloadBoardArtifactQueryKey = (options?: Options<DownloadBoardArtifactData>) => createQueryKey('downloadBoardArtifact', options);
 
 /**
- * Read Story Suggestions
+ * Download board artifact
  */
-export const readStorySuggestionsApiProjectsProjectIdStorySuggestionsGetOptions = (options: Options<ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetData>) => queryOptions<ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetResponse, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetError, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetResponse, ReturnType<typeof readStorySuggestionsApiProjectsProjectIdStorySuggestionsGetQueryKey>>({
+export const downloadBoardArtifactOptions = (options?: Options<DownloadBoardArtifactData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof downloadBoardArtifactQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readStorySuggestionsApiProjectsProjectIdStorySuggestionsGet({
+        const { data } = await downloadBoardArtifact({
             ...options,
             ...queryKey[0],
             signal,
@@ -1137,17 +875,17 @@ export const readStorySuggestionsApiProjectsProjectIdStorySuggestionsGetOptions 
         });
         return data;
     },
-    queryKey: readStorySuggestionsApiProjectsProjectIdStorySuggestionsGetQueryKey(options)
+    queryKey: downloadBoardArtifactQueryKey(options)
 });
 
-export const readStoryReferencesApiProjectsProjectIdStoryReferencesGetQueryKey = (options: Options<ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetData>) => createQueryKey('readStoryReferencesApiProjectsProjectIdStoryReferencesGet', options);
+export const listAssetsQueryKey = (options: Options<ListAssetsData>) => createQueryKey('listAssets', options);
 
 /**
- * Read Story References
+ * List all assets
  */
-export const readStoryReferencesApiProjectsProjectIdStoryReferencesGetOptions = (options: Options<ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetData>) => queryOptions<ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetResponse, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetError, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetResponse, ReturnType<typeof readStoryReferencesApiProjectsProjectIdStoryReferencesGetQueryKey>>({
+export const listAssetsOptions = (options: Options<ListAssetsData>) => queryOptions<ListAssetsResponse, DefaultError, ListAssetsResponse, ReturnType<typeof listAssetsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readStoryReferencesApiProjectsProjectIdStoryReferencesGet({
+        const { data } = await listAssets({
             ...options,
             ...queryKey[0],
             signal,
@@ -1155,17 +893,51 @@ export const readStoryReferencesApiProjectsProjectIdStoryReferencesGetOptions = 
         });
         return data;
     },
-    queryKey: readStoryReferencesApiProjectsProjectIdStoryReferencesGetQueryKey(options)
+    queryKey: listAssetsQueryKey(options)
 });
 
-export const readTomesApiProjectsProjectIdStoryTomesGetQueryKey = (options: Options<ReadTomesApiProjectsProjectIdStoryTomesGetData>) => createQueryKey('readTomesApiProjectsProjectIdStoryTomesGet', options);
+/**
+ * Import an asset from local filesystem
+ */
+export const importAssetMutation = (options?: Partial<Options<ImportAssetData>>): UseMutationOptions<ImportAssetResponse, DefaultError, Options<ImportAssetData>> => {
+    const mutationOptions: UseMutationOptions<ImportAssetResponse, DefaultError, Options<ImportAssetData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await importAsset({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
- * Read Tomes
+ * Delete an asset
  */
-export const readTomesApiProjectsProjectIdStoryTomesGetOptions = (options: Options<ReadTomesApiProjectsProjectIdStoryTomesGetData>) => queryOptions<ReadTomesApiProjectsProjectIdStoryTomesGetResponse, ReadTomesApiProjectsProjectIdStoryTomesGetError, ReadTomesApiProjectsProjectIdStoryTomesGetResponse, ReturnType<typeof readTomesApiProjectsProjectIdStoryTomesGetQueryKey>>({
+export const deleteAssetMutation = (options?: Partial<Options<DeleteAssetData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteAssetData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteAssetData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteAsset({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getAssetQueryKey = (options: Options<GetAssetData>) => createQueryKey('getAsset', options);
+
+/**
+ * Get asset details
+ */
+export const getAssetOptions = (options: Options<GetAssetData>) => queryOptions<GetAssetResponse, DefaultError, GetAssetResponse, ReturnType<typeof getAssetQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readTomesApiProjectsProjectIdStoryTomesGet({
+        const { data } = await getAsset({
             ...options,
             ...queryKey[0],
             signal,
@@ -1173,16 +945,16 @@ export const readTomesApiProjectsProjectIdStoryTomesGetOptions = (options: Optio
         });
         return data;
     },
-    queryKey: readTomesApiProjectsProjectIdStoryTomesGetQueryKey(options)
+    queryKey: getAssetQueryKey(options)
 });
 
 /**
- * Create Tome Route
+ * Update an asset
  */
-export const createTomeRouteApiProjectsProjectIdStoryTomesPostMutation = (options?: Partial<Options<CreateTomeRouteApiProjectsProjectIdStoryTomesPostData>>): UseMutationOptions<CreateTomeRouteApiProjectsProjectIdStoryTomesPostResponse, CreateTomeRouteApiProjectsProjectIdStoryTomesPostError, Options<CreateTomeRouteApiProjectsProjectIdStoryTomesPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateTomeRouteApiProjectsProjectIdStoryTomesPostResponse, CreateTomeRouteApiProjectsProjectIdStoryTomesPostError, Options<CreateTomeRouteApiProjectsProjectIdStoryTomesPostData>> = {
+export const updateAssetMutation = (options?: Partial<Options<UpdateAssetData>>): UseMutationOptions<UpdateAssetResponse, DefaultError, Options<UpdateAssetData>> => {
+    const mutationOptions: UseMutationOptions<UpdateAssetResponse, DefaultError, Options<UpdateAssetData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createTomeRouteApiProjectsProjectIdStoryTomesPost({
+            const { data } = await updateAsset({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1194,12 +966,12 @@ export const createTomeRouteApiProjectsProjectIdStoryTomesPostMutation = (option
 };
 
 /**
- * Delete Tome Route
+ * Archive an asset
  */
-export const deleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteMutation = (options?: Partial<Options<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteData>>): UseMutationOptions<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteResponse, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteError, Options<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteResponse, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteError, Options<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteData>> = {
+export const archiveAssetMutation = (options?: Partial<Options<ArchiveAssetData>>): UseMutationOptions<ArchiveAssetResponse, DefaultError, Options<ArchiveAssetData>> => {
+    const mutationOptions: UseMutationOptions<ArchiveAssetResponse, DefaultError, Options<ArchiveAssetData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDelete({
+            const { data } = await archiveAsset({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1210,31 +982,14 @@ export const deleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteMutation =
     return mutationOptions;
 };
 
-/**
- * Update Tome Route
- */
-export const updateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchMutation = (options?: Partial<Options<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchData>>): UseMutationOptions<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchResponse, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchError, Options<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchResponse, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchError, Options<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatch({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readChaptersApiProjectsProjectIdStoryChaptersGetQueryKey = (options: Options<ReadChaptersApiProjectsProjectIdStoryChaptersGetData>) => createQueryKey('readChaptersApiProjectsProjectIdStoryChaptersGet', options);
+export const getAssetFileQueryKey = (options: Options<GetAssetFileData>) => createQueryKey('getAssetFile', options);
 
 /**
- * Read Chapters
+ * Get asset file content
  */
-export const readChaptersApiProjectsProjectIdStoryChaptersGetOptions = (options: Options<ReadChaptersApiProjectsProjectIdStoryChaptersGetData>) => queryOptions<ReadChaptersApiProjectsProjectIdStoryChaptersGetResponse, ReadChaptersApiProjectsProjectIdStoryChaptersGetError, ReadChaptersApiProjectsProjectIdStoryChaptersGetResponse, ReturnType<typeof readChaptersApiProjectsProjectIdStoryChaptersGetQueryKey>>({
+export const getAssetFileOptions = (options: Options<GetAssetFileData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getAssetFileQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readChaptersApiProjectsProjectIdStoryChaptersGet({
+        const { data } = await getAssetFile({
             ...options,
             ...queryKey[0],
             signal,
@@ -1242,16 +997,16 @@ export const readChaptersApiProjectsProjectIdStoryChaptersGetOptions = (options:
         });
         return data;
     },
-    queryKey: readChaptersApiProjectsProjectIdStoryChaptersGetQueryKey(options)
+    queryKey: getAssetFileQueryKey(options)
 });
 
 /**
- * Create Chapter Route
+ * Create an asset link
  */
-export const createChapterRouteApiProjectsProjectIdStoryChaptersPostMutation = (options?: Partial<Options<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostData>>): UseMutationOptions<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostResponse, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostError, Options<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostResponse, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostError, Options<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostData>> = {
+export const createAssetLinkMutation = (options?: Partial<Options<CreateAssetLinkData>>): UseMutationOptions<CreateAssetLinkResponse, DefaultError, Options<CreateAssetLinkData>> => {
+    const mutationOptions: UseMutationOptions<CreateAssetLinkResponse, DefaultError, Options<CreateAssetLinkData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createChapterRouteApiProjectsProjectIdStoryChaptersPost({
+            const { data } = await createAssetLink({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1263,12 +1018,12 @@ export const createChapterRouteApiProjectsProjectIdStoryChaptersPostMutation = (
 };
 
 /**
- * Delete Chapter Route
+ * Delete an asset link
  */
-export const deleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteMutation = (options?: Partial<Options<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteData>>): UseMutationOptions<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteResponse, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteError, Options<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteResponse, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteError, Options<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteData>> = {
+export const deleteAssetLinkMutation = (options?: Partial<Options<DeleteAssetLinkData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteAssetLinkData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteAssetLinkData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDelete({
+            const { data } = await deleteAssetLink({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1279,31 +1034,14 @@ export const deleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteM
     return mutationOptions;
 };
 
-/**
- * Update Chapter Route
- */
-export const updateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchMutation = (options?: Partial<Options<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchData>>): UseMutationOptions<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchResponse, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchError, Options<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchResponse, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchError, Options<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatch({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readScenesApiProjectsProjectIdStoryScenesGetQueryKey = (options: Options<ReadScenesApiProjectsProjectIdStoryScenesGetData>) => createQueryKey('readScenesApiProjectsProjectIdStoryScenesGet', options);
+export const listSceneConfigsQueryKey = (options: Options<ListSceneConfigsData>) => createQueryKey('listSceneConfigs', options);
 
 /**
- * Read Scenes
+ * List scene generation configs
  */
-export const readScenesApiProjectsProjectIdStoryScenesGetOptions = (options: Options<ReadScenesApiProjectsProjectIdStoryScenesGetData>) => queryOptions<ReadScenesApiProjectsProjectIdStoryScenesGetResponse, ReadScenesApiProjectsProjectIdStoryScenesGetError, ReadScenesApiProjectsProjectIdStoryScenesGetResponse, ReturnType<typeof readScenesApiProjectsProjectIdStoryScenesGetQueryKey>>({
+export const listSceneConfigsOptions = (options: Options<ListSceneConfigsData>) => queryOptions<ListSceneConfigsResponse, DefaultError, ListSceneConfigsResponse, ReturnType<typeof listSceneConfigsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readScenesApiProjectsProjectIdStoryScenesGet({
+        const { data } = await listSceneConfigs({
             ...options,
             ...queryKey[0],
             signal,
@@ -1311,16 +1049,16 @@ export const readScenesApiProjectsProjectIdStoryScenesGetOptions = (options: Opt
         });
         return data;
     },
-    queryKey: readScenesApiProjectsProjectIdStoryScenesGetQueryKey(options)
+    queryKey: listSceneConfigsQueryKey(options)
 });
 
 /**
- * Create Scene Route
+ * Create a generation config
  */
-export const createSceneRouteApiProjectsProjectIdStoryScenesPostMutation = (options?: Partial<Options<CreateSceneRouteApiProjectsProjectIdStoryScenesPostData>>): UseMutationOptions<CreateSceneRouteApiProjectsProjectIdStoryScenesPostResponse, CreateSceneRouteApiProjectsProjectIdStoryScenesPostError, Options<CreateSceneRouteApiProjectsProjectIdStoryScenesPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateSceneRouteApiProjectsProjectIdStoryScenesPostResponse, CreateSceneRouteApiProjectsProjectIdStoryScenesPostError, Options<CreateSceneRouteApiProjectsProjectIdStoryScenesPostData>> = {
+export const createSceneConfigMutation = (options?: Partial<Options<CreateSceneConfigData>>): UseMutationOptions<CreateSceneConfigResponse, DefaultError, Options<CreateSceneConfigData>> => {
+    const mutationOptions: UseMutationOptions<CreateSceneConfigResponse, DefaultError, Options<CreateSceneConfigData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createSceneRouteApiProjectsProjectIdStoryScenesPost({
+            const { data } = await createSceneConfig({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1332,12 +1070,12 @@ export const createSceneRouteApiProjectsProjectIdStoryScenesPostMutation = (opti
 };
 
 /**
- * Delete Scene Route
+ * Delete a generation config
  */
-export const deleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteMutation = (options?: Partial<Options<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteData>>): UseMutationOptions<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteResponse, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteError, Options<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteResponse, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteError, Options<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteData>> = {
+export const deleteSceneConfigMutation = (options?: Partial<Options<DeleteSceneConfigData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteSceneConfigData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteSceneConfigData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDelete({
+            const { data } = await deleteSceneConfig({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1349,118 +1087,12 @@ export const deleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteMutatio
 };
 
 /**
- * Update Scene Route
+ * Update a generation config
  */
-export const updateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchMutation = (options?: Partial<Options<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchData>>): UseMutationOptions<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchResponse, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchError, Options<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchResponse, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchError, Options<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchData>> = {
+export const updateSceneConfigMutation = (options?: Partial<Options<UpdateSceneConfigData>>): UseMutationOptions<UpdateSceneConfigResponse, DefaultError, Options<UpdateSceneConfigData>> => {
+    const mutationOptions: UseMutationOptions<UpdateSceneConfigResponse, DefaultError, Options<UpdateSceneConfigData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await updateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatch({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetQueryKey = (options: Options<ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetData>) => createQueryKey('readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGet', options);
-
-/**
- * Read Reference Suggestions
- */
-export const readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetOptions = (options: Options<ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetData>) => queryOptions<ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetResponse, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetError, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetResponse, ReturnType<typeof readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetQueryKey(options)
-});
-
-export const readVersionsApiProjectsProjectIdVersionsGetQueryKey = (options: Options<ReadVersionsApiProjectsProjectIdVersionsGetData>) => createQueryKey('readVersionsApiProjectsProjectIdVersionsGet', options);
-
-/**
- * Read Versions
- */
-export const readVersionsApiProjectsProjectIdVersionsGetOptions = (options: Options<ReadVersionsApiProjectsProjectIdVersionsGetData>) => queryOptions<ReadVersionsApiProjectsProjectIdVersionsGetResponse, ReadVersionsApiProjectsProjectIdVersionsGetError, ReadVersionsApiProjectsProjectIdVersionsGetResponse, ReturnType<typeof readVersionsApiProjectsProjectIdVersionsGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readVersionsApiProjectsProjectIdVersionsGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readVersionsApiProjectsProjectIdVersionsGetQueryKey(options)
-});
-
-/**
- * Create Version Route
- */
-export const createVersionRouteApiProjectsProjectIdVersionsPostMutation = (options?: Partial<Options<CreateVersionRouteApiProjectsProjectIdVersionsPostData>>): UseMutationOptions<CreateVersionRouteApiProjectsProjectIdVersionsPostResponse, CreateVersionRouteApiProjectsProjectIdVersionsPostError, Options<CreateVersionRouteApiProjectsProjectIdVersionsPostData>> => {
-    const mutationOptions: UseMutationOptions<CreateVersionRouteApiProjectsProjectIdVersionsPostResponse, CreateVersionRouteApiProjectsProjectIdVersionsPostError, Options<CreateVersionRouteApiProjectsProjectIdVersionsPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createVersionRouteApiProjectsProjectIdVersionsPost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readVersionBranchesApiProjectsProjectIdVersionsBranchesGetQueryKey = (options: Options<ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetData>) => createQueryKey('readVersionBranchesApiProjectsProjectIdVersionsBranchesGet', options);
-
-/**
- * Read Version Branches
- */
-export const readVersionBranchesApiProjectsProjectIdVersionsBranchesGetOptions = (options: Options<ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetData>) => queryOptions<ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetResponse, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetError, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetResponse, ReturnType<typeof readVersionBranchesApiProjectsProjectIdVersionsBranchesGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readVersionBranchesApiProjectsProjectIdVersionsBranchesGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readVersionBranchesApiProjectsProjectIdVersionsBranchesGetQueryKey(options)
-});
-
-export const readVersionApiProjectsProjectIdVersionsVersionIdGetQueryKey = (options: Options<ReadVersionApiProjectsProjectIdVersionsVersionIdGetData>) => createQueryKey('readVersionApiProjectsProjectIdVersionsVersionIdGet', options);
-
-/**
- * Read Version
- */
-export const readVersionApiProjectsProjectIdVersionsVersionIdGetOptions = (options: Options<ReadVersionApiProjectsProjectIdVersionsVersionIdGetData>) => queryOptions<ReadVersionApiProjectsProjectIdVersionsVersionIdGetResponse, ReadVersionApiProjectsProjectIdVersionsVersionIdGetError, ReadVersionApiProjectsProjectIdVersionsVersionIdGetResponse, ReturnType<typeof readVersionApiProjectsProjectIdVersionsVersionIdGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readVersionApiProjectsProjectIdVersionsVersionIdGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readVersionApiProjectsProjectIdVersionsVersionIdGetQueryKey(options)
-});
-
-/**
- * Compare Versions Route
- */
-export const compareVersionsRouteApiProjectsProjectIdVersionsComparePostMutation = (options?: Partial<Options<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostData>>): UseMutationOptions<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostResponse, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostError, Options<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostData>> => {
-    const mutationOptions: UseMutationOptions<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostResponse, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostError, Options<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await compareVersionsRouteApiProjectsProjectIdVersionsComparePost({
+            const { data } = await updateSceneConfig({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1472,47 +1104,12 @@ export const compareVersionsRouteApiProjectsProjectIdVersionsComparePostMutation
 };
 
 /**
- * Restore Version Route
+ * Set config as default
  */
-export const restoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostMutation = (options?: Partial<Options<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostData>>): UseMutationOptions<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostResponse, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostError, Options<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostData>> => {
-    const mutationOptions: UseMutationOptions<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostResponse, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostError, Options<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostData>> = {
+export const setDefaultConfigMutation = (options?: Partial<Options<SetDefaultConfigData>>): UseMutationOptions<SetDefaultConfigResponse, DefaultError, Options<SetDefaultConfigData>> => {
+    const mutationOptions: UseMutationOptions<SetDefaultConfigResponse, DefaultError, Options<SetDefaultConfigData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await restoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePost({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const readWarningsApiProjectsProjectIdWarningsGetQueryKey = (options: Options<ReadWarningsApiProjectsProjectIdWarningsGetData>) => createQueryKey('readWarningsApiProjectsProjectIdWarningsGet', options);
-
-/**
- * Read Warnings
- */
-export const readWarningsApiProjectsProjectIdWarningsGetOptions = (options: Options<ReadWarningsApiProjectsProjectIdWarningsGetData>) => queryOptions<ReadWarningsApiProjectsProjectIdWarningsGetResponse, ReadWarningsApiProjectsProjectIdWarningsGetError, ReadWarningsApiProjectsProjectIdWarningsGetResponse, ReturnType<typeof readWarningsApiProjectsProjectIdWarningsGetQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await readWarningsApiProjectsProjectIdWarningsGet({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: readWarningsApiProjectsProjectIdWarningsGetQueryKey(options)
-});
-
-/**
- * Scan Warnings
- */
-export const scanWarningsApiProjectsProjectIdWarningsScanPostMutation = (options?: Partial<Options<ScanWarningsApiProjectsProjectIdWarningsScanPostData>>): UseMutationOptions<ScanWarningsApiProjectsProjectIdWarningsScanPostResponse, ScanWarningsApiProjectsProjectIdWarningsScanPostError, Options<ScanWarningsApiProjectsProjectIdWarningsScanPostData>> => {
-    const mutationOptions: UseMutationOptions<ScanWarningsApiProjectsProjectIdWarningsScanPostResponse, ScanWarningsApiProjectsProjectIdWarningsScanPostError, Options<ScanWarningsApiProjectsProjectIdWarningsScanPostData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await scanWarningsApiProjectsProjectIdWarningsScanPost({
+            const { data } = await setDefaultConfig({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1524,12 +1121,12 @@ export const scanWarningsApiProjectsProjectIdWarningsScanPostMutation = (options
 };
 
 /**
- * Patch Warning
+ * Generate manga for scene
  */
-export const patchWarningApiProjectsProjectIdWarningsWarningIdPatchMutation = (options?: Partial<Options<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchData>>): UseMutationOptions<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchResponse, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchError, Options<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchData>> => {
-    const mutationOptions: UseMutationOptions<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchResponse, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchError, Options<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchData>> = {
+export const generateSceneMangaMutation = (options?: Partial<Options<GenerateSceneMangaData>>): UseMutationOptions<GenerateSceneMangaResponse, DefaultError, Options<GenerateSceneMangaData>> => {
+    const mutationOptions: UseMutationOptions<GenerateSceneMangaResponse, DefaultError, Options<GenerateSceneMangaData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await patchWarningApiProjectsProjectIdWarningsWarningIdPatch({
+            const { data } = await generateSceneManga({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1540,14 +1137,31 @@ export const patchWarningApiProjectsProjectIdWarningsWarningIdPatchMutation = (o
     return mutationOptions;
 };
 
-export const healthApiHealthGetQueryKey = (options?: Options<HealthApiHealthGetData>) => createQueryKey('healthApiHealthGet', options);
+/**
+ * Preview generation prompts
+ */
+export const previewPromptMutation = (options?: Partial<Options<PreviewPromptData>>): UseMutationOptions<PreviewPromptResponse, DefaultError, Options<PreviewPromptData>> => {
+    const mutationOptions: UseMutationOptions<PreviewPromptResponse, DefaultError, Options<PreviewPromptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await previewPrompt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listSceneMangaPagesQueryKey = (options: Options<ListSceneMangaPagesData>) => createQueryKey('listSceneMangaPages', options);
 
 /**
- * Health
+ * List scene manga pages
  */
-export const healthApiHealthGetOptions = (options?: Options<HealthApiHealthGetData>) => queryOptions<HealthApiHealthGetResponse, DefaultError, HealthApiHealthGetResponse, ReturnType<typeof healthApiHealthGetQueryKey>>({
+export const listSceneMangaPagesOptions = (options: Options<ListSceneMangaPagesData>) => queryOptions<ListSceneMangaPagesResponse, DefaultError, ListSceneMangaPagesResponse, ReturnType<typeof listSceneMangaPagesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await healthApiHealthGet({
+        const { data } = await listSceneMangaPages({
             ...options,
             ...queryKey[0],
             signal,
@@ -1555,17 +1169,51 @@ export const healthApiHealthGetOptions = (options?: Options<HealthApiHealthGetDa
         });
         return data;
     },
-    queryKey: healthApiHealthGetQueryKey(options)
+    queryKey: listSceneMangaPagesQueryKey(options)
 });
 
-export const configApiConfigGetQueryKey = (options?: Options<ConfigApiConfigGetData>) => createQueryKey('configApiConfigGet', options);
+/**
+ * Delete a manga page
+ */
+export const deleteSceneMangaPageMutation = (options?: Partial<Options<DeleteSceneMangaPageData>>): UseMutationOptions<unknown, DefaultError, Options<DeleteSceneMangaPageData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<DeleteSceneMangaPageData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteSceneMangaPage({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
- * Config
+ * Update a manga page
  */
-export const configApiConfigGetOptions = (options?: Options<ConfigApiConfigGetData>) => queryOptions<ConfigApiConfigGetResponse, DefaultError, ConfigApiConfigGetResponse, ReturnType<typeof configApiConfigGetQueryKey>>({
+export const updateSceneMangaPageMutation = (options?: Partial<Options<UpdateSceneMangaPageData>>): UseMutationOptions<UpdateSceneMangaPageResponse, DefaultError, Options<UpdateSceneMangaPageData>> => {
+    const mutationOptions: UseMutationOptions<UpdateSceneMangaPageResponse, DefaultError, Options<UpdateSceneMangaPageData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateSceneMangaPage({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listVersionsQueryKey = (options: Options<ListVersionsData>) => createQueryKey('listVersions', options);
+
+/**
+ * List all versions
+ */
+export const listVersionsOptions = (options: Options<ListVersionsData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listVersionsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await configApiConfigGet({
+        const { data } = await listVersions({
             ...options,
             ...queryKey[0],
             signal,
@@ -1573,17 +1221,34 @@ export const configApiConfigGetOptions = (options?: Options<ConfigApiConfigGetDa
         });
         return data;
     },
-    queryKey: configApiConfigGetQueryKey(options)
+    queryKey: listVersionsQueryKey(options)
 });
 
-export const modelsApiModelsGetQueryKey = (options?: Options<ModelsApiModelsGetData>) => createQueryKey('modelsApiModelsGet', options);
+/**
+ * Create a version
+ */
+export const createVersionMutation = (options?: Partial<Options<CreateVersionData>>): UseMutationOptions<CreateVersionResponse, DefaultError, Options<CreateVersionData>> => {
+    const mutationOptions: UseMutationOptions<CreateVersionResponse, DefaultError, Options<CreateVersionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createVersion({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listBranchesQueryKey = (options: Options<ListBranchesData>) => createQueryKey('listBranches', options);
 
 /**
- * Models
+ * List version branches
  */
-export const modelsApiModelsGetOptions = (options?: Options<ModelsApiModelsGetData>) => queryOptions<ModelsApiModelsGetResponse, DefaultError, ModelsApiModelsGetResponse, ReturnType<typeof modelsApiModelsGetQueryKey>>({
+export const listBranchesOptions = (options: Options<ListBranchesData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listBranchesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await modelsApiModelsGet({
+        const { data } = await listBranches({
             ...options,
             ...queryKey[0],
             signal,
@@ -1591,5 +1256,223 @@ export const modelsApiModelsGetOptions = (options?: Options<ModelsApiModelsGetDa
         });
         return data;
     },
-    queryKey: modelsApiModelsGetQueryKey(options)
+    queryKey: listBranchesQueryKey(options)
 });
+
+export const getVersionQueryKey = (options: Options<GetVersionData>) => createQueryKey('getVersion', options);
+
+/**
+ * Get version details
+ */
+export const getVersionOptions = (options: Options<GetVersionData>) => queryOptions<GetVersionResponse, DefaultError, GetVersionResponse, ReturnType<typeof getVersionQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getVersion({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getVersionQueryKey(options)
+});
+
+/**
+ * Compare two versions
+ */
+export const compareVersionsMutation = (options?: Partial<Options<CompareVersionsData>>): UseMutationOptions<CompareVersionsResponse, DefaultError, Options<CompareVersionsData>> => {
+    const mutationOptions: UseMutationOptions<CompareVersionsResponse, DefaultError, Options<CompareVersionsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await compareVersions({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Restore a version
+ */
+export const restoreVersionMutation = (options?: Partial<Options<RestoreVersionData>>): UseMutationOptions<RestoreVersionResponse, DefaultError, Options<RestoreVersionData>> => {
+    const mutationOptions: UseMutationOptions<RestoreVersionResponse, DefaultError, Options<RestoreVersionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await restoreVersion({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listWarningsQueryKey = (options: Options<ListWarningsData>) => createQueryKey('listWarnings', options);
+
+/**
+ * List all warnings
+ */
+export const listWarningsOptions = (options: Options<ListWarningsData>) => queryOptions<ListWarningsResponse, DefaultError, ListWarningsResponse, ReturnType<typeof listWarningsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listWarnings({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listWarningsQueryKey(options)
+});
+
+/**
+ * Scan and rebuild warnings
+ */
+export const scanWarningsMutation = (options?: Partial<Options<ScanWarningsData>>): UseMutationOptions<ScanWarningsResponse, DefaultError, Options<ScanWarningsData>> => {
+    const mutationOptions: UseMutationOptions<ScanWarningsResponse, DefaultError, Options<ScanWarningsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await scanWarnings({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update warning status
+ */
+export const updateWarningMutation = (options?: Partial<Options<UpdateWarningData>>): UseMutationOptions<UpdateWarningResponse, DefaultError, Options<UpdateWarningData>> => {
+    const mutationOptions: UseMutationOptions<UpdateWarningResponse, DefaultError, Options<UpdateWarningData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateWarning({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listExportsQueryKey = (options: Options<ListExportsData>) => createQueryKey('listExports', options);
+
+/**
+ * List all exports
+ */
+export const listExportsOptions = (options: Options<ListExportsData>) => queryOptions<ListExportsResponse, DefaultError, ListExportsResponse, ReturnType<typeof listExportsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listExports({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listExportsQueryKey(options)
+});
+
+/**
+ * Create an export
+ */
+export const createExportMutation = (options?: Partial<Options<CreateExportData>>): UseMutationOptions<CreateExportResponse, DefaultError, Options<CreateExportData>> => {
+    const mutationOptions: UseMutationOptions<CreateExportResponse, DefaultError, Options<CreateExportData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createExport({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getExportQueryKey = (options: Options<GetExportData>) => createQueryKey('getExport', options);
+
+/**
+ * Get export details
+ */
+export const getExportOptions = (options: Options<GetExportData>) => queryOptions<GetExportResponse, DefaultError, GetExportResponse, ReturnType<typeof getExportQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getExport({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getExportQueryKey(options)
+});
+
+export const downloadExportQueryKey = (options: Options<DownloadExportData>) => createQueryKey('downloadExport', options);
+
+/**
+ * Download export artifact
+ */
+export const downloadExportOptions = (options: Options<DownloadExportData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof downloadExportQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await downloadExport({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: downloadExportQueryKey(options)
+});
+
+export const getApiInngestQueryKey = (options?: Options<GetApiInngestData>) => createQueryKey('getApiInngest', options);
+
+export const getApiInngestOptions = (options?: Options<GetApiInngestData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getApiInngestQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getApiInngest({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getApiInngestQueryKey(options)
+});
+
+export const postApiInngestMutation = (options?: Partial<Options<PostApiInngestData>>): UseMutationOptions<unknown, DefaultError, Options<PostApiInngestData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<PostApiInngestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await postApiInngest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const putApiInngestMutation = (options?: Partial<Options<PutApiInngestData>>): UseMutationOptions<unknown, DefaultError, Options<PutApiInngestData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<PutApiInngestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await putApiInngest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};

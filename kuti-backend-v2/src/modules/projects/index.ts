@@ -5,23 +5,23 @@
 
 import { Elysia } from "elysia";
 import {
-  projectIdParamsSchema,
-  createProjectBodySchema,
-  updateProjectBodySchema,
-  cloneProjectBodySchema,
-  projectResponseSchema,
-  projectListResponseSchema,
-} from "./dto";
-import {
-  listProjects,
-  getProject,
-  createProject,
-  updateProject,
   archiveProject,
-  openProject,
   cloneProject,
+  createProject,
   exportProject,
+  getProject,
+  listProjects,
+  openProject,
+  updateProject,
 } from "./controller";
+import {
+  cloneProjectBodySchema,
+  createProjectBodySchema,
+  projectIdParamsSchema,
+  projectListResponseSchema,
+  projectResponseSchema,
+  updateProjectBodySchema,
+} from "./dto";
 
 // ============================================================================
 // Module
@@ -32,6 +32,12 @@ export const projectsModule = new Elysia({
   name: "projectsModule",
   detail: { tags: ["Projects"] },
 })
+  // Register models for OpenAPI schema generation
+  .model({
+    
+    Project: projectResponseSchema,
+    ProjectList: projectListResponseSchema,
+  })
   // GET /api/projects - Liste tous les projets
   .get(
     "/",

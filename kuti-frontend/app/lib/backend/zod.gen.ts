@@ -2,2003 +2,2290 @@
 
 import * as z from 'zod';
 
-/**
- * AssetImport
- */
-export const zAssetImport = z.object({
-    source_path: z.string().min(1),
-    name: z.string().min(1).max(255).nullish(),
-    slug: z.string().min(1).max(255).nullish(),
-    description: z.string().optional().default(''),
-    tags_json: z.array(z.string()).optional(),
-    mime_type: z.string().max(255).nullish()
-});
-
-/**
- * AssetLinkCreate
- */
-export const zAssetLinkCreate = z.object({
-    asset_id: z.string(),
-    target_kind: z.string().min(1).max(64),
-    target_id: z.string().min(1).max(36),
-    note: z.string().optional().default('')
-});
-
-/**
- * AssetLinkRead
- */
-export const zAssetLinkRead = z.object({
+export const zProject = z.object({
     id: z.string(),
-    project_id: z.string(),
-    asset_id: z.string(),
-    target_kind: z.string(),
-    target_id: z.string(),
-    note: z.string(),
-    created_at: z.iso.datetime()
-});
-
-/**
- * AssetStatus
- */
-export const zAssetStatus = z.enum(['active', 'archived']);
-
-/**
- * AssetDetail
- */
-export const zAssetDetail = z.object({
-    id: z.string(),
-    project_id: z.string(),
-    slug: z.string(),
     name: z.string(),
-    original_filename: z.string(),
-    mime_type: z.string(),
-    checksum: z.string(),
-    size_bytes: z.int(),
-    storage_path: z.string(),
-    description: z.string(),
-    tags_json: z.array(z.string()),
-    status: zAssetStatus,
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    archived_at: z.iso.datetime().nullish(),
-    links: z.array(zAssetLinkRead).optional()
-});
-
-/**
- * AssetRead
- */
-export const zAssetRead = z.object({
-    id: z.string(),
-    project_id: z.string(),
     slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zProjectList = z.array(z.object({
+    id: z.string(),
     name: z.string(),
-    original_filename: z.string(),
-    mime_type: z.string(),
-    checksum: z.string(),
-    size_bytes: z.int(),
-    storage_path: z.string(),
-    description: z.string(),
-    tags_json: z.array(z.string()),
-    status: zAssetStatus,
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    archived_at: z.iso.datetime().nullish()
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+}));
+
+/**
+ * Response for status 200
+ */
+export const zGetHealthResponse = z.object({
+    status: z.string(),
+    service: z.string(),
+    version: z.string(),
+    timestamp: z.string(),
+    dataDir: z.string()
 });
 
 /**
- * AssetListResponse
+ * Response for status 200
  */
-export const zAssetListResponse = z.object({
-    items: z.array(zAssetRead)
+export const zGetConfigResponse = z.object({
+    appName: z.string(),
+    appVersion: z.string(),
+    environment: z.string(),
+    locale: z.string(),
+    dataDir: z.string(),
+    projectDataDir: z.string(),
+    exportsDir: z.string(),
+    openapiUrl: z.string()
 });
 
 /**
- * AssetUpdate
+ * Response for status 200
  */
-export const zAssetUpdate = z.object({
-    name: z.string().min(1).max(255).nullish(),
-    slug: z.string().min(1).max(255).nullish(),
-    description: z.string().nullish(),
-    tags_json: z.array(z.string()).nullish(),
-    status: zAssetStatus.nullish()
-});
+export const zListModelsResponse = z.array(z.object({
+    key: z.string(),
+    kind: z.enum([
+        'image',
+        'video',
+        'audio'
+    ]),
+    displayName: z.string(),
+    baseUrl: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    enabled: z.boolean(),
+    configured: z.boolean(),
+    hasApiKey: z.boolean()
+}));
 
 /**
- * CharacterDuplicate
+ * Response for status 200
  */
-export const zCharacterDuplicate = z.object({
-    name: z.string().min(1).max(255).nullish()
-});
-
-/**
- * CharacterImageRead
- */
-export const zCharacterImageRead = z.object({
+export const zListProjectsResponse = z.array(z.object({
     id: z.string(),
-    project_id: z.string(),
-    character_id: z.string(),
-    file_path: z.string(),
-    file_name: z.string(),
-    file_size: z.int().nullable(),
-    mime_type: z.string(),
-    prompt: z.string(),
-    strategy: z.string().nullable(),
-    style: z.string().nullable(),
-    variation_index: z.int().nullable(),
-    created_at: z.iso.datetime()
-});
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+}));
 
-/**
- * CharacterImageListResponse
- */
-export const zCharacterImageListResponse = z.object({
-    items: z.array(zCharacterImageRead)
-});
-
-/**
- * CharacterRelationCreate
- */
-export const zCharacterRelationCreate = z.object({
-    source_character_id: z.string(),
-    target_character_id: z.string(),
-    relation_type: z.string().min(1).max(64),
-    strength: z.int().gte(0).lte(100).optional().default(50),
-    narrative_dependency: z.string().optional().default(''),
-    notes: z.string().optional().default('')
-});
-
-/**
- * CharacterRelationRead
- */
-export const zCharacterRelationRead = z.object({
-    id: z.string(),
-    project_id: z.string(),
-    source_character_id: z.string(),
-    target_character_id: z.string(),
-    relation_type: z.string(),
-    strength: z.int(),
-    narrative_dependency: z.string(),
-    notes: z.string(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
-});
-
-/**
- * CharacterRelationUpdate
- */
-export const zCharacterRelationUpdate = z.object({
-    relation_type: z.string().min(1).max(64).nullish(),
-    strength: z.int().gte(0).lte(100).nullish(),
-    narrative_dependency: z.string().nullish(),
-    notes: z.string().nullish()
-});
-
-/**
- * CharacterStatus
- */
-export const zCharacterStatus = z.enum([
-    'active',
-    'draft',
-    'archived'
-]);
-
-/**
- * CharacterCreate
- */
-export const zCharacterCreate = z.object({
+export const zCreateProjectBody = z.object({
     name: z.string().min(1).max(255),
-    alias: z.string().max(255).nullish(),
-    narrative_role: z.string().max(255).nullish(),
-    description: z.string().optional().default(''),
-    physical_description: z.string().optional().default(''),
-    color_palette_json: z.array(z.string()).optional(),
-    costume_elements_json: z.array(z.string()).optional(),
-    key_traits_json: z.array(z.string()).optional(),
-    personality: z.string().optional().default(''),
-    narrative_arc: z.string().optional().default(''),
-    tags_json: z.array(z.string()).optional(),
-    status: zCharacterStatus.optional().default('active')
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]).default('draft'),
+    settingsJson: z.record(z.string(), z.unknown()).optional()
 });
 
 /**
- * CharacterRead
+ * Response for status 200
  */
-export const zCharacterRead = z.object({
+export const zCreateProjectResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zGetProjectPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zGetProjectResponse = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zUpdateProjectBody = z.object({
+    name: z.string().min(1).max(255).optional(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]).optional(),
+    settingsJson: z.record(z.string(), z.unknown()).optional()
+});
+
+export const zUpdateProjectPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zUpdateProjectResponse = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zOpenProjectPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zOpenProjectResponse = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zArchiveProjectPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zArchiveProjectResponse = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zCloneProjectBody = z.object({
+    name: z.string().min(1).max(255).optional()
+});
+
+export const zCloneProjectPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zCloneProjectResponse = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum([
+        'draft',
+        'active',
+        'archived',
+        'maintenance'
+    ]),
+    rootPath: z.string(),
+    settingsJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    lastOpenedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zExportProjectPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zListCharactersPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zListCharactersResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
     slug: z.string(),
     name: z.string(),
-    alias: z.string().nullable(),
-    narrative_role: z.string().nullable(),
+    alias: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    narrativeRole: z.union([
+        z.string(),
+        z.unknown()
+    ]),
     description: z.string(),
-    physical_description: z.string(),
-    color_palette_json: z.array(z.string()),
-    costume_elements_json: z.array(z.string()),
-    key_traits_json: z.array(z.string()),
+    physicalDescription: z.string(),
+    colorPaletteJson: z.array(z.string()),
+    costumeElementsJson: z.array(z.string()),
+    keyTraitsJson: z.array(z.string()),
     personality: z.string(),
-    narrative_arc: z.string(),
-    tags_json: z.array(z.string()),
-    status: zCharacterStatus,
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    archived_at: z.iso.datetime().nullish()
+    narrativeArc: z.string(),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+}));
+
+export const zCreateCharacterBody = z.object({
+    name: z.string().min(1).max(255),
+    alias: z.string().max(255).optional(),
+    narrativeRole: z.string().max(255).optional(),
+    description: z.string().optional(),
+    physicalDescription: z.string().optional(),
+    colorPaletteJson: z.array(z.string()).optional(),
+    costumeElementsJson: z.array(z.string()).optional(),
+    keyTraitsJson: z.array(z.string()).optional(),
+    personality: z.string().optional(),
+    narrativeArc: z.string().optional(),
+    tagsJson: z.array(z.string()).optional()
+});
+
+export const zCreateCharacterPath = z.object({
+    projectId: z.string()
 });
 
 /**
- * CharacterListResponse
+ * Response for status 200
  */
-export const zCharacterListResponse = z.object({
-    items: z.array(zCharacterRead)
-});
-
-/**
- * CharacterUpdate
- */
-export const zCharacterUpdate = z.object({
-    name: z.string().min(1).max(255).nullish(),
-    alias: z.string().max(255).nullish(),
-    narrative_role: z.string().max(255).nullish(),
-    description: z.string().nullish(),
-    physical_description: z.string().nullish(),
-    color_palette_json: z.array(z.string()).nullish(),
-    costume_elements_json: z.array(z.string()).nullish(),
-    key_traits_json: z.array(z.string()).nullish(),
-    personality: z.string().nullish(),
-    narrative_arc: z.string().nullish(),
-    tags_json: z.array(z.string()).nullish(),
-    status: zCharacterStatus.nullish()
-});
-
-/**
- * ColorMode
- *
- * Color modes for manga generation.
- */
-export const zColorMode = z.enum([
-    'bw',
-    'color',
-    'spot_color'
-]);
-
-/**
- * ExportFormat
- */
-export const zExportFormat = z.enum([
-    'json',
-    'tree',
-    'zip'
-]);
-
-/**
- * ExportKind
- */
-export const zExportKind = z.enum(['work', 'publication']);
-
-/**
- * ExportCreate
- */
-export const zExportCreate = z.object({
-    kind: zExportKind.optional().default('work'),
-    format: zExportFormat.optional().default('json'),
-    label: z.string().max(255).nullish(),
-    summary: z.string().max(2000).optional().default('')
-});
-
-/**
- * ExportStatus
- */
-export const zExportStatus = z.enum([
-    'pending',
-    'ready',
-    'failed'
-]);
-
-/**
- * ExportRead
- */
-export const zExportRead = z.object({
+export const zCreateCharacterResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    kind: zExportKind,
-    format: zExportFormat,
-    status: zExportStatus,
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    alias: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    narrativeRole: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    description: z.string(),
+    physicalDescription: z.string(),
+    colorPaletteJson: z.array(z.string()),
+    costumeElementsJson: z.array(z.string()),
+    keyTraitsJson: z.array(z.string()),
+    personality: z.string(),
+    narrativeArc: z.string(),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zGetProjectCharacterImagesPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zGetProjectCharacterImagesResponse = z.record(z.string(), z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    characterId: z.string(),
+    filePath: z.string(),
+    fileName: z.string(),
+    fileSize: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    mimeType: z.string(),
+    prompt: z.string(),
+    strategy: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    style: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    variationIndex: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+})));
+
+export const zDeleteCharacterPath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+export const zGetCharacterPath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zGetCharacterResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    alias: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    narrativeRole: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    description: z.string(),
+    physicalDescription: z.string(),
+    colorPaletteJson: z.array(z.string()),
+    costumeElementsJson: z.array(z.string()),
+    keyTraitsJson: z.array(z.string()),
+    personality: z.string(),
+    narrativeArc: z.string(),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    relations: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        sourceCharacterId: z.string(),
+        targetCharacterId: z.string(),
+        relationType: z.string(),
+        strength: z.number(),
+        narrativeDependency: z.string(),
+        notes: z.string(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    })),
+    voiceSamples: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        characterId: z.string(),
+        assetPath: z.union([
+            z.string(),
+            z.unknown()
+        ]),
+        label: z.string(),
+        voiceNotes: z.string(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    })),
+    relationshipsSummary: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zUpdateCharacterBody = z.object({
+    name: z.string().min(1).max(255).optional(),
+    alias: z.string().max(255).optional(),
+    narrativeRole: z.string().max(255).optional(),
+    description: z.string().optional(),
+    physicalDescription: z.string().optional(),
+    colorPaletteJson: z.array(z.string()).optional(),
+    costumeElementsJson: z.array(z.string()).optional(),
+    keyTraitsJson: z.array(z.string()).optional(),
+    personality: z.string().optional(),
+    narrativeArc: z.string().optional(),
+    tagsJson: z.array(z.string()).optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional()
+});
+
+export const zUpdateCharacterPath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zUpdateCharacterResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    alias: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    narrativeRole: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    description: z.string(),
+    physicalDescription: z.string(),
+    colorPaletteJson: z.array(z.string()),
+    costumeElementsJson: z.array(z.string()),
+    keyTraitsJson: z.array(z.string()),
+    personality: z.string(),
+    narrativeArc: z.string(),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zArchiveCharacterPath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zArchiveCharacterResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    alias: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    narrativeRole: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    description: z.string(),
+    physicalDescription: z.string(),
+    colorPaletteJson: z.array(z.string()),
+    costumeElementsJson: z.array(z.string()),
+    keyTraitsJson: z.array(z.string()),
+    personality: z.string(),
+    narrativeArc: z.string(),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    archivedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zCreateRelationBody = z.object({
+    sourceCharacterId: z.string(),
+    targetCharacterId: z.string(),
+    relationType: z.string().min(1),
+    strength: z.number().gte(0).lte(100).default(50),
+    narrativeDependency: z.string().optional(),
+    notes: z.string().optional()
+});
+
+export const zCreateRelationPath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateRelationResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceCharacterId: z.string(),
+    targetCharacterId: z.string(),
+    relationType: z.string(),
+    strength: z.number(),
+    narrativeDependency: z.string(),
+    notes: z.string(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zCreateVoiceSampleBody = z.object({
+    sourceCharacterId: z.string(),
+    targetCharacterId: z.string(),
+    relationType: z.string().min(1),
+    strength: z.number().gte(0).lte(100).default(50),
+    narrativeDependency: z.string().optional(),
+    notes: z.string().optional()
+});
+
+export const zCreateVoiceSamplePath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateVoiceSampleResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    characterId: z.string(),
+    assetPath: z.union([
+        z.string(),
+        z.unknown()
+    ]),
     label: z.string(),
-    summary: z.string(),
-    artifact_path: z.string().nullish(),
-    artifact_name: z.string().nullish(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    size_bytes: z.int().nullish(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    completed_at: z.iso.datetime().nullish(),
-    failed_at: z.iso.datetime().nullish(),
-    error_message: z.string().nullish()
+    voiceNotes: z.string(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zGenerateCharacterImagePath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
+});
+
+export const zGenerateCharacterImageQuery = z.object({
+    strategy: z.string().default('portrait'),
+    style: z.string().default('realistic'),
+    imageCount: z.number().gte(1).lte(4).default(1),
+    modelKey: z.string().optional()
+});
+
+export const zListCharacterImagesPath = z.object({
+    projectId: z.string(),
+    characterId: z.string()
 });
 
 /**
- * GenerationBoardPanelRead
+ * Response for status 200
  */
-export const zGenerationBoardPanelRead = z.object({
+export const zListCharacterImagesResponse = z.array(z.object({
     id: z.string(),
-    board_id: z.string(),
-    step_id: z.string().nullable(),
-    order_index: z.int(),
-    title: z.string(),
-    caption: z.string(),
+    projectId: z.string(),
+    characterId: z.string(),
+    filePath: z.string(),
+    fileName: z.string(),
+    fileSize: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    mimeType: z.string(),
     prompt: z.string(),
-    status: z.string(),
-    image_path: z.string(),
-    image_name: z.string(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
+    strategy: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    style: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    variationIndex: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+}));
+
+export const zDeleteCharacterImagePath = z.object({
+    projectId: z.string(),
+    characterId: z.string(),
+    imageId: z.string()
+});
+
+export const zGetCharacterImageFilePath = z.object({
+    projectId: z.string(),
+    characterId: z.string(),
+    imageId: z.string()
+});
+
+export const zGetStorySummaryPath = z.object({
+    projectId: z.string()
 });
 
 /**
- * GenerationBoardValidateRequest
+ * Response for status 200
  */
-export const zGenerationBoardValidateRequest = z.object({
-    note: z.string().max(4000).nullish()
+export const zGetStorySummaryResponse = z.object({
+    tomes: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        title: z.string(),
+        slug: z.string(),
+        synopsis: z.string(),
+        status: z.enum([
+            'active',
+            'draft',
+            'archived'
+        ]),
+        orderIndex: z.number(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    })),
+    chapters: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        tomeId: z.string(),
+        title: z.string(),
+        slug: z.string(),
+        synopsis: z.string(),
+        status: z.enum([
+            'active',
+            'draft',
+            'archived'
+        ]),
+        orderIndex: z.number(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    })),
+    scenes: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        tomeId: z.string(),
+        chapterId: z.string(),
+        title: z.string(),
+        slug: z.string(),
+        sceneType: z.string(),
+        location: z.string(),
+        summary: z.string(),
+        content: z.string(),
+        notes: z.string(),
+        charactersJson: z.array(z.string()),
+        tagsJson: z.array(z.string()),
+        status: z.enum([
+            'active',
+            'draft',
+            'archived'
+        ]),
+        orderIndex: z.number(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    })),
+    orphanReferences: z.array(z.object({
+        reference: z.object({
+            id: z.string(),
+            projectId: z.string(),
+            sceneId: z.string(),
+            referenceKind: z.string(),
+            targetSlug: z.string(),
+            rawToken: z.string(),
+            createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+        }),
+        reason: z.string()
+    }))
+});
+
+export const zListTomesPath = z.object({
+    projectId: z.string()
+});
+
+export const zCreateTomeBody = z.object({
+    title: z.string().min(1),
+    synopsis: z.string().optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional(),
+    orderIndex: z.number().optional()
+});
+
+export const zCreateTomePath = z.object({
+    projectId: z.string()
 });
 
 /**
- * GenerationJobStepRead
+ * Response for status 200
  */
-export const zGenerationJobStepRead = z.object({
+export const zCreateTomeResponse = z.object({
     id: z.string(),
-    job_id: z.string(),
-    order_index: z.int(),
+    projectId: z.string(),
     title: z.string(),
-    status: z.string(),
-    prompt: z.string(),
-    output_text: z.string(),
-    artifact_path: z.string().nullable(),
-    artifact_name: z.string().nullable(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    completed_at: z.iso.datetime().nullable(),
-    failed_at: z.iso.datetime().nullable(),
-    error_message: z.string().nullable()
+    slug: z.string(),
+    synopsis: z.string(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    orderIndex: z.number(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zUpdateTomeBody = z.object({
+    title: z.string().min(1).optional(),
+    synopsis: z.string().optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional(),
+    orderIndex: z.number().optional()
 });
 
 /**
- * GenerationPanelUpdate
+ * Response for status 200
  */
-export const zGenerationPanelUpdate = z.object({
-    status: z.string().nullish(),
-    caption: z.string().max(4000).nullish(),
-    title: z.string().max(255).nullish()
-});
-
-/**
- * GenerationSourceKind
- */
-export const zGenerationSourceKind = z.enum([
-    'scene',
-    'chapter',
-    'tome',
-    'panel',
-    'custom'
-]);
-
-/**
- * GenerationBoardRead
- */
-export const zGenerationBoardRead = z.object({
+export const zUpdateTomeResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    job_id: z.string(),
-    source_kind: zGenerationSourceKind,
-    strategy: z.string(),
+    projectId: z.string(),
     title: z.string(),
+    slug: z.string(),
+    synopsis: z.string(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    orderIndex: z.number(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zCreateChapterBody = z.object({
+    tomeId: z.string(),
+    title: z.string().min(1),
+    synopsis: z.string().optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional(),
+    orderIndex: z.number().optional()
+});
+
+export const zCreateChapterPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateChapterResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    tomeId: z.string(),
+    title: z.string(),
+    slug: z.string(),
+    synopsis: z.string(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    orderIndex: z.number(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zUpdateChapterBody = z.object({
+    tomeId: z.string().optional(),
+    title: z.string().min(1).optional(),
+    synopsis: z.string().optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional(),
+    orderIndex: z.number().optional()
+});
+
+/**
+ * Response for status 200
+ */
+export const zUpdateChapterResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    tomeId: z.string(),
+    title: z.string(),
+    slug: z.string(),
+    synopsis: z.string(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    orderIndex: z.number(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zCreateSceneBody = z.object({
+    tomeId: z.string(),
+    chapterId: z.string(),
+    title: z.string().min(1),
+    sceneType: z.string().optional(),
+    location: z.string().optional(),
+    summary: z.string().optional(),
+    content: z.string().optional(),
+    notes: z.string().optional(),
+    charactersJson: z.array(z.string()).optional(),
+    tagsJson: z.array(z.string()).optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional(),
+    orderIndex: z.number().optional()
+});
+
+export const zCreateScenePath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateSceneResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    tomeId: z.string(),
+    chapterId: z.string(),
+    title: z.string(),
+    slug: z.string(),
+    sceneType: z.string(),
+    location: z.string(),
     summary: z.string(),
-    status: z.string(),
-    artifact_path: z.string().nullable(),
-    artifact_name: z.string().nullable(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    validated_at: z.iso.datetime().nullable(),
-    panels: z.array(zGenerationBoardPanelRead).optional()
+    content: z.string(),
+    notes: z.string(),
+    charactersJson: z.array(z.string()),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    orderIndex: z.number(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zUpdateSceneBody = z.object({
+    tomeId: z.string().optional(),
+    chapterId: z.string().optional(),
+    title: z.string().min(1).optional(),
+    sceneType: z.string().optional(),
+    location: z.string().optional(),
+    summary: z.string().optional(),
+    content: z.string().optional(),
+    notes: z.string().optional(),
+    charactersJson: z.array(z.string()).optional(),
+    tagsJson: z.array(z.string()).optional(),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]).optional(),
+    orderIndex: z.number().optional()
 });
 
 /**
- * GenerationJobCreate
+ * Response for status 200
  */
-export const zGenerationJobCreate = z.object({
-    source_kind: zGenerationSourceKind,
-    source_id: z.string(),
-    source_version_id: z.string().nullish(),
-    strategy: z.string().optional().default('direct'),
-    model_key: z.string().nullish(),
-    mode: z.string().optional().default('separate'),
-    selection_ids: z.array(z.string()).optional(),
-    grid_rows: z.int().nullish(),
-    grid_cols: z.int().nullish(),
-    image_count: z.int().nullish(),
-    title: z.string().nullish(),
-    summary: z.string().optional().default('')
-});
-
-/**
- * GenerationJobRead
- */
-export const zGenerationJobRead = z.object({
+export const zUpdateSceneResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    source_kind: zGenerationSourceKind,
-    source_id: z.string(),
-    source_label: z.string(),
-    source_version_id: z.string().nullable(),
-    strategy: z.string(),
-    model_key: z.string().nullish(),
-    model_name: z.string().nullish(),
-    model_kind: z.string().nullish(),
+    projectId: z.string(),
+    tomeId: z.string(),
+    chapterId: z.string(),
+    title: z.string(),
+    slug: z.string(),
+    sceneType: z.string(),
+    location: z.string(),
+    summary: z.string(),
+    content: z.string(),
+    notes: z.string(),
+    charactersJson: z.array(z.string()),
+    tagsJson: z.array(z.string()),
+    status: z.enum([
+        'active',
+        'draft',
+        'archived'
+    ]),
+    orderIndex: z.number(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zListGenerationJobsPath = z.object({
+    projectId: z.string()
+});
+
+export const zCreateGenerationJobBody = z.object({
+    sourceKind: z.enum([
+        'scene',
+        'chapter',
+        'tome',
+        'panel',
+        'custom'
+    ]),
+    sourceId: z.string(),
+    sourceVersionId: z.string().optional(),
+    strategy: z.enum(['direct', 'intermediate']).default('direct'),
+    modelKey: z.string().optional(),
+    mode: z.string().optional(),
+    selectionIds: z.array(z.string()).optional(),
+    gridRows: z.number().optional(),
+    gridCols: z.number().optional(),
+    imageCount: z.number().optional(),
+    title: z.string().optional(),
+    summary: z.string().optional()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateGenerationJobResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceKind: z.enum([
+        'scene',
+        'chapter',
+        'tome',
+        'panel',
+        'custom'
+    ]),
+    sourceId: z.string(),
+    sourceLabel: z.string(),
+    sourceVersionId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    strategy: z.enum(['direct', 'intermediate']),
     entrypoint: z.string(),
     title: z.string(),
     prompt: z.string(),
     summary: z.string(),
-    status: z.string(),
-    progress: z.int(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    completed_at: z.iso.datetime().nullable(),
-    failed_at: z.iso.datetime().nullable(),
-    error_message: z.string().nullable(),
-    steps: z.array(zGenerationJobStepRead).optional(),
-    board: zGenerationBoardRead.nullish()
+    status: z.enum([
+        'pending',
+        'running',
+        'ready',
+        'validated',
+        'failed'
+    ]),
+    progress: z.number(),
+    metadataJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    completedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
 });
 
 /**
- * ModelProviderRead
+ * Response for status 200
  */
-export const zModelProviderRead = z.object({
-    key: z.string(),
-    kind: z.string(),
-    display_name: z.string(),
-    base_url: z.string().nullish(),
-    enabled: z.boolean(),
-    configured: z.boolean(),
-    has_api_key: z.boolean()
+export const zGetGenerationJobResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceKind: z.enum([
+        'scene',
+        'chapter',
+        'tome',
+        'panel',
+        'custom'
+    ]),
+    sourceId: z.string(),
+    sourceLabel: z.string(),
+    sourceVersionId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    strategy: z.enum(['direct', 'intermediate']),
+    entrypoint: z.string(),
+    title: z.string(),
+    prompt: z.string(),
+    summary: z.string(),
+    status: z.enum([
+        'pending',
+        'running',
+        'ready',
+        'validated',
+        'failed'
+    ]),
+    progress: z.number(),
+    metadataJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    completedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zListGenerationBoardsPath = z.object({
+    projectId: z.string()
 });
 
 /**
- * ProjectClone
+ * Response for status 200
  */
-export const zProjectClone = z.object({
-    name: z.string().min(1).max(255).nullish()
+export const zGetGenerationBoardResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    jobId: z.string(),
+    sourceKind: z.enum([
+        'scene',
+        'chapter',
+        'tome',
+        'panel',
+        'custom'
+    ]),
+    strategy: z.enum(['direct', 'intermediate']),
+    title: z.string(),
+    summary: z.string(),
+    status: z.enum(['draft', 'validated']),
+    artifactPath: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    artifactName: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    metadataJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    validatedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    panels: z.array(z.object({
+        id: z.string(),
+        boardId: z.string(),
+        stepId: z.union([
+            z.string(),
+            z.unknown()
+        ]),
+        orderIndex: z.number(),
+        title: z.string(),
+        caption: z.string(),
+        prompt: z.string(),
+        status: z.enum([
+            'draft',
+            'selected',
+            'rejected',
+            'replaced'
+        ]),
+        imagePath: z.string(),
+        imageName: z.string(),
+        metadataJson: z.record(z.string(), z.unknown()),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    }))
+});
+
+export const zValidateGenerationBoardBody = z.object({
+    note: z.string().optional()
 });
 
 /**
- * ProjectStatus
+ * Response for status 200
  */
-export const zProjectStatus = z.enum([
-    'draft',
-    'active',
-    'archived',
-    'maintenance'
-]);
+export const zValidateGenerationBoardResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    jobId: z.string(),
+    sourceKind: z.enum([
+        'scene',
+        'chapter',
+        'tome',
+        'panel',
+        'custom'
+    ]),
+    strategy: z.enum(['direct', 'intermediate']),
+    title: z.string(),
+    summary: z.string(),
+    status: z.enum(['draft', 'validated']),
+    artifactPath: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    artifactName: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    metadataJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    validatedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    panels: z.array(z.object({
+        id: z.string(),
+        boardId: z.string(),
+        stepId: z.union([
+            z.string(),
+            z.unknown()
+        ]),
+        orderIndex: z.number(),
+        title: z.string(),
+        caption: z.string(),
+        prompt: z.string(),
+        status: z.enum([
+            'draft',
+            'selected',
+            'rejected',
+            'replaced'
+        ]),
+        imagePath: z.string(),
+        imageName: z.string(),
+        metadataJson: z.record(z.string(), z.unknown()),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    }))
+});
+
+export const zUpdateGenerationPanelBody = z.object({
+    status: z.enum([
+        'draft',
+        'selected',
+        'rejected',
+        'replaced'
+    ]).optional(),
+    caption: z.string().optional(),
+    title: z.string().optional()
+});
+
+export const zListAssetsPath = z.object({
+    projectId: z.string()
+});
 
 /**
- * ProjectCreate
+ * Response for status 200
  */
-export const zProjectCreate = z.object({
+export const zListAssetsResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    originalFilename: z.string(),
+    mimeType: z.string(),
+    checksum: z.string(),
+    sizeBytes: z.number(),
+    storagePath: z.string(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    status: z.enum(['active', 'archived']),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    archivedAt: z.union([
+        z.string(),
+        z.unknown()
+    ])
+}));
+
+export const zImportAssetBody = z.object({
     name: z.string().min(1).max(255),
-    settings_json: z.record(z.string(), z.unknown()).optional(),
-    status: zProjectStatus.optional().default('draft')
+    slug: z.string().min(1).max(255),
+    sourcePath: z.string().min(1),
+    description: z.string().max(2000).optional(),
+    tags: z.array(z.string()).optional()
+});
+
+export const zImportAssetPath = z.object({
+    projectId: z.string()
 });
 
 /**
- * ProjectRead
+ * Response for status 200
  */
-export const zProjectRead = z.object({
+export const zImportAssetResponse = z.object({
     id: z.string(),
-    name: z.string(),
+    projectId: z.string(),
     slug: z.string(),
-    status: zProjectStatus,
-    root_path: z.string(),
-    settings_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    last_opened_at: z.iso.datetime().nullish(),
-    archived_at: z.iso.datetime().nullish()
-});
-
-/**
- * ProjectListResponse
- */
-export const zProjectListResponse = z.object({
-    items: z.array(zProjectRead)
-});
-
-/**
- * ProjectUpdate
- */
-export const zProjectUpdate = z.object({
-    name: z.string().min(1).max(255).nullish(),
-    status: zProjectStatus.nullish(),
-    settings_json: z.record(z.string(), z.unknown()).nullish()
-});
-
-/**
- * PromptPreviewRequest
- *
- * Request to preview the generated prompt without running generation.
- */
-export const zPromptPreviewRequest = z.object({
-    config_id: z.string().nullish(),
-    character_image_refs: z.record(z.string(), z.string()).optional(),
-    additional_context: z.string().optional().default('')
-});
-
-/**
- * PromptPreviewResponse
- *
- * Preview of the prompt that would be sent.
- */
-export const zPromptPreviewResponse = z.object({
-    system_prompt: z.string(),
-    scene_section: z.string(),
-    full_prompt: z.string(),
-    character_summaries: z.array(z.record(z.string(), z.string())),
-    warnings: z.array(z.string()).optional()
-});
-
-/**
- * ReferenceSuggestionResponse
- */
-export const zReferenceSuggestionResponse = z.object({
-    slug: z.string(),
-    label: z.string()
-});
-
-/**
- * SceneGenerateRequest
- *
- * Request to generate manga pages from a scene.
- */
-export const zSceneGenerateRequest = z.object({
-    config_id: z.string().nullish(),
-    image_count: z.int().gte(1).lte(5).optional().default(1),
-    style_override: z.record(z.string(), z.unknown()).nullish(),
-    character_image_refs: z.record(z.string(), z.string()).optional(),
-    additional_context: z.string().optional().default('')
-});
-
-/**
- * SceneGenerateResponse
- *
- * Response after triggering generation.
- */
-export const zSceneGenerateResponse = z.object({
-    job_id: z.string(),
-    status: z.string(),
-    message: z.string().optional().default('Generation job started')
-});
-
-/**
- * SceneGenerationConfigRead
- *
- * Config read model.
- */
-export const zSceneGenerationConfigRead = z.object({
-    id: z.string(),
-    project_id: z.string(),
     name: z.string(),
-    is_default: z.boolean(),
-    system_prompt: z.string(),
-    style_preset: z.string(),
-    color_mode: z.string(),
-    default_image_count: z.int(),
-    allow_multi_page: z.boolean(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
+    originalFilename: z.string(),
+    mimeType: z.string(),
+    checksum: z.string(),
+    sizeBytes: z.number(),
+    storagePath: z.string(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    status: z.enum(['active', 'archived']),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    archivedAt: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zDeleteAssetPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zGetAssetPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
 });
 
 /**
- * SceneMangaPageRead
- *
- * Read model for a scene manga page.
+ * Response for status 200
  */
-export const zSceneMangaPageRead = z.object({
+export const zGetAssetResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    scene_id: z.string(),
-    tome_id: z.string(),
-    chapter_id: z.string(),
-    job_id: z.string(),
-    board_id: z.string(),
-    panel_id: z.string(),
-    page_number: z.int(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    originalFilename: z.string(),
+    mimeType: z.string(),
+    checksum: z.string(),
+    sizeBytes: z.number(),
+    storagePath: z.string(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    status: z.enum(['active', 'archived']),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    archivedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    links: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        assetId: z.string(),
+        targetKind: z.string(),
+        targetId: z.string(),
+        note: z.string(),
+        createdAt: z.string()
+    })),
+    usages: z.array(z.object({
+        kind: z.string(),
+        id: z.string(),
+        name: z.string()
+    }))
+});
+
+export const zUpdateAssetBody = z.object({
+    name: z.string().min(1).max(255).optional(),
+    description: z.string().max(2000).optional(),
+    tags: z.array(z.string()).optional()
+});
+
+export const zUpdateAssetPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zUpdateAssetResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    originalFilename: z.string(),
+    mimeType: z.string(),
+    checksum: z.string(),
+    sizeBytes: z.number(),
+    storagePath: z.string(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    status: z.enum(['active', 'archived']),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    archivedAt: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zArchiveAssetPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zArchiveAssetResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    originalFilename: z.string(),
+    mimeType: z.string(),
+    checksum: z.string(),
+    sizeBytes: z.number(),
+    storagePath: z.string(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    status: z.enum(['active', 'archived']),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    archivedAt: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zGetAssetFilePath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zCreateAssetLinkBody = z.object({
+    targetKind: z.enum([
+        'character',
+        'scene',
+        'chapter',
+        'tome'
+    ]),
+    targetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    note: z.string().max(500).optional()
+});
+
+export const zCreateAssetLinkPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateAssetLinkResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    assetId: z.string(),
+    targetKind: z.string(),
+    targetId: z.string(),
+    note: z.string(),
+    createdAt: z.string()
+});
+
+export const zDeleteAssetLinkPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    assetId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    linkId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zListSceneConfigsPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zListSceneConfigsResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    name: z.string(),
+    isDefault: z.boolean(),
+    systemPrompt: z.string(),
+    stylePreset: z.enum([
+        'shonen',
+        'shojo',
+        'seinen',
+        'generic'
+    ]),
+    colorMode: z.enum([
+        'bw',
+        'color',
+        'spot_color'
+    ]),
+    defaultImageCount: z.number(),
+    allowMultiPage: z.boolean(),
+    metadata: z.record(z.string(), z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string()
+}));
+
+export const zCreateSceneConfigBody = z.object({
+    name: z.string().min(1).max(255),
+    systemPrompt: z.string().min(1),
+    stylePreset: z.enum([
+        'shonen',
+        'shojo',
+        'seinen',
+        'generic'
+    ]).default('generic'),
+    colorMode: z.enum([
+        'bw',
+        'color',
+        'spot_color'
+    ]).default('bw'),
+    defaultImageCount: z.int().gte(1).lte(16).default(4),
+    allowMultiPage: z.boolean().default(false)
+});
+
+export const zCreateSceneConfigPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateSceneConfigResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    name: z.string(),
+    isDefault: z.boolean(),
+    systemPrompt: z.string(),
+    stylePreset: z.enum([
+        'shonen',
+        'shojo',
+        'seinen',
+        'generic'
+    ]),
+    colorMode: z.enum([
+        'bw',
+        'color',
+        'spot_color'
+    ]),
+    defaultImageCount: z.number(),
+    allowMultiPage: z.boolean(),
+    metadata: z.record(z.string(), z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string()
+});
+
+export const zDeleteSceneConfigPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    configId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zUpdateSceneConfigBody = z.object({
+    name: z.string().min(1).max(255).optional(),
+    systemPrompt: z.string().min(1).optional(),
+    stylePreset: z.enum([
+        'shonen',
+        'shojo',
+        'seinen',
+        'generic'
+    ]).optional(),
+    colorMode: z.enum([
+        'bw',
+        'color',
+        'spot_color'
+    ]).optional(),
+    defaultImageCount: z.int().gte(1).lte(16).optional(),
+    allowMultiPage: z.boolean().optional()
+});
+
+export const zUpdateSceneConfigPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    configId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zUpdateSceneConfigResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    name: z.string(),
+    isDefault: z.boolean(),
+    systemPrompt: z.string(),
+    stylePreset: z.enum([
+        'shonen',
+        'shojo',
+        'seinen',
+        'generic'
+    ]),
+    colorMode: z.enum([
+        'bw',
+        'color',
+        'spot_color'
+    ]),
+    defaultImageCount: z.number(),
+    allowMultiPage: z.boolean(),
+    metadata: z.record(z.string(), z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string()
+});
+
+export const zSetDefaultConfigBody = z.object({
+    isDefault: z.boolean().default(true)
+});
+
+export const zSetDefaultConfigPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    configId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zSetDefaultConfigResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    name: z.string(),
+    isDefault: z.boolean(),
+    systemPrompt: z.string(),
+    stylePreset: z.enum([
+        'shonen',
+        'shojo',
+        'seinen',
+        'generic'
+    ]),
+    colorMode: z.enum([
+        'bw',
+        'color',
+        'spot_color'
+    ]),
+    defaultImageCount: z.number(),
+    allowMultiPage: z.boolean(),
+    metadata: z.record(z.string(), z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string()
+});
+
+export const zGenerateSceneMangaBody = z.object({
+    configId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/).optional(),
+    imageCount: z.int().gte(1).lte(16).default(6),
+    characterImageRefs: z.record(z.string(), z.string()).optional(),
+    additionalContext: z.string().max(2000).optional()
+});
+
+export const zGenerateSceneMangaPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zGenerateSceneMangaResponse = z.object({
+    success: z.boolean(),
+    jobId: z.string(),
+    boardId: z.string().optional(),
+    message: z.string()
+});
+
+export const zPreviewPromptBody = z.object({
+    configId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/).optional(),
+    characterImageRefs: z.record(z.string(), z.string()).optional(),
+    panelCount: z.int().gte(1).lte(10).default(6)
+});
+
+export const zPreviewPromptPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zPreviewPromptResponse = z.object({
+    prompts: z.array(z.object({
+        panelIndex: z.number(),
+        title: z.string(),
+        prompt: z.string(),
+        caption: z.string()
+    })),
+    systemPrompt: z.string(),
+    styleDescription: z.string()
+});
+
+export const zListSceneMangaPagesPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zListSceneMangaPagesResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sceneId: z.string(),
+    tomeId: z.string(),
+    chapterId: z.string(),
+    jobId: z.string(),
+    boardId: z.string(),
+    panelId: z.string(),
+    pageNumber: z.number(),
     label: z.string(),
-    status: z.string(),
-    image_url: z.string().nullish(),
-    caption: z.string().nullish(),
-    prompt: z.string().nullish(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
-});
-
-/**
- * SceneGenerationListResponse
- *
- * List of generation jobs for a scene.
- */
-export const zSceneGenerationListResponse = z.object({
-    scene_id: z.string(),
-    pages: z.array(zSceneMangaPageRead),
-    total_pages: z.int()
-});
-
-/**
- * SceneMangaPageUpdate
- *
- * Update page metadata.
- */
-export const zSceneMangaPageUpdate = z.object({
-    label: z.string().max(255).nullish(),
     status: z.enum([
         'draft',
         'selected',
         'rejected'
-    ]).nullish()
+    ]),
+    imageUrl: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    caption: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    prompt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    createdAt: z.string(),
+    updatedAt: z.string()
+}));
+
+export const zDeleteSceneMangaPagePath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    pageId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zUpdateSceneMangaPageBody = z.object({
+    label: z.string().max(255).optional(),
+    status: z.enum([
+        'draft',
+        'selected',
+        'rejected'
+    ]).optional(),
+    imageUrl: z.string().optional(),
+    caption: z.string().max(2000).optional(),
+    prompt: z.string().max(4000).optional()
+});
+
+export const zUpdateSceneMangaPagePath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    pageId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
 });
 
 /**
- * StoryReferenceRead
+ * Response for status 200
  */
-export const zStoryReferenceRead = z.object({
+export const zUpdateSceneMangaPageResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    scene_id: z.string(),
-    reference_kind: z.string(),
-    target_slug: z.string(),
-    raw_token: z.string(),
-    created_at: z.iso.datetime()
+    projectId: z.string(),
+    sceneId: z.string(),
+    tomeId: z.string(),
+    chapterId: z.string(),
+    jobId: z.string(),
+    boardId: z.string(),
+    panelId: z.string(),
+    pageNumber: z.number(),
+    label: z.string(),
+    status: z.enum([
+        'draft',
+        'selected',
+        'rejected'
+    ]),
+    imageUrl: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    caption: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    prompt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    createdAt: z.string(),
+    updatedAt: z.string()
+});
+
+export const zListVersionsPath = z.object({
+    projectId: z.string()
+});
+
+export const zCreateVersionBody = z.object({
+    branchName: z.string().max(255).default('main'),
+    label: z.string().max(255).default('Checkpoint'),
+    summary: z.string().default('')
+});
+
+export const zCreateVersionPath = z.object({
+    projectId: z.string()
 });
 
 /**
- * StoryOrphanReferenceRead
+ * Response for status 200
  */
-export const zStoryOrphanReferenceRead = z.object({
-    reference: zStoryReferenceRead,
-    reason: z.string()
-});
-
-/**
- * StoryStatus
- */
-export const zStoryStatus = z.enum([
-    'active',
-    'draft',
-    'archived'
-]);
-
-/**
- * ChapterCreate
- */
-export const zChapterCreate = z.object({
-    tome_id: z.string(),
-    title: z.string().min(1).max(255),
-    slug: z.string().min(1).max(255).nullish(),
-    synopsis: z.string().optional().default(''),
-    status: zStoryStatus.optional().default('active'),
-    order_index: z.int().optional().default(0)
-});
-
-/**
- * ChapterRead
- */
-export const zChapterRead = z.object({
+export const zCreateVersionResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    tome_id: z.string(),
-    title: z.string(),
-    slug: z.string(),
-    synopsis: z.string(),
-    status: zStoryStatus,
-    order_index: z.int(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
-});
-
-/**
- * ChapterUpdate
- */
-export const zChapterUpdate = z.object({
-    tome_id: z.string().nullish(),
-    title: z.string().min(1).max(255).nullish(),
-    slug: z.string().min(1).max(255).nullish(),
-    synopsis: z.string().nullish(),
-    status: zStoryStatus.nullish(),
-    order_index: z.int().nullish()
-});
-
-/**
- * SceneCreate
- */
-export const zSceneCreate = z.object({
-    tome_id: z.string(),
-    chapter_id: z.string(),
-    title: z.string().min(1).max(255),
-    slug: z.string().min(1).max(255).nullish(),
-    summary: z.string().optional().default(''),
-    content: z.string().optional().default(''),
-    notes: z.string().optional().default(''),
-    characters_json: z.array(z.string()).optional(),
-    tags_json: z.array(z.string()).optional(),
-    status: zStoryStatus.optional().default('active'),
-    order_index: z.int().optional().default(0)
-});
-
-/**
- * SceneRead
- */
-export const zSceneRead = z.object({
-    id: z.string(),
-    project_id: z.string(),
-    tome_id: z.string(),
-    chapter_id: z.string(),
-    title: z.string(),
-    slug: z.string(),
-    summary: z.string(),
-    content: z.string(),
-    notes: z.string(),
-    characters_json: z.array(z.string()),
-    tags_json: z.array(z.string()),
-    status: zStoryStatus,
-    order_index: z.int(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
-});
-
-/**
- * SceneUpdate
- */
-export const zSceneUpdate = z.object({
-    tome_id: z.string().nullish(),
-    chapter_id: z.string().nullish(),
-    title: z.string().min(1).max(255).nullish(),
-    slug: z.string().min(1).max(255).nullish(),
-    summary: z.string().nullish(),
-    content: z.string().nullish(),
-    notes: z.string().nullish(),
-    characters_json: z.array(z.string()).nullish(),
-    tags_json: z.array(z.string()).nullish(),
-    status: zStoryStatus.nullish(),
-    order_index: z.int().nullish()
-});
-
-/**
- * StorySuggestionRead
- */
-export const zStorySuggestionRead = z.object({
-    kind: z.string(),
-    slug: z.string(),
-    title: z.string(),
-    label: z.string()
-});
-
-/**
- * StylePreset
- *
- * Manga style presets.
- */
-export const zStylePreset = z.enum([
-    'shonen',
-    'shojo',
-    'seinen',
-    'generic'
-]);
-
-/**
- * SceneGenerationConfigCreate
- *
- * Create a new generation config.
- */
-export const zSceneGenerationConfigCreate = z.object({
-    name: z.string().min(1).max(255),
-    is_default: z.boolean().optional().default(false),
-    system_prompt: z.string().min(10),
-    style_preset: zStylePreset.optional().default('generic'),
-    color_mode: zColorMode.optional().default('bw'),
-    default_image_count: z.int().gte(1).lte(10).optional().default(1),
-    allow_multi_page: z.boolean().optional().default(true),
-    metadata_json: z.record(z.string(), z.unknown()).optional()
-});
-
-/**
- * SceneGenerationConfigUpdate
- *
- * Update an existing config.
- */
-export const zSceneGenerationConfigUpdate = z.object({
-    name: z.string().min(1).max(255).nullish(),
-    is_default: z.boolean().nullish(),
-    system_prompt: z.string().min(10).nullish(),
-    style_preset: zStylePreset.nullish(),
-    color_mode: zColorMode.nullish(),
-    default_image_count: z.int().gte(1).lte(10).nullish(),
-    allow_multi_page: z.boolean().nullish(),
-    metadata_json: z.record(z.string(), z.unknown()).nullish()
-});
-
-/**
- * TomeCreate
- */
-export const zTomeCreate = z.object({
-    title: z.string().min(1).max(255),
-    slug: z.string().min(1).max(255).nullish(),
-    synopsis: z.string().optional().default(''),
-    status: zStoryStatus.optional().default('active'),
-    order_index: z.int().optional().default(0)
-});
-
-/**
- * TomeRead
- */
-export const zTomeRead = z.object({
-    id: z.string(),
-    project_id: z.string(),
-    title: z.string(),
-    slug: z.string(),
-    synopsis: z.string(),
-    status: zStoryStatus,
-    order_index: z.int(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime()
-});
-
-/**
- * StorySummaryResponse
- */
-export const zStorySummaryResponse = z.object({
-    tomes: z.array(zTomeRead),
-    chapters: z.array(zChapterRead),
-    scenes: z.array(zSceneRead),
-    orphan_references: z.array(zStoryOrphanReferenceRead).optional()
-});
-
-/**
- * TomeUpdate
- */
-export const zTomeUpdate = z.object({
-    title: z.string().min(1).max(255).nullish(),
-    slug: z.string().min(1).max(255).nullish(),
-    synopsis: z.string().nullish(),
-    status: zStoryStatus.nullish(),
-    order_index: z.int().nullish()
-});
-
-/**
- * ValidationError
- */
-export const zValidationError = z.object({
-    loc: z.array(z.union([z.string(), z.int()])),
-    msg: z.string(),
-    type: z.string(),
-    input: z.unknown().optional(),
-    ctx: z.record(z.string(), z.unknown()).optional()
-});
-
-/**
- * HTTPValidationError
- */
-export const zHttpValidationError = z.object({
-    detail: z.array(zValidationError).optional()
-});
-
-/**
- * VersionBranchRead
- */
-export const zVersionBranchRead = z.object({
-    branch_name: z.string(),
-    version_count: z.int(),
-    latest_version_id: z.string().nullish(),
-    latest_created_at: z.iso.datetime().nullish()
-});
-
-/**
- * VersionCompareRequest
- */
-export const zVersionCompareRequest = z.object({
-    left_version_id: z.string(),
-    right_version_id: z.string()
-});
-
-/**
- * VersionCreate
- */
-export const zVersionCreate = z.object({
-    branch_name: z.string().max(255).optional().default('main'),
-    label: z.string().max(255).optional().default('Checkpoint'),
-    summary: z.string().optional().default('')
-});
-
-/**
- * VersionRead
- */
-export const zVersionRead = z.object({
-    id: z.string(),
-    project_id: z.string(),
-    branch_name: z.string(),
-    version_index: z.int(),
+    projectId: z.string(),
+    branchName: z.string(),
+    versionIndex: z.number(),
     label: z.string(),
     summary: z.string(),
-    created_at: z.iso.datetime()
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zListBranchesPath = z.object({
+    projectId: z.string()
+});
+
+export const zGetVersionPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    versionId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
 });
 
 /**
- * VersionCompareRead
+ * Response for status 200
  */
-export const zVersionCompareRead = z.object({
-    left: zVersionRead,
-    right: zVersionRead,
-    project_changes: z.array(z.string()).optional(),
-    counts_delta: z.record(z.string(), z.int()).optional()
-});
-
-/**
- * VersionRestoreRequest
- */
-export const zVersionRestoreRequest = z.object({
-    label: z.string().max(255).nullish(),
-    summary: z.string().nullish()
-});
-
-/**
- * VoiceSampleCreate
- */
-export const zVoiceSampleCreate = z.object({
-    label: z.string().min(1).max(255),
-    asset_path: z.string().nullish(),
-    voice_notes: z.string().optional().default('')
-});
-
-/**
- * VoiceSampleRead
- */
-export const zVoiceSampleRead = z.object({
+export const zGetVersionResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
-    character_id: z.string(),
-    asset_path: z.string().nullable(),
+    projectId: z.string(),
+    branchName: z.string(),
+    versionIndex: z.number(),
     label: z.string(),
-    voice_notes: z.string(),
-    created_at: z.iso.datetime()
+    summary: z.string(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zCompareVersionsBody = z.object({
+    leftVersionId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    rightVersionId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+export const zCompareVersionsPath = z.object({
+    projectId: z.string()
 });
 
 /**
- * CharacterDetail
+ * Response for status 200
  */
-export const zCharacterDetail = z.object({
-    id: z.string(),
-    project_id: z.string(),
-    slug: z.string(),
-    name: z.string(),
-    alias: z.string().nullable(),
-    narrative_role: z.string().nullable(),
-    description: z.string(),
-    physical_description: z.string(),
-    color_palette_json: z.array(z.string()),
-    costume_elements_json: z.array(z.string()),
-    key_traits_json: z.array(z.string()),
-    personality: z.string(),
-    narrative_arc: z.string(),
-    tags_json: z.array(z.string()),
-    status: zCharacterStatus,
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    archived_at: z.iso.datetime().nullish(),
-    relationships_summary: z.string().nullish(),
-    relations: z.array(zCharacterRelationRead).optional(),
-    voice_samples: z.array(zVoiceSampleRead).optional()
+export const zCompareVersionsResponse = z.object({
+    left: z.object({
+        id: z.string(),
+        projectId: z.string(),
+        branchName: z.string(),
+        versionIndex: z.number(),
+        label: z.string(),
+        summary: z.string(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    }),
+    right: z.object({
+        id: z.string(),
+        projectId: z.string(),
+        branchName: z.string(),
+        versionIndex: z.number(),
+        label: z.string(),
+        summary: z.string(),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+    }),
+    projectChanges: z.array(z.string()),
+    countsDelta: z.record(z.string(), z.number())
+});
+
+export const zRestoreVersionBody = z.object({
+    label: z.string().max(255).optional(),
+    summary: z.string().optional()
+});
+
+export const zRestoreVersionPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    versionId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
 });
 
 /**
- * WarningKind
+ * Response for status 200
  */
-export const zWarningKind = z.enum([
-    'missing_character_reference',
-    'timeline_incoherence',
-    'orphan_reference',
-    'orphan_character_image'
-]);
-
-/**
- * WarningSeverity
- */
-export const zWarningSeverity = z.enum([
-    'info',
-    'warning',
-    'critical'
-]);
-
-/**
- * WarningStatus
- */
-export const zWarningStatus = z.enum([
-    'open',
-    'ignored',
-    'resolved'
-]);
-
-/**
- * WarningRead
- */
-export const zWarningRead = z.object({
+export const zRestoreVersionResponse = z.object({
     id: z.string(),
-    project_id: z.string(),
+    projectId: z.string(),
+    branchName: z.string(),
+    versionIndex: z.number(),
+    label: z.string(),
+    summary: z.string(),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zListWarningsPath = z.object({
+    projectId: z.string()
+});
+
+export const zListWarningsQuery = z.object({
+    status: z.enum([
+        'open',
+        'ignored',
+        'resolved'
+    ]).optional(),
+    kind: z.string().optional(),
+    severity: z.enum([
+        'info',
+        'warning',
+        'critical'
+    ]).optional()
+});
+
+/**
+ * Response for status 200
+ */
+export const zListWarningsResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
     fingerprint: z.string(),
-    kind: zWarningKind,
-    severity: zWarningSeverity,
-    status: zWarningStatus,
+    kind: z.string(),
+    severity: z.enum([
+        'info',
+        'warning',
+        'critical'
+    ]),
+    status: z.enum([
+        'open',
+        'ignored',
+        'resolved'
+    ]),
     title: z.string(),
     message: z.string(),
-    entity_kind: z.string(),
-    entity_id: z.string(),
-    metadata_json: z.record(z.string(), z.unknown()),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
-    resolved_at: z.iso.datetime().nullish()
+    entityKind: z.string(),
+    entityId: z.string(),
+    metadataJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    resolvedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+}));
+
+export const zScanWarningsPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zScanWarningsResponse = z.object({
+    items: z.array(z.object({
+        id: z.string(),
+        projectId: z.string(),
+        fingerprint: z.string(),
+        kind: z.string(),
+        severity: z.enum([
+            'info',
+            'warning',
+            'critical'
+        ]),
+        status: z.enum([
+            'open',
+            'ignored',
+            'resolved'
+        ]),
+        title: z.string(),
+        message: z.string(),
+        entityKind: z.string(),
+        entityId: z.string(),
+        metadataJson: z.record(z.string(), z.unknown()),
+        createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        resolvedAt: z.union([
+            z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+            z.unknown()
+        ])
+    }))
+});
+
+export const zUpdateWarningBody = z.object({
+    status: z.enum([
+        'open',
+        'ignored',
+        'resolved'
+    ]),
+    note: z.string().max(500).optional()
+});
+
+export const zUpdateWarningPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    warningId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zUpdateWarningResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    fingerprint: z.string(),
+    kind: z.string(),
+    severity: z.enum([
+        'info',
+        'warning',
+        'critical'
+    ]),
+    status: z.enum([
+        'open',
+        'ignored',
+        'resolved'
+    ]),
+    title: z.string(),
+    message: z.string(),
+    entityKind: z.string(),
+    entityId: z.string(),
+    metadataJson: z.record(z.string(), z.unknown()),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    resolvedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ])
+});
+
+export const zListExportsPath = z.object({
+    projectId: z.string()
+});
+
+export const zListExportsQuery = z.object({
+    kind: z.enum(['work', 'publication']).optional(),
+    status: z.enum([
+        'pending',
+        'ready',
+        'failed'
+    ]).optional(),
+    format: z.enum([
+        'json',
+        'tree',
+        'zip'
+    ]).optional()
+});
+
+/**
+ * Response for status 200
+ */
+export const zListExportsResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    kind: z.enum(['work', 'publication']),
+    format: z.enum([
+        'json',
+        'tree',
+        'zip'
+    ]),
+    status: z.enum([
+        'pending',
+        'ready',
+        'failed'
+    ]),
+    label: z.string(),
+    summary: z.string(),
+    artifactPath: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    artifactName: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    metadataJson: z.record(z.string(), z.unknown()),
+    sizeBytes: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    completedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+}));
+
+export const zCreateExportBody = z.object({
+    kind: z.enum(['work', 'publication']).default('work'),
+    format: z.enum([
+        'json',
+        'tree',
+        'zip'
+    ]).default('json'),
+    label: z.string().max(255).optional(),
+    summary: z.string().max(2000).default('')
+});
+
+export const zCreateExportPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCreateExportResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    kind: z.enum(['work', 'publication']),
+    format: z.enum([
+        'json',
+        'tree',
+        'zip'
+    ]),
+    status: z.enum([
+        'pending',
+        'ready',
+        'failed'
+    ]),
+    label: z.string(),
+    summary: z.string(),
+    artifactPath: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    artifactName: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    metadataJson: z.record(z.string(), z.unknown()),
+    sizeBytes: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    completedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zGetExportPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    exportId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zGetExportResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    kind: z.enum(['work', 'publication']),
+    format: z.enum([
+        'json',
+        'tree',
+        'zip'
+    ]),
+    status: z.enum([
+        'pending',
+        'ready',
+        'failed'
+    ]),
+    label: z.string(),
+    summary: z.string(),
+    artifactPath: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    artifactName: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    metadataJson: z.record(z.string(), z.unknown()),
+    sizeBytes: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    createdAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    completedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+});
+
+export const zDownloadExportPath = z.object({
+    projectId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    exportId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
 });
-
-/**
- * WarningScanResponse
- */
-export const zWarningScanResponse = z.object({
-    items: z.array(zWarningRead)
-});
-
-/**
- * WarningUpdate
- */
-export const zWarningUpdate = z.object({
-    status: zWarningStatus,
-    note: z.string().max(500).nullish()
-});
-
-/**
- * Successful Response
- */
-export const zReadProjectsApiProjectsGetResponse = zProjectListResponse;
-
-export const zCreateProjectRouteApiProjectsPostBody = zProjectCreate;
-
-/**
- * Successful Response
- */
-export const zCreateProjectRouteApiProjectsPostResponse = zProjectRead;
-
-export const zReadProjectApiProjectsProjectIdGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadProjectApiProjectsProjectIdGetResponse = zProjectRead;
-
-export const zPatchProjectApiProjectsProjectIdPatchBody = zProjectUpdate;
-
-export const zPatchProjectApiProjectsProjectIdPatchPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zPatchProjectApiProjectsProjectIdPatchResponse = zProjectRead;
-
-export const zArchiveProjectRouteApiProjectsProjectIdArchivePostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zArchiveProjectRouteApiProjectsProjectIdArchivePostResponse = zProjectRead;
-
-export const zCloneProjectRouteApiProjectsProjectIdClonePostBody = zProjectClone;
-
-export const zCloneProjectRouteApiProjectsProjectIdClonePostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCloneProjectRouteApiProjectsProjectIdClonePostResponse = zProjectRead;
-
-export const zOpenProjectRouteApiProjectsProjectIdOpenPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zOpenProjectRouteApiProjectsProjectIdOpenPostResponse = zProjectRead;
-
-export const zExportProjectRouteApiProjectsProjectIdExportGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Export Project Route Api Projects  Project Id  Export Get
- *
- * Successful Response
- */
-export const zExportProjectRouteApiProjectsProjectIdExportGetResponse = z.record(z.string(), z.unknown());
-
-export const zReadAssetsApiProjectsProjectIdAssetsGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadAssetsApiProjectsProjectIdAssetsGetResponse = zAssetListResponse;
-
-export const zImportAssetRouteApiProjectsProjectIdAssetsImportPostBody = zAssetImport;
-
-export const zImportAssetRouteApiProjectsProjectIdAssetsImportPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zImportAssetRouteApiProjectsProjectIdAssetsImportPostResponse = zAssetRead;
-
-export const zDeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeletePath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteResponse = z.void();
-
-export const zReadAssetApiProjectsProjectIdAssetsAssetIdGetPath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadAssetApiProjectsProjectIdAssetsAssetIdGetResponse = zAssetDetail;
-
-export const zUpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchBody = zAssetUpdate;
-
-export const zUpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchPath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchResponse = zAssetRead;
-
-export const zArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostPath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostResponse = zAssetRead;
-
-export const zReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetPath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-export const zReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetPath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-/**
- * Response Read Asset Links Api Projects  Project Id  Assets  Asset Id  Links Get
- *
- * Successful Response
- */
-export const zReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetResponse = z.array(zAssetLinkRead);
-
-export const zCreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostBody = zAssetLinkCreate;
-
-export const zCreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostPath = z.object({
-    project_id: z.string(),
-    asset_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostResponse = zAssetLinkRead;
-
-export const zDeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeletePath = z.object({
-    project_id: z.string(),
-    asset_id: z.string(),
-    link_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteResponse = z.void();
-
-export const zReadCharactersApiProjectsProjectIdCharactersGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadCharactersApiProjectsProjectIdCharactersGetResponse = zCharacterListResponse;
-
-export const zCreateCharacterRouteApiProjectsProjectIdCharactersPostBody = zCharacterCreate;
-
-export const zCreateCharacterRouteApiProjectsProjectIdCharactersPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateCharacterRouteApiProjectsProjectIdCharactersPostResponse = zCharacterRead;
-
-export const zReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Read Project Character Images Api Projects  Project Id  Characters Images Get
- *
- * Successful Response
- */
-export const zReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetResponse = z.record(z.string(), z.array(zCharacterImageRead));
-
-export const zDeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeletePath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteResponse = z.void();
-
-export const zReadCharacterApiProjectsProjectIdCharactersCharacterIdGetPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadCharacterApiProjectsProjectIdCharactersCharacterIdGetResponse = zCharacterDetail;
-
-export const zUpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchBody = zCharacterUpdate;
-
-export const zUpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchResponse = zCharacterRead;
-
-export const zDuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostBody = zCharacterDuplicate;
-
-export const zDuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostResponse = zCharacterRead;
-
-export const zArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostResponse = zCharacterRead;
-
-export const zCreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostBody = zCharacterRelationCreate;
-
-export const zCreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostResponse = zCharacterRelationRead;
-
-export const zDeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeletePath = z.object({
-    project_id: z.string(),
-    character_id: z.string(),
-    relation_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteResponse = z.void();
-
-export const zUpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchBody = zCharacterRelationUpdate;
-
-export const zUpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchPath = z.object({
-    project_id: z.string(),
-    character_id: z.string(),
-    relation_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchResponse = zCharacterRelationRead;
-
-export const zCreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostBody = zVoiceSampleCreate;
-
-export const zCreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostResponse = zVoiceSampleRead;
-
-export const zGenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-export const zGenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostQuery = z.object({
-    strategy: z.string().optional().default('portrait'),
-    style: z.string().optional().default('realistic'),
-    image_count: z.int().optional().default(1),
-    model_key: z.string().nullish()
-});
-
-/**
- * Successful Response
- */
-export const zGenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostResponse = zGenerationJobRead;
-
-export const zListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetPath = z.object({
-    project_id: z.string(),
-    character_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetResponse = zCharacterImageListResponse;
-
-export const zDeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeletePath = z.object({
-    project_id: z.string(),
-    character_id: z.string(),
-    image_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteResponse = z.void();
-
-export const zReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetPath = z.object({
-    project_id: z.string(),
-    character_id: z.string(),
-    image_id: z.string()
-});
-
-export const zReadExportsApiProjectsProjectIdExportsGetPath = z.object({
-    project_id: z.string()
-});
-
-export const zReadExportsApiProjectsProjectIdExportsGetQuery = z.object({
-    kind: zExportKind.nullish(),
-    status: zExportStatus.nullish(),
-    format: zExportFormat.nullish()
-});
-
-/**
- * Response Read Exports Api Projects  Project Id  Exports Get
- *
- * Successful Response
- */
-export const zReadExportsApiProjectsProjectIdExportsGetResponse = z.array(zExportRead);
-
-export const zCreateExportRouteApiProjectsProjectIdExportsPostBody = zExportCreate;
-
-export const zCreateExportRouteApiProjectsProjectIdExportsPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateExportRouteApiProjectsProjectIdExportsPostResponse = zExportRead;
-
-export const zReadExportApiProjectsProjectIdExportsExportIdGetPath = z.object({
-    project_id: z.string(),
-    export_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadExportApiProjectsProjectIdExportsExportIdGetResponse = zExportRead;
-
-export const zDownloadExportApiProjectsProjectIdExportsExportIdDownloadGetPath = z.object({
-    project_id: z.string(),
-    export_id: z.string()
-});
-
-export const zReadGenerationJobsApiProjectsProjectIdGenerationJobsGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Read Generation Jobs Api Projects  Project Id  Generation Jobs Get
- *
- * Successful Response
- */
-export const zReadGenerationJobsApiProjectsProjectIdGenerationJobsGetResponse = z.array(zGenerationJobRead);
-
-export const zCreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostBody = zGenerationJobCreate;
-
-export const zCreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostResponse = zGenerationJobRead;
-
-export const zReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetPath = z.object({
-    project_id: z.string(),
-    job_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetResponse = zGenerationJobRead;
-
-export const zReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Read Generation Boards Api Projects  Project Id  Generation Boards Get
- *
- * Successful Response
- */
-export const zReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetResponse = z.array(zGenerationBoardRead);
-
-export const zReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetPath = z.object({
-    project_id: z.string(),
-    board_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetResponse = zGenerationBoardRead;
-
-/**
- * Payload
- */
-export const zValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostBody = zGenerationBoardValidateRequest.nullable();
-
-export const zValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostPath = z.object({
-    project_id: z.string(),
-    board_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostResponse = zGenerationBoardRead;
-
-export const zUpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchBody = zGenerationPanelUpdate;
-
-export const zUpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchPath = z.object({
-    project_id: z.string(),
-    board_id: z.string(),
-    panel_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchResponse = zGenerationBoardPanelRead;
-
-export const zDownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetPath = z.object({
-    project_id: z.string(),
-    board_id: z.string()
-});
-
-export const zReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetPath = z.object({
-    project_id: z.string(),
-    board_id: z.string(),
-    panel_id: z.string()
-});
-
-export const zListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response List Generation Configs Api Projects  Project Id  Story Scenes  Scene Id  Generation Configs Get
- *
- * Successful Response
- */
-export const zListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetResponse = z.array(zSceneGenerationConfigRead);
-
-export const zCreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostBody = zSceneGenerationConfigCreate;
-
-export const zCreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostResponse = zSceneGenerationConfigRead;
-
-export const zDeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeletePath = z.object({
-    project_id: z.string(),
-    config_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteResponse = z.void();
-
-export const zGetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetPath = z.object({
-    project_id: z.string(),
-    config_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zGetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetResponse = zSceneGenerationConfigRead;
-
-export const zUpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchBody = zSceneGenerationConfigUpdate;
-
-export const zUpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchPath = z.object({
-    project_id: z.string(),
-    config_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchResponse = zSceneGenerationConfigRead;
-
-export const zSetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostPath = z.object({
-    project_id: z.string(),
-    config_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zSetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostResponse = zSceneGenerationConfigRead;
-
-export const zGenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostBody = zSceneGenerateRequest;
-
-export const zGenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostPath = z.object({
-    project_id: z.string(),
-    scene_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zGenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostResponse = zSceneGenerateResponse;
-
-export const zPreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostBody = zPromptPreviewRequest;
-
-export const zPreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostPath = z.object({
-    project_id: z.string(),
-    scene_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zPreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostResponse = zPromptPreviewResponse;
-
-export const zListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetPath = z.object({
-    project_id: z.string(),
-    scene_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetResponse = zSceneGenerationListResponse;
-
-export const zDeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeletePath = z.object({
-    project_id: z.string(),
-    scene_id: z.string(),
-    page_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteResponse = z.void();
-
-export const zGetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetPath = z.object({
-    project_id: z.string(),
-    scene_id: z.string(),
-    page_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zGetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetResponse = zSceneMangaPageRead;
-
-export const zUpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchBody = zSceneMangaPageUpdate;
-
-export const zUpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchPath = z.object({
-    project_id: z.string(),
-    scene_id: z.string(),
-    page_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchResponse = zSceneMangaPageRead;
-
-export const zReadStoryApiProjectsProjectIdStoryGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadStoryApiProjectsProjectIdStoryGetResponse = zStorySummaryResponse;
-
-export const zReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetPath = z.object({
-    project_id: z.string()
-});
-
-export const zReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetQuery = z.object({
-    query: z.string().nullish()
-});
-
-/**
- * Response Read Story Suggestions Api Projects  Project Id  Story Suggestions Get
- *
- * Successful Response
- */
-export const zReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetResponse = z.array(zStorySuggestionRead);
-
-export const zReadStoryReferencesApiProjectsProjectIdStoryReferencesGetPath = z.object({
-    project_id: z.string()
-});
-
-export const zReadStoryReferencesApiProjectsProjectIdStoryReferencesGetQuery = z.object({
-    scene_id: z.string().nullish()
-});
-
-/**
- * Response Read Story References Api Projects  Project Id  Story References Get
- *
- * Successful Response
- */
-export const zReadStoryReferencesApiProjectsProjectIdStoryReferencesGetResponse = z.array(zStoryReferenceRead);
-
-export const zReadTomesApiProjectsProjectIdStoryTomesGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Read Tomes Api Projects  Project Id  Story Tomes Get
- *
- * Successful Response
- */
-export const zReadTomesApiProjectsProjectIdStoryTomesGetResponse = z.array(zTomeRead);
-
-export const zCreateTomeRouteApiProjectsProjectIdStoryTomesPostBody = zTomeCreate;
-
-export const zCreateTomeRouteApiProjectsProjectIdStoryTomesPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateTomeRouteApiProjectsProjectIdStoryTomesPostResponse = zTomeRead;
-
-export const zDeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeletePath = z.object({
-    project_id: z.string(),
-    tome_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteResponse = z.void();
-
-export const zUpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchBody = zTomeUpdate;
-
-export const zUpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchPath = z.object({
-    project_id: z.string(),
-    tome_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchResponse = zTomeRead;
-
-export const zReadChaptersApiProjectsProjectIdStoryChaptersGetPath = z.object({
-    project_id: z.string()
-});
-
-export const zReadChaptersApiProjectsProjectIdStoryChaptersGetQuery = z.object({
-    tome_id: z.string().nullish()
-});
-
-/**
- * Response Read Chapters Api Projects  Project Id  Story Chapters Get
- *
- * Successful Response
- */
-export const zReadChaptersApiProjectsProjectIdStoryChaptersGetResponse = z.array(zChapterRead);
-
-export const zCreateChapterRouteApiProjectsProjectIdStoryChaptersPostBody = zChapterCreate;
-
-export const zCreateChapterRouteApiProjectsProjectIdStoryChaptersPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateChapterRouteApiProjectsProjectIdStoryChaptersPostResponse = zChapterRead;
-
-export const zDeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeletePath = z.object({
-    project_id: z.string(),
-    chapter_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteResponse = z.void();
-
-export const zUpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchBody = zChapterUpdate;
-
-export const zUpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchPath = z.object({
-    project_id: z.string(),
-    chapter_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchResponse = zChapterRead;
-
-export const zReadScenesApiProjectsProjectIdStoryScenesGetPath = z.object({
-    project_id: z.string()
-});
-
-export const zReadScenesApiProjectsProjectIdStoryScenesGetQuery = z.object({
-    chapter_id: z.string().nullish()
-});
-
-/**
- * Response Read Scenes Api Projects  Project Id  Story Scenes Get
- *
- * Successful Response
- */
-export const zReadScenesApiProjectsProjectIdStoryScenesGetResponse = z.array(zSceneRead);
-
-export const zCreateSceneRouteApiProjectsProjectIdStoryScenesPostBody = zSceneCreate;
-
-export const zCreateSceneRouteApiProjectsProjectIdStoryScenesPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateSceneRouteApiProjectsProjectIdStoryScenesPostResponse = zSceneRead;
-
-export const zDeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeletePath = z.object({
-    project_id: z.string(),
-    scene_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zDeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteResponse = z.void();
-
-export const zUpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchBody = zSceneUpdate;
-
-export const zUpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchPath = z.object({
-    project_id: z.string(),
-    scene_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zUpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchResponse = zSceneRead;
-
-export const zReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetPath = z.object({
-    project_id: z.string(),
-    type: z.string()
-});
-
-export const zReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetQuery = z.object({
-    q: z.string().optional().default('')
-});
-
-/**
- * Response Read Reference Suggestions Api Projects  Project Id  References  Type  Get
- *
- * Successful Response
- */
-export const zReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetResponse = z.array(zReferenceSuggestionResponse);
-
-export const zReadVersionsApiProjectsProjectIdVersionsGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Read Versions Api Projects  Project Id  Versions Get
- *
- * Successful Response
- */
-export const zReadVersionsApiProjectsProjectIdVersionsGetResponse = z.array(zVersionRead);
-
-export const zCreateVersionRouteApiProjectsProjectIdVersionsPostBody = zVersionCreate;
-
-export const zCreateVersionRouteApiProjectsProjectIdVersionsPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCreateVersionRouteApiProjectsProjectIdVersionsPostResponse = zVersionRead;
-
-export const zReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Response Read Version Branches Api Projects  Project Id  Versions Branches Get
- *
- * Successful Response
- */
-export const zReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetResponse = z.array(zVersionBranchRead);
-
-export const zReadVersionApiProjectsProjectIdVersionsVersionIdGetPath = z.object({
-    project_id: z.string(),
-    version_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zReadVersionApiProjectsProjectIdVersionsVersionIdGetResponse = zVersionRead;
-
-export const zCompareVersionsRouteApiProjectsProjectIdVersionsComparePostBody = zVersionCompareRequest;
-
-export const zCompareVersionsRouteApiProjectsProjectIdVersionsComparePostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zCompareVersionsRouteApiProjectsProjectIdVersionsComparePostResponse = zVersionCompareRead;
-
-/**
- * Payload
- */
-export const zRestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostBody = zVersionRestoreRequest.nullable();
-
-export const zRestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostPath = z.object({
-    project_id: z.string(),
-    version_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zRestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostResponse = zVersionRead;
-
-export const zReadWarningsApiProjectsProjectIdWarningsGetPath = z.object({
-    project_id: z.string()
-});
-
-export const zReadWarningsApiProjectsProjectIdWarningsGetQuery = z.object({
-    status: zWarningStatus.nullish(),
-    kind: zWarningKind.nullish(),
-    severity: zWarningSeverity.nullish()
-});
-
-/**
- * Response Read Warnings Api Projects  Project Id  Warnings Get
- *
- * Successful Response
- */
-export const zReadWarningsApiProjectsProjectIdWarningsGetResponse = z.array(zWarningRead);
-
-export const zScanWarningsApiProjectsProjectIdWarningsScanPostPath = z.object({
-    project_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zScanWarningsApiProjectsProjectIdWarningsScanPostResponse = zWarningScanResponse;
-
-export const zPatchWarningApiProjectsProjectIdWarningsWarningIdPatchBody = zWarningUpdate;
-
-export const zPatchWarningApiProjectsProjectIdWarningsWarningIdPatchPath = z.object({
-    project_id: z.string(),
-    warning_id: z.string()
-});
-
-/**
- * Successful Response
- */
-export const zPatchWarningApiProjectsProjectIdWarningsWarningIdPatchResponse = zWarningRead;
-
-/**
- * Response Health Api Health Get
- *
- * Successful Response
- */
-export const zHealthApiHealthGetResponse = z.record(z.string(), z.unknown());
-
-/**
- * Response Config Api Config Get
- *
- * Successful Response
- */
-export const zConfigApiConfigGetResponse = z.record(z.string(), z.unknown());
-
-/**
- * Response Models Api Models Get
- *
- * Successful Response
- */
-export const zModelsApiModelsGetResponse = z.array(zModelProviderRead);

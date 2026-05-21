@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import {
+  validateBoardBodySchema,
   generationJobResponseSchema,
   generationBoardResponseSchema,
   createGenerationJobBodySchema,
@@ -63,7 +64,7 @@ export const generationModule = new Elysia({
     return board;
   }, {
     params: { projectId: "string", boardId: "string" },
-    body: "optional",
+    body: validateBoardBodySchema,
     response: generationBoardResponseSchema,
     detail: { operationId: "validateGenerationBoard", summary: "Validate a board" },
   })

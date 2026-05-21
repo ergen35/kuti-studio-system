@@ -20,20 +20,20 @@ Kuti Studio centralise l'écriture, la conception des personnages, l'organisatio
 
 ## Stack technique
 
-| Couche | Technologie |
-|--------|-------------|
-| **Backend** | Bun + ElysiaJS + Prisma + PostgreSQL |
-| **Frontend** | React Router v7 + TanStack Query + Zustand |
-| **Background Jobs** | Inngest (durable execution) |
-| **Auth** | Better Auth |
-| **Storage** | Filesystem local |
+| Couche              | Technologie                                |
+| ------------------- | ------------------------------------------ |
+| **Backend**         | Bun + ElysiaJS + Prisma + PostgreSQL       |
+| **Frontend**        | React Router v7 + TanStack Query + Zustand |
+| **Background Jobs** | Inngest (durable execution)                |
+| **Auth**            | Better Auth                                |
+| **Storage**         | Filesystem local                           |
 
 ## Démarrage rapide
 
 ### Prérequis
 
-- Bun 1.1+
-- PostgreSQL 15+
+- Bun 1.3+
+- PostgreSQL 17+
 - Redis 7+ (optionnel)
 
 ### Installation
@@ -91,23 +91,24 @@ yarn dev
 
 ## Modules backend
 
-| Module | Endpoint | Description |
-|--------|----------|-------------|
-| health | `/api/v1/health` | Santé et configuration |
-| authentication | `/api/v1/auth/*` | Auth Better Auth |
-| projects | `/api/v1/projects` | Projets |
-| characters | `/api/v1/projects/:id/characters` | Personnages |
-| story | `/api/v1/projects/:id/story/*` | Tomes/Chapitres/Scènes |
-| generation | `/api/v1/projects/:id/generation` | Génération IA |
-| assets | `/api/v1/projects/:id/assets` | Médias |
-| exports | `/api/v1/projects/:id/exports` | Exports |
-| versions | `/api/v1/projects/:id/versions` | Historique |
-| warnings | `/api/v1/projects/:id/warnings` | Cohérence |
-| inngest | `/api/inngest` | Workflows |
+| Module         | Endpoint                          | Description            |
+| -------------- | --------------------------------- | ---------------------- |
+| health         | `/api/v1/health`                  | Santé et configuration |
+| authentication | `/api/v1/auth/*`                  | Auth Better Auth       |
+| projects       | `/api/v1/projects`                | Projets                |
+| characters     | `/api/v1/projects/:id/characters` | Personnages            |
+| story          | `/api/v1/projects/:id/story/*`    | Tomes/Chapitres/Scènes |
+| generation     | `/api/v1/projects/:id/generation` | Génération IA          |
+| assets         | `/api/v1/projects/:id/assets`     | Médias                 |
+| exports        | `/api/v1/projects/:id/exports`    | Exports                |
+| versions       | `/api/v1/projects/:id/versions`   | Historique             |
+| warnings       | `/api/v1/projects/:id/warnings`   | Cohérence              |
+| inngest        | `/api/inngest`                    | Workflows              |
 
 ## Commandes utiles
 
 ### Backend
+
 ```bash
 cd kuti-backend-v2
 bun run dev              # Démarrer
@@ -117,6 +118,7 @@ bun run typecheck        # TypeScript
 ```
 
 ### Frontend
+
 ```bash
 cd kuti-frontend
 yarn dev                 # Démarrer

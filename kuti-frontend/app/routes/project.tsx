@@ -35,6 +35,34 @@ export default function ProjectRoute() {
     { key: "settings", title: t('workspaces.settings.title'), desc: t('workspaces.settings.description') },
   ];
 
+  // Helper to access properties with both camelCase and snake_case support
+  const getProjectPath = (data: typeof project.data) => {
+    if (!data) return "";
+    // @ts-expect-error - support both snake_case and camelCase
+    return data.rootPath || data.root_path || "";
+  };
+
+  const getProjectUpdatedAt = (data: typeof project.data) => {
+    if (!data) return null;
+    // @ts-expect-error - support both snake_case and camelCase
+    return data.updatedAt || data.updated_at || null;
+  };
+
+  const getProjectLastOpenedAt = (data: typeof project.data) => {
+    if (!data) return null;
+    // @ts-expect-error - support both snake_case and camelCase
+    return data.lastOpenedAt || data.last_opened_at || null;
+  };
+
+  // Helper for characters data (handles both array and { items: [...] })
+  const getCharactersCount = () => {
+    const data = characters.data;
+    if (!data) return "-";
+    // @ts-expect-error - support both formats
+    const items = Array.isArray(data) ? data : (data.items || []);
+    return items.length;
+  };
+
   return (
     <AppShell>
       {project.isLoading ? <LoadingState /> : null}
@@ -43,13 +71,13 @@ export default function ProjectRoute() {
         <>
           <PageHeader
             title={project.data.name}
-            description={t('meta.description', { slug: project.data.slug, path: project.data.root_path })}
+            description={t('meta.description', { slug: project.data.slug, path: getProjectPath(project.data) })}
             actions={<Badge>{project.data.status}</Badge>}
           />
           <div className="mb-4 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
-            <Stat value={characters.data?.items.length ?? "-"} label={t('stats.characters')} />
-            <Stat value={story.data?.scenes.length ?? "-"} label={t('stats.scenes')} />
-            <Stat value={warnings.data?.filter((item) => item.status === "open").length ?? "-"} label={t('stats.warnings')} />
+            <Stat value={getCharactersCount()} label={t('stats.characters')} />
+            <Stat value={story.data?.scenes?.length ?? "-"} label={t('stats.scenes')} />
+            <Stat value={warnings.data?.filter?.((item: { status: string }) => item.status === "open").length ?? "-"} label={t('stats.warnings')} />
             <Stat value={versions.data?.length ?? "-"} label={t('stats.versions')} />
           </div>
           <div className="grid gap-3 lg:grid-cols-3">
@@ -71,8 +99,8 @@ export default function ProjectRoute() {
             </Card>
             <Card>
               <SectionTitle title={t('recent.production.title')} meta={`${jobs.data?.length ?? 0} ${t('recent.production.jobs')} · ${exports.data?.length ?? 0} ${t('recent.production.exports')}`} />
-              <p className="text-xs leading-5 text-muted">{t('common:meta.updated')} {dateLabel(project.data.updated_at)}</p>
-              <p className="text-xs leading-5 text-muted">{t('meta.lastOpened')} {dateLabel(project.data.last_opened_at)}</p>
+              <p className="text-xs leading-5 text-muted">{t('common:meta.updated')} {dateLabel(getProjectUpdatedAt(project.data))}</p>
+              <p className="text-xs leading-5 text-muted">{t('meta.lastOpened')} {dateLabel(getProjectLastOpenedAt(project.data))}</p>
             </Card>
           </div>
         </>

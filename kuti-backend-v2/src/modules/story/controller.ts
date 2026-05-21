@@ -34,14 +34,14 @@ function serializeTome(t: {
 }): TomeResponse {
   return {
     id: t.id,
-    project_id: t.projectId,
+    projectId: t.projectId,
     title: t.title,
     slug: t.slug,
     synopsis: t.synopsis,
     status: t.status as "active" | "draft" | "archived",
-    order_index: t.orderIndex,
-    created_at: t.createdAt.toISOString(),
-    updated_at: t.updatedAt.toISOString(),
+    orderIndex: t.orderIndex,
+    createdAt: t.createdAt.toISOString(),
+    updatedAt: t.updatedAt.toISOString(),
   };
 }
 
@@ -59,15 +59,15 @@ function serializeChapter(c: {
 }): ChapterResponse {
   return {
     id: c.id,
-    project_id: c.projectId,
-    tome_id: c.tomeId,
+    projectId: c.projectId,
+    tomeId: c.tomeId,
     title: c.title,
     slug: c.slug,
     synopsis: c.synopsis,
     status: c.status as "active" | "draft" | "archived",
-    order_index: c.orderIndex,
-    created_at: c.createdAt.toISOString(),
-    updated_at: c.updatedAt.toISOString(),
+    orderIndex: c.orderIndex,
+    createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
   };
 }
 
@@ -93,7 +93,7 @@ function serializeScene(s: {
   // Parser charactersJson et tagsJson si ce sont des strings JSON
   let characters: string[] = [];
   let tags: string[] = [];
-  
+
   try {
     if (typeof s.charactersJson === 'string') {
       characters = JSON.parse(s.charactersJson);
@@ -101,7 +101,7 @@ function serializeScene(s: {
       characters = s.charactersJson as string[];
     }
   } catch { /* ignore */ }
-  
+
   try {
     if (typeof s.tagsJson === 'string') {
       tags = JSON.parse(s.tagsJson);
@@ -109,25 +109,25 @@ function serializeScene(s: {
       tags = s.tagsJson as string[];
     }
   } catch { /* ignore */ }
-  
+
   return {
     id: s.id,
-    project_id: s.projectId,
-    tome_id: s.tomeId,
-    chapter_id: s.chapterId,
+    projectId: s.projectId,
+    tomeId: s.tomeId,
+    chapterId: s.chapterId,
     title: s.title,
     slug: s.slug,
-    scene_type: s.sceneType,
+    sceneType: s.sceneType,
     location: s.location,
     summary: s.summary,
     content: s.content,
     notes: s.notes,
-    characters_json: characters,
-    tags_json: tags,
+    charactersJson: characters,
+    tagsJson: tags,
     status: s.status as "active" | "draft" | "archived",
-    order_index: s.orderIndex,
-    created_at: s.createdAt.toISOString(),
-    updated_at: s.updatedAt.toISOString(),
+    orderIndex: s.orderIndex,
+    createdAt: s.createdAt.toISOString(),
+    updatedAt: s.updatedAt.toISOString(),
   };
 }
 
@@ -206,7 +206,7 @@ export async function getStorySummary(projectId: string) {
     tomes: tomes.map(serializeTome),
     chapters: chapters.map(serializeChapter),
     scenes: scenes.map(serializeScene),
-    orphan_references: orphanReferences,
+    orphanReferences,
   };
 }
 

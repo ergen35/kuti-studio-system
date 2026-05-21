@@ -66,294 +66,294 @@ export type Project = {
   name: string;
   slug: string;
   status: ProjectStatus;
-  root_path: string;
-  settings_json: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-  last_opened_at: string | null;
-  archived_at: string | null;
+  rootPath: string;
+  settingsJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  lastOpenedAt: string | null;
+  archivedAt: string | null;
 };
 
 export type ProjectListResponse = { items: Project[] };
 
 export type Character = {
   id: string;
-  project_id: string;
+  projectId: string;
   slug: string;
   name: string;
   alias: string | null;
-  narrative_role: string | null;
+  narrativeRole: string | null;
   description: string;
-  physical_description: string;
-  color_palette_json: string[];
-  costume_elements_json: string[];
-  key_traits_json: string[];
+  physicalDescription: string;
+  colorPaletteJson: string[];
+  costumeElementsJson: string[];
+  keyTraitsJson: string[];
   personality: string;
-  narrative_arc: string;
-  tags_json: string[];
+  narrativeArc: string;
+  tagsJson: string[];
   status: CharacterStatus;
-  created_at: string;
-  updated_at: string;
-  archived_at: string | null;
+  createdAt: string;
+  updatedAt: string;
+  archivedAt: string | null;
 };
 
 export type CharacterRelation = {
   id: string;
-  project_id: string;
-  source_character_id: string;
-  target_character_id: string;
-  relation_type: string;
+  projectId: string;
+  sourceCharacterId: string;
+  targetCharacterId: string;
+  relationType: string;
   strength: number;
-  narrative_dependency: string;
+  narrativeDependency: string;
   notes: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type VoiceSample = {
   id: string;
-  project_id: string;
-  character_id: string;
-  asset_path: string | null;
+  projectId: string;
+  characterId: string;
+  assetPath: string | null;
   label: string;
-  voice_notes: string;
-  created_at: string;
+  voiceNotes: string;
+  createdAt: string;
 };
 
 export type CharacterImage = {
   id: string;
-  project_id: string;
-  character_id: string;
-  file_path: string;
-  file_name: string;
-  file_size: number | null;
-  mime_type: string;
+  projectId: string;
+  characterId: string;
+  filePath: string;
+  fileName: string;
+  fileSize: number | null;
+  mimeType: string;
   prompt: string;
   strategy: string | null;
   style: string | null;
-  variation_index: number | null;
-  created_at: string;
+  variationIndex: number | null;
+  createdAt: string;
 };
 
 export type CharacterDetail = Character & {
-  relationships_summary: string | null;
+  relationshipsSummary: string | null;
   relations: CharacterRelation[];
-  voice_samples: VoiceSample[];
+  voiceSamples: VoiceSample[];
   images?: CharacterImage[];
 };
 
 export type Tome = {
   id: string;
-  project_id: string;
+  projectId: string;
   title: string;
   slug: string;
   synopsis: string;
   status: StoryStatus;
-  order_index: number;
-  created_at: string;
-  updated_at: string;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Chapter = {
   id: string;
-  project_id: string;
-  tome_id: string;
+  projectId: string;
+  tomeId: string;
   title: string;
   slug: string;
   synopsis: string;
   status: StoryStatus;
-  order_index: number;
-  created_at: string;
-  updated_at: string;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Scene = {
   id: string;
-  project_id: string;
-  tome_id: string;
-  chapter_id: string;
+  projectId: string;
+  tomeId: string;
+  chapterId: string;
   title: string;
   slug: string;
-  scene_type: string;
+  sceneType: string;
   location: string;
   summary: string;
   content: string;
   notes: string;
-  characters_json: string[];
-  tags_json: string[];
+  charactersJson: string[];
+  tagsJson: string[];
   status: StoryStatus;
-  order_index: number;
-  created_at: string;
-  updated_at: string;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type StoryReference = {
   id: string;
-  project_id: string;
-  scene_id: string;
-  reference_kind: string;
-  target_slug: string;
-  raw_token: string;
-  created_at: string;
+  projectId: string;
+  sceneId: string;
+  referenceKind: string;
+  targetSlug: string;
+  rawToken: string;
+  createdAt: string;
 };
 
 export type StorySummary = {
   tomes: Tome[];
   chapters: Chapter[];
   scenes: Scene[];
-  orphan_references: { reference: StoryReference; reason: string }[];
+  orphanReferences: { reference: StoryReference; reason: string }[];
 };
 
 export type Asset = {
   id: string;
-  project_id: string;
+  projectId: string;
   slug: string;
   name: string;
-  original_filename: string;
-  mime_type: string;
+  originalFilename: string;
+  mimeType: string;
   checksum: string;
-  size_bytes: number;
-  storage_path: string;
+  sizeBytes: number;
+  storagePath: string;
   description: string;
-  tags_json: string[];
+  tagsJson: string[];
   status: "active" | "archived";
-  created_at: string;
-  updated_at: string;
-  archived_at: string | null;
+  createdAt: string;
+  updatedAt: string;
+  archivedAt: string | null;
 };
 
 export type AssetLink = {
   id: string;
-  project_id: string;
-  asset_id: string;
-  target_kind: string;
-  target_id: string;
+  projectId: string;
+  assetId: string;
+  targetKind: string;
+  targetId: string;
   note: string;
-  created_at: string;
+  createdAt: string;
 };
 
 export type AssetDetail = Asset & { links: AssetLink[] };
 
 export type Warning = {
   id: string;
-  project_id: string;
+  projectId: string;
   fingerprint: string;
   kind: string;
   severity: WarningSeverity;
   status: WarningStatus;
   title: string;
   message: string;
-  entity_kind: string;
-  entity_id: string;
-  metadata_json: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-  resolved_at: string | null;
+  entityKind: string;
+  entityId: string;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt: string | null;
 };
 
 export type Version = {
   id: string;
-  project_id: string;
-  branch_name: string;
-  version_index: number;
+  projectId: string;
+  branchName: string;
+  versionIndex: number;
   label: string;
   summary: string;
-  created_at: string;
+  createdAt: string;
 };
 
 export type VersionBranch = {
-  branch_name: string;
-  version_count: number;
-  latest_version_id: string | null;
-  latest_created_at: string | null;
+  branchName: string;
+  versionCount: number;
+  latestVersionId: string | null;
+  latestCreatedAt: string | null;
 };
 
 export type ExportRecord = {
   id: string;
-  project_id: string;
+  projectId: string;
   kind: ExportKind;
   format: ExportFormat;
   status: "pending" | "ready" | "failed";
   label: string;
   summary: string;
-  artifact_path: string | null;
-  artifact_name: string | null;
-  metadata_json: Record<string, unknown>;
-  size_bytes: number | null;
-  created_at: string;
-  updated_at: string;
-  completed_at: string | null;
-  failed_at: string | null;
-  error_message: string | null;
+  artifactPath: string | null;
+  artifactName: string | null;
+  metadataJson: Record<string, unknown>;
+  sizeBytes: number | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+  failedAt: string | null;
+  errorMessage: string | null;
 };
 
 export type ModelProvider = {
   key: string;
   kind: string;
-  display_name: string;
-  base_url: string | null;
+  displayName: string;
+  baseUrl: string | null;
   enabled: boolean;
   configured: boolean;
-  has_api_key: boolean;
+  hasApiKey: boolean;
 };
 
 export type GenerationPanel = {
   id: string;
-  board_id: string;
-  step_id: string | null;
-  order_index: number;
+  boardId: string;
+  stepId: string | null;
+  orderIndex: number;
   title: string;
   caption: string;
   prompt: string;
   status: string;
-  image_path: string;
-  image_name: string;
-  metadata_json: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
+  imagePath: string;
+  imageName: string;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type GenerationBoard = {
   id: string;
-  project_id: string;
-  job_id: string;
-  source_kind: string;
+  projectId: string;
+  jobId: string;
+  sourceKind: string;
   strategy: string;
   title: string;
   summary: string;
   status: string;
-  artifact_path: string | null;
-  artifact_name: string | null;
-  metadata_json: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-  validated_at: string | null;
+  artifactPath: string | null;
+  artifactName: string | null;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  validatedAt: string | null;
   panels: GenerationPanel[];
 };
 
 export type GenerationJob = {
   id: string;
-  project_id: string;
-  source_kind: string;
-  source_id: string;
-  source_label: string;
-  source_version_id: string | null;
+  projectId: string;
+  sourceKind: string;
+  sourceId: string;
+  sourceLabel: string;
+  sourceVersionId: string | null;
   strategy: string;
-  model_key: string | null;
-  model_name: string | null;
-  model_kind: string | null;
+  modelKey: string | null;
+  modelName: string | null;
+  modelKind: string | null;
   entrypoint: string;
   title: string;
   prompt: string;
   summary: string;
   status: string;
   progress: number;
-  metadata_json: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-  completed_at: string | null;
-  failed_at: string | null;
-  error_message: string | null;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+  failedAt: string | null;
+  errorMessage: string | null;
   board: GenerationBoard | null;
 };
 
@@ -363,49 +363,49 @@ export type GenerationJob = {
 
 export type SceneGenerationConfig = {
   id: string;
-  project_id: string;
+  projectId: string;
   name: string;
-  is_default: boolean;
-  system_prompt: string;
-  style_preset: "shonen" | "shojo" | "seinen" | "generic";
-  color_mode: "bw" | "color" | "spot_color";
-  default_image_count: number;
-  allow_multi_page: boolean;
-  metadata_json: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
+  isDefault: boolean;
+  systemPrompt: string;
+  stylePreset: "shonen" | "shojo" | "seinen" | "generic";
+  colorMode: "bw" | "color" | "spot_color";
+  defaultImageCount: number;
+  allowMultiPage: boolean;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type SceneMangaPage = {
   id: string;
-  project_id: string;
-  scene_id: string;
-  tome_id: string;
-  chapter_id: string;
-  job_id: string;
-  board_id: string;
-  panel_id: string;
-  page_number: number;
+  projectId: string;
+  sceneId: string;
+  tomeId: string;
+  chapterId: string;
+  jobId: string;
+  boardId: string;
+  panelId: string;
+  pageNumber: number;
   label: string;
   status: "draft" | "selected" | "rejected";
-  image_url: string | null;
+  imageUrl: string | null;
   caption: string | null;
   prompt: string | null;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type SceneGenerationListResponse = {
-  scene_id: string;
+  sceneId: string;
   pages: SceneMangaPage[];
-  total_pages: number;
+  totalPages: number;
 };
 
 export type PromptPreviewResponse = {
-  system_prompt: string;
-  scene_section: string;
-  full_prompt: string;
-  character_summaries: { slug: string; name: string; has_reference: boolean; summary: string }[];
+  systemPrompt: string;
+  sceneSection: string;
+  fullPrompt: string;
+  characterSummaries: { slug: string; name: string; hasReference: boolean; summary: string }[];
   warnings: string[];
 };
 
@@ -413,9 +413,9 @@ export const api = {
   health: () => request<Record<string, unknown>>("/health"),
   models: () => request<ModelProvider[]>("/models"),
   projects: () => request<ProjectListResponse>("/projects"),
-  createProject: (body: { name: string; status?: ProjectStatus; settings_json?: Record<string, unknown> }) => request<Project>("/projects", { method: "POST", body }),
+  createProject: (body: { name: string; status?: ProjectStatus; settingsJson?: Record<string, unknown> }) => request<Project>("/projects", { method: "POST", body }),
   project: (projectId: string) => request<Project>(`/projects/${projectId}`),
-  updateProject: (projectId: string, body: Partial<Pick<Project, "name" | "status" | "settings_json">>) => request<Project>(`/projects/${projectId}`, { method: "PATCH", body }),
+  updateProject: (projectId: string, body: Partial<Pick<Project, "name" | "status" | "settingsJson">>) => request<Project>(`/projects/${projectId}`, { method: "PATCH", body }),
   openProject: (projectId: string) => request<Project>(`/projects/${projectId}/open`, { method: "POST" }),
   archiveProject: (projectId: string) => request<Project>(`/projects/${projectId}/archive`, { method: "POST" }),
   cloneProject: (projectId: string, body: { name?: string }) => request<Project>(`/projects/${projectId}/clone`, { method: "POST", body }),
@@ -426,9 +426,9 @@ export const api = {
   updateCharacter: (projectId: string, characterId: string, body: Partial<Character>) => request<Character>(`/projects/${projectId}/characters/${characterId}`, { method: "PATCH", body }),
   archiveCharacter: (projectId: string, characterId: string) => request<Character>(`/projects/${projectId}/characters/${characterId}/archive`, { method: "POST" }),
   deleteCharacter: (projectId: string, characterId: string) => request<void>(`/projects/${projectId}/characters/${characterId}`, { method: "DELETE" }),
-  createRelation: (projectId: string, characterId: string, body: { source_character_id: string; target_character_id: string; relation_type: string; strength: number; narrative_dependency?: string; notes?: string }) => request<CharacterRelation>(`/projects/${projectId}/characters/${characterId}/relations`, { method: "POST", body }),
-  createVoiceSample: (projectId: string, characterId: string, body: { label: string; asset_path?: string; voice_notes?: string }) => request<VoiceSample>(`/projects/${projectId}/characters/${characterId}/voice-samples`, { method: "POST", body }),
-  generateCharacterImage: (projectId: string, characterId: string, body: { strategy?: string; style?: string; image_count?: number; model_key?: string }) => request<GenerationJob>(`/projects/${projectId}/characters/${characterId}/generate-image`, { method: "POST", body }),
+  createRelation: (projectId: string, characterId: string, body: { sourceCharacterId: string; targetCharacterId: string; relationType: string; strength: number; narrativeDependency?: string; notes?: string }) => request<CharacterRelation>(`/projects/${projectId}/characters/${characterId}/relations`, { method: "POST", body }),
+  createVoiceSample: (projectId: string, characterId: string, body: { label: string; assetPath?: string; voiceNotes?: string }) => request<VoiceSample>(`/projects/${projectId}/characters/${characterId}/voice-samples`, { method: "POST", body }),
+  generateCharacterImage: (projectId: string, characterId: string, body: { strategy?: string; style?: string; imageCount?: number; modelKey?: string }) => request<GenerationJob>(`/projects/${projectId}/characters/${characterId}/generate-image`, { method: "POST", body }),
   characterImages: (projectId: string, characterId: string) => request<{ items: CharacterImage[] }>(`/projects/${projectId}/characters/${characterId}/images`),
   projectCharacterImages: (projectId: string) => request<Record<string, CharacterImage[]>>(`/projects/${projectId}/characters/images`),
   deleteCharacterImage: (projectId: string, characterId: string, imageId: string) => request<void>(`/projects/${projectId}/characters/${characterId}/images/${imageId}`, { method: "DELETE" }),
@@ -438,21 +438,21 @@ export const api = {
 
   story: (projectId: string) => request<StorySummary>(`/projects/${projectId}/story`),
   references: (projectId: string) => request<StoryReference[]>(`/projects/${projectId}/story/references`),
-  createTome: (projectId: string, body: { title: string; synopsis?: string; status?: StoryStatus; order_index?: number }) => request<Tome>(`/projects/${projectId}/story/tomes`, { method: "POST", body }),
+  createTome: (projectId: string, body: { title: string; synopsis?: string; status?: StoryStatus; orderIndex?: number }) => request<Tome>(`/projects/${projectId}/story/tomes`, { method: "POST", body }),
   updateTome: (projectId: string, tomeId: string, body: Partial<Tome>) => request<Tome>(`/projects/${projectId}/story/tomes/${tomeId}`, { method: "PATCH", body }),
-  createChapter: (projectId: string, body: { tome_id: string; title: string; synopsis?: string; status?: StoryStatus; order_index?: number }) => request<Chapter>(`/projects/${projectId}/story/chapters`, { method: "POST", body }),
+  createChapter: (projectId: string, body: { tomeId: string; title: string; synopsis?: string; status?: StoryStatus; orderIndex?: number }) => request<Chapter>(`/projects/${projectId}/story/chapters`, { method: "POST", body }),
   updateChapter: (projectId: string, chapterId: string, body: Partial<Chapter>) => request<Chapter>(`/projects/${projectId}/story/chapters/${chapterId}`, { method: "PATCH", body }),
-  createScene: (projectId: string, body: Partial<Scene> & { tome_id: string; chapter_id: string; title: string }) => request<Scene>(`/projects/${projectId}/story/scenes`, { method: "POST", body }),
+  createScene: (projectId: string, body: Partial<Scene> & { tomeId: string; chapterId: string; title: string }) => request<Scene>(`/projects/${projectId}/story/scenes`, { method: "POST", body }),
   updateScene: (projectId: string, sceneId: string, body: Partial<Scene>) => request<Scene>(`/projects/${projectId}/story/scenes/${sceneId}`, { method: "PATCH", body }),
   deleteScene: (projectId: string, sceneId: string) => request<void>(`/projects/${projectId}/story/scenes/${sceneId}`, { method: "DELETE" }),
 
   assets: (projectId: string) => request<{ items: Asset[] }>(`/projects/${projectId}/assets`),
   asset: (projectId: string, assetId: string) => request<AssetDetail>(`/projects/${projectId}/assets/${assetId}`),
-  importAsset: (projectId: string, body: { source_path: string; name?: string; description?: string; tags_json?: string[]; mime_type?: string }) => request<Asset>(`/projects/${projectId}/assets/import`, { method: "POST", body }),
+  importAsset: (projectId: string, body: { sourcePath: string; name?: string; description?: string; tagsJson?: string[]; mimeType?: string }) => request<Asset>(`/projects/${projectId}/assets/import`, { method: "POST", body }),
   updateAsset: (projectId: string, assetId: string, body: Partial<Asset>) => request<Asset>(`/projects/${projectId}/assets/${assetId}`, { method: "PATCH", body }),
   archiveAsset: (projectId: string, assetId: string) => request<Asset>(`/projects/${projectId}/assets/${assetId}/archive`, { method: "POST" }),
   deleteAsset: (projectId: string, assetId: string) => request<void>(`/projects/${projectId}/assets/${assetId}`, { method: "DELETE" }),
-  createAssetLink: (projectId: string, assetId: string, body: { asset_id: string; target_kind: string; target_id: string; note?: string }) => request<AssetLink>(`/projects/${projectId}/assets/${assetId}/links`, { method: "POST", body }),
+  createAssetLink: (projectId: string, assetId: string, body: { assetId: string; targetKind: string; targetId: string; note?: string }) => request<AssetLink>(`/projects/${projectId}/assets/${assetId}/links`, { method: "POST", body }),
 
   warnings: (projectId: string) => request<Warning[]>(`/projects/${projectId}/warnings`),
   scanWarnings: (projectId: string) => request<{ items: Warning[] }>(`/projects/${projectId}/warnings/scan`, { method: "POST" }),
@@ -460,7 +460,7 @@ export const api = {
 
   versions: (projectId: string) => request<Version[]>(`/projects/${projectId}/versions`),
   branches: (projectId: string) => request<VersionBranch[]>(`/projects/${projectId}/versions/branches`),
-  createVersion: (projectId: string, body: { branch_name?: string; label?: string; summary?: string }) => request<Version>(`/projects/${projectId}/versions`, { method: "POST", body }),
+  createVersion: (projectId: string, body: { branchName?: string; label?: string; summary?: string }) => request<Version>(`/projects/${projectId}/versions`, { method: "POST", body }),
   restoreVersion: (projectId: string, versionId: string, body?: { label?: string; summary?: string }) => request<Version>(`/projects/${projectId}/versions/${versionId}/restore`, { method: "POST", body: body ?? {} }),
 
   exports: (projectId: string) => request<ExportRecord[]>(`/projects/${projectId}/exports`),
@@ -468,20 +468,20 @@ export const api = {
 
   generationJobs: (projectId: string) => request<GenerationJob[]>(`/projects/${projectId}/generation/jobs`),
   generationBoards: (projectId: string) => request<GenerationBoard[]>(`/projects/${projectId}/generation/boards`),
-  createGenerationJob: (projectId: string, body: { source_kind: string; source_id: string; strategy: string; model_key?: string; mode?: string; selection_ids?: string[]; grid_rows?: number; grid_cols?: number; image_count?: number; title?: string; summary?: string }) => request<GenerationJob>(`/projects/${projectId}/generation/jobs`, { method: "POST", body }),
+  createGenerationJob: (projectId: string, body: { sourceKind: string; sourceId: string; strategy: string; modelKey?: string; mode?: string; selectionIds?: string[]; gridRows?: number; gridCols?: number; imageCount?: number; title?: string; summary?: string }) => request<GenerationJob>(`/projects/${projectId}/generation/jobs`, { method: "POST", body }),
   validateBoard: (projectId: string, boardId: string, body?: { note?: string }) => request<GenerationBoard>(`/projects/${projectId}/generation/boards/${boardId}/validate`, { method: "POST", body: body ?? {} }),
   updatePanel: (projectId: string, boardId: string, panelId: string, body: { status?: string; caption?: string; title?: string }) => request<GenerationPanel>(`/projects/${projectId}/generation/boards/${boardId}/panels/${panelId}`, { method: "PATCH", body }),
 
   // Scene Generation (Manga)
   sceneGenerationConfigs: (projectId: string, sceneId: string) => request<SceneGenerationConfig[]>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs`),
-  createSceneGenerationConfig: (projectId: string, sceneId: string, body: { name: string; is_default?: boolean; system_prompt: string; style_preset?: string; color_mode?: string; default_image_count?: number; allow_multi_page?: boolean; metadata_json?: Record<string, unknown> }) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs`, { method: "POST", body }),
-  updateSceneGenerationConfig: (projectId: string, sceneId: string, configId: string, body: Partial<Omit<SceneGenerationConfig, 'id' | 'project_id' | 'created_at' | 'updated_at'>>) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}`, { method: "PATCH", body }),
+  createSceneGenerationConfig: (projectId: string, sceneId: string, body: { name: string; isDefault?: boolean; systemPrompt: string; stylePreset?: string; colorMode?: string; defaultImageCount?: number; allowMultiPage?: boolean; metadataJson?: Record<string, unknown> }) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs`, { method: "POST", body }),
+  updateSceneGenerationConfig: (projectId: string, sceneId: string, configId: string, body: Partial<Omit<SceneGenerationConfig, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>>) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}`, { method: "PATCH", body }),
   deleteSceneGenerationConfig: (projectId: string, sceneId: string, configId: string) => request<void>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}`, { method: "DELETE" }),
   setDefaultSceneGenerationConfig: (projectId: string, sceneId: string, configId: string) => request<SceneGenerationConfig>(`/projects/${projectId}/story/scenes/${sceneId}/generation-configs/${configId}/set-default`, { method: "POST" }),
-  
-  generateSceneManga: (projectId: string, sceneId: string, body: { config_id?: string; image_count?: number; style_override?: Record<string, unknown>; character_image_refs?: Record<string, string>; additional_context?: string }) => request<{ job_id: string; status: string; message: string }>(`/projects/${projectId}/story/scenes/${sceneId}/generate`, { method: "POST", body }),
-  previewScenePrompt: (projectId: string, sceneId: string, body: { config_id?: string; character_image_refs?: Record<string, string>; additional_context?: string }) => request<PromptPreviewResponse>(`/projects/${projectId}/story/scenes/${sceneId}/preview-prompt`, { method: "POST", body }),
-  
+
+  generateSceneManga: (projectId: string, sceneId: string, body: { configId?: string; imageCount?: number; styleOverride?: Record<string, unknown>; characterImageRefs?: Record<string, string>; additionalContext?: string }) => request<{ jobId: string; status: string; message: string }>(`/projects/${projectId}/story/scenes/${sceneId}/generate`, { method: "POST", body }),
+  previewScenePrompt: (projectId: string, sceneId: string, body: { configId?: string; characterImageRefs?: Record<string, string>; additionalContext?: string }) => request<PromptPreviewResponse>(`/projects/${projectId}/story/scenes/${sceneId}/preview-prompt`, { method: "POST", body }),
+
   sceneMangaPages: (projectId: string, sceneId: string) => request<SceneGenerationListResponse>(`/projects/${projectId}/story/scenes/${sceneId}/manga-pages`),
   updateSceneMangaPage: (projectId: string, sceneId: string, pageId: string, body: { label?: string; status?: 'draft' | 'selected' | 'rejected' }) => request<SceneMangaPage>(`/projects/${projectId}/story/scenes/${sceneId}/manga-pages/${pageId}`, { method: "PATCH", body }),
   deleteSceneMangaPage: (projectId: string, sceneId: string, pageId: string) => request<void>(`/projects/${projectId}/story/scenes/${sceneId}/manga-pages/${pageId}`, { method: "DELETE" }),

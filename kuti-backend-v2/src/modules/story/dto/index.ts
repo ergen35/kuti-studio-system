@@ -6,14 +6,14 @@ export type StoryStatus = z.infer<typeof storyStatusSchema>;
 // Tome
 export const tomeResponseSchema = z.object({
   id: z.string(),
-  project_id: z.string(),
+  projectId: z.string(),
   title: z.string(),
   slug: z.string(),
   synopsis: z.string(),
   status: storyStatusSchema,
-  order_index: z.number(),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  orderIndex: z.number(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const createTomeBodySchema = z.object({
@@ -33,15 +33,15 @@ export const updateTomeBodySchema = z.object({
 // Chapter
 export const chapterResponseSchema = z.object({
   id: z.string(),
-  project_id: z.string(),
-  tome_id: z.string(),
+  projectId: z.string(),
+  tomeId: z.string(),
   title: z.string(),
   slug: z.string(),
   synopsis: z.string(),
   status: storyStatusSchema,
-  order_index: z.number(),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  orderIndex: z.number(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const createChapterBodySchema = z.object({
@@ -63,22 +63,22 @@ export const updateChapterBodySchema = z.object({
 // Scene
 export const sceneResponseSchema = z.object({
   id: z.string(),
-  project_id: z.string(),
-  tome_id: z.string(),
-  chapter_id: z.string(),
+  projectId: z.string(),
+  tomeId: z.string(),
+  chapterId: z.string(),
   title: z.string(),
   slug: z.string(),
-  scene_type: z.string(),
+  sceneType: z.string(),
   location: z.string(),
   summary: z.string(),
   content: z.string(),
   notes: z.string(),
-  characters_json: z.array(z.string()),
-  tags_json: z.array(z.string()),
+  charactersJson: z.array(z.string()),
+  tagsJson: z.array(z.string()),
   status: storyStatusSchema,
-  order_index: z.number(),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  orderIndex: z.number(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const createSceneBodySchema = z.object({
@@ -111,22 +111,22 @@ export const updateSceneBodySchema = z.object({
   orderIndex: z.number().optional(),
 });
 
-// Story Summary
+// Story Reference
 export const storyReferenceSchema = z.object({
   id: z.string(),
-  project_id: z.string(),
-  scene_id: z.string(),
-  reference_kind: z.string(),
-  target_slug: z.string(),
-  raw_token: z.string(),
-  created_at: z.string().datetime(),
+  projectId: z.string(),
+  sceneId: z.string(),
+  referenceKind: z.string(),
+  targetSlug: z.string(),
+  rawToken: z.string(),
+  createdAt: z.string().datetime(),
 });
 
 export const storySummaryResponseSchema = z.object({
   tomes: z.array(tomeResponseSchema),
   chapters: z.array(chapterResponseSchema),
   scenes: z.array(sceneResponseSchema),
-  orphan_references: z.array(z.object({
+  orphanReferences: z.array(z.object({
     reference: storyReferenceSchema,
     reason: z.string(),
   })),
@@ -144,3 +144,9 @@ export const StorySummaryResponse = storySummaryResponseSchema;
 export type TomeResponse = z.infer<typeof tomeResponseSchema>;
 export type ChapterResponse = z.infer<typeof chapterResponseSchema>;
 export type SceneResponse = z.infer<typeof sceneResponseSchema>;
+export type CreateTomeBody = z.infer<typeof createTomeBodySchema>;
+export type UpdateTomeBody = z.infer<typeof updateTomeBodySchema>;
+export type CreateChapterBody = z.infer<typeof createChapterBodySchema>;
+export type UpdateChapterBody = z.infer<typeof updateChapterBodySchema>;
+export type CreateSceneBody = z.infer<typeof createSceneBodySchema>;
+export type UpdateSceneBody = z.infer<typeof updateSceneBodySchema>;

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostData, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostErrors, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostResponses, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostData, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostErrors, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostResponses, ArchiveProjectRouteApiProjectsProjectIdArchivePostData, ArchiveProjectRouteApiProjectsProjectIdArchivePostErrors, ArchiveProjectRouteApiProjectsProjectIdArchivePostResponses, CloneProjectRouteApiProjectsProjectIdClonePostData, CloneProjectRouteApiProjectsProjectIdClonePostErrors, CloneProjectRouteApiProjectsProjectIdClonePostResponses, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostData, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostErrors, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostResponses, ConfigApiConfigGetData, ConfigApiConfigGetResponses, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostData, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostErrors, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostResponses, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostData, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostErrors, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostResponses, CreateCharacterRouteApiProjectsProjectIdCharactersPostData, CreateCharacterRouteApiProjectsProjectIdCharactersPostErrors, CreateCharacterRouteApiProjectsProjectIdCharactersPostResponses, CreateExportRouteApiProjectsProjectIdExportsPostData, CreateExportRouteApiProjectsProjectIdExportsPostErrors, CreateExportRouteApiProjectsProjectIdExportsPostResponses, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostData, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostErrors, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostResponses, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostData, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostErrors, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostResponses, CreateProjectRouteApiProjectsPostData, CreateProjectRouteApiProjectsPostErrors, CreateProjectRouteApiProjectsPostResponses, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostData, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostErrors, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostResponses, CreateSceneRouteApiProjectsProjectIdStoryScenesPostData, CreateSceneRouteApiProjectsProjectIdStoryScenesPostErrors, CreateSceneRouteApiProjectsProjectIdStoryScenesPostResponses, CreateTomeRouteApiProjectsProjectIdStoryTomesPostData, CreateTomeRouteApiProjectsProjectIdStoryTomesPostErrors, CreateTomeRouteApiProjectsProjectIdStoryTomesPostResponses, CreateVersionRouteApiProjectsProjectIdVersionsPostData, CreateVersionRouteApiProjectsProjectIdVersionsPostErrors, CreateVersionRouteApiProjectsProjectIdVersionsPostResponses, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostData, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostErrors, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostResponses, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteData, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteErrors, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteResponses, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteData, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteErrors, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteResponses, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteData, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteErrors, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteResponses, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteData, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteErrors, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteResponses, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteData, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteErrors, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteResponses, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteData, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteErrors, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteResponses, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteData, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteErrors, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteResponses, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteData, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteErrors, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteResponses, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteData, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteErrors, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteResponses, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteData, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteErrors, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteResponses, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetData, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetErrors, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetResponses, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetData, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetErrors, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetResponses, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostData, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostErrors, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostResponses, ExportProjectRouteApiProjectsProjectIdExportGetData, ExportProjectRouteApiProjectsProjectIdExportGetErrors, ExportProjectRouteApiProjectsProjectIdExportGetResponses, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostData, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostErrors, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostResponses, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostData, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostErrors, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostResponses, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetData, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetErrors, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetResponses, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetData, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetErrors, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ImportAssetRouteApiProjectsProjectIdAssetsImportPostData, ImportAssetRouteApiProjectsProjectIdAssetsImportPostErrors, ImportAssetRouteApiProjectsProjectIdAssetsImportPostResponses, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetData, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetErrors, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetResponses, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetData, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetErrors, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetResponses, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetData, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetErrors, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetResponses, ModelsApiModelsGetData, ModelsApiModelsGetResponses, OpenProjectRouteApiProjectsProjectIdOpenPostData, OpenProjectRouteApiProjectsProjectIdOpenPostErrors, OpenProjectRouteApiProjectsProjectIdOpenPostResponses, PatchProjectApiProjectsProjectIdPatchData, PatchProjectApiProjectsProjectIdPatchErrors, PatchProjectApiProjectsProjectIdPatchResponses, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchData, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchErrors, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchResponses, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostData, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostErrors, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostResponses, ReadAssetApiProjectsProjectIdAssetsAssetIdGetData, ReadAssetApiProjectsProjectIdAssetsAssetIdGetErrors, ReadAssetApiProjectsProjectIdAssetsAssetIdGetResponses, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetData, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetErrors, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetResponses, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetData, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetErrors, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetResponses, ReadAssetsApiProjectsProjectIdAssetsGetData, ReadAssetsApiProjectsProjectIdAssetsGetErrors, ReadAssetsApiProjectsProjectIdAssetsGetResponses, ReadChaptersApiProjectsProjectIdStoryChaptersGetData, ReadChaptersApiProjectsProjectIdStoryChaptersGetErrors, ReadChaptersApiProjectsProjectIdStoryChaptersGetResponses, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetData, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetErrors, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetResponses, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetData, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetErrors, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetResponses, ReadCharactersApiProjectsProjectIdCharactersGetData, ReadCharactersApiProjectsProjectIdCharactersGetErrors, ReadCharactersApiProjectsProjectIdCharactersGetResponses, ReadExportApiProjectsProjectIdExportsExportIdGetData, ReadExportApiProjectsProjectIdExportsExportIdGetErrors, ReadExportApiProjectsProjectIdExportsExportIdGetResponses, ReadExportsApiProjectsProjectIdExportsGetData, ReadExportsApiProjectsProjectIdExportsGetErrors, ReadExportsApiProjectsProjectIdExportsGetResponses, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetData, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetErrors, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetResponses, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetData, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetErrors, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetResponses, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetData, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetErrors, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetResponses, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetData, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetErrors, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetResponses, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetData, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetErrors, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetResponses, ReadProjectApiProjectsProjectIdGetData, ReadProjectApiProjectsProjectIdGetErrors, ReadProjectApiProjectsProjectIdGetResponses, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetData, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetErrors, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetResponses, ReadProjectsApiProjectsGetData, ReadProjectsApiProjectsGetResponses, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetData, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetErrors, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetResponses, ReadScenesApiProjectsProjectIdStoryScenesGetData, ReadScenesApiProjectsProjectIdStoryScenesGetErrors, ReadScenesApiProjectsProjectIdStoryScenesGetResponses, ReadStoryApiProjectsProjectIdStoryGetData, ReadStoryApiProjectsProjectIdStoryGetErrors, ReadStoryApiProjectsProjectIdStoryGetResponses, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetData, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetErrors, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetResponses, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetData, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetErrors, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetResponses, ReadTomesApiProjectsProjectIdStoryTomesGetData, ReadTomesApiProjectsProjectIdStoryTomesGetErrors, ReadTomesApiProjectsProjectIdStoryTomesGetResponses, ReadVersionApiProjectsProjectIdVersionsVersionIdGetData, ReadVersionApiProjectsProjectIdVersionsVersionIdGetErrors, ReadVersionApiProjectsProjectIdVersionsVersionIdGetResponses, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetData, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetErrors, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetResponses, ReadVersionsApiProjectsProjectIdVersionsGetData, ReadVersionsApiProjectsProjectIdVersionsGetErrors, ReadVersionsApiProjectsProjectIdVersionsGetResponses, ReadWarningsApiProjectsProjectIdWarningsGetData, ReadWarningsApiProjectsProjectIdWarningsGetErrors, ReadWarningsApiProjectsProjectIdWarningsGetResponses, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostData, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostErrors, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostResponses, ScanWarningsApiProjectsProjectIdWarningsScanPostData, ScanWarningsApiProjectsProjectIdWarningsScanPostErrors, ScanWarningsApiProjectsProjectIdWarningsScanPostResponses, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostData, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostErrors, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostResponses, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchData, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchErrors, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchResponses, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchData, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchErrors, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchResponses, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchData, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchErrors, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchResponses, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchData, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchErrors, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchResponses, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchData, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchErrors, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchResponses, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchData, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchErrors, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchResponses, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchData, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchErrors, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchResponses, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchData, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchErrors, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchResponses, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchData, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchErrors, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchResponses, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostData, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostErrors, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostResponses } from './types.gen';
+import type { ArchiveAssetData, ArchiveAssetResponses, ArchiveCharacterData, ArchiveCharacterResponses, ArchiveProjectData, ArchiveProjectResponses, CloneProjectData, CloneProjectResponses, CompareVersionsData, CompareVersionsResponses, CreateAssetLinkData, CreateAssetLinkResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVersionData, CreateVersionResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponses, GetCharacterData, GetCharacterImageFileData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, GetVersionData, GetVersionResponses, ImportAssetData, ImportAssetResponses, ListAssetsData, ListAssetsResponses, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RestoreVersionData, RestoreVersionResponses, ScanWarningsData, ScanWarningsResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateAssetData, UpdateAssetResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -19,15 +19,35 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Read Projects
+ * Health check endpoint
  */
-export const readProjectsApiProjectsGet = <ThrowOnError extends boolean = false>(options?: Options<ReadProjectsApiProjectsGetData, ThrowOnError>) => (options?.client ?? client).get<ReadProjectsApiProjectsGetResponses, unknown, ThrowOnError>({ url: '/api/projects', ...options });
+export const getHealth = <ThrowOnError extends boolean = false>(options?: Options<GetHealthData, ThrowOnError>) => (options?.client ?? client).get<GetHealthResponses, unknown, ThrowOnError>({ url: '/api/health', ...options });
 
 /**
- * Create Project Route
+ * Simple health check
  */
-export const createProjectRouteApiProjectsPost = <ThrowOnError extends boolean = false>(options: Options<CreateProjectRouteApiProjectsPostData, ThrowOnError>) => (options.client ?? client).post<CreateProjectRouteApiProjectsPostResponses, CreateProjectRouteApiProjectsPostErrors, ThrowOnError>({
-    url: '/api/projects',
+export const getHealthz = <ThrowOnError extends boolean = false>(options?: Options<GetHealthzData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/healthz', ...options });
+
+/**
+ * Get application configuration
+ */
+export const getConfig = <ThrowOnError extends boolean = false>(options?: Options<GetConfigData, ThrowOnError>) => (options?.client ?? client).get<GetConfigResponses, unknown, ThrowOnError>({ url: '/api/config', ...options });
+
+/**
+ * List available AI model providers
+ */
+export const listModels = <ThrowOnError extends boolean = false>(options?: Options<ListModelsData, ThrowOnError>) => (options?.client ?? client).get<ListModelsResponses, unknown, ThrowOnError>({ url: '/api/models', ...options });
+
+/**
+ * List all projects
+ */
+export const listProjects = <ThrowOnError extends boolean = false>(options?: Options<ListProjectsData, ThrowOnError>) => (options?.client ?? client).get<ListProjectsResponses, unknown, ThrowOnError>({ url: '/api/projects/', ...options });
+
+/**
+ * Create a new project
+ */
+export const createProject = <ThrowOnError extends boolean = false>(options: Options<CreateProjectData, ThrowOnError>) => (options.client ?? client).post<CreateProjectResponses, unknown, ThrowOnError>({
+    url: '/api/projects/',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -36,15 +56,15 @@ export const createProjectRouteApiProjectsPost = <ThrowOnError extends boolean =
 });
 
 /**
- * Read Project
+ * Get a project by ID
  */
-export const readProjectApiProjectsProjectIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadProjectApiProjectsProjectIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadProjectApiProjectsProjectIdGetResponses, ReadProjectApiProjectsProjectIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}', ...options });
+export const getProject = <ThrowOnError extends boolean = false>(options: Options<GetProjectData, ThrowOnError>) => (options.client ?? client).get<GetProjectResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}', ...options });
 
 /**
- * Patch Project
+ * Update a project
  */
-export const patchProjectApiProjectsProjectIdPatch = <ThrowOnError extends boolean = false>(options: Options<PatchProjectApiProjectsProjectIdPatchData, ThrowOnError>) => (options.client ?? client).patch<PatchProjectApiProjectsProjectIdPatchResponses, PatchProjectApiProjectsProjectIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}',
+export const updateProject = <ThrowOnError extends boolean = false>(options: Options<UpdateProjectData, ThrowOnError>) => (options.client ?? client).patch<UpdateProjectResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -53,15 +73,20 @@ export const patchProjectApiProjectsProjectIdPatch = <ThrowOnError extends boole
 });
 
 /**
- * Archive Project Route
+ * Mark project as opened
  */
-export const archiveProjectRouteApiProjectsProjectIdArchivePost = <ThrowOnError extends boolean = false>(options: Options<ArchiveProjectRouteApiProjectsProjectIdArchivePostData, ThrowOnError>) => (options.client ?? client).post<ArchiveProjectRouteApiProjectsProjectIdArchivePostResponses, ArchiveProjectRouteApiProjectsProjectIdArchivePostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/archive', ...options });
+export const openProject = <ThrowOnError extends boolean = false>(options: Options<OpenProjectData, ThrowOnError>) => (options.client ?? client).post<OpenProjectResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/open', ...options });
 
 /**
- * Clone Project Route
+ * Archive a project
  */
-export const cloneProjectRouteApiProjectsProjectIdClonePost = <ThrowOnError extends boolean = false>(options: Options<CloneProjectRouteApiProjectsProjectIdClonePostData, ThrowOnError>) => (options.client ?? client).post<CloneProjectRouteApiProjectsProjectIdClonePostResponses, CloneProjectRouteApiProjectsProjectIdClonePostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/clone',
+export const archiveProject = <ThrowOnError extends boolean = false>(options: Options<ArchiveProjectData, ThrowOnError>) => (options.client ?? client).post<ArchiveProjectResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/archive', ...options });
+
+/**
+ * Clone a project
+ */
+export const cloneProject = <ThrowOnError extends boolean = false>(options: Options<CloneProjectData, ThrowOnError>) => (options.client ?? client).post<CloneProjectResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/clone',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -70,25 +95,20 @@ export const cloneProjectRouteApiProjectsProjectIdClonePost = <ThrowOnError exte
 });
 
 /**
- * Open Project Route
+ * Export project data
  */
-export const openProjectRouteApiProjectsProjectIdOpenPost = <ThrowOnError extends boolean = false>(options: Options<OpenProjectRouteApiProjectsProjectIdOpenPostData, ThrowOnError>) => (options.client ?? client).post<OpenProjectRouteApiProjectsProjectIdOpenPostResponses, OpenProjectRouteApiProjectsProjectIdOpenPostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/open', ...options });
+export const exportProject = <ThrowOnError extends boolean = false>(options: Options<ExportProjectData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/export', ...options });
 
 /**
- * Export Project Route
+ * List all characters
  */
-export const exportProjectRouteApiProjectsProjectIdExportGet = <ThrowOnError extends boolean = false>(options: Options<ExportProjectRouteApiProjectsProjectIdExportGetData, ThrowOnError>) => (options.client ?? client).get<ExportProjectRouteApiProjectsProjectIdExportGetResponses, ExportProjectRouteApiProjectsProjectIdExportGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/export', ...options });
+export const listCharacters = <ThrowOnError extends boolean = false>(options: Options<ListCharactersData, ThrowOnError>) => (options.client ?? client).get<ListCharactersResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/', ...options });
 
 /**
- * Read Assets
+ * Create a character
  */
-export const readAssetsApiProjectsProjectIdAssetsGet = <ThrowOnError extends boolean = false>(options: Options<ReadAssetsApiProjectsProjectIdAssetsGetData, ThrowOnError>) => (options.client ?? client).get<ReadAssetsApiProjectsProjectIdAssetsGetResponses, ReadAssetsApiProjectsProjectIdAssetsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets', ...options });
-
-/**
- * Import Asset Route
- */
-export const importAssetRouteApiProjectsProjectIdAssetsImportPost = <ThrowOnError extends boolean = false>(options: Options<ImportAssetRouteApiProjectsProjectIdAssetsImportPostData, ThrowOnError>) => (options.client ?? client).post<ImportAssetRouteApiProjectsProjectIdAssetsImportPostResponses, ImportAssetRouteApiProjectsProjectIdAssetsImportPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/assets/import',
+export const createCharacter = <ThrowOnError extends boolean = false>(options: Options<CreateCharacterData, ThrowOnError>) => (options.client ?? client).post<CreateCharacterResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/characters/',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -97,20 +117,25 @@ export const importAssetRouteApiProjectsProjectIdAssetsImportPost = <ThrowOnErro
 });
 
 /**
- * Delete Asset Route
+ * Get all character images for project
  */
-export const deleteAssetRouteApiProjectsProjectIdAssetsAssetIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteResponses, DeleteAssetRouteApiProjectsProjectIdAssetsAssetIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets/{asset_id}', ...options });
+export const getProjectCharacterImages = <ThrowOnError extends boolean = false>(options: Options<GetProjectCharacterImagesData, ThrowOnError>) => (options.client ?? client).get<GetProjectCharacterImagesResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/images', ...options });
 
 /**
- * Read Asset
+ * Delete a character
  */
-export const readAssetApiProjectsProjectIdAssetsAssetIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadAssetApiProjectsProjectIdAssetsAssetIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadAssetApiProjectsProjectIdAssetsAssetIdGetResponses, ReadAssetApiProjectsProjectIdAssetsAssetIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets/{asset_id}', ...options });
+export const deleteCharacter = <ThrowOnError extends boolean = false>(options: Options<DeleteCharacterData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}', ...options });
 
 /**
- * Update Asset Route
+ * Get character details
  */
-export const updateAssetRouteApiProjectsProjectIdAssetsAssetIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchResponses, UpdateAssetRouteApiProjectsProjectIdAssetsAssetIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/assets/{asset_id}',
+export const getCharacter = <ThrowOnError extends boolean = false>(options: Options<GetCharacterData, ThrowOnError>) => (options.client ?? client).get<GetCharacterResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}', ...options });
+
+/**
+ * Update a character
+ */
+export const updateCharacter = <ThrowOnError extends boolean = false>(options: Options<UpdateCharacterData, ThrowOnError>) => (options.client ?? client).patch<UpdateCharacterResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/characters/{characterId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -119,25 +144,15 @@ export const updateAssetRouteApiProjectsProjectIdAssetsAssetIdPatch = <ThrowOnEr
 });
 
 /**
- * Archive Asset Route
+ * Archive a character
  */
-export const archiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePost = <ThrowOnError extends boolean = false>(options: Options<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostData, ThrowOnError>) => (options.client ?? client).post<ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostResponses, ArchiveAssetRouteApiProjectsProjectIdAssetsAssetIdArchivePostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets/{asset_id}/archive', ...options });
+export const archiveCharacter = <ThrowOnError extends boolean = false>(options: Options<ArchiveCharacterData, ThrowOnError>) => (options.client ?? client).post<ArchiveCharacterResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}/archive', ...options });
 
 /**
- * Read Asset File
+ * Create a character relation
  */
-export const readAssetFileApiProjectsProjectIdAssetsAssetIdFileGet = <ThrowOnError extends boolean = false>(options: Options<ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetData, ThrowOnError>) => (options.client ?? client).get<ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetResponses, ReadAssetFileApiProjectsProjectIdAssetsAssetIdFileGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets/{asset_id}/file', ...options });
-
-/**
- * Read Asset Links
- */
-export const readAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGet = <ThrowOnError extends boolean = false>(options: Options<ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetData, ThrowOnError>) => (options.client ?? client).get<ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetResponses, ReadAssetLinksApiProjectsProjectIdAssetsAssetIdLinksGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets/{asset_id}/links', ...options });
-
-/**
- * Create Asset Link Route
- */
-export const createAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPost = <ThrowOnError extends boolean = false>(options: Options<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostData, ThrowOnError>) => (options.client ?? client).post<CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostResponses, CreateAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/assets/{asset_id}/links',
+export const createRelation = <ThrowOnError extends boolean = false>(options: Options<CreateRelationData, ThrowOnError>) => (options.client ?? client).post<CreateRelationResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/characters/{characterId}/relations',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -146,20 +161,10 @@ export const createAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksPost = <T
 });
 
 /**
- * Delete Asset Link Route
+ * Create a voice sample
  */
-export const deleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteResponses, DeleteAssetLinkRouteApiProjectsProjectIdAssetsAssetIdLinksLinkIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/assets/{asset_id}/links/{link_id}', ...options });
-
-/**
- * Read Characters
- */
-export const readCharactersApiProjectsProjectIdCharactersGet = <ThrowOnError extends boolean = false>(options: Options<ReadCharactersApiProjectsProjectIdCharactersGetData, ThrowOnError>) => (options.client ?? client).get<ReadCharactersApiProjectsProjectIdCharactersGetResponses, ReadCharactersApiProjectsProjectIdCharactersGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters', ...options });
-
-/**
- * Create Character Route
- */
-export const createCharacterRouteApiProjectsProjectIdCharactersPost = <ThrowOnError extends boolean = false>(options: Options<CreateCharacterRouteApiProjectsProjectIdCharactersPostData, ThrowOnError>) => (options.client ?? client).post<CreateCharacterRouteApiProjectsProjectIdCharactersPostResponses, CreateCharacterRouteApiProjectsProjectIdCharactersPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/characters',
+export const createVoiceSample = <ThrowOnError extends boolean = false>(options: Options<CreateVoiceSampleData, ThrowOnError>) => (options.client ?? client).post<CreateVoiceSampleResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/characters/{characterId}/voice-samples',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -168,27 +173,45 @@ export const createCharacterRouteApiProjectsProjectIdCharactersPost = <ThrowOnEr
 });
 
 /**
- * Read Project Character Images
- *
- * Get all character images for a project, keyed by character_id.
+ * Generate character images
  */
-export const readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet = <ThrowOnError extends boolean = false>(options: Options<ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetData, ThrowOnError>) => (options.client ?? client).get<ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetResponses, ReadProjectCharacterImagesApiProjectsProjectIdCharactersImagesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/images', ...options });
+export const generateCharacterImage = <ThrowOnError extends boolean = false>(options: Options<GenerateCharacterImageData, ThrowOnError>) => (options.client ?? client).post<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}/generate-image', ...options });
 
 /**
- * Delete Character Route
+ * List character images
  */
-export const deleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteResponses, DeleteCharacterRouteApiProjectsProjectIdCharactersCharacterIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}', ...options });
+export const listCharacterImages = <ThrowOnError extends boolean = false>(options: Options<ListCharacterImagesData, ThrowOnError>) => (options.client ?? client).get<ListCharacterImagesResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}/images', ...options });
 
 /**
- * Read Character
+ * Delete a character image
  */
-export const readCharacterApiProjectsProjectIdCharactersCharacterIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetResponses, ReadCharacterApiProjectsProjectIdCharactersCharacterIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}', ...options });
+export const deleteCharacterImage = <ThrowOnError extends boolean = false>(options: Options<DeleteCharacterImageData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}/images/{imageId}', ...options });
 
 /**
- * Update Character Route
+ * Get character image file
  */
-export const updateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchResponses, UpdateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/characters/{character_id}',
+export const getCharacterImageFile = <ThrowOnError extends boolean = false>(options: Options<GetCharacterImageFileData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/characters/{characterId}/images/{imageId}/file', ...options });
+
+/**
+ * Get story summary
+ */
+export const getStorySummary = <ThrowOnError extends boolean = false>(options: Options<GetStorySummaryData, ThrowOnError>) => (options.client ?? client).get<GetStorySummaryResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story', ...options });
+
+/**
+ * Get reference suggestions
+ */
+export const getReferenceSuggestions = <ThrowOnError extends boolean = false>(options?: Options<GetReferenceSuggestionsData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/references/{type}', ...options });
+
+/**
+ * List tomes
+ */
+export const listTomes = <ThrowOnError extends boolean = false>(options: Options<ListTomesData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/tomes', ...options });
+
+/**
+ * Create a tome
+ */
+export const createTome = <ThrowOnError extends boolean = false>(options: Options<CreateTomeData, ThrowOnError>) => (options.client ?? client).post<CreateTomeResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/tomes',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -197,10 +220,15 @@ export const updateCharacterRouteApiProjectsProjectIdCharactersCharacterIdPatch 
 });
 
 /**
- * Duplicate Character Route
+ * Delete a tome
  */
-export const duplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePost = <ThrowOnError extends boolean = false>(options: Options<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostData, ThrowOnError>) => (options.client ?? client).post<DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostResponses, DuplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDuplicatePostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/characters/{character_id}/duplicate',
+export const deleteTome = <ThrowOnError extends boolean = false>(options?: Options<DeleteTomeData, ThrowOnError>) => (options?.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/tomes/{tomeId}', ...options });
+
+/**
+ * Update a tome
+ */
+export const updateTome = <ThrowOnError extends boolean = false>(options: Options<UpdateTomeData, ThrowOnError>) => (options.client ?? client).patch<UpdateTomeResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/tomes/{tomeId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -209,15 +237,15 @@ export const duplicateCharacterRouteApiProjectsProjectIdCharactersCharacterIdDup
 });
 
 /**
- * Archive Character Route
+ * List chapters
  */
-export const archiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePost = <ThrowOnError extends boolean = false>(options: Options<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostData, ThrowOnError>) => (options.client ?? client).post<ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostResponses, ArchiveCharacterRouteApiProjectsProjectIdCharactersCharacterIdArchivePostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}/archive', ...options });
+export const listChapters = <ThrowOnError extends boolean = false>(options?: Options<ListChaptersData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/chapters', ...options });
 
 /**
- * Create Relation Route
+ * Create a chapter
  */
-export const createRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPost = <ThrowOnError extends boolean = false>(options: Options<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostData, ThrowOnError>) => (options.client ?? client).post<CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostResponses, CreateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/characters/{character_id}/relations',
+export const createChapter = <ThrowOnError extends boolean = false>(options: Options<CreateChapterData, ThrowOnError>) => (options.client ?? client).post<CreateChapterResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/chapters',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -226,15 +254,15 @@ export const createRelationRouteApiProjectsProjectIdCharactersCharacterIdRelatio
 });
 
 /**
- * Delete Relation Route
+ * Delete a chapter
  */
-export const deleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteResponses, DeleteRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}/relations/{relation_id}', ...options });
+export const deleteChapter = <ThrowOnError extends boolean = false>(options?: Options<DeleteChapterData, ThrowOnError>) => (options?.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/chapters/{chapterId}', ...options });
 
 /**
- * Update Relation Route
+ * Update a chapter
  */
-export const updateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchResponses, UpdateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelationsRelationIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/characters/{character_id}/relations/{relation_id}',
+export const updateChapter = <ThrowOnError extends boolean = false>(options: Options<UpdateChapterData, ThrowOnError>) => (options.client ?? client).patch<UpdateChapterResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/chapters/{chapterId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -243,10 +271,15 @@ export const updateRelationRouteApiProjectsProjectIdCharactersCharacterIdRelatio
 });
 
 /**
- * Create Voice Sample Route
+ * List scenes
  */
-export const createVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPost = <ThrowOnError extends boolean = false>(options: Options<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostData, ThrowOnError>) => (options.client ?? client).post<CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostResponses, CreateVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoiceSamplesPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/characters/{character_id}/voice-samples',
+export const listScenes = <ThrowOnError extends boolean = false>(options?: Options<ListScenesData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes', ...options });
+
+/**
+ * Create a scene
+ */
+export const createScene = <ThrowOnError extends boolean = false>(options: Options<CreateSceneData, ThrowOnError>) => (options.client ?? client).post<CreateSceneResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -255,41 +288,15 @@ export const createVoiceSampleRouteApiProjectsProjectIdCharactersCharacterIdVoic
 });
 
 /**
- * Generate Character Image Route
+ * Delete a scene
  */
-export const generateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePost = <ThrowOnError extends boolean = false>(options: Options<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostData, ThrowOnError>) => (options.client ?? client).post<GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostResponses, GenerateCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdGenerateImagePostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}/generate-image', ...options });
+export const deleteScene = <ThrowOnError extends boolean = false>(options?: Options<DeleteSceneData, ThrowOnError>) => (options?.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}', ...options });
 
 /**
- * List Character Images
- *
- * List all generated images for a character.
+ * Update a scene
  */
-export const listCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGet = <ThrowOnError extends boolean = false>(options: Options<ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetData, ThrowOnError>) => (options.client ?? client).get<ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetResponses, ListCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}/images', ...options });
-
-/**
- * Delete Character Image Route
- *
- * Delete a character image.
- */
-export const deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteResponses, DeleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}/images/{image_id}', ...options });
-
-/**
- * Read Character Image File
- *
- * Serve a character image file.
- */
-export const readCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGet = <ThrowOnError extends boolean = false>(options: Options<ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetData, ThrowOnError>) => (options.client ?? client).get<ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetResponses, ReadCharacterImageFileApiProjectsProjectIdCharactersCharacterIdImagesImageIdFileGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/characters/{character_id}/images/{image_id}/file', ...options });
-
-/**
- * Read Exports
- */
-export const readExportsApiProjectsProjectIdExportsGet = <ThrowOnError extends boolean = false>(options: Options<ReadExportsApiProjectsProjectIdExportsGetData, ThrowOnError>) => (options.client ?? client).get<ReadExportsApiProjectsProjectIdExportsGetResponses, ReadExportsApiProjectsProjectIdExportsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/exports', ...options });
-
-/**
- * Create Export Route
- */
-export const createExportRouteApiProjectsProjectIdExportsPost = <ThrowOnError extends boolean = false>(options: Options<CreateExportRouteApiProjectsProjectIdExportsPostData, ThrowOnError>) => (options.client ?? client).post<CreateExportRouteApiProjectsProjectIdExportsPostResponses, CreateExportRouteApiProjectsProjectIdExportsPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/exports',
+export const updateScene = <ThrowOnError extends boolean = false>(options: Options<UpdateSceneData, ThrowOnError>) => (options.client ?? client).patch<UpdateSceneResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -298,25 +305,15 @@ export const createExportRouteApiProjectsProjectIdExportsPost = <ThrowOnError ex
 });
 
 /**
- * Read Export
+ * List generation jobs
  */
-export const readExportApiProjectsProjectIdExportsExportIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadExportApiProjectsProjectIdExportsExportIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadExportApiProjectsProjectIdExportsExportIdGetResponses, ReadExportApiProjectsProjectIdExportsExportIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/exports/{export_id}', ...options });
+export const listGenerationJobs = <ThrowOnError extends boolean = false>(options: Options<ListGenerationJobsData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs', ...options });
 
 /**
- * Download Export
+ * Create a generation job
  */
-export const downloadExportApiProjectsProjectIdExportsExportIdDownloadGet = <ThrowOnError extends boolean = false>(options: Options<DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetData, ThrowOnError>) => (options.client ?? client).get<DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetResponses, DownloadExportApiProjectsProjectIdExportsExportIdDownloadGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/exports/{export_id}/download', ...options });
-
-/**
- * Read Generation Jobs
- */
-export const readGenerationJobsApiProjectsProjectIdGenerationJobsGet = <ThrowOnError extends boolean = false>(options: Options<ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetData, ThrowOnError>) => (options.client ?? client).get<ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetResponses, ReadGenerationJobsApiProjectsProjectIdGenerationJobsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/generation/jobs', ...options });
-
-/**
- * Create Generation Job Route
- */
-export const createGenerationJobRouteApiProjectsProjectIdGenerationJobsPost = <ThrowOnError extends boolean = false>(options: Options<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostData, ThrowOnError>) => (options.client ?? client).post<CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostResponses, CreateGenerationJobRouteApiProjectsProjectIdGenerationJobsPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/generation/jobs',
+export const createGenerationJob = <ThrowOnError extends boolean = false>(options: Options<CreateGenerationJobData, ThrowOnError>) => (options.client ?? client).post<CreateGenerationJobResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/generation/jobs',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -325,25 +322,25 @@ export const createGenerationJobRouteApiProjectsProjectIdGenerationJobsPost = <T
 });
 
 /**
- * Read Generation Job
+ * Get a generation job
  */
-export const readGenerationJobApiProjectsProjectIdGenerationJobsJobIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetResponses, ReadGenerationJobApiProjectsProjectIdGenerationJobsJobIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/generation/jobs/{job_id}', ...options });
+export const getGenerationJob = <ThrowOnError extends boolean = false>(options?: Options<GetGenerationJobData, ThrowOnError>) => (options?.client ?? client).get<GetGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}', ...options });
 
 /**
- * Read Generation Boards
+ * List generation boards
  */
-export const readGenerationBoardsApiProjectsProjectIdGenerationBoardsGet = <ThrowOnError extends boolean = false>(options: Options<ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetData, ThrowOnError>) => (options.client ?? client).get<ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetResponses, ReadGenerationBoardsApiProjectsProjectIdGenerationBoardsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/generation/boards', ...options });
+export const listGenerationBoards = <ThrowOnError extends boolean = false>(options: Options<ListGenerationBoardsData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards', ...options });
 
 /**
- * Read Generation Board
+ * Get a generation board
  */
-export const readGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetResponses, ReadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/generation/boards/{board_id}', ...options });
+export const getGenerationBoard = <ThrowOnError extends boolean = false>(options?: Options<GetGenerationBoardData, ThrowOnError>) => (options?.client ?? client).get<GetGenerationBoardResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}', ...options });
 
 /**
- * Validate Generation Board Route
+ * Validate a board
  */
-export const validateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePost = <ThrowOnError extends boolean = false>(options: Options<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostData, ThrowOnError>) => (options.client ?? client).post<ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostResponses, ValidateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoardIdValidatePostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/generation/boards/{board_id}/validate',
+export const validateGenerationBoard = <ThrowOnError extends boolean = false>(options: Options<ValidateGenerationBoardData, ThrowOnError>) => (options.client ?? client).post<ValidateGenerationBoardResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/generation/boards/{boardId}/validate',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -352,10 +349,10 @@ export const validateGenerationBoardRouteApiProjectsProjectIdGenerationBoardsBoa
 });
 
 /**
- * Update Generation Panel Route
+ * Update a panel
  */
-export const updateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchResponses, UpdateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/generation/boards/{board_id}/panels/{panel_id}',
+export const updateGenerationPanel = <ThrowOnError extends boolean = false>(options: Options<UpdateGenerationPanelData, ThrowOnError>) => (options.client ?? client).patch<unknown, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/generation/boards/{boardId}/panels/{panelId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -364,29 +361,25 @@ export const updateGenerationPanelRouteApiProjectsProjectIdGenerationBoardsBoard
 });
 
 /**
- * Download Generation Board
+ * Get panel image
  */
-export const downloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGet = <ThrowOnError extends boolean = false>(options: Options<DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetData, ThrowOnError>) => (options.client ?? client).get<DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetResponses, DownloadGenerationBoardApiProjectsProjectIdGenerationBoardsBoardIdDownloadGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/generation/boards/{board_id}/download', ...options });
+export const getGenerationPanelImage = <ThrowOnError extends boolean = false>(options?: Options<GetGenerationPanelImageData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}/panels/{panelId}/image', ...options });
 
 /**
- * Read Generation Panel Image
+ * Download board artifact
  */
-export const readGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGet = <ThrowOnError extends boolean = false>(options: Options<ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetData, ThrowOnError>) => (options.client ?? client).get<ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetResponses, ReadGenerationPanelImageApiProjectsProjectIdGenerationBoardsBoardIdPanelsPanelIdImageGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/generation/boards/{board_id}/panels/{panel_id}/image', ...options });
+export const downloadBoardArtifact = <ThrowOnError extends boolean = false>(options?: Options<DownloadBoardArtifactData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}/download', ...options });
 
 /**
- * List Generation Configs
- *
- * List all generation configs for a project.
+ * List all assets
  */
-export const listGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGet = <ThrowOnError extends boolean = false>(options: Options<ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetData, ThrowOnError>) => (options.client ?? client).get<ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetResponses, ListGenerationConfigsApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/generation-configs', ...options });
+export const listAssets = <ThrowOnError extends boolean = false>(options: Options<ListAssetsData, ThrowOnError>) => (options.client ?? client).get<ListAssetsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/', ...options });
 
 /**
- * Create Generation Config
- *
- * Create a new generation config.
+ * Import an asset from local filesystem
  */
-export const createGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPost = <ThrowOnError extends boolean = false>(options: Options<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostData, ThrowOnError>) => (options.client ?? client).post<CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostResponses, CreateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes/{scene_id}/generation-configs',
+export const importAsset = <ThrowOnError extends boolean = false>(options: Options<ImportAssetData, ThrowOnError>) => (options.client ?? client).post<ImportAssetResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/assets/import',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -395,26 +388,20 @@ export const createGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerat
 });
 
 /**
- * Delete Generation Config
- *
- * Delete a generation config.
+ * Delete an asset
  */
-export const deleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteResponses, DeleteGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/generation-configs/{config_id}', ...options });
+export const deleteAsset = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}', ...options });
 
 /**
- * Get Generation Config
- *
- * Get a specific generation config.
+ * Get asset details
  */
-export const getGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGet = <ThrowOnError extends boolean = false>(options: Options<GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetData, ThrowOnError>) => (options.client ?? client).get<GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetResponses, GetGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/generation-configs/{config_id}', ...options });
+export const getAsset = <ThrowOnError extends boolean = false>(options: Options<GetAssetData, ThrowOnError>) => (options.client ?? client).get<GetAssetResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}', ...options });
 
 /**
- * Update Generation Config
- *
- * Update a generation config.
+ * Update an asset
  */
-export const updateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchResponses, UpdateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes/{scene_id}/generation-configs/{config_id}',
+export const updateAsset = <ThrowOnError extends boolean = false>(options: Options<UpdateAssetData, ThrowOnError>) => (options.client ?? client).patch<UpdateAssetResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/assets/{assetId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -423,22 +410,20 @@ export const updateGenerationConfigApiProjectsProjectIdStoryScenesSceneIdGenerat
 });
 
 /**
- * Set Default Config
- *
- * Set a config as the default for the project.
+ * Archive an asset
  */
-export const setDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPost = <ThrowOnError extends boolean = false>(options: Options<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostData, ThrowOnError>) => (options.client ?? client).post<SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostResponses, SetDefaultConfigApiProjectsProjectIdStoryScenesSceneIdGenerationConfigsConfigIdSetDefaultPostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/generation-configs/{config_id}/set-default', ...options });
+export const archiveAsset = <ThrowOnError extends boolean = false>(options: Options<ArchiveAssetData, ThrowOnError>) => (options.client ?? client).post<ArchiveAssetResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}/archive', ...options });
 
 /**
- * Generate Scene Manga
- *
- * Generate manga page(s) from a scene.
- *
- * This creates a generation job that will be processed asynchronously.
- * The job ID can be used to poll for status via the regular generation API.
+ * Get asset file content
  */
-export const generateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePost = <ThrowOnError extends boolean = false>(options: Options<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostData, ThrowOnError>) => (options.client ?? client).post<GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostResponses, GenerateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes/{scene_id}/generate',
+export const getAssetFile = <ThrowOnError extends boolean = false>(options: Options<GetAssetFileData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}/file', ...options });
+
+/**
+ * Create an asset link
+ */
+export const createAssetLink = <ThrowOnError extends boolean = false>(options: Options<CreateAssetLinkData, ThrowOnError>) => (options.client ?? client).post<CreateAssetLinkResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/assets/{assetId}/links',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -447,14 +432,20 @@ export const generateSceneMangaApiProjectsProjectIdStoryScenesSceneIdGeneratePos
 });
 
 /**
- * Preview Generation Prompt
- *
- * Preview the prompt that would be generated without actually running generation.
- *
- * Useful for debugging and verifying character references before committing credits.
+ * Delete an asset link
  */
-export const previewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPost = <ThrowOnError extends boolean = false>(options: Options<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostData, ThrowOnError>) => (options.client ?? client).post<PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostResponses, PreviewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPreviewPromptPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes/{scene_id}/preview-prompt',
+export const deleteAssetLink = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetLinkData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}/links/{linkId}', ...options });
+
+/**
+ * List scene generation configs
+ */
+export const listSceneConfigs = <ThrowOnError extends boolean = false>(options: Options<ListSceneConfigsData, ThrowOnError>) => (options.client ?? client).get<ListSceneConfigsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/generation-configs', ...options });
+
+/**
+ * Create a generation config
+ */
+export const createSceneConfig = <ThrowOnError extends boolean = false>(options: Options<CreateSceneConfigData, ThrowOnError>) => (options.client ?? client).post<CreateSceneConfigResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/generation-configs',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -463,33 +454,15 @@ export const previewGenerationPromptApiProjectsProjectIdStoryScenesSceneIdPrevie
 });
 
 /**
- * List Scene Manga Pages
- *
- * List all manga pages generated for this scene.
+ * Delete a generation config
  */
-export const listSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGet = <ThrowOnError extends boolean = false>(options: Options<ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetData, ThrowOnError>) => (options.client ?? client).get<ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetResponses, ListSceneMangaPagesApiProjectsProjectIdStoryScenesSceneIdMangaPagesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/manga-pages', ...options });
+export const deleteSceneConfig = <ThrowOnError extends boolean = false>(options: Options<DeleteSceneConfigData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/generation-configs/{configId}', ...options });
 
 /**
- * Delete Scene Manga Page
- *
- * Delete a manga page reference (does not delete the underlying image).
+ * Update a generation config
  */
-export const deleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteResponses, DeleteSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/manga-pages/{page_id}', ...options });
-
-/**
- * Get Scene Manga Page
- *
- * Get a specific manga page.
- */
-export const getSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGet = <ThrowOnError extends boolean = false>(options: Options<GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetData, ThrowOnError>) => (options.client ?? client).get<GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetResponses, GetSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}/manga-pages/{page_id}', ...options });
-
-/**
- * Update Scene Manga Page
- *
- * Update a manga page (label, status, etc.).
- */
-export const updateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchResponses, UpdateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPagesPageIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes/{scene_id}/manga-pages/{page_id}',
+export const updateSceneConfig = <ThrowOnError extends boolean = false>(options: Options<UpdateSceneConfigData, ThrowOnError>) => (options.client ?? client).patch<UpdateSceneConfigResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/generation-configs/{configId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -498,30 +471,10 @@ export const updateSceneMangaPageApiProjectsProjectIdStoryScenesSceneIdMangaPage
 });
 
 /**
- * Read Story
+ * Set config as default
  */
-export const readStoryApiProjectsProjectIdStoryGet = <ThrowOnError extends boolean = false>(options: Options<ReadStoryApiProjectsProjectIdStoryGetData, ThrowOnError>) => (options.client ?? client).get<ReadStoryApiProjectsProjectIdStoryGetResponses, ReadStoryApiProjectsProjectIdStoryGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story', ...options });
-
-/**
- * Read Story Suggestions
- */
-export const readStorySuggestionsApiProjectsProjectIdStorySuggestionsGet = <ThrowOnError extends boolean = false>(options: Options<ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetData, ThrowOnError>) => (options.client ?? client).get<ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetResponses, ReadStorySuggestionsApiProjectsProjectIdStorySuggestionsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/suggestions', ...options });
-
-/**
- * Read Story References
- */
-export const readStoryReferencesApiProjectsProjectIdStoryReferencesGet = <ThrowOnError extends boolean = false>(options: Options<ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetData, ThrowOnError>) => (options.client ?? client).get<ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetResponses, ReadStoryReferencesApiProjectsProjectIdStoryReferencesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/references', ...options });
-
-/**
- * Read Tomes
- */
-export const readTomesApiProjectsProjectIdStoryTomesGet = <ThrowOnError extends boolean = false>(options: Options<ReadTomesApiProjectsProjectIdStoryTomesGetData, ThrowOnError>) => (options.client ?? client).get<ReadTomesApiProjectsProjectIdStoryTomesGetResponses, ReadTomesApiProjectsProjectIdStoryTomesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/tomes', ...options });
-
-/**
- * Create Tome Route
- */
-export const createTomeRouteApiProjectsProjectIdStoryTomesPost = <ThrowOnError extends boolean = false>(options: Options<CreateTomeRouteApiProjectsProjectIdStoryTomesPostData, ThrowOnError>) => (options.client ?? client).post<CreateTomeRouteApiProjectsProjectIdStoryTomesPostResponses, CreateTomeRouteApiProjectsProjectIdStoryTomesPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/tomes',
+export const setDefaultConfig = <ThrowOnError extends boolean = false>(options: Options<SetDefaultConfigData, ThrowOnError>) => (options.client ?? client).post<SetDefaultConfigResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/generation-configs/{configId}/set-default',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -530,15 +483,10 @@ export const createTomeRouteApiProjectsProjectIdStoryTomesPost = <ThrowOnError e
 });
 
 /**
- * Delete Tome Route
+ * Generate manga for scene
  */
-export const deleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteResponses, DeleteTomeRouteApiProjectsProjectIdStoryTomesTomeIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/tomes/{tome_id}', ...options });
-
-/**
- * Update Tome Route
- */
-export const updateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchResponses, UpdateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/tomes/{tome_id}',
+export const generateSceneManga = <ThrowOnError extends boolean = false>(options: Options<GenerateSceneMangaData, ThrowOnError>) => (options.client ?? client).post<GenerateSceneMangaResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/generate',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -547,15 +495,10 @@ export const updateTomeRouteApiProjectsProjectIdStoryTomesTomeIdPatch = <ThrowOn
 });
 
 /**
- * Read Chapters
+ * Preview generation prompts
  */
-export const readChaptersApiProjectsProjectIdStoryChaptersGet = <ThrowOnError extends boolean = false>(options: Options<ReadChaptersApiProjectsProjectIdStoryChaptersGetData, ThrowOnError>) => (options.client ?? client).get<ReadChaptersApiProjectsProjectIdStoryChaptersGetResponses, ReadChaptersApiProjectsProjectIdStoryChaptersGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/chapters', ...options });
-
-/**
- * Create Chapter Route
- */
-export const createChapterRouteApiProjectsProjectIdStoryChaptersPost = <ThrowOnError extends boolean = false>(options: Options<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostData, ThrowOnError>) => (options.client ?? client).post<CreateChapterRouteApiProjectsProjectIdStoryChaptersPostResponses, CreateChapterRouteApiProjectsProjectIdStoryChaptersPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/chapters',
+export const previewPrompt = <ThrowOnError extends boolean = false>(options: Options<PreviewPromptData, ThrowOnError>) => (options.client ?? client).post<PreviewPromptResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/preview-prompt',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -564,15 +507,20 @@ export const createChapterRouteApiProjectsProjectIdStoryChaptersPost = <ThrowOnE
 });
 
 /**
- * Delete Chapter Route
+ * List scene manga pages
  */
-export const deleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteResponses, DeleteChapterRouteApiProjectsProjectIdStoryChaptersChapterIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/chapters/{chapter_id}', ...options });
+export const listSceneMangaPages = <ThrowOnError extends boolean = false>(options: Options<ListSceneMangaPagesData, ThrowOnError>) => (options.client ?? client).get<ListSceneMangaPagesResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages', ...options });
 
 /**
- * Update Chapter Route
+ * Delete a manga page
  */
-export const updateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchResponses, UpdateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/chapters/{chapter_id}',
+export const deleteSceneMangaPage = <ThrowOnError extends boolean = false>(options: Options<DeleteSceneMangaPageData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}', ...options });
+
+/**
+ * Update a manga page
+ */
+export const updateSceneMangaPage = <ThrowOnError extends boolean = false>(options: Options<UpdateSceneMangaPageData, ThrowOnError>) => (options.client ?? client).patch<UpdateSceneMangaPageResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -581,15 +529,15 @@ export const updateChapterRouteApiProjectsProjectIdStoryChaptersChapterIdPatch =
 });
 
 /**
- * Read Scenes
+ * List all versions
  */
-export const readScenesApiProjectsProjectIdStoryScenesGet = <ThrowOnError extends boolean = false>(options: Options<ReadScenesApiProjectsProjectIdStoryScenesGetData, ThrowOnError>) => (options.client ?? client).get<ReadScenesApiProjectsProjectIdStoryScenesGetResponses, ReadScenesApiProjectsProjectIdStoryScenesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes', ...options });
+export const listVersions = <ThrowOnError extends boolean = false>(options: Options<ListVersionsData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/versions/', ...options });
 
 /**
- * Create Scene Route
+ * Create a version
  */
-export const createSceneRouteApiProjectsProjectIdStoryScenesPost = <ThrowOnError extends boolean = false>(options: Options<CreateSceneRouteApiProjectsProjectIdStoryScenesPostData, ThrowOnError>) => (options.client ?? client).post<CreateSceneRouteApiProjectsProjectIdStoryScenesPostResponses, CreateSceneRouteApiProjectsProjectIdStoryScenesPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes',
+export const createVersion = <ThrowOnError extends boolean = false>(options: Options<CreateVersionData, ThrowOnError>) => (options.client ?? client).post<CreateVersionResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/versions/',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -598,15 +546,20 @@ export const createSceneRouteApiProjectsProjectIdStoryScenesPost = <ThrowOnError
 });
 
 /**
- * Delete Scene Route
+ * List version branches
  */
-export const deleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteResponses, DeleteSceneRouteApiProjectsProjectIdStoryScenesSceneIdDeleteErrors, ThrowOnError>({ url: '/api/projects/{project_id}/story/scenes/{scene_id}', ...options });
+export const listBranches = <ThrowOnError extends boolean = false>(options: Options<ListBranchesData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/versions/branches', ...options });
 
 /**
- * Update Scene Route
+ * Get version details
  */
-export const updateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchData, ThrowOnError>) => (options.client ?? client).patch<UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchResponses, UpdateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/story/scenes/{scene_id}',
+export const getVersion = <ThrowOnError extends boolean = false>(options: Options<GetVersionData, ThrowOnError>) => (options.client ?? client).get<GetVersionResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/versions/{versionId}', ...options });
+
+/**
+ * Compare two versions
+ */
+export const compareVersions = <ThrowOnError extends boolean = false>(options: Options<CompareVersionsData, ThrowOnError>) => (options.client ?? client).post<CompareVersionsResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/versions/compare',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -615,20 +568,10 @@ export const updateSceneRouteApiProjectsProjectIdStoryScenesSceneIdPatch = <Thro
 });
 
 /**
- * Read Reference Suggestions
+ * Restore a version
  */
-export const readReferenceSuggestionsApiProjectsProjectIdReferencesTypeGet = <ThrowOnError extends boolean = false>(options: Options<ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetData, ThrowOnError>) => (options.client ?? client).get<ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetResponses, ReadReferenceSuggestionsApiProjectsProjectIdReferencesTypeGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/references/{type}', ...options });
-
-/**
- * Read Versions
- */
-export const readVersionsApiProjectsProjectIdVersionsGet = <ThrowOnError extends boolean = false>(options: Options<ReadVersionsApiProjectsProjectIdVersionsGetData, ThrowOnError>) => (options.client ?? client).get<ReadVersionsApiProjectsProjectIdVersionsGetResponses, ReadVersionsApiProjectsProjectIdVersionsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/versions', ...options });
-
-/**
- * Create Version Route
- */
-export const createVersionRouteApiProjectsProjectIdVersionsPost = <ThrowOnError extends boolean = false>(options: Options<CreateVersionRouteApiProjectsProjectIdVersionsPostData, ThrowOnError>) => (options.client ?? client).post<CreateVersionRouteApiProjectsProjectIdVersionsPostResponses, CreateVersionRouteApiProjectsProjectIdVersionsPostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/versions',
+export const restoreVersion = <ThrowOnError extends boolean = false>(options: Options<RestoreVersionData, ThrowOnError>) => (options.client ?? client).post<RestoreVersionResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/versions/{versionId}/restore',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -637,20 +580,20 @@ export const createVersionRouteApiProjectsProjectIdVersionsPost = <ThrowOnError 
 });
 
 /**
- * Read Version Branches
+ * List all warnings
  */
-export const readVersionBranchesApiProjectsProjectIdVersionsBranchesGet = <ThrowOnError extends boolean = false>(options: Options<ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetData, ThrowOnError>) => (options.client ?? client).get<ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetResponses, ReadVersionBranchesApiProjectsProjectIdVersionsBranchesGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/versions/branches', ...options });
+export const listWarnings = <ThrowOnError extends boolean = false>(options: Options<ListWarningsData, ThrowOnError>) => (options.client ?? client).get<ListWarningsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/warnings/', ...options });
 
 /**
- * Read Version
+ * Scan and rebuild warnings
  */
-export const readVersionApiProjectsProjectIdVersionsVersionIdGet = <ThrowOnError extends boolean = false>(options: Options<ReadVersionApiProjectsProjectIdVersionsVersionIdGetData, ThrowOnError>) => (options.client ?? client).get<ReadVersionApiProjectsProjectIdVersionsVersionIdGetResponses, ReadVersionApiProjectsProjectIdVersionsVersionIdGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/versions/{version_id}', ...options });
+export const scanWarnings = <ThrowOnError extends boolean = false>(options: Options<ScanWarningsData, ThrowOnError>) => (options.client ?? client).post<ScanWarningsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/warnings/scan', ...options });
 
 /**
- * Compare Versions Route
+ * Update warning status
  */
-export const compareVersionsRouteApiProjectsProjectIdVersionsComparePost = <ThrowOnError extends boolean = false>(options: Options<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostData, ThrowOnError>) => (options.client ?? client).post<CompareVersionsRouteApiProjectsProjectIdVersionsComparePostResponses, CompareVersionsRouteApiProjectsProjectIdVersionsComparePostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/versions/compare',
+export const updateWarning = <ThrowOnError extends boolean = false>(options: Options<UpdateWarningData, ThrowOnError>) => (options.client ?? client).patch<UpdateWarningResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/warnings/{warningId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -659,10 +602,15 @@ export const compareVersionsRouteApiProjectsProjectIdVersionsComparePost = <Thro
 });
 
 /**
- * Restore Version Route
+ * List all exports
  */
-export const restoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePost = <ThrowOnError extends boolean = false>(options: Options<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostData, ThrowOnError>) => (options.client ?? client).post<RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostResponses, RestoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePostErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/versions/{version_id}/restore',
+export const listExports = <ThrowOnError extends boolean = false>(options: Options<ListExportsData, ThrowOnError>) => (options.client ?? client).get<ListExportsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/exports/', ...options });
+
+/**
+ * Create an export
+ */
+export const createExport = <ThrowOnError extends boolean = false>(options: Options<CreateExportData, ThrowOnError>) => (options.client ?? client).post<CreateExportResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/exports/',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -671,38 +619,17 @@ export const restoreVersionRouteApiProjectsProjectIdVersionsVersionIdRestorePost
 });
 
 /**
- * Read Warnings
+ * Get export details
  */
-export const readWarningsApiProjectsProjectIdWarningsGet = <ThrowOnError extends boolean = false>(options: Options<ReadWarningsApiProjectsProjectIdWarningsGetData, ThrowOnError>) => (options.client ?? client).get<ReadWarningsApiProjectsProjectIdWarningsGetResponses, ReadWarningsApiProjectsProjectIdWarningsGetErrors, ThrowOnError>({ url: '/api/projects/{project_id}/warnings', ...options });
+export const getExport = <ThrowOnError extends boolean = false>(options: Options<GetExportData, ThrowOnError>) => (options.client ?? client).get<GetExportResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/exports/{exportId}', ...options });
 
 /**
- * Scan Warnings
+ * Download export artifact
  */
-export const scanWarningsApiProjectsProjectIdWarningsScanPost = <ThrowOnError extends boolean = false>(options: Options<ScanWarningsApiProjectsProjectIdWarningsScanPostData, ThrowOnError>) => (options.client ?? client).post<ScanWarningsApiProjectsProjectIdWarningsScanPostResponses, ScanWarningsApiProjectsProjectIdWarningsScanPostErrors, ThrowOnError>({ url: '/api/projects/{project_id}/warnings/scan', ...options });
+export const downloadExport = <ThrowOnError extends boolean = false>(options: Options<DownloadExportData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/exports/{exportId}/download', ...options });
 
-/**
- * Patch Warning
- */
-export const patchWarningApiProjectsProjectIdWarningsWarningIdPatch = <ThrowOnError extends boolean = false>(options: Options<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchData, ThrowOnError>) => (options.client ?? client).patch<PatchWarningApiProjectsProjectIdWarningsWarningIdPatchResponses, PatchWarningApiProjectsProjectIdWarningsWarningIdPatchErrors, ThrowOnError>({
-    url: '/api/projects/{project_id}/warnings/{warning_id}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const getApiInngest = <ThrowOnError extends boolean = false>(options?: Options<GetApiInngestData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/inngest/', ...options });
 
-/**
- * Health
- */
-export const healthApiHealthGet = <ThrowOnError extends boolean = false>(options?: Options<HealthApiHealthGetData, ThrowOnError>) => (options?.client ?? client).get<HealthApiHealthGetResponses, unknown, ThrowOnError>({ url: '/api/health', ...options });
+export const postApiInngest = <ThrowOnError extends boolean = false>(options?: Options<PostApiInngestData, ThrowOnError>) => (options?.client ?? client).post<unknown, unknown, ThrowOnError>({ url: '/api/inngest/', ...options });
 
-/**
- * Config
- */
-export const configApiConfigGet = <ThrowOnError extends boolean = false>(options?: Options<ConfigApiConfigGetData, ThrowOnError>) => (options?.client ?? client).get<ConfigApiConfigGetResponses, unknown, ThrowOnError>({ url: '/api/config', ...options });
-
-/**
- * Models
- */
-export const modelsApiModelsGet = <ThrowOnError extends boolean = false>(options?: Options<ModelsApiModelsGetData, ThrowOnError>) => (options?.client ?? client).get<ModelsApiModelsGetResponses, unknown, ThrowOnError>({ url: '/api/models', ...options });
+export const putApiInngest = <ThrowOnError extends boolean = false>(options?: Options<PutApiInngestData, ThrowOnError>) => (options?.client ?? client).put<unknown, unknown, ThrowOnError>({ url: '/api/inngest/', ...options });

@@ -4,7 +4,7 @@
  */
 
 import cors from "@elysiajs/cors";
-import { swagger } from "@elysiajs/swagger";
+import { openapi } from "@elysiajs/openapi";
 import { config } from "@lib/config";
 import { orphanCheckerCron } from "@lib/cron";
 import { assetsModule } from "@modules/assets";
@@ -24,6 +24,7 @@ import { warningsModule } from "@modules/warnings";
 import { randomUUIDv7 } from "bun";
 import { Elysia } from "elysia";
 import { wideEvent } from "elysia-wide-event";
+import { toJSONSchema } from 'zod';
 
 export const app = new Elysia({
   aot: true,
@@ -48,36 +49,22 @@ export const app = new Elysia({
     }),
   )
 
-  // API Documentation (Swagger UI)
+  // API Documentation
   .use(
-    swagger({
+    openapi({
+      enabled: process.env.NODE_ENV === "development",
+      path: "/openapi",
+      specPath: "/openapi/api-doc.json",
       documentation: {
         info: {
-          title: config.appName,
-          version: config.appVersion,
-          description: "Kuti Studio Backend API",
+          title: "Kuti Backend",
+          version: "1.0.0",
+          description: "Authentication server.",
         },
-        tags: [
-          { name: "Health", description: "Health and configuration" },
-          { name: "Authentication", description: "Better Auth endpoints" },
-          { name: "Projects", description: "Project management" },
-          { name: "Characters", description: "Character management" },
-          { name: "Story", description: "Story structure (Tomes, Chapters, Scenes)" },
-          { name: "Generation", description: "AI image/video generation" },
-          { name: "Assets", description: "Project assets management" },
-          { name: "Scene Generation", description: "Scene manga generation" },
-          { name: "Versions", description: "Project versioning" },
-          { name: "Warnings", description: "Consistency warnings" },
-          { name: "Exports", description: "Project exports" },
-        ],
       },
-      path: "/openapi",
-      scalarConfig: {
-        darkMode: true,
-      },
+      mapJsonSchema: { zod: toJSONSchema },
     }),
   )
-
   .onError(({ error }) => {
     console.error("error", error);
   })
@@ -102,10 +89,6 @@ export const app = new Elysia({
   // Start server
   .listen(Number(config.port), () => {
     console.log(`🚀 ${config.appName} v${config.appVersion}`);
-    console.log(`   Environment: ${config.nodeEnv}`);
-    console.log(`   Port: ${config.port}`);
-    console.log(`   Data directory: ${config.dataDir}`);
-    console.log(`   OpenAPI: http://localhost:${config.port}/openapi`);
   });
 
 export type App = typeof app;
