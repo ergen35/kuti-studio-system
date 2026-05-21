@@ -409,7 +409,6 @@ export default function TomeRoute() {
 
   const handleCreateChapter = (body: { title: string }) => {
     createChapter.mutate({
-      // @ts-expect-error - SDK types have path as never but the API requires projectId
       path: { projectId },
       body: {
         tomeId: tomeId,
