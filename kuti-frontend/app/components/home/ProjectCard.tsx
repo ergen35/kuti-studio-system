@@ -97,13 +97,13 @@ export function ProjectCard({
             "flex items-center gap-1 transition-opacity",
             isGrid && !showActions ? "opacity-0 group-hover:opacity-100" : ""
           )}>
-            <Button variant="primary" size="sm" onClick={onOpen}>
+            <Button variant="primary" onClick={onOpen} className="text-xs py-1 px-2">
               <FolderOpen size={14} className="mr-1" />
               Ouvrir
             </Button>
             
             <div className="relative group/menu">
-              <Button variant="ghost" size="sm" className="px-2">
+              <Button variant="ghost" className="px-2 py-1">
                 <MoreHorizontal size={14} />
               </Button>
               

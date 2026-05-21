@@ -7,27 +7,28 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, Card, EmptyState, ErrorState, LinkButton, LoadingState, PageHeader, Panel, SectionTitle, dateLabel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { api, apiErrorMessage, csv } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import { apiErrorMessage, csv, API_BASE_URL } from "~/lib/api";
+import { useAssets, useImportAsset, useArchiveAsset, useDeleteAsset } from "~/hooks/use-api";
+import { queryClient } from "~/lib/query";
 import { assetImportSchema, type AssetImportInput } from "~/lib/schemas";
 
 export default function AssetsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['assets', 'common']);
-  const assets = useQuery({ queryKey: keys.assets(projectId), queryFn: () => api.assets(projectId) });
+  const assets = useAssets(projectId);
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<AssetImportInput>({
     resolver: zodResolver(assetImportSchema),
     defaultValues: { source_path: '', name: '', tags: '' },
   });
   
-  const importAsset = useMutation({ 
-    mutationFn: (data: AssetImportInput) => api.importAsset(projectId, { source_path: data.source_path, name: data.name || undefined, tags_json: csv(data.tags || '') }), 
-    onSuccess: () => { reset(); invalidateWorkspace(projectId); } 
-  });
-  const onSubmit = (data: AssetImportInput) => importAsset.mutate(data);
+  const importAsset = useImportAsset();
+  const onSubmit = (data: AssetImportInput) => importAsset.mutate({
+    path: { project_id: projectId },
+    body: { source_path: data.source_path, name: data.name || undefined, tags_json: csv(data.tags || '') }
+  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readAssetsApiProjectsProjectIdAssetsGet"] }); } });
   
-  const archive = useMutation({ mutationFn: (id: string) => api.archiveAsset(projectId, id), onSuccess: () => invalidateWorkspace(projectId) });
-  const remove = useMutation({ mutationFn: (id: string) => api.deleteAsset(projectId, id), onSuccess: () => invalidateWorkspace(projectId) });
+  const archive = useArchiveAsset();
+  const remove = useDeleteAsset();
 
   return (
     <AppShell>
@@ -61,9 +62,9 @@ export default function AssetsRoute() {
                 <p className="mt-2 text-xs leading-5 text-muted">{asset.original_filename} · {asset.mime_type}</p>
                 <p className="mt-1 text-xs leading-5 text-muted">{asset.size_bytes} {t('meta.size')} · {dateLabel(asset.updated_at)}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <LinkButton href={api.fileUrl(`/projects/${projectId}/assets/${asset.id}/file`)} target="_blank" rel="noreferrer"><Link2 size={15} /> {t('actions.open')}</LinkButton>
-                  <Button onClick={() => archive.mutate(asset.id)}><Archive size={15} /> {t('actions.archive')}</Button>
-                  <Button variant="danger" onClick={() => remove.mutate(asset.id)}><Trash2 size={15} /></Button>
+                  <LinkButton href={`${API_BASE_URL}/api/projects/${projectId}/assets/${asset.id}/file`} target="_blank" rel="noreferrer"><Link2 size={15} /> {t('actions.open')}</LinkButton>
+                  <Button onClick={() => archive.mutate({ path: { project_id: projectId, asset_id: asset.id } })}><Archive size={15} /> {t('actions.archive')}</Button>
+                  <Button variant="danger" onClick={() => remove.mutate({ path: { project_id: projectId, asset_id: asset.id } })}><Trash2 size={15} /></Button>
                 </div>
               </Card>
             ))}

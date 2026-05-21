@@ -1,21 +1,28 @@
 import { Link, useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "~/components/layout";
-import { api, apiErrorMessage } from "~/lib/api";
-import { keys } from "~/lib/query";
+import { apiErrorMessage } from "~/lib/api";
+import {
+  useProject,
+  useCharacters,
+  useStory,
+  useWarnings,
+  useVersions,
+  useExports,
+  useGenerationJobs,
+} from "~/hooks/use-api";
 import { useTranslation } from "~/hooks/useTranslation";
 import { Badge, Card, EmptyState, ErrorState, LoadingState, PageHeader, SectionTitle, Stat, dateLabel } from "~/components/ui";
 
 export default function ProjectRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['project', 'common']);
-  const project = useQuery({ queryKey: keys.project(projectId), queryFn: () => api.project(projectId) });
-  const characters = useQuery({ queryKey: keys.characters(projectId), queryFn: () => api.characters(projectId) });
-  const story = useQuery({ queryKey: keys.story(projectId), queryFn: () => api.story(projectId) });
-  const warnings = useQuery({ queryKey: keys.warnings(projectId), queryFn: () => api.warnings(projectId) });
-  const versions = useQuery({ queryKey: keys.versions(projectId), queryFn: () => api.versions(projectId) });
-  const exports = useQuery({ queryKey: keys.exports(projectId), queryFn: () => api.exports(projectId) });
-  const jobs = useQuery({ queryKey: keys.generationJobs(projectId), queryFn: () => api.generationJobs(projectId) });
+  const project = useProject(projectId);
+  const characters = useCharacters(projectId);
+  const story = useStory(projectId);
+  const warnings = useWarnings(projectId);
+  const versions = useVersions(projectId);
+  const exports = useExports(projectId);
+  const jobs = useGenerationJobs(projectId);
 
   const workspaces = [
     { key: "characters", title: t('workspaces.characters.title'), desc: t('workspaces.characters.description') },

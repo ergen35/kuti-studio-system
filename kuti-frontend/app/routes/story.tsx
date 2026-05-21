@@ -10,8 +10,9 @@ import { AppShell } from '~/components/layout';
 import { Button, ErrorState, LoadingState } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { TomeCardGrid } from '~/components/story';
-import { api, apiErrorMessage } from '~/lib/api';
-import { invalidateWorkspace, keys } from '~/lib/query';
+import { apiErrorMessage } from '~/lib/api';
+import { useStory, useCreateTome } from '~/hooks/use-api';
+import { queryClient } from '~/lib/query';
 
 // Schema for creating a new tome
 const createTomeSchema = z.object({
@@ -138,22 +139,27 @@ export default function StoryRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch story data
-  const story = useQuery({ 
-    queryKey: keys.story(projectId), 
-    queryFn: () => api.story(projectId) 
-  });
+  const story = useStory(projectId);
   
   // Create tome mutation
-  const createTome = useMutation({ 
-    mutationFn: (body: CreateTomeInput) => api.createTome(projectId, { 
-      title: body.title, 
-      order_index: story.data?.tomes.length || 0 
-    }), 
-    onSuccess: () => {
-      invalidateWorkspace(projectId);
-      setIsModalOpen(false);
-    }
-  });
+  const createTome = useCreateTome();
+  
+  const handleCreateSubmit = (data: CreateTomeInput) => {
+    createTome.mutate(
+      {
+        path: { project_id: projectId },
+        body: {
+          title: data.title,
+          order_index: (story.data?.tomes?.length ?? 0)
+        }
+      },
+      {
+        onSuccess: () => {
+          setIsModalOpen(false);
+        }
+      }
+    );
+  };
   
   // Calculate tome stats
   const tomeStats = useMemo(() => {
@@ -189,9 +195,7 @@ export default function StoryRoute() {
     setIsModalOpen(true);
   };
   
-  const handleCreateSubmit = (data: CreateTomeInput) => {
-    createTome.mutate(data);
-  };
+
 
   return (
     <AppShell>

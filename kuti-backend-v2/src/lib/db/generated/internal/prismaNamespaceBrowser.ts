@@ -54,7 +54,27 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  Project: 'Project',
+  Character: 'Character',
+  CharacterRelation: 'CharacterRelation',
+  VoiceSample: 'VoiceSample',
+  CharacterImage: 'CharacterImage',
+  Tome: 'Tome',
+  Chapter: 'Chapter',
+  Scene: 'Scene',
+  StoryReference: 'StoryReference',
+  Asset: 'Asset',
+  AssetLink: 'AssetLink',
+  GenerationJob: 'GenerationJob',
+  GenerationJobStep: 'GenerationJobStep',
+  GenerationBoard: 'GenerationBoard',
+  GenerationBoardPanel: 'GenerationBoardPanel',
+  SceneGenerationConfig: 'SceneGenerationConfig',
+  SceneMangaPage: 'SceneMangaPage',
+  Version: 'Version',
+  Warning: 'Warning',
+  ExportRecord: 'ExportRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -136,12 +156,388 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
+export const ProjectScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  status: 'status',
+  rootPath: 'rootPath',
+  settingsJson: 'settingsJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastOpenedAt: 'lastOpenedAt',
+  archivedAt: 'archivedAt'
+} as const
+
+export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
+
+
+export const CharacterScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  slug: 'slug',
+  name: 'name',
+  alias: 'alias',
+  narrativeRole: 'narrativeRole',
+  description: 'description',
+  physicalDescription: 'physicalDescription',
+  colorPaletteJson: 'colorPaletteJson',
+  costumeElementsJson: 'costumeElementsJson',
+  keyTraitsJson: 'keyTraitsJson',
+  personality: 'personality',
+  narrativeArc: 'narrativeArc',
+  tagsJson: 'tagsJson',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  archivedAt: 'archivedAt'
+} as const
+
+export type CharacterScalarFieldEnum = (typeof CharacterScalarFieldEnum)[keyof typeof CharacterScalarFieldEnum]
+
+
+export const CharacterRelationScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  sourceCharacterId: 'sourceCharacterId',
+  targetCharacterId: 'targetCharacterId',
+  relationType: 'relationType',
+  strength: 'strength',
+  narrativeDependency: 'narrativeDependency',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CharacterRelationScalarFieldEnum = (typeof CharacterRelationScalarFieldEnum)[keyof typeof CharacterRelationScalarFieldEnum]
+
+
+export const VoiceSampleScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  characterId: 'characterId',
+  assetPath: 'assetPath',
+  label: 'label',
+  voiceNotes: 'voiceNotes',
+  createdAt: 'createdAt'
+} as const
+
+export type VoiceSampleScalarFieldEnum = (typeof VoiceSampleScalarFieldEnum)[keyof typeof VoiceSampleScalarFieldEnum]
+
+
+export const CharacterImageScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  characterId: 'characterId',
+  boardPanelId: 'boardPanelId',
+  filePath: 'filePath',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  mimeType: 'mimeType',
+  prompt: 'prompt',
+  strategy: 'strategy',
+  style: 'style',
+  variationIndex: 'variationIndex',
+  createdAt: 'createdAt'
+} as const
+
+export type CharacterImageScalarFieldEnum = (typeof CharacterImageScalarFieldEnum)[keyof typeof CharacterImageScalarFieldEnum]
+
+
+export const TomeScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  title: 'title',
+  slug: 'slug',
+  synopsis: 'synopsis',
+  status: 'status',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TomeScalarFieldEnum = (typeof TomeScalarFieldEnum)[keyof typeof TomeScalarFieldEnum]
+
+
+export const ChapterScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  tomeId: 'tomeId',
+  title: 'title',
+  slug: 'slug',
+  synopsis: 'synopsis',
+  status: 'status',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChapterScalarFieldEnum = (typeof ChapterScalarFieldEnum)[keyof typeof ChapterScalarFieldEnum]
+
+
+export const SceneScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  tomeId: 'tomeId',
+  chapterId: 'chapterId',
+  title: 'title',
+  slug: 'slug',
+  sceneType: 'sceneType',
+  location: 'location',
+  summary: 'summary',
+  content: 'content',
+  notes: 'notes',
+  charactersJson: 'charactersJson',
+  tagsJson: 'tagsJson',
+  status: 'status',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SceneScalarFieldEnum = (typeof SceneScalarFieldEnum)[keyof typeof SceneScalarFieldEnum]
+
+
+export const StoryReferenceScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  sceneId: 'sceneId',
+  referenceKind: 'referenceKind',
+  targetSlug: 'targetSlug',
+  rawToken: 'rawToken',
+  createdAt: 'createdAt'
+} as const
+
+export type StoryReferenceScalarFieldEnum = (typeof StoryReferenceScalarFieldEnum)[keyof typeof StoryReferenceScalarFieldEnum]
+
+
+export const AssetScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  slug: 'slug',
+  name: 'name',
+  originalFilename: 'originalFilename',
+  mimeType: 'mimeType',
+  checksum: 'checksum',
+  sizeBytes: 'sizeBytes',
+  storagePath: 'storagePath',
+  description: 'description',
+  tagsJson: 'tagsJson',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  archivedAt: 'archivedAt'
+} as const
+
+export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
+
+
+export const AssetLinkScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  assetId: 'assetId',
+  targetKind: 'targetKind',
+  targetId: 'targetId',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type AssetLinkScalarFieldEnum = (typeof AssetLinkScalarFieldEnum)[keyof typeof AssetLinkScalarFieldEnum]
+
+
+export const GenerationJobScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  sourceKind: 'sourceKind',
+  sourceId: 'sourceId',
+  sourceLabel: 'sourceLabel',
+  sourceVersionId: 'sourceVersionId',
+  strategy: 'strategy',
+  entrypoint: 'entrypoint',
+  title: 'title',
+  prompt: 'prompt',
+  summary: 'summary',
+  status: 'status',
+  progress: 'progress',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  completedAt: 'completedAt',
+  failedAt: 'failedAt',
+  errorMessage: 'errorMessage'
+} as const
+
+export type GenerationJobScalarFieldEnum = (typeof GenerationJobScalarFieldEnum)[keyof typeof GenerationJobScalarFieldEnum]
+
+
+export const GenerationJobStepScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  orderIndex: 'orderIndex',
+  title: 'title',
+  status: 'status',
+  prompt: 'prompt',
+  outputText: 'outputText',
+  artifactPath: 'artifactPath',
+  artifactName: 'artifactName',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  completedAt: 'completedAt',
+  failedAt: 'failedAt',
+  errorMessage: 'errorMessage'
+} as const
+
+export type GenerationJobStepScalarFieldEnum = (typeof GenerationJobStepScalarFieldEnum)[keyof typeof GenerationJobStepScalarFieldEnum]
+
+
+export const GenerationBoardScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  jobId: 'jobId',
+  sourceKind: 'sourceKind',
+  strategy: 'strategy',
+  title: 'title',
+  summary: 'summary',
+  status: 'status',
+  artifactPath: 'artifactPath',
+  artifactName: 'artifactName',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  validatedAt: 'validatedAt'
+} as const
+
+export type GenerationBoardScalarFieldEnum = (typeof GenerationBoardScalarFieldEnum)[keyof typeof GenerationBoardScalarFieldEnum]
+
+
+export const GenerationBoardPanelScalarFieldEnum = {
+  id: 'id',
+  boardId: 'boardId',
+  stepId: 'stepId',
+  orderIndex: 'orderIndex',
+  title: 'title',
+  caption: 'caption',
+  prompt: 'prompt',
+  status: 'status',
+  imagePath: 'imagePath',
+  imageName: 'imageName',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GenerationBoardPanelScalarFieldEnum = (typeof GenerationBoardPanelScalarFieldEnum)[keyof typeof GenerationBoardPanelScalarFieldEnum]
+
+
+export const SceneGenerationConfigScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  name: 'name',
+  isDefault: 'isDefault',
+  systemPrompt: 'systemPrompt',
+  stylePreset: 'stylePreset',
+  colorMode: 'colorMode',
+  defaultImageCount: 'defaultImageCount',
+  allowMultiPage: 'allowMultiPage',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SceneGenerationConfigScalarFieldEnum = (typeof SceneGenerationConfigScalarFieldEnum)[keyof typeof SceneGenerationConfigScalarFieldEnum]
+
+
+export const SceneMangaPageScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  sceneId: 'sceneId',
+  tomeId: 'tomeId',
+  chapterId: 'chapterId',
+  jobId: 'jobId',
+  boardId: 'boardId',
+  panelId: 'panelId',
+  pageNumber: 'pageNumber',
+  label: 'label',
+  status: 'status',
+  imageUrl: 'imageUrl',
+  caption: 'caption',
+  prompt: 'prompt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SceneMangaPageScalarFieldEnum = (typeof SceneMangaPageScalarFieldEnum)[keyof typeof SceneMangaPageScalarFieldEnum]
+
+
+export const VersionScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  branchName: 'branchName',
+  versionIndex: 'versionIndex',
+  label: 'label',
+  summary: 'summary',
+  createdAt: 'createdAt'
+} as const
+
+export type VersionScalarFieldEnum = (typeof VersionScalarFieldEnum)[keyof typeof VersionScalarFieldEnum]
+
+
+export const WarningScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  fingerprint: 'fingerprint',
+  kind: 'kind',
+  severity: 'severity',
+  status: 'status',
+  title: 'title',
+  message: 'message',
+  entityKind: 'entityKind',
+  entityId: 'entityId',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt'
+} as const
+
+export type WarningScalarFieldEnum = (typeof WarningScalarFieldEnum)[keyof typeof WarningScalarFieldEnum]
+
+
+export const ExportRecordScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  kind: 'kind',
+  format: 'format',
+  status: 'status',
+  label: 'label',
+  summary: 'summary',
+  artifactPath: 'artifactPath',
+  artifactName: 'artifactName',
+  metadataJson: 'metadataJson',
+  sizeBytes: 'sizeBytes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  completedAt: 'completedAt',
+  failedAt: 'failedAt',
+  errorMessage: 'errorMessage'
+} as const
+
+export type ExportRecordScalarFieldEnum = (typeof ExportRecordScalarFieldEnum)[keyof typeof ExportRecordScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -158,4 +554,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

@@ -7,3 +7,6 @@ export const db = new PrismaClient({
   adapter,
   errorFormat: "pretty",
 });
+
+// Alias pour compatibilité avec le reste du code
+export const prisma = db;

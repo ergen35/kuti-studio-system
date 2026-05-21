@@ -7,25 +7,26 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, dateLabel, EmptyState, ErrorState, LinkButton, LoadingState, PageHeader, Panel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { api, apiErrorMessage, type ExportFormat, type ExportKind } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import { apiErrorMessage, API_BASE_URL } from "~/lib/api";
+import { useExports, useCreateExport } from "~/hooks/use-api";
+import { queryClient } from "~/lib/query";
 import { exportCreateSchema, type ExportCreateInput } from "~/lib/schemas";
 
 export default function ExportsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['exports', 'common']);
-  const exports = useQuery({ queryKey: keys.exports(projectId), queryFn: () => api.exports(projectId) });
+  const exports = useExports(projectId);
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ExportCreateInput>({
     resolver: zodResolver(exportCreateSchema),
     defaultValues: { kind: 'work', format: 'json', label: 'Work export' },
   });
   
-  const create = useMutation({ 
-    mutationFn: (data: ExportCreateInput) => api.createExport(projectId, { kind: data.kind as ExportKind, format: data.format as ExportFormat, label: data.label }), 
-    onSuccess: () => { reset(); invalidateWorkspace(projectId); }
-  });
-  const onSubmit = (data: ExportCreateInput) => create.mutate(data);
+  const create = useCreateExport();
+  const onSubmit = (data: ExportCreateInput) => create.mutate({
+    path: { project_id: projectId },
+    body: { kind: data.kind as "work" | "publication", format: data.format as "json" | "tree" | "zip", label: data.label }
+  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readExportsApiProjectsProjectIdExportsGet"] }); } });
 
   const kindOptions = [
     { value: "work", label: t('panels.create.kinds.work') },
@@ -71,7 +72,7 @@ export default function ExportsRoute() {
               <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.id}>
                 <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{item.label}</strong><Badge tone={item.status}>{item.status}</Badge></div>
                 <small className="text-xs text-muted">{item.kind} · {item.format} · {dateLabel(item.created_at)}</small>
-                {item.artifact_path ? <LinkButton href={api.fileUrl(`/projects/${projectId}/exports/${item.id}/download`)}><Download size={15} /> {t('common:actions.download')}</LinkButton> : null}
+                {item.artifact_path ? <LinkButton href={`${API_BASE_URL}/api/projects/${projectId}/exports/${item.id}/download`}><Download size={15} /> {t('common:actions.download')}</LinkButton> : null}
               </div>
             ))}
           </div>

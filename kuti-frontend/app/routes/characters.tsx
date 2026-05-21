@@ -10,8 +10,10 @@ import { AppShell } from '~/components/layout';
 import { Button, ErrorState, LoadingState } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { CharacterCardGrid } from '~/components/characters';
-import { api, apiErrorMessage } from '~/lib/api';
-import { invalidateWorkspace, invalidateProject, keys, queryClient } from '~/lib/query';
+import { apiErrorMessage, API_BASE_URL } from '~/lib/api';
+import { useCharacters, useCreateCharacter } from '~/hooks/use-api';
+import { queryClient } from '~/lib/query';
+
 
 // Schema for creating a new character
 const createCharacterSchema = z.object({
@@ -150,34 +152,34 @@ export default function CharactersRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch all characters
-  const characters = useQuery({ 
-    queryKey: keys.characters(projectId), 
-    queryFn: () => api.characters(projectId) 
-  });
+  const characters = useCharacters(projectId);
   
   // Fetch character images for all characters
   const characterImages = useQuery({
-    queryKey: keys.characterImages(projectId, 'all'),
-    queryFn: () => api.projectCharacterImages(projectId),
+    queryKey: ['characterImages', projectId, 'all'],
+    queryFn: async () => {
+      const { readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet } = await import('~/lib/backend');
+      const { data } = await readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet({
+        path: { project_id: projectId }
+      });
+      return data ?? {};
+    },
+    enabled: !!projectId,
   });
   
   // Create mutation
-  // Create mutation
-  const create = useMutation({
-    mutationFn: (body: CreateCharacterInput) => api.createCharacter(projectId, body),
-    onSuccess: (character) => {
-      invalidateWorkspace(projectId);
-      // Navigate to the new character's detail page
-      navigate(`/projects/${projectId}/characters/${character.id}`);
-    },
-  });
+  const create = useCreateCharacter();
   
   // Delete character image mutation (for grid updates)
   const deleteImageMutation = useMutation({
-    mutationFn: ({ characterId, imageId }: { characterId: string; imageId: string }) => 
-      api.deleteCharacterImage(projectId, characterId, imageId),
+    mutationFn: async ({ characterId, imageId }: { characterId: string; imageId: string }) => {
+      const { deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete } = await import('~/lib/backend');
+      await deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete({
+        path: { project_id: projectId, character_id: characterId, image_id: imageId }
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: keys.characterImages(projectId, 'all') });
+      queryClient.invalidateQueries({ queryKey: ['characterImages', projectId, 'all'] });
     },
   });
   
@@ -186,11 +188,24 @@ export default function CharactersRoute() {
   };
   
   const handleCreateSubmit = (data: CreateCharacterInput) => {
-    create.mutate(data, {
-      onSuccess: () => {
-        setIsModalOpen(false);
+    create.mutate(
+      {
+        path: { project_id: projectId },
+        body: {
+          name: data.name,
+          narrative_role: data.narrative_role || null,
+          description: '',
+        }
       },
-    });
+      {
+        onSuccess: (result: unknown) => {
+          const character = result as { id: string };
+          setIsModalOpen(false);
+          // Navigate to the new character's detail page
+          navigate(`/projects/${projectId}/characters/${character.id}`);
+        },
+      }
+    );
   };
   
   const handleSelect = (characterId: string) => {
@@ -237,7 +252,7 @@ export default function CharactersRoute() {
       {/* Character card grid */}
       {characters.data && (
         <CharacterCardGrid
-          characters={characters.data.items}
+          characters={characters.data.items as unknown as import('~/lib/api').Character[]}
           imagesByCharacter={characterImages.data || {}}
           onSelect={(char) => handleSelect(char.id)}
           onCreate={handleCreateClick}

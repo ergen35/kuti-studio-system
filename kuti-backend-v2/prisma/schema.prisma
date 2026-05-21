@@ -7,6 +7,10 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================================================
+// Better Auth Models (keep as-is)
+// ============================================================================
+
 model User {
   id            String    @id
   name          String
@@ -73,4 +77,695 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// ============================================================================
+// Kuti Studio Domain Models
+// ============================================================================
+
+enum ProjectStatus {
+  draft
+  active
+  archived
+  maintenance
+
+  @@map("project_status")
+}
+
+model Project {
+  id            String        @id @default(uuid())
+  name          String
+  slug          String        @unique
+  status        ProjectStatus @default(draft)
+  rootPath      String        @map("root_path")
+  settingsJson  Json          @default("{}") @map("settings_json")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  lastOpenedAt  DateTime?     @map("last_opened_at")
+  archivedAt    DateTime?     @map("archived_at")
+
+  // Relations
+  characters    Character[]
+  characterRelations CharacterRelation[]
+  voiceSamples  VoiceSample[]
+  tomes         Tome[]
+  chapters      Chapter[]
+  scenes        Scene[]
+  storyReferences StoryReference[]
+  assets        Asset[]
+  assetLinks    AssetLink[]
+  generationJobs GenerationJob[]
+  generationBoards GenerationBoard[]
+  warnings      Warning[]
+  versions      Version[]
+  exports       ExportRecord[]
+  characterImages CharacterImage[]
+  sceneGenerationConfigs SceneGenerationConfig[]
+  sceneMangaPages SceneMangaPage[]
+
+  @@map("projects")
+}
+
+// ============================================================================
+// Characters Domain
+// ============================================================================
+
+enum CharacterStatus {
+  active
+  draft
+  archived
+
+  @@map("character_status")
+}
+
+model Character {
+  id                    String          @id @default(uuid())
+  projectId             String          @map("project_id")
+  slug                  String
+  name                  String
+  alias                 String?
+  narrativeRole         String?         @map("narrative_role")
+  description           String          @default("")
+  physicalDescription   String          @default("") @map("physical_description")
+  colorPaletteJson      Json            @default("[]") @map("color_palette_json")
+  costumeElementsJson   Json            @default("[]") @map("costume_elements_json")
+  keyTraitsJson         Json            @default("[]") @map("key_traits_json")
+  personality           String          @default("")
+  narrativeArc          String          @default("") @map("narrative_arc")
+  tagsJson              Json            @default("[]") @map("tags_json")
+  status                CharacterStatus @default(active)
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
+  archivedAt            DateTime?       @map("archived_at")
+
+  // Relations
+  project               Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sourceRelations       CharacterRelation[] @relation("SourceCharacter")
+  targetRelations       CharacterRelation[] @relation("TargetCharacter")
+  voiceSamples          VoiceSample[]
+  images                CharacterImage[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@index([slug])
+  @@index([name])
+  @@map("characters")
+}
+
+model CharacterRelation {
+  id                  String    @id @default(uuid())
+  projectId           String    @map("project_id")
+  sourceCharacterId   String    @map("source_character_id")
+  targetCharacterId   String    @map("target_character_id")
+  relationType        String    @map("relation_type")
+  strength            Int       @default(50)
+  narrativeDependency String    @default("") @map("narrative_dependency")
+  notes               String    @default("")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  project             Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sourceCharacter     Character @relation("SourceCharacter", fields: [sourceCharacterId], references: [id], onDelete: Cascade)
+  targetCharacter     Character @relation("TargetCharacter", fields: [targetCharacterId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([sourceCharacterId])
+  @@index([targetCharacterId])
+  @@map("character_relations")
+}
+
+model VoiceSample {
+  id            String    @id @default(uuid())
+  projectId     String    @map("project_id")
+  characterId   String    @map("character_id")
+  assetPath     String?   @map("asset_path")
+  label         String
+  voiceNotes    String    @default("") @map("voice_notes")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([characterId])
+  @@map("voice_samples")
+}
+
+model CharacterImage {
+  id              String    @id @default(uuid())
+  projectId       String    @map("project_id")
+  characterId     String    @map("character_id")
+  boardPanelId    String?   @map("board_panel_id")
+  filePath        String    @map("file_path")
+  fileName        String    @map("file_name")
+  fileSize        Int?      @map("file_size")
+  mimeType        String    @default("image/png") @map("mime_type")
+  prompt          String    @default("")
+  strategy        String?
+  style           String?
+  variationIndex  Int?      @map("variation_index")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  character       Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, fileName])
+  @@index([projectId])
+  @@index([characterId])
+  @@index([boardPanelId])
+  @@map("character_images")
+}
+
+// ============================================================================
+// Story Domain
+// ============================================================================
+
+enum StoryStatus {
+  active
+  draft
+  archived
+
+  @@map("story_status")
+}
+
+model Tome {
+  id          String      @id @default(uuid())
+  projectId   String      @map("project_id")
+  title       String
+  slug        String
+  synopsis    String      @default("")
+  status      StoryStatus @default(draft)
+  orderIndex  Int         @default(0) @map("order_index")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  chapters    Chapter[]
+  scenes      Scene[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@map("tomes")
+}
+
+model Chapter {
+  id          String      @id @default(uuid())
+  projectId   String      @map("project_id")
+  tomeId      String      @map("tome_id")
+  title       String
+  slug        String
+  synopsis    String      @default("")
+  status      StoryStatus @default(draft)
+  orderIndex  Int         @default(0) @map("order_index")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tome        Tome        @relation(fields: [tomeId], references: [id], onDelete: Cascade)
+  scenes      Scene[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@index([tomeId])
+  @@map("chapters")
+}
+
+model Scene {
+  id            String      @id @default(uuid())
+  projectId     String      @map("project_id")
+  tomeId        String      @map("tome_id")
+  chapterId     String      @map("chapter_id")
+  title         String
+  slug          String
+  sceneType     String      @default("") @map("scene_type")
+  location      String      @default("")
+  summary       String      @default("")
+  content       String      @default("")
+  notes         String      @default("")
+  charactersJson Json       @default("[]") @map("characters_json")
+  tagsJson      Json        @default("[]") @map("tags_json")
+  status        StoryStatus @default(draft)
+  orderIndex    Int         @default(0) @map("order_index")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  project       Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tome          Tome        @relation(fields: [tomeId], references: [id], onDelete: Cascade)
+  chapter       Chapter     @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  references    StoryReference[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@index([tomeId])
+  @@index([chapterId])
+  @@map("scenes")
+}
+
+model StoryReference {
+  id            String    @id @default(uuid())
+  projectId     String    @map("project_id")
+  sceneId       String    @map("scene_id")
+  referenceKind String    @map("reference_kind")
+  targetSlug    String    @map("target_slug")
+  rawToken      String    @map("raw_token")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scene         Scene     @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([sceneId])
+  @@map("story_references")
+}
+
+// ============================================================================
+// Assets Domain
+// ============================================================================
+
+enum AssetStatus {
+  active
+  archived
+
+  @@map("asset_status")
+}
+
+model Asset {
+  id                String      @id @default(uuid())
+  projectId         String      @map("project_id")
+  slug              String
+  name              String
+  originalFilename  String      @map("original_filename")
+  mimeType          String      @map("mime_type")
+  checksum          String
+  sizeBytes         Int         @map("size_bytes")
+  storagePath       String      @map("storage_path")
+  description       String      @default("")
+  tagsJson          Json        @default("[]") @map("tags_json")
+  status            AssetStatus @default(active)
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+  archivedAt        DateTime?   @map("archived_at")
+
+  // Relations
+  project           Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  links             AssetLink[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@map("assets")
+}
+
+model AssetLink {
+  id          String    @id @default(uuid())
+  projectId   String    @map("project_id")
+  assetId     String    @map("asset_id")
+  targetKind  String    @map("target_kind")
+  targetId    String    @map("target_id")
+  note        String    @default("")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  asset       Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([assetId])
+  @@index([targetId])
+  @@map("asset_links")
+}
+
+// ============================================================================
+// Generation Domain
+// ============================================================================
+
+enum GenerationSourceKind {
+  scene
+  chapter
+  tome
+  panel
+  custom
+
+  @@map("generation_source_kind")
+}
+
+enum GenerationStrategy {
+  direct
+  intermediate
+
+  @@map("generation_strategy")
+}
+
+enum GenerationJobStatus {
+  pending
+  running
+  ready
+  validated
+  failed
+
+  @@map("generation_job_status")
+}
+
+enum GenerationStepStatus {
+  pending
+  running
+  ready
+  failed
+
+  @@map("generation_step_status")
+}
+
+enum GenerationBoardStatus {
+  draft
+  validated
+
+  @@map("generation_board_status")
+}
+
+enum GenerationPanelStatus {
+  draft
+  selected
+  rejected
+  replaced
+
+  @@map("generation_panel_status")
+}
+
+model GenerationJob {
+  id                String              @id @default(uuid())
+  projectId         String              @map("project_id")
+  sourceKind        GenerationSourceKind @map("source_kind")
+  sourceId          String              @map("source_id")
+  sourceLabel       String              @map("source_label")
+  sourceVersionId   String?             @map("source_version_id")
+  strategy          GenerationStrategy
+  entrypoint        String              @default("gpt-2-images")
+  title             String              @default("Generation job")
+  prompt            String              @default("")
+  summary           String              @default("")
+  status            GenerationJobStatus @default(pending)
+  progress          Int                 @default(0)
+  metadataJson      Json                @default("{}") @map("metadata_json")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  completedAt       DateTime?           @map("completed_at")
+  failedAt          DateTime?           @map("failed_at")
+  errorMessage      String?             @map("error_message")
+
+  // Relations
+  project           Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  steps             GenerationJobStep[]
+  board             GenerationBoard?
+
+  @@index([projectId])
+  @@index([sourceKind])
+  @@index([sourceId])
+  @@index([sourceVersionId])
+  @@index([strategy])
+  @@index([status])
+  @@map("generation_jobs")
+}
+
+model GenerationJobStep {
+  id            String              @id @default(uuid())
+  jobId         String              @map("job_id")
+  orderIndex    Int                 @default(0) @map("order_index")
+  title         String
+  status        GenerationStepStatus @default(pending)
+  prompt        String              @default("")
+  outputText    String              @default("") @map("output_text")
+  artifactPath  String?             @map("artifact_path")
+  artifactName  String?             @map("artifact_name")
+  metadataJson  Json                @default("{}") @map("metadata_json")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+  completedAt   DateTime?           @map("completed_at")
+  failedAt      DateTime?           @map("failed_at")
+  errorMessage  String?             @map("error_message")
+
+  // Relations
+  job           GenerationJob       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([status])
+  @@map("generation_job_steps")
+}
+
+model GenerationBoard {
+  id            String              @id @default(uuid())
+  projectId     String              @map("project_id")
+  jobId         String              @unique @map("job_id")
+  sourceKind    GenerationSourceKind @map("source_kind")
+  strategy      GenerationStrategy
+  title         String
+  summary       String              @default("")
+  status        GenerationBoardStatus @default(draft)
+  artifactPath  String?             @map("artifact_path")
+  artifactName  String?             @map("artifact_name")
+  metadataJson  Json                @default("{}") @map("metadata_json")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+  validatedAt   DateTime?           @map("validated_at")
+
+  // Relations
+  project       Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  job           GenerationJob       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  panels        GenerationBoardPanel[]
+
+  @@index([projectId])
+  @@index([sourceKind])
+  @@index([strategy])
+  @@index([status])
+  @@map("generation_boards")
+}
+
+model GenerationBoardPanel {
+  id            String              @id @default(uuid())
+  boardId       String              @map("board_id")
+  stepId        String?             @map("step_id")
+  orderIndex    Int                 @default(0) @map("order_index")
+  title         String
+  caption       String              @default("")
+  prompt        String              @default("")
+  status        GenerationPanelStatus @default(draft)
+  imagePath     String              @map("image_path")
+  imageName     String              @map("image_name")
+  metadataJson  Json                @default("{}") @map("metadata_json")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  board         GenerationBoard     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@index([boardId])
+  @@index([stepId])
+  @@index([status])
+  @@map("generation_board_panels")
+}
+
+// ============================================================================
+// Scene Generation Domain
+// ============================================================================
+
+enum StylePreset {
+  shonen
+  shojo
+  seinen
+  generic
+
+  @@map("style_preset")
+}
+
+enum ColorMode {
+  bw
+  color
+  spot_color
+
+  @@map("color_mode")
+}
+
+model SceneGenerationConfig {
+  id                String      @id @default(uuid())
+  projectId         String      @map("project_id")
+  name              String
+  isDefault         Boolean     @default(false) @map("is_default")
+  systemPrompt      String      @map("system_prompt")
+  stylePreset       StylePreset @default(generic) @map("style_preset")
+  colorMode         ColorMode   @default(bw) @map("color_mode")
+  defaultImageCount Int         @default(4) @map("default_image_count")
+  allowMultiPage    Boolean     @default(false) @map("allow_multi_page")
+  metadataJson      Json        @default("{}") @map("metadata_json")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  project           Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("scene_generation_configs")
+}
+
+enum MangaPageStatus {
+  draft
+  selected
+  rejected
+
+  @@map("manga_page_status")
+}
+
+model SceneMangaPage {
+  id          String          @id @default(uuid())
+  projectId   String          @map("project_id")
+  sceneId     String          @map("scene_id")
+  tomeId      String          @map("tome_id")
+  chapterId   String          @map("chapter_id")
+  jobId       String          @map("job_id")
+  boardId     String          @map("board_id")
+  panelId     String          @map("panel_id")
+  pageNumber  Int             @map("page_number")
+  label       String
+  status      MangaPageStatus @default(draft)
+  imageUrl    String?         @map("image_url")
+  caption     String?
+  prompt      String?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([sceneId])
+  @@index([tomeId])
+  @@index([chapterId])
+  @@index([jobId])
+  @@index([boardId])
+  @@map("scene_manga_pages")
+}
+
+// ============================================================================
+// Versions Domain
+// ============================================================================
+
+model Version {
+  id            String    @id @default(uuid())
+  projectId     String    @map("project_id")
+  branchName    String    @map("branch_name")
+  versionIndex  Int       @map("version_index")
+  label         String
+  summary       String    @default("")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([branchName])
+  @@map("versions")
+}
+
+// ============================================================================
+// Warnings Domain
+// ============================================================================
+
+enum WarningSeverity {
+  info
+  warning
+  critical
+
+  @@map("warning_severity")
+}
+
+enum WarningStatus {
+  open
+  ignored
+  resolved
+
+  @@map("warning_status")
+}
+
+model Warning {
+  id            String          @id @default(uuid())
+  projectId     String          @map("project_id")
+  fingerprint   String
+  kind          String
+  severity      WarningSeverity
+  status        WarningStatus   @default(open)
+  title         String
+  message       String
+  entityKind    String          @map("entity_kind")
+  entityId      String          @map("entity_id")
+  metadataJson  Json            @default("{}") @map("metadata_json")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  resolvedAt    DateTime?       @map("resolved_at")
+
+  // Relations
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, fingerprint])
+  @@index([projectId])
+  @@index([severity])
+  @@index([status])
+  @@index([kind])
+  @@map("warnings")
+}
+
+// ============================================================================
+// Exports Domain
+// ============================================================================
+
+enum ExportFormat {
+  json
+  tree
+  zip
+
+  @@map("export_format")
+}
+
+enum ExportKind {
+  work
+  publication
+
+  @@map("export_kind")
+}
+
+enum ExportStatus {
+  pending
+  ready
+  failed
+
+  @@map("export_status")
+}
+
+model ExportRecord {
+  id            String        @id @default(uuid())
+  projectId     String        @map("project_id")
+  kind          ExportKind
+  format        ExportFormat
+  status        ExportStatus  @default(pending)
+  label         String
+  summary       String        @default("")
+  artifactPath  String?       @map("artifact_path")
+  artifactName  String?       @map("artifact_name")
+  metadataJson  Json          @default("{}") @map("metadata_json")
+  sizeBytes     Int?          @map("size_bytes")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  completedAt   DateTime?     @map("completed_at")
+  failedAt      DateTime?     @map("failed_at")
+  errorMessage  String?       @map("error_message")
+
+  // Relations
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@map("export_records")
 }

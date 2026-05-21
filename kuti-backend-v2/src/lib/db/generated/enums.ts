@@ -9,7 +9,167 @@
 * 🟢 You can import this file directly.
 */
 
+export const ProjectStatus = {
+  draft: 'draft',
+  active: 'active',
+  archived: 'archived',
+  maintenance: 'maintenance'
+} as const
+
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const CharacterStatus = {
+  active: 'active',
+  draft: 'draft',
+  archived: 'archived'
+} as const
+
+export type CharacterStatus = (typeof CharacterStatus)[keyof typeof CharacterStatus]
+
+
+export const StoryStatus = {
+  active: 'active',
+  draft: 'draft',
+  archived: 'archived'
+} as const
+
+export type StoryStatus = (typeof StoryStatus)[keyof typeof StoryStatus]
+
+
+export const AssetStatus = {
+  active: 'active',
+  archived: 'archived'
+} as const
+
+export type AssetStatus = (typeof AssetStatus)[keyof typeof AssetStatus]
+
+
+export const GenerationSourceKind = {
+  scene: 'scene',
+  chapter: 'chapter',
+  tome: 'tome',
+  panel: 'panel',
+  custom: 'custom'
+} as const
+
+export type GenerationSourceKind = (typeof GenerationSourceKind)[keyof typeof GenerationSourceKind]
+
+
+export const GenerationStrategy = {
+  direct: 'direct',
+  intermediate: 'intermediate'
+} as const
+
+export type GenerationStrategy = (typeof GenerationStrategy)[keyof typeof GenerationStrategy]
+
+
+export const GenerationJobStatus = {
+  pending: 'pending',
+  running: 'running',
+  ready: 'ready',
+  validated: 'validated',
+  failed: 'failed'
+} as const
+
+export type GenerationJobStatus = (typeof GenerationJobStatus)[keyof typeof GenerationJobStatus]
+
+
+export const GenerationStepStatus = {
+  pending: 'pending',
+  running: 'running',
+  ready: 'ready',
+  failed: 'failed'
+} as const
+
+export type GenerationStepStatus = (typeof GenerationStepStatus)[keyof typeof GenerationStepStatus]
+
+
+export const GenerationBoardStatus = {
+  draft: 'draft',
+  validated: 'validated'
+} as const
+
+export type GenerationBoardStatus = (typeof GenerationBoardStatus)[keyof typeof GenerationBoardStatus]
+
+
+export const GenerationPanelStatus = {
+  draft: 'draft',
+  selected: 'selected',
+  rejected: 'rejected',
+  replaced: 'replaced'
+} as const
+
+export type GenerationPanelStatus = (typeof GenerationPanelStatus)[keyof typeof GenerationPanelStatus]
+
+
+export const StylePreset = {
+  shonen: 'shonen',
+  shojo: 'shojo',
+  seinen: 'seinen',
+  generic: 'generic'
+} as const
+
+export type StylePreset = (typeof StylePreset)[keyof typeof StylePreset]
+
+
+export const ColorMode = {
+  bw: 'bw',
+  color: 'color',
+  spot_color: 'spot_color'
+} as const
+
+export type ColorMode = (typeof ColorMode)[keyof typeof ColorMode]
+
+
+export const MangaPageStatus = {
+  draft: 'draft',
+  selected: 'selected',
+  rejected: 'rejected'
+} as const
+
+export type MangaPageStatus = (typeof MangaPageStatus)[keyof typeof MangaPageStatus]
+
+
+export const WarningSeverity = {
+  info: 'info',
+  warning: 'warning',
+  critical: 'critical'
+} as const
+
+export type WarningSeverity = (typeof WarningSeverity)[keyof typeof WarningSeverity]
+
+
+export const WarningStatus = {
+  open: 'open',
+  ignored: 'ignored',
+  resolved: 'resolved'
+} as const
+
+export type WarningStatus = (typeof WarningStatus)[keyof typeof WarningStatus]
+
+
+export const ExportFormat = {
+  json: 'json',
+  tree: 'tree',
+  zip: 'zip'
+} as const
+
+export type ExportFormat = (typeof ExportFormat)[keyof typeof ExportFormat]
+
+
+export const ExportKind = {
+  work: 'work',
+  publication: 'publication'
+} as const
+
+export type ExportKind = (typeof ExportKind)[keyof typeof ExportKind]
+
+
+export const ExportStatus = {
+  pending: 'pending',
+  ready: 'ready',
+  failed: 'failed'
+} as const
+
+export type ExportStatus = (typeof ExportStatus)[keyof typeof ExportStatus]

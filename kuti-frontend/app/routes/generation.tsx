@@ -8,17 +8,18 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, Card, EmptyState, ErrorState, LoadingState, PageHeader, Panel, dateLabel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { api, apiErrorMessage, type Chapter, type Scene, type Tome } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import { apiErrorMessage, API_BASE_URL } from "~/lib/api";
+import { useStory, useGenerationJobs, useGenerationBoards, useModels, useCreateGenerationJob, useValidateBoard } from "~/hooks/use-api";
+import { queryClient } from "~/lib/query";
 import { generationJobSchema, type GenerationJobInput } from "~/lib/schemas";
 
 export default function GenerationRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['generation', 'common']);
-  const story = useQuery({ queryKey: keys.story(projectId), queryFn: () => api.story(projectId) });
-  const models = useQuery({ queryKey: keys.models, queryFn: api.models });
-  const jobs = useQuery({ queryKey: keys.generationJobs(projectId), queryFn: () => api.generationJobs(projectId) });
-  const boards = useQuery({ queryKey: keys.generationBoards(projectId), queryFn: () => api.generationBoards(projectId) });
+  const story = useStory(projectId);
+  const models = useModels();
+  const jobs = useGenerationJobs(projectId);
+  const boards = useGenerationBoards(projectId);
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset, control, setValue } = useForm<GenerationJobInput>({
     resolver: zodResolver(generationJobSchema),
@@ -35,27 +36,27 @@ export default function GenerationRoute() {
     }
   }, [sourceKind, prevKind, setValue]);
   
-  const sources = useMemo<Array<Tome | Chapter | Scene>>(() => 
+  const sources = useMemo<Array<unknown>>(() => 
     sourceKind === "tome" ? story.data?.tomes || [] : 
     sourceKind === "chapter" ? story.data?.chapters || [] : 
     story.data?.scenes || [], 
   [sourceKind, story.data]);
   
-  const create = useMutation({ 
-    mutationFn: (data: GenerationJobInput) => api.createGenerationJob(projectId, { 
-      source_kind: data.source_kind, 
-      source_id: data.source_id, 
-      strategy: "direct", 
-      model_key: data.model_key || undefined, 
-      mode: data.mode, 
-      grid_rows: data.mode === "grid" ? 2 : undefined, 
-      grid_cols: data.mode === "grid" ? 2 : undefined 
-    }), 
-    onSuccess: () => { reset(); invalidateWorkspace(projectId); }
-  });
-  const onSubmit = (data: GenerationJobInput) => create.mutate(data);
+  const create = useCreateGenerationJob();
+  const onSubmit = (data: GenerationJobInput) => create.mutate({
+    path: { project_id: projectId },
+    body: {
+      source_kind: data.source_kind,
+      source_id: data.source_id,
+      strategy: "direct",
+      model_key: data.model_key || undefined,
+      mode: data.mode,
+      grid_rows: data.mode === "grid" ? 2 : undefined,
+      grid_cols: data.mode === "grid" ? 2 : undefined
+    }
+  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readGenerationJobsApiProjectsProjectIdGenerationJobsGet"] }); } });
   
-  const validate = useMutation({ mutationFn: (boardId: string) => api.validateBoard(projectId, boardId), onSuccess: () => invalidateWorkspace(projectId) });
+  const validate = useValidateBoard();
 
   const sourceOptions = [
     { value: "scene", label: t('sources.scene') },
@@ -77,13 +78,13 @@ export default function GenerationRoute() {
             <FormField label={t('panels.create.source')} error={errors.source_id}>
               <select {...register('source_id')}>
                 <option value="">{t('panels.create.selectSource')}</option>
-                {sources.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
+                {(sources as Array<{ id: string; title: string }>).map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
               </select>
             </FormField>
             <FormField label={t('panels.create.model')} error={errors.model_key}>
               <select {...register('model_key')}>
                 <option value="">{t('panels.create.defaultModel')}</option>
-                {(models.data || []).map((model) => <option key={model.key} value={model.key}>{model.display_name} · {model.kind} {model.configured ? "" : t('panels.create.notConfigured')}</option>)}
+                {((models.data as Array<{ key: string; display_name: string; kind: string; configured: boolean }> | undefined ?? [])).map((model) => <option key={model.key} value={model.key}>{model.display_name} · {model.kind} {model.configured ? "" : t('panels.create.notConfigured')}</option>)}
               </select>
             </FormField>
             <FormField label={t('panels.create.mode')} error={errors.mode}>
@@ -111,8 +112,13 @@ export default function GenerationRoute() {
             <Card key={board.id}>
               <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{board.title}</strong><Badge tone={board.status}>{board.status}</Badge></div>
               <p className="mt-2 text-xs text-muted">{board.source_kind} · {dateLabel(board.created_at)}</p>
-              {board.panels[0] ? <img className="mt-3 aspect-[4/5] w-full rounded-[7px] border border-line bg-surface-2 object-cover" src={api.fileUrl(`/projects/${projectId}/generation/boards/${board.id}/panels/${board.panels[0].id}/image`)} alt={board.panels[0].title} /> : null}
-              <div className="mt-3 flex flex-wrap items-center gap-2"><Button onClick={() => validate.mutate(board.id)}><Check size={15} /> {t('common:actions.validate')}</Button></div>
+              {board.panels?.[0] ? <img className="mt-3 aspect-[4/5] w-full rounded-[7px] border border-line bg-surface-2 object-cover" src={`${API_BASE_URL}/api/projects/${projectId}/generation/boards/${board.id}/panels/${board.panels[0].id}/image`} alt={board.panels[0].title} /> : null}
+              <div className="mt-3 flex flex-wrap items-center gap-2"><Button onClick={() => {
+              const mutationOptions = validate as unknown as { mutationFn?: (opts: { path: { project_id: string; board_id: string } }) => Promise<unknown> };
+              if (mutationOptions.mutationFn) {
+                mutationOptions.mutationFn({ path: { project_id: projectId, board_id: board.id } });
+              }
+            }}><Check size={15} /> {t('common:actions.validate')}</Button></div>
             </Card>
           ))}
         </div>

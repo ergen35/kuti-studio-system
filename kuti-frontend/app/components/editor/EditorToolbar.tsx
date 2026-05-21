@@ -8,6 +8,7 @@ import {
   REDO_COMMAND,
   CAN_UNDO_COMMAND,
   CAN_REDO_COMMAND,
+  $createParagraphNode,
 } from 'lexical';
 import {
   $isListNode,
@@ -145,7 +146,7 @@ export function EditorToolbar() {
         
         // If already this heading, convert back to paragraph
         if ($isHeadingNode(element) && element.getTag() === headingSize) {
-          $wrapNodes(selection, () => $createHeadingNode('paragraph'));
+          $wrapNodes(selection, () => $createParagraphNode());
         } else {
           $wrapNodes(selection, () => $createHeadingNode(headingSize));
         }

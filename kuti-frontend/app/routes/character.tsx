@@ -13,8 +13,17 @@ import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, toCsv } from '~/components/ui';
 import { FormField } from '~/components/FormField';
 import { CharacterAvatar, CharacterImageGallery, CharacterImageGenerator, ImageLightbox } from '~/components/characters';
-import { api, apiErrorMessage, csv, type Character, type CharacterDetail, type CharacterImage, type CharacterRelation, type VoiceSample } from '~/lib/api';
-import { invalidateWorkspace, keys, queryClient } from '~/lib/query';
+import { apiErrorMessage, csv, type Character, type CharacterImage, type CharacterRelation, type VoiceSample } from '~/lib/api';
+import { queryClient } from '~/lib/query';
+import {
+  useCharacter,
+  useCharacters,
+  useCharacterImages,
+  useUpdateCharacter,
+  useArchiveCharacter,
+  useDeleteCharacter,
+  useCreateRelation,
+} from '~/hooks/use-api';
 import { characterSchema, relationSchema, type CharacterInput, type RelationInput } from '~/lib/schemas';
 
 const ITEMS_PER_PAGE = 10;
@@ -257,7 +266,12 @@ function CharacterSidePanel({
         {/* Add relation form */}
         <RelationQuickAdd
           characters={characters.filter(c => c.id !== currentCharacterId)}
-          onSubmit={(body) => relationMutation.mutate(body)}
+          onSubmit={((relationData: { target_character_id: string; relation_type: string; strength: number }) => {
+            relationMutation.mutate({ 
+              path: { project_id: projectId, character_id: currentCharacterId }, 
+              body: { source_character_id: currentCharacterId, ...relationData }
+            } as never);
+          }) as never}
           submitting={relationMutation.isPending}
         />
       </AccordionSection>
@@ -322,66 +336,36 @@ export default function CharacterRoute() {
   const { t } = useTranslation(['characters', 'common']);
   
   // Fetch current character detail
-  const character = useQuery({
-    queryKey: keys.character(projectId, characterId),
-    queryFn: () => api.character(projectId, characterId),
-  });
+  const character = useCharacter(projectId, characterId);
   
   // Fetch all characters for sidepanel
-  const allCharacters = useQuery({
-    queryKey: keys.characters(projectId),
-    queryFn: () => api.characters(projectId),
-  });
+  const allCharacters = useCharacters(projectId);
   
   // Mutations
-  const update = useMutation({
-    mutationFn: (body: Partial<Character>) => api.updateCharacter(projectId, characterId, body),
-    onSuccess: () => invalidateWorkspace(projectId),
-  });
-  
-  const archive = useMutation({
-    mutationFn: () => api.archiveCharacter(projectId, characterId),
-    onSuccess: () => {
-      navigate(`/projects/${projectId}/characters`);
-      invalidateWorkspace(projectId);
-    },
-  });
-  
-  const remove = useMutation({
-    mutationFn: () => api.deleteCharacter(projectId, characterId),
-    onSuccess: () => {
-      navigate(`/projects/${projectId}/characters`);
-      invalidateWorkspace(projectId);
-    },
-  });
-  
-  const relation = useMutation({
-    mutationFn: (body: RelationInput) => 
-      api.createRelation(projectId, characterId, { source_character_id: characterId, ...body }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: keys.character(projectId, characterId) });
-      invalidateWorkspace(projectId);
-    },
-  });
+  const update = useUpdateCharacter();
+  const archive = useArchiveCharacter();
+  const remove = useDeleteCharacter();
+  const relation = useCreateRelation();
   
   // Fetch character images
-  const imagesQuery = useQuery({
-    queryKey: keys.characterImages(projectId, characterId),
-    queryFn: () => api.characterImages(projectId, characterId),
-    select: (data) => data.items,
-  });
+  const imagesQuery = useCharacterImages(projectId, characterId);
   
   // Delete image mutation
   const deleteImageMutation = useMutation({
-    mutationFn: (imageId: string) => api.deleteCharacterImage(projectId, characterId, imageId),
+    mutationFn: async (imageId: string) => {
+      const { deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete } = await import('~/lib/backend');
+      await deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete({
+        path: { project_id: projectId, character_id: characterId, image_id: imageId }
+      });
+    },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: keys.characterImages(projectId, characterId) });
+      queryClient.invalidateQueries({ queryKey: ['readCharacterImagesApiProjectsProjectIdCharactersCharacterIdImagesGet'] });
     },
   });
   
   // Lightbox state
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const lightboxImage = selectedImageIndex !== null ? (imagesQuery.data?.[selectedImageIndex] || null) : null;
+  const lightboxImage = selectedImageIndex !== null ? ((imagesQuery.data as unknown as CharacterImage[])?.[selectedImageIndex] || null) : null;
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   const handleImageClick = (image: CharacterImage, index: number) => {
@@ -465,18 +449,18 @@ export default function CharacterRoute() {
           {/* Image Generator */}
           <div className="mb-4">
             <CharacterImageGenerator 
-              character={character.data}
+              character={character.data as unknown as import('~/lib/api').Character}
               projectId={projectId}
             />
           </div>
           
           {/* Form */}
           <CharacterForm
-            initialData={character.data}
+            initialData={character.data as unknown as Character}
             saving={update.isPending}
-            onSave={(body) => update.mutate(body)}
-            onArchive={() => archive.mutate()}
-            onDelete={() => remove.mutate()}
+            onSave={(body) => update.mutate({ path: { project_id: projectId, character_id: characterId }, body })}
+            onArchive={() => archive.mutate({ path: { project_id: projectId, character_id: characterId } })}
+            onDelete={() => remove.mutate({ path: { project_id: projectId, character_id: characterId } })}
             archiving={archive.isPending}
             deleting={remove.isPending}
           />
@@ -487,13 +471,13 @@ export default function CharacterRoute() {
           characters={(allCharacters.data?.items || []) as Character[]}
           currentCharacterId={characterId}
           projectId={projectId}
-          relations={character.data.relations}
-          voiceSamples={character.data.voice_samples}
-          images={imagesQuery.data || []}
+          relations={(character.data?.relations || []) as CharacterRelation[]}
+          voiceSamples={(character.data?.voice_samples || []) as VoiceSample[]}
+          images={(imagesQuery.data as unknown as { items: CharacterImage[] })?.items || []}
           imageLoading={imagesQuery.isLoading}
           onDeleteImage={handleDeleteImage}
           onImageClick={handleImageClick}
-          relationMutation={relation}
+          relationMutation={relation as unknown as UseMutationResult<CharacterRelation, Error, import('~/lib/schemas').RelationInput, unknown>}
         />
         
         {/* Lightbox */}
@@ -501,7 +485,7 @@ export default function CharacterRoute() {
           image={lightboxImage}
           isOpen={isLightboxOpen}
           onClose={handleCloseLightbox}
-          images={imagesQuery.data || []}
+          images={(imagesQuery.data as unknown as { items: CharacterImage[] })?.items || []}
           currentIndex={selectedImageIndex ?? 0}
           onNavigate={handleLightboxNavigate}
           projectId={projectId}
@@ -629,10 +613,10 @@ function CharacterForm({
 function RelationQuickAdd({ 
   characters, 
   onSubmit, 
-  submitting 
+  submitting
 }: { 
   characters: Character[]; 
-  onSubmit: (body: RelationInput) => void;
+  onSubmit: (data: RelationInput) => void;
   submitting: boolean;
 }) {
   const { t } = useTranslation('characters');

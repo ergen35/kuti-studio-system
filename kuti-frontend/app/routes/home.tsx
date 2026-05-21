@@ -20,9 +20,11 @@ import {
   SectionTitle,
   dateLabel,
 } from "~/components/ui";
-import { api, apiErrorMessage, type Project } from "~/lib/api";
+import { apiErrorMessage, API_BASE_URL, type Project } from "~/lib/api";
+import { useProjects, useCreateProject } from "~/hooks/use-api";
 import { keys, queryClient } from "~/lib/query";
-import { projectCreateSchema, type ProjectCreateInput } from "~/lib/schemas";
+import { projectCreateSchema } from "~/lib/schemas";
+import type { ProjectCreateInput } from "~/lib/schemas";
 import { useTranslation } from "~/hooks/useTranslation";
 
 // =============================================================================
@@ -46,7 +48,7 @@ interface ProjectWithMetrics {
 // =============================================================================
 
 function useBackgroundImages() {
-  const projects = useQuery({ queryKey: keys.projects, queryFn: api.projects });
+  const projects = useProjects();
   
   const projectImagesQueries = useMemo(() => {
     const items = projects.data?.items || [];
@@ -62,10 +64,15 @@ function useBackgroundImages() {
       const results: string[] = [];
       for (const { projectId } of projectImagesQueries) {
         try {
-          const images = await api.projectCharacterImages(projectId);
-          const imageUrls = Object.values(images).flat().slice(0, 2);
-          for (const img of imageUrls) {
-            results.push(api.characterImageUrl(projectId, img.character_id, img.id));
+          const { readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet } = await import("~/lib/backend");
+          const { data: images } = await readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet({
+            path: { project_id: projectId }
+          });
+          if (images) {
+            const imageUrls = Object.values(images).flat().slice(0, 2);
+            for (const img of imageUrls) {
+              results.push(`${API_BASE_URL}/api/projects/${projectId}/characters/${img.character_id}/images/${img.id}/file`);
+            }
           }
         } catch {
           // Ignore errors for background images
@@ -104,7 +111,15 @@ function generateProjectMetrics(project: Project): ProjectMetrics {
 
 function BackendStatusSection() {
   const { t } = useTranslation('home');
-  const health = useQuery({ queryKey: keys.health, queryFn: api.health, retry: 0 });
+  const health = useQuery({
+    queryKey: keys.health,
+    queryFn: async () => {
+      const { healthApiHealthGet } = await import("~/lib/backend");
+      const { data } = await healthApiHealthGet();
+      return data;
+    },
+    retry: 0
+  });
   
   const status: "ok" | "error" | "loading" | "unknown" = health.isLoading 
     ? "loading" 
@@ -135,31 +150,52 @@ function ProjectsSection() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   
-  const projects = useQuery({ queryKey: keys.projects, queryFn: api.projects });
+  const projects = useProjects();
   
   const open = useMutation({
-    mutationFn: (projectId: string) => api.openProject(projectId),
+    mutationFn: async (projectId: string) => {
+      const { openProjectRouteApiProjectsProjectIdOpenPost } = await import("~/lib/backend");
+      const { data } = await openProjectRouteApiProjectsProjectIdOpenPost({
+        path: { project_id: projectId }
+      });
+      return data;
+    },
     onSuccess: async (project) => {
       await queryClient.invalidateQueries({ queryKey: keys.projects });
-      navigate(`/projects/${project.id}`);
+      if (project) {
+        navigate(`/projects/${project.id}`);
+      }
     },
   });
   
   const archive = useMutation({
-    mutationFn: (projectId: string) => api.archiveProject(projectId),
+    mutationFn: async (projectId: string) => {
+      const { archiveProjectRouteApiProjectsProjectIdArchivePost } = await import("~/lib/backend");
+      const { data } = await archiveProjectRouteApiProjectsProjectIdArchivePost({
+        path: { project_id: projectId }
+      });
+      return data;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }),
   });
   
   const clone = useMutation({
-    mutationFn: (projectId: string) => api.cloneProject(projectId, {}),
+    mutationFn: async (projectId: string) => {
+      const { cloneProjectRouteApiProjectsProjectIdClonePost } =await import("~/lib/backend");
+      const { data } = await cloneProjectRouteApiProjectsProjectIdClonePost({
+        path: { project_id: projectId },
+        body: {}
+      });
+      return data;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }),
   });
 
   const items: ProjectWithMetrics[] = useMemo(() => {
-    const projectItems = projects.data?.items || [];
+    const projectItems = projects.data?.items ?? [];
     return projectItems.map(project => ({
-      project,
-      metrics: generateProjectMetrics(project),
+      project: project as unknown as Project,
+      metrics: generateProjectMetrics(project as unknown as Project),
     }));
   }, [projects.data]);
 
@@ -237,16 +273,13 @@ export default function HomeRoute() {
   const navigate = useNavigate();
   const backgroundImages = useBackgroundImages();
   
-  const create = useMutation({
-    mutationFn: (data: ProjectCreateInput) => 
-      api.createProject({ 
-        name: data.name, 
-        status: data.status, 
-        settings_json: { locations_json: [] } 
-      }),
-    onSuccess: async (project) => {
-      await queryClient.invalidateQueries({ queryKey: keys.projects });
-      navigate(`/projects/${project.id}`);
+  const create = useCreateProject({
+    mutation: {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries({ queryKey: keys.projects });
+        const project = data as Project;
+        navigate(`/projects/${project.id}`);
+      },
     },
   });
   
@@ -254,7 +287,13 @@ export default function HomeRoute() {
 
   const handleCreate = () => {
     if (projectName.trim()) {
-      create.mutate({ name: projectName.trim(), status: "draft" });
+      create.mutate({
+        body: {
+          name: projectName.trim(),
+          status: "draft",
+          settings_json: { locations_json: [] }
+        }
+      });
     }
   };
 

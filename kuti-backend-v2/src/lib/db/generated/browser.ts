@@ -37,3 +37,103 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model Project
+ * 
+ */
+export type Project = Prisma.ProjectModel
+/**
+ * Model Character
+ * 
+ */
+export type Character = Prisma.CharacterModel
+/**
+ * Model CharacterRelation
+ * 
+ */
+export type CharacterRelation = Prisma.CharacterRelationModel
+/**
+ * Model VoiceSample
+ * 
+ */
+export type VoiceSample = Prisma.VoiceSampleModel
+/**
+ * Model CharacterImage
+ * 
+ */
+export type CharacterImage = Prisma.CharacterImageModel
+/**
+ * Model Tome
+ * 
+ */
+export type Tome = Prisma.TomeModel
+/**
+ * Model Chapter
+ * 
+ */
+export type Chapter = Prisma.ChapterModel
+/**
+ * Model Scene
+ * 
+ */
+export type Scene = Prisma.SceneModel
+/**
+ * Model StoryReference
+ * 
+ */
+export type StoryReference = Prisma.StoryReferenceModel
+/**
+ * Model Asset
+ * 
+ */
+export type Asset = Prisma.AssetModel
+/**
+ * Model AssetLink
+ * 
+ */
+export type AssetLink = Prisma.AssetLinkModel
+/**
+ * Model GenerationJob
+ * 
+ */
+export type GenerationJob = Prisma.GenerationJobModel
+/**
+ * Model GenerationJobStep
+ * 
+ */
+export type GenerationJobStep = Prisma.GenerationJobStepModel
+/**
+ * Model GenerationBoard
+ * 
+ */
+export type GenerationBoard = Prisma.GenerationBoardModel
+/**
+ * Model GenerationBoardPanel
+ * 
+ */
+export type GenerationBoardPanel = Prisma.GenerationBoardPanelModel
+/**
+ * Model SceneGenerationConfig
+ * 
+ */
+export type SceneGenerationConfig = Prisma.SceneGenerationConfigModel
+/**
+ * Model SceneMangaPage
+ * 
+ */
+export type SceneMangaPage = Prisma.SceneMangaPageModel
+/**
+ * Model Version
+ * 
+ */
+export type Version = Prisma.VersionModel
+/**
+ * Model Warning
+ * 
+ */
+export type Warning = Prisma.WarningModel
+/**
+ * Model ExportRecord
+ * 
+ */
+export type ExportRecord = Prisma.ExportRecordModel

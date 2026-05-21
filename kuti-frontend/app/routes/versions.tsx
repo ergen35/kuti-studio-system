@@ -7,28 +7,29 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, EmptyState, ErrorState, LoadingState, PageHeader, Panel, dateLabel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
-import { api, apiErrorMessage } from "~/lib/api";
-import { invalidateWorkspace, keys } from "~/lib/query";
+import { apiErrorMessage } from "~/lib/api";
+import { useVersions, useBranches, useCreateVersion, useRestoreVersion } from "~/hooks/use-api";
+import { queryClient } from "~/lib/query";
 import { versionCreateSchema, type VersionCreateInput } from "~/lib/schemas";
 
 export default function VersionsRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['versions', 'common']);
-  const versions = useQuery({ queryKey: keys.versions(projectId), queryFn: () => api.versions(projectId) });
-  const branches = useQuery({ queryKey: keys.branches(projectId), queryFn: () => api.branches(projectId) });
+  const versions = useVersions(projectId);
+  const branches = useBranches(projectId);
   
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<VersionCreateInput>({
     resolver: zodResolver(versionCreateSchema),
     defaultValues: { branch: 'main', label: 'Checkpoint' },
   });
   
-  const create = useMutation({ 
-    mutationFn: (data: VersionCreateInput) => api.createVersion(projectId, { label: data.label, branch_name: data.branch }), 
-    onSuccess: () => { reset(); invalidateWorkspace(projectId); } 
-  });
-  const onSubmit = (data: VersionCreateInput) => create.mutate(data);
+  const create = useCreateVersion();
+  const onSubmit = (data: VersionCreateInput) => create.mutate({
+    path: { project_id: projectId },
+    body: { label: data.label, branch_name: data.branch }
+  }, { onSuccess: () => { reset(); queryClient.invalidateQueries({ queryKey: ["readVersionsApiProjectsProjectIdVersionsGet"] }); } });
   
-  const restore = useMutation({ mutationFn: (id: string) => api.restoreVersion(projectId, id), onSuccess: () => invalidateWorkspace(projectId) });
+  const restore = useRestoreVersion();
 
   return (
     <AppShell>
@@ -58,7 +59,7 @@ export default function VersionsRoute() {
         <div className="overflow-x-auto rounded-[7px] border border-line bg-surface shadow-card">
           <table className="w-full border-collapse text-left text-sm">
             <thead><tr className="border-b border-line text-xs text-muted"><th className="p-2.5 font-semibold">{t('table.version')}</th><th className="p-2.5 font-semibold">{t('table.branch')}</th><th className="p-2.5 font-semibold">{t('table.created')}</th><th className="p-2.5" /></tr></thead>
-            <tbody>{(versions.data || []).map((version) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.version_index}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branch_name}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.created_at)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate(version.id)}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
+            <tbody>{(versions.data || []).map((version) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.version_index}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branch_name}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.created_at)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate({ path: { project_id: projectId, version_id: version.id } })}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
           </table>
         </div>
       </div>

@@ -26,9 +26,9 @@ export const authProvider = new Elysia({ name: "authProvider" }).macro("accessCo
       return status("Unauthorized");
     }
 
-    const roles = session.user.role;
+    const role = session.user.role ?? "";
 
-    if (acp.roles && !acp.roles.includes(session.user.role)) {
+    if (acp.roles && !acp.roles.includes(role)) {
       return status("Forbidden");
     }
 
