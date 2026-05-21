@@ -15,7 +15,9 @@ import {
   Maximize2,
 } from "lucide-react";
 import { Button, Badge, EmptyState, LoadingState, ErrorState } from "~/components/ui";
-import type { SceneMangaPage } from "~/lib/backend/types.gen";
+import type { ListSceneMangaPagesResponse } from "~/lib/backend/types.gen";
+
+type SceneMangaPage = ListSceneMangaPagesResponse[number];
 import {
   listSceneMangaPagesOptions,
   updateSceneMangaPageMutation,
@@ -58,7 +60,7 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
     },
   });
 
-  const pages = pagesQuery.data?.pages || [];
+  const pages = pagesQuery.data ?? [];
   const selectedPage = pages.find((p) => p.id === selectedPageId);
 
   // Lightbox navigation

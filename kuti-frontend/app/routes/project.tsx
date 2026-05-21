@@ -17,13 +17,18 @@ import { Badge, Card, EmptyState, ErrorState, LoadingState, PageHeader, SectionT
 export default function ProjectRoute() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(['project', 'common']);
-  const project = useQuery({ ...getProjectOptions({ path: { project_id: projectId } }), enabled: !!projectId });
-  const characters = useQuery({ ...listCharactersOptions({ path: { project_id: projectId } }), enabled: !!projectId });
-  const story = useQuery({ ...getStorySummaryOptions({ path: { project_id: projectId } }), enabled: !!projectId });
-  const warnings = useQuery({ ...listWarningsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
-  const versions = useQuery({ ...listVersionsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
-  const exports = useQuery({ ...listExportsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
-  const jobs = useQuery({ ...listGenerationJobsOptions({ path: { project_id: projectId } }), enabled: !!projectId });
+  const project = useQuery({ ...getProjectOptions({ path: { projectId } }), enabled: !!projectId });
+  const characters = useQuery({ ...listCharactersOptions({ path: { projectId } }), enabled: !!projectId });
+  const story = useQuery({ ...getStorySummaryOptions({ path: { projectId } }), enabled: !!projectId });
+  const warnings = useQuery({ ...listWarningsOptions({ path: { projectId } }), enabled: !!projectId });
+  const versions = useQuery({ ...listVersionsOptions({ path: { projectId } }), enabled: !!projectId });
+  const exports = useQuery({ ...listExportsOptions({ path: { projectId } }), enabled: !!projectId });
+  const jobs = useQuery({ ...listGenerationJobsOptions({ path: { projectId } }), enabled: !!projectId });
+
+  const warningItems = (warnings.data as Array<{ id: string; status: string; title: string; message: string }> | undefined) ?? [];
+  const jobItems = (jobs.data as Array<unknown> | undefined) ?? [];
+  const exportItems = (exports.data as Array<unknown> | undefined) ?? [];
+  const versionItems = (versions.data as Array<unknown> | undefined) ?? [];
 
   const workspaces = [
     { key: "characters", title: t('workspaces.characters.title'), desc: t('workspaces.characters.description') },
@@ -78,8 +83,8 @@ export default function ProjectRoute() {
           <div className="mb-4 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
             <Stat value={getCharactersCount()} label={t('stats.characters')} />
             <Stat value={story.data?.scenes?.length ?? "-"} label={t('stats.scenes')} />
-            <Stat value={warnings.data?.filter?.((item: { status: string }) => item.status === "open").length ?? "-"} label={t('stats.warnings')} />
-            <Stat value={versions.data?.length ?? "-"} label={t('stats.versions')} />
+            <Stat value={warningItems.filter((item) => item.status === "open").length.toString() || "-"} label={t('stats.warnings')} />
+            <Stat value={String(versionItems.length) || "-"} label={t('stats.versions')} />
           </div>
           <div className="grid gap-3 lg:grid-cols-3">
             {workspaces.map(({ key, title, desc }) => (
@@ -94,12 +99,12 @@ export default function ProjectRoute() {
           </div>
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             <Card>
-              <SectionTitle title={t('recent.warnings.title')} meta={`${warnings.data?.length ?? 0} ${t('common:meta.total')}`} />
-              <div className="grid gap-2">{(warnings.data || []).slice(0, 5).map((warning) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={warning.id}><strong className="text-sm text-ink">{warning.title}</strong><small className="text-xs text-muted">{warning.message}</small></div>)}</div>
-              {warnings.data?.length === 0 ? <EmptyState title={t('recent.warnings.empty.title')} description={t('recent.warnings.empty.description')} /> : null}
+              <SectionTitle title={t('recent.warnings.title')} meta={`${warningItems.length ?? 0} ${t('common:meta.total')}`} />
+              <div className="grid gap-2">{(warningItems || []).slice(0, 5).map((warning) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={warning.id}><strong className="text-sm text-ink">{warning.title}</strong><small className="text-xs text-muted">{warning.message}</small></div>)}</div>
+              {warningItems.length === 0 ? <EmptyState title={t('recent.warnings.empty.title')} description={t('recent.warnings.empty.description')} /> : null}
             </Card>
             <Card>
-              <SectionTitle title={t('recent.production.title')} meta={`${jobs.data?.length ?? 0} ${t('recent.production.jobs')} · ${exports.data?.length ?? 0} ${t('recent.production.exports')}`} />
+              <SectionTitle title={t('recent.production.title')} meta={`${jobItems.length ?? 0} ${t('recent.production.jobs')} · ${exportItems.length ?? 0} ${t('recent.production.exports')}`} />
               <p className="text-xs leading-5 text-muted">{t('common:meta.updated')} {dateLabel(getProjectUpdatedAt(project.data))}</p>
               <p className="text-xs leading-5 text-muted">{t('meta.lastOpened')} {dateLabel(getProjectLastOpenedAt(project.data))}</p>
             </Card>

@@ -68,23 +68,23 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
         >
           <img
             src={getImageUrl(image.id)}
-            alt={image.file_name}
+            alt={image.fileName}
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          
+
           {/* Hover overlay with metadata */}
           {hoveredId === image.id && (
             <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm flex flex-col justify-end p-2">
               <div className="flex items-center gap-1 flex-wrap">
                 {image.strategy && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
-                    {getStrategyLabel(image.strategy)}
+                    {getStrategyLabel(image.strategy as string)}
                   </span>
                 )}
                 {image.style && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
-                    {getStyleLabel(image.style)}
+                    {getStyleLabel(image.style as string)}
                   </span>
                 )}
               </div>

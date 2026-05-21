@@ -96,15 +96,15 @@ export function CharacterDetailModal({
     onSave({
       name: data.name,
       alias: data.alias,
-      narrative_role: data.narrative_role,
+      narrativeRole: data.narrative_role,
       description: data.description,
-      physical_description: data.physical_description,
-      key_traits_json: csv(data.key_traits_json),
-      color_palette_json: csv(data.color_palette_json),
-      costume_elements_json: csv(data.costume_elements_json),
+      physicalDescription: data.physical_description,
+      keyTraitsJson: csv(data.key_traits_json),
+      colorPaletteJson: csv(data.color_palette_json),
+      costumeElementsJson: csv(data.costume_elements_json),
       personality: data.personality,
-      narrative_arc: data.narrative_arc,
-      tags_json: csv(data.tags_json),
+      narrativeArc: data.narrative_arc,
+      tagsJson: csv(data.tags_json),
     });
   };
   
@@ -150,15 +150,15 @@ export function CharacterDetailModal({
               <FormField label={t('fields.narrativeRole')} error={errors.narrative_role}>
                 <input {...register('narrative_role')} className="w-full" />
               </FormField>
-              
+
               <FormField label={t('fields.description')} error={errors.description}>
                 <textarea {...register('description')} rows={3} className="w-full" />
               </FormField>
-              
+
               <FormField label={t('fields.physicalDescription')} error={errors.physical_description}>
                 <textarea {...register('physical_description')} rows={3} className="w-full" />
               </FormField>
-              
+
               <div className="grid gap-4 lg:grid-cols-2">
                 <FormField label={t('fields.traits')} error={errors.key_traits_json}>
                   <input {...register('key_traits_json')} className="w-full" placeholder="brave, loyal, cunning..." />
@@ -167,19 +167,19 @@ export function CharacterDetailModal({
                   <input {...register('color_palette_json')} className="w-full" placeholder="#2f6f73, #61a5a0..." />
                 </FormField>
               </div>
-              
+
               <FormField label={t('fields.costumeElements')} error={errors.costume_elements_json}>
                 <input {...register('costume_elements_json')} className="w-full" />
               </FormField>
-              
+
               <FormField label={t('fields.personality')} error={errors.personality}>
                 <textarea {...register('personality')} rows={3} className="w-full" />
               </FormField>
-              
+
               <FormField label={t('fields.narrativeArc')} error={errors.narrative_arc}>
                 <textarea {...register('narrative_arc')} rows={3} className="w-full" />
               </FormField>
-              
+
               <FormField label={t('fields.tags')} error={errors.tags_json}>
                 <input {...register('tags_json')} className="w-full" />
               </FormField>

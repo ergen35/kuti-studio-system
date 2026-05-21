@@ -152,7 +152,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
             
             <div className="min-w-0">
               <b className="block truncate text-sm text-ink">{project.data?.name || t('sidebar.projectHub')}</b>
-              <span className="block truncate text-xs text-muted">{project.data ? `${project.data.status} · ${project.data.root_path}` : "Backend-driven workspace"}</span>
+              <span className="block truncate text-xs text-muted">{project.data ? `${project.data.status} · ${project.data.rootPath}` : "Backend-driven workspace"}</span>
             </div>
           </div>
           

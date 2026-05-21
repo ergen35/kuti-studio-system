@@ -18,7 +18,7 @@ import { queryClient } from '~/lib/query';
 // Schema for creating a new character
 const createCharacterSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  narrative_role: z.string().optional(),
+  narrativeRole: z.string().optional(),
 });
 
 type CreateCharacterInput = z.infer<typeof createCharacterSchema>;
@@ -38,7 +38,7 @@ function CreateCharacterModal({
   const { t } = useTranslation('characters');
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateCharacterInput>({
     resolver: zodResolver(createCharacterSchema),
-    defaultValues: { name: '', narrative_role: '' },
+    defaultValues: { name: '', narrativeRole: '' },
   });
   
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -61,7 +61,7 @@ function CreateCharacterModal({
   // Reset form when opened
   useEffect(() => {
     if (isOpen) {
-      reset({ name: '', narrative_role: '' });
+      reset({ name: '', narrativeRole: '' });
     }
   }, [isOpen, reset]);
   
@@ -102,12 +102,12 @@ function CreateCharacterModal({
             />
           </FormField>
           
-          <FormField 
-            label={t('fields.narrativeRole')} 
-            error={errors.narrative_role}
+          <FormField
+            label={t('fields.narrativeRole')}
+            error={errors.narrativeRole}
           >
             <input
-              {...register('narrative_role')}
+              {...register('narrativeRole')}
               className="w-full"
               placeholder={t('createModal.rolePlaceholder') || 'Ex: Protagoniste'}
             />
@@ -152,15 +152,15 @@ export default function CharactersRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch all characters
-  const characters = useQuery(listCharactersOptions({ path: { project_id: projectId } }));
+  const characters = useQuery(listCharactersOptions({ path: { projectId } }));
   
   // Fetch character images for all characters
   const characterImages = useQuery({
     queryKey: ['characterImages', projectId, 'all'],
     queryFn: async () => {
-      const { readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet } = await import('~/lib/backend');
-      const { data } = await readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet({
-        path: { project_id: projectId }
+      const { getProjectCharacterImages } = await import('~/lib/backend/sdk.gen');
+      const { data } = await getProjectCharacterImages({
+        path: { projectId }
       });
       return data ?? {};
     },
@@ -173,9 +173,9 @@ export default function CharactersRoute() {
   // Delete character image mutation (for grid updates)
   const deleteImageMutation = useMutation({
     mutationFn: async ({ characterId, imageId }: { characterId: string; imageId: string }) => {
-      const { deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete } = await import('~/lib/backend');
-      await deleteCharacterImageRouteApiProjectsProjectIdCharactersCharacterIdImagesImageIdDelete({
-        path: { project_id: projectId, character_id: characterId, image_id: imageId }
+      const { deleteCharacterImage } = await import('~/lib/backend/sdk.gen');
+      await deleteCharacterImage({
+        path: { projectId, characterId, imageId }
       });
     },
     onSuccess: () => {
@@ -190,10 +190,10 @@ export default function CharactersRoute() {
   const handleCreateSubmit = (data: CreateCharacterInput) => {
     create.mutate(
       {
-        path: { project_id: projectId },
+        path: { projectId },
         body: {
           name: data.name,
-          narrative_role: data.narrative_role || null,
+          narrativeRole: data.narrativeRole || null,
           description: '',
         }
       },
@@ -252,7 +252,7 @@ export default function CharactersRoute() {
       {/* Character card grid */}
       {characters.data && (
         <CharacterCardGrid
-          characters={characters.data.items as unknown as import('~/lib/api').Character[]}
+          characters={characters.data}
           imagesByCharacter={characterImages.data || {}}
           onSelect={(char) => handleSelect(char.id)}
           onCreate={handleCreateClick}

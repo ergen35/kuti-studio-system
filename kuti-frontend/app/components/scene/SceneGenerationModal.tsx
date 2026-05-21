@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { clsx } from "clsx";
 import { X, Sparkles, Eye, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "~/hooks/useTranslation";
 import { Button, Badge, ErrorState, LoadingState } from "~/components/ui";
 import { CharacterImageSelector } from "./CharacterImageSelector";
-import type { Scene, SceneGenerationConfig, Character, CharacterImage } from "~/lib/backend/types.gen";
+import type { ListCharactersResponse, GetProjectCharacterImagesResponse, GetStorySummaryResponse } from "~/lib/backend/types.gen";
+
+type Character = ListCharactersResponse[number];
+type CharacterImage = GetProjectCharacterImagesResponse[string][number];
+type Scene = GetStorySummaryResponse['scenes'][number];
 import {
   listSceneConfigsOptions,
   generateSceneMangaMutation,
@@ -60,14 +64,45 @@ export function SceneGenerationModal({
 
   const selectedConfig = configs.data?.find((c) => c.id === selectedConfigId);
 
+  // Compute preview options
+  const previewOptions = useMemo(() => ({
+    path: { projectId, sceneId: scene.id },
+    body: {
+      configId: selectedConfigId,
+      characterImageRefs: selectedCharacterImages,
+      panelCount: imageCount,
+    },
+  }), [projectId, scene.id, selectedConfigId, selectedCharacterImages, imageCount]);
+
+  // Preview mutation config
+  const previewMutationConfig = useMemo(() => {
+    return previewPromptMutation();
+  }, []);
+
   // Preview mutation
   const preview = useMutation({
-    ...previewPromptMutation(),
+    ...previewMutationConfig,
   });
+
+  // Compute generate options
+  const generateOptions = useMemo(() => ({
+    path: { projectId, sceneId: scene.id },
+    body: {
+      configId: selectedConfigId,
+      imageCount,
+      characterImageRefs: selectedCharacterImages,
+      additionalContext,
+    },
+  }), [projectId, scene.id, selectedConfigId, imageCount, selectedCharacterImages, additionalContext]);
+
+  // Generate mutation config
+  const generateMutationConfig = useMemo(() => {
+    return generateSceneMangaMutation();
+  }, []);
 
   // Generate mutation
   const generate = useMutation({
-    ...generateSceneMangaMutation(),
+    ...generateMutationConfig,
     onSuccess: () => {
       invalidateWorkspace(projectId);
       onClose();
@@ -86,6 +121,22 @@ export function SceneGenerationModal({
       return next;
     });
   };
+
+  // Handle preview toggle
+  const handlePreviewToggle = useCallback(() => {
+    const newShowPreview = !showPreview;
+    setShowPreview(newShowPreview);
+    if (!showPreview && selectedConfigId) {
+      preview.mutate(previewOptions);
+    }
+  }, [showPreview, selectedConfigId, preview, previewOptions]);
+
+  // Handle generate
+  const handleGenerate = useCallback(() => {
+    if (selectedConfigId) {
+      generate.mutate(generateOptions);
+    }
+  }, [selectedConfigId, generate, generateOptions]);
 
   if (!isOpen) return null;
 
@@ -192,12 +243,7 @@ export function SceneGenerationModal({
               {/* Preview Section */}
               <div className="border border-line rounded-lg overflow-hidden">
                 <button
-                  onClick={() => {
-                    setShowPreview(!showPreview);
-                    if (!showPreview) {
-                      preview.mutate();
-                    }
-                  }}
+                  onClick={handlePreviewToggle}
                   className="w-full flex items-center justify-between p-3 hover:bg-surface-2/30 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -215,22 +261,21 @@ export function SceneGenerationModal({
                     )}
                     {preview.data && (
                       <div className="space-y-3">
-                        {preview.data.warnings.length > 0 && (
-                          <div className="space-y-1">
-                            {preview.data.warnings.map((warning, i) => (
-                              <div key={i} className="flex items-start gap-2 text-xs text-warning">
-                                <AlertCircle size={14} className="shrink-0 mt-0.5" />
-                                <span>{warning}</span>
-                              </div>
-                            ))}
+                        <div className="text-xs text-muted mb-2">
+                          Style: {preview.data.styleDescription}
+                        </div>
+                        {preview.data.prompts.map((promptItem, i) => (
+                          <div key={i} className="border border-line rounded p-2">
+                            <div className="text-xs font-medium text-ink">{promptItem.title}</div>
+                            <div className="text-xs text-muted">{promptItem.caption}</div>
                           </div>
-                        )}
+                        ))}
                         <details className="text-xs">
                           <summary className="cursor-pointer text-muted hover:text-ink">
-                            Voir le prompt complet ({preview.data.full_prompt.length} caractères)
+                            Voir le system prompt ({preview.data.systemPrompt.length} caractères)
                           </summary>
                           <pre className="mt-2 p-2 bg-ink/5 rounded text-[10px] whitespace-pre-wrap max-h-40 overflow-y-auto">
-                            {preview.data.full_prompt}
+                            {preview.data.systemPrompt}
                           </pre>
                         </details>
                       </div>
@@ -249,7 +294,7 @@ export function SceneGenerationModal({
           </Button>
           <Button
             variant="primary"
-            onClick={() => generate.mutate()}
+            onClick={handleGenerate}
             disabled={!selectedConfigId || generate.isPending}
           >
             {generate.isPending ? (

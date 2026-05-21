@@ -57,7 +57,8 @@ export default function GenerationRoute() {
     },
   });
   const onSubmit = (data: GenerationJobInput) => create.mutate({
-    path: { projectId: projectId },
+    // @ts-expect-error - SDK types have path as never but the API requires projectId
+    path: { projectId },
     body: {
       sourceKind: data.source_kind,
       sourceId: data.source_id,
@@ -70,6 +71,9 @@ export default function GenerationRoute() {
   }, { onSuccess: () => reset() });
   
   const validate = useMutation(validateGenerationBoardMutation());
+
+  const jobItems = (jobs.data as Array<{ id: string; title: string; status: string; sourceKind?: string; progress?: number; modelName?: string; entrypoint?: string }> | undefined) ?? [];
+  const boardItems = (boards.data as Array<{ id: string; title: string; status: string; sourceKind?: string; createdAt?: string; panels?: Array<{ id: string; title: string }> }> | undefined) ?? [];
 
   const sourceOptions = [
     { value: "scene", label: t('sources.scene') },
@@ -114,20 +118,23 @@ export default function GenerationRoute() {
           <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.jobs.title')}</h2>
           {jobs.isLoading ? <LoadingState /> : null}
           {jobs.error ? <ErrorState message={apiErrorMessage(jobs.error)} /> : null}
-          {jobs.data?.length === 0 ? <EmptyState title={t('empty.noJob')} /> : null}
-          <div className="grid gap-2">{(jobs.data || []).map((job: { id: string; title: string; status: string; sourceKind?: string; progress?: number; modelName?: string; entrypoint?: string }) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={job.id}><div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{job.title}</strong><Badge tone={job.status}>{job.status}</Badge></div><small className="text-xs text-muted">{t('panels.jobs.sourceKind')}: {job.sourceKind} · {job.progress}%</small><small className="text-xs text-muted">{job.modelName || job.entrypoint}</small></div>)}</div>
+          {jobItems.length === 0 ? <EmptyState title={t('empty.noJob')} /> : null}
+          <div className="grid gap-2">{(jobItems).map((job) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={job.id}><div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{job.title}</strong><Badge tone={job.status}>{job.status}</Badge></div><small className="text-xs text-muted">{t('panels.jobs.sourceKind')}: {job.sourceKind} · {job.progress}%</small><small className="text-xs text-muted">{job.modelName || job.entrypoint}</small></div>)}</div>
         </Panel>
       </div>
       <Panel className="mt-3">
         <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.boards.title')}</h2>
         <div className="grid gap-3 lg:grid-cols-3">
-          {(boards.data || []).map((board: { id: string; title: string; status: string; sourceKind?: string; createdAt?: string; panels?: Array<{ id: string; title: string }> }) => (
+          {(boardItems).map((board) => (
             <Card key={board.id}>
               <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{board.title}</strong><Badge tone={board.status}>{board.status}</Badge></div>
               <p className="mt-2 text-xs text-muted">{board.sourceKind} · {dateLabel(board.createdAt)}</p>
               {board.panels?.[0] ? <img className="mt-3 aspect-[4/5] w-full rounded-[7px] border border-line bg-surface-2 object-cover" src={`${API_BASE_URL}/api/projects/${projectId}/generation/boards/${board.id}/panels/${board.panels[0].id}/image`} alt={board.panels[0].title} /> : null}
               <div className="mt-3 flex flex-wrap items-center gap-2"><Button onClick={() => {
-                validate.mutate({ path: { projectId: projectId, boardId: board.id } });
+                validate.mutate({
+                  // @ts-expect-error - SDK types have path as never but the API requires it
+                  path: { projectId, boardId: board.id }
+                });
               }}><Check size={15} /> {t('common:actions.validate')}</Button></div>
             </Card>
           ))}

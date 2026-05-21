@@ -250,6 +250,7 @@ export default function ChapterRoute() {
   const updateChapterMut = useMutation({
     mutationFn: async (body: { title: string }) => {
       const { data } = await updateChapter({
+        // @ts-expect-error - SDK types have path as never but the API requires projectId and chapterId
         path: { projectId, chapterId },
         body,
         throwOnError: true,

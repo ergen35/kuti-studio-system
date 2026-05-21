@@ -66,6 +66,7 @@ export const exportCreateSchema = z.object({
   kind: z.enum(['work', 'publication']),
   format: z.enum(['json', 'tree', 'zip']),
   label: z.string().min(1, 'Label is required'),
+  summary: z.string().default(''),
 });
 
 // Project settings schema

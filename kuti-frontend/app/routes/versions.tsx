@@ -15,6 +15,15 @@ import {
   restoreVersionMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
 import { versionCreateSchema, type VersionCreateInput } from "~/lib/schemas";
+import type { GetVersionResponse } from "~/lib/backend/types.gen";
+
+// Type definitions for list responses (not exported from types.gen.ts)
+type Version = GetVersionResponse;
+interface Branch {
+  branchName: string;
+  versionCount: number;
+  latestCreatedAt: string;
+}
 
 export default function VersionsRoute() {
   const { projectId = "" } = useParams();
@@ -37,7 +46,7 @@ export default function VersionsRoute() {
   });
   const onSubmit = (data: VersionCreateInput) => create.mutate({
     path: { projectId: projectId },
-    body: { label: data.label, branchName: data.branch }
+    body: { label: data.label, branchName: data.branch, summary: '' }
   }, { onSuccess: () => reset() });
   
   const restore = useMutation(restoreVersionMutation());
@@ -60,7 +69,7 @@ export default function VersionsRoute() {
         </Panel>
         <Panel>
           <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.branches.title')}</h2>
-          <div className="grid gap-2">{(branches.data || []).map((item: { branchName: string; versionCount: number; latestCreatedAt: string }) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.branchName}><strong className="text-sm text-ink">{item.branchName}</strong><small className="text-xs text-muted">{item.versionCount} {t('panels.branches.count', { count: item.versionCount })} · {t('panels.branches.latest')} {dateLabel(item.latestCreatedAt)}</small></div>)}</div>
+          <div className="grid gap-2">{(branches.data as Array<Branch> || []).map((item) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.branchName}><strong className="text-sm text-ink">{item.branchName}</strong><small className="text-xs text-muted">{item.versionCount} {t('panels.branches.count', { count: item.versionCount })} · {t('panels.branches.latest')} {dateLabel(item.latestCreatedAt)}</small></div>)}</div>
         </Panel>
       </div>
       <div className="mt-3">
@@ -70,7 +79,7 @@ export default function VersionsRoute() {
         <div className="overflow-x-auto rounded-[7px] border border-line bg-surface shadow-card">
           <table className="w-full border-collapse text-left text-sm">
             <thead><tr className="border-b border-line text-xs text-muted"><th className="p-2.5 font-semibold">{t('table.version')}</th><th className="p-2.5 font-semibold">{t('table.branch')}</th><th className="p-2.5 font-semibold">{t('table.created')}</th><th className="p-2.5" /></tr></thead>
-            <tbody>{(versions.data || []).map((version: { id: string; label: string; summary?: string; versionIndex: number; branchName: string; createdAt: string }) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.versionIndex}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branchName}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.createdAt)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate({ path: { projectId: projectId, versionId: version.id } })}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
+            <tbody>{(versions.data as Array<Version> || []).map((version) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.versionIndex}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branchName}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.createdAt)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate({ path: { projectId: projectId, versionId: version.id }, body: {} })}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
           </table>
         </div>
       </div>

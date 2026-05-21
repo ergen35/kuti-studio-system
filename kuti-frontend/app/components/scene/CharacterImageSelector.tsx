@@ -4,8 +4,11 @@ import { useState } from "react";
 import { clsx } from "clsx";
 import { Check, ImageIcon, X } from "lucide-react";
 import { Button } from "~/components/ui";
-import type { Character, CharacterImage } from "~/lib/backend/types.gen";
+import type { ListCharactersResponse, GetProjectCharacterImagesResponse } from "~/lib/backend";
 import { characterImageUrl } from "~/lib/image-urls";
+
+type Character = ListCharactersResponse[number];
+type CharacterImage = GetProjectCharacterImagesResponse[string][number];
 
 interface CharacterImageSelectorProps {
   projectId: string;
@@ -119,7 +122,7 @@ export function CharacterImageSelector({
                       )}
                     >
                       <img
-                        src={api.characterImageUrl(
+                        src={characterImageUrl(
                           projectId,
                           character.id,
                           characterImages[character.slug].id

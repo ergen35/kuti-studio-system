@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -53,9 +53,9 @@ interface ProjectWithMetrics {
 
 function useBackgroundImages() {
   const projects = useQuery(listProjectsOptions());
-  
+
   const projectImagesQueries = useMemo(() => {
-    const items = projects.data?.items || [];
+    const items = projects.data ?? [];
     return items.slice(0, 6).map(p => ({
       projectId: p.id,
       queryKey: ['characterImages', p.id, 'all'] as const,
@@ -68,14 +68,14 @@ function useBackgroundImages() {
       const results: string[] = [];
       for (const { projectId } of projectImagesQueries) {
         try {
-          const { readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet } = await import("~/lib/backend");
-          const { data: images } = await readProjectCharacterImagesApiProjectsProjectIdCharactersImagesGet({
-            path: { project_id: projectId }
+          const { getProjectCharacterImages } = await import("~/lib/backend/sdk.gen");
+          const { data: images } = await getProjectCharacterImages({
+            path: { projectId }
           });
           if (images) {
             const imageUrls = Object.values(images).flat().slice(0, 2);
             for (const img of imageUrls) {
-              results.push(`${API_BASE_URL}/api/projects/${projectId}/characters/${img.character_id}/images/${img.id}/file`);
+              results.push(`${API_BASE_URL}/api/projects/${projectId}/characters/${img.characterId}/images/${img.id}/file`);
             }
           }
         } catch {
@@ -118,8 +118,8 @@ function BackendStatusSection() {
   const health = useQuery({
     queryKey: keys.health,
     queryFn: async () => {
-      const { healthApiHealthGet } = await import("~/lib/backend");
-      const { data } = await healthApiHealthGet();
+      const { getHealth } = await import("~/lib/backend/sdk.gen");
+      const { data } = await getHealth();
       return data;
     },
     retry: 0
@@ -159,9 +159,9 @@ function ProjectsSection() {
   
   const open = useMutation({
     mutationFn: async (projectId: string) => {
-      const { openProjectRouteApiProjectsProjectIdOpenPost } = await import("~/lib/backend");
-      const { data } = await openProjectRouteApiProjectsProjectIdOpenPost({
-        path: { project_id: projectId }
+      const { openProject } = await import("~/lib/backend/sdk.gen");
+      const { data } = await openProject({
+        path: { projectId }
       });
       return data;
     },
@@ -175,9 +175,9 @@ function ProjectsSection() {
   
   const archive = useMutation({
     mutationFn: async (projectId: string) => {
-      const { archiveProjectRouteApiProjectsProjectIdArchivePost } = await import("~/lib/backend");
-      const { data } = await archiveProjectRouteApiProjectsProjectIdArchivePost({
-        path: { project_id: projectId }
+      const { archiveProject } = await import("~/lib/backend/sdk.gen");
+      const { data } = await archiveProject({
+        path: { projectId }
       });
       return data;
     },
@@ -186,9 +186,9 @@ function ProjectsSection() {
   
   const clone = useMutation({
     mutationFn: async (projectId: string) => {
-      const { cloneProjectRouteApiProjectsProjectIdClonePost } =await import("~/lib/backend");
-      const { data } = await cloneProjectRouteApiProjectsProjectIdClonePost({
-        path: { project_id: projectId },
+      const { cloneProject } = await import("~/lib/backend/sdk.gen");
+      const { data } = await cloneProject({
+        path: { projectId },
         body: {}
       });
       return data;
@@ -197,10 +197,10 @@ function ProjectsSection() {
   });
 
   const items: ProjectWithMetrics[] = useMemo(() => {
-    const projectItems = projects.data?.items ?? [];
+    const projectItems = projects.data ?? [];
     return projectItems.map(project => ({
-      project: project as unknown as Project,
-      metrics: generateProjectMetrics(project as unknown as Project),
+      project,
+      metrics: generateProjectMetrics(project),
     }));
   }, [projects.data]);
 
@@ -296,7 +296,7 @@ export default function HomeRoute() {
         body: {
           name: projectName.trim(),
           status: "draft",
-          settings_json: { locations_json: [] }
+          settingsJson: {}
         }
       });
     }

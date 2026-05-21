@@ -67,7 +67,7 @@ export function ProjectCard({
           </div>
           
           <p className="text-xs text-muted mt-1 truncate">
-            {isGrid ? project.root_path : dateLabel(project.updated_at)}
+            {isGrid ? project.rootPath : dateLabel(project.updatedAt)}
           </p>
         </div>
 
@@ -87,11 +87,11 @@ export function ProjectCard({
             ? "flex items-center justify-between pt-2" 
             : "flex items-center gap-2 shrink-0"
         )}>
-          {isGrid && (
-            <span className="text-[10px] text-muted">
-              {dateLabel(project.updated_at)}
-            </span>
-          )}
+            {isGrid && (
+              <span className="text-[10px] text-muted">
+                {dateLabel(project.updatedAt)}
+              </span>
+            )}
           
           <div className={clsx(
             "flex items-center gap-1 transition-opacity",

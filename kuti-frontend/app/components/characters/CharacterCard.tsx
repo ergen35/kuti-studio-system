@@ -24,8 +24,8 @@ export function CharacterCard({ character, image, onClick, className = '' }: Cha
   const status = statusConfig[character.status] || statusConfig.draft;
   
   // Format role text - truncate if too long
-  const roleText = character.narrativeRole || (character.alias as string | undefined) || t('cards.noRole');
-  const displayRole = roleText.length > 35 ? roleText.slice(0, 32) + '...' : roleText;
+  const roleText = (character.narrativeRole as string | undefined) || (character.alias as string | undefined) || t('cards.noRole');
+  const displayRole = typeof roleText === 'string' && roleText.length > 35 ? roleText.slice(0, 32) + '...' : roleText;
   
   // Custom card style when image is present - more like trading cards
   const hasImage = !!image;

@@ -58,17 +58,8 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
   // Generate mutation using SDK
-  const genMutationConfig = generateCharacterImageMutation();
   const generateMutation = useMutation({
-    mutationFn: (body: { strategy: string; style: string; image_count: number }) =>
-      genMutationConfig.mutationFn!({
-        path: { projectId, characterId: character.id },
-        query: {
-          strategy: body.strategy,
-          style: body.style,
-          imageCount: body.image_count,
-        },
-      }),
+    ...generateCharacterImageMutation(),
     onSuccess: (job) => {
       if (job && typeof job === 'object' && 'id' in job) {
         setActiveJobId((job as GenerationJobResponse).id);
@@ -126,7 +117,10 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
   }, [character, strategy, style, t]);
 
   const handleGenerate = () => {
-    generateMutation.mutate({ strategy, style, image_count: imageCount });
+    generateMutation.mutate({
+      path: { projectId, characterId: character.id },
+      query: { strategy, style, imageCount },
+    });
     setIsModalOpen(false);
   };
 

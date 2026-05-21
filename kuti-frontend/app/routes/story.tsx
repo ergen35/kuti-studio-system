@@ -139,7 +139,7 @@ export default function StoryRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Fetch story data
-  const story = useQuery(getStorySummaryOptions({ path: { project_id: projectId } }));
+  const story = useQuery(getStorySummaryOptions({ path: { projectId } }));
 
   // Create tome mutation
   const createTome = useMutation(createTomeMutation());
@@ -147,10 +147,10 @@ export default function StoryRoute() {
   const handleCreateSubmit = (data: CreateTomeInput) => {
     createTome.mutate(
       {
-        path: { project_id: projectId },
+        path: { projectId },
         body: {
           title: data.title,
-          order_index: (story.data?.tomes?.length ?? 0)
+          orderIndex: (story.data?.tomes?.length ?? 0)
         }
       },
       {
@@ -169,13 +169,13 @@ export default function StoryRoute() {
     
     return tomes
       .map((tome) => {
-        const tomeChapters = chapters.filter(c => c.tome_id === tome.id);
-        const tomeScenes = scenes.filter(s => s.tome_id === tome.id);
-        
+        const tomeChapters = chapters.filter(c => c.tomeId === tome.id);
+        const tomeScenes = scenes.filter(s => s.tomeId === tome.id);
+
         // Calculate last modified date
-        const lastSceneUpdate = tomeScenes.length > 0 
-          ? Math.max(...tomeScenes.map(s => new Date(s.updated_at).getTime()))
-          : new Date(tome.updated_at).getTime();
+        const lastSceneUpdate = tomeScenes.length > 0
+          ? Math.max(...tomeScenes.map(s => new Date(s.updatedAt).getTime()))
+          : new Date(tome.updatedAt).getTime();
         
         return {
           ...tome,
@@ -184,7 +184,7 @@ export default function StoryRoute() {
           lastModified: new Date(lastSceneUpdate),
         };
       })
-      .sort((a, b) => a.order_index - b.order_index);
+      .sort((a, b) => a.orderIndex - b.orderIndex);
   }, [story.data]);
   
   const handleSelectTome = (tomeId: string) => {

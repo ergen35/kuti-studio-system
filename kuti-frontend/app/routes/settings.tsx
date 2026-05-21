@@ -10,7 +10,7 @@ import { Button, ErrorState, LoadingState, PageHeader, Panel } from "~/component
 import { FormField } from "~/components/FormField";
 import { apiErrorMessage } from "~/lib/errors";
 import { csv } from "~/lib/utils";
-import type { ProjectStatus } from "~/lib/backend/types.gen";
+import type { Project } from "~/lib/backend/types.gen";
 import { getProjectOptions, updateProjectMutation } from "~/lib/backend/@tanstack/react-query.gen";
 import { projectSettingsSchema, type ProjectSettingsInput } from "~/lib/schemas";
 
@@ -29,11 +29,10 @@ export default function SettingsRoute() {
 
   useEffect(() => {
     if (project.data) {
-      // @ts-expect-error - settingsJson might have different structure
-      const raw = project.data.settingsJson?.locationsJson;
+      const raw = project.data.settingsJson?.locationsJson as string[] | undefined;
       reset({
         name: project.data.name,
-        status: project.data.status as ProjectStatus,
+        status: project.data.status as Project['status'],
         locations: Array.isArray(raw) ? raw.join(", ") : '',
       });
     }
@@ -51,7 +50,6 @@ export default function SettingsRoute() {
     body: {
       name: data.name || project.data?.name,
       status: data.status,
-      // @ts-expect-error - settingsJson structure
       settingsJson: { ...(project.data?.settingsJson || {}), locationsJson: csv(data.locations || '') }
     }
   });
