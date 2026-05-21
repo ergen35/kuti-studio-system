@@ -1,1 +1,0 @@
-"""Kuti Studio backend package."""

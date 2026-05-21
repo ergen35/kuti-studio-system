@@ -1,86 +1,162 @@
 # Kuti Studio
 
-Kuti Studio is a local-first narrative production platform for building projects with characters, storylines, assets, versions, warnings, exports, and AI-assisted generation. The repository is split into a Python backend and a React frontend.
+Plateforme de production narrative local-first pour créer des œuvres de type bande dessinée, manga et univers narratifs multimodaux.
 
-## Project structure
+## Vue d'ensemble
 
-- `kuti-backend/` - FastAPI application, SQLite persistence, OpenAPI generation, local job orchestration, and domain logic.
-- `kuti-frontend/` - React Router v7 application, React Query data layer, Zustand UI state, and the local editing interface.
-- The frontend design system is based on Adobe Spectrum S2, with React Query for server-state caching and mutations.
-- `kuti-data/` - Local project storage used by the backend for projects, assets, exports, and generated artifacts.
+Kuti Studio centralise l'écriture, la conception des personnages, l'organisation des scènes, la génération d'images et la préparation des exports de publication.
 
-## Environment variables
+### Fonctionnalités principales
 
-The repository includes example files you can copy and edit:
+- **Gestion de projets** - Création, organisation, archivage de projets narratifs
+- **Fiches personnages** - Création de personnages avec médias, relations et voix
+- **Storyline structurée** - Organisation en tomes, chapitres et scènes
+- **Système de références** - Mentions typées `@chara:`, `@environment:` dans le texte
+- **Génération IA** - Génération d'images de personnages et de planches manga
+- **Assets Library** - Import, archivage et gestion des médias
+- **Warnings de cohérence** - Détection d'incohérences narrative
+- **Versioning** - Historique et branches de versions
+- **Exports** - Export travail (JSON/ZIP) et publication (PDF/CBZ)
 
-- `kuti-backend/.env.example`
-- `kuti-frontend/.env.example`
+## Stack technique
 
-### Backend env
+| Couche | Technologie |
+|--------|-------------|
+| **Backend** | Bun + ElysiaJS + Prisma + PostgreSQL |
+| **Frontend** | React Router v7 + TanStack Query + Zustand |
+| **Background Jobs** | Inngest (durable execution) |
+| **Auth** | Better Auth |
+| **Storage** | Filesystem local |
 
-Configure provider endpoints and API keys in `kuti-backend/.env`:
+## Démarrage rapide
 
-```env
-KUTI_SORA_2_BASE_URL=https://example.invalid/sora-2
-KUTI_SORA_2_API_KEY=replace-me
+### Prérequis
 
-KUTI_SEEDANCE_2_BASE_URL=https://example.invalid/seedance-2
-KUTI_SEEDANCE_2_API_KEY=replace-me
+- Bun 1.1+
+- PostgreSQL 15+
+- Redis 7+ (optionnel)
 
-KUTI_GPT_IMAGES_1_5_BASE_URL=https://example.invalid/gpt-images-1-5
-KUTI_GPT_IMAGES_1_5_API_KEY=replace-me
+### Installation
 
-KUTI_GPT_IMAGES_2_BASE_URL=https://example.invalid/gpt-images-2
-KUTI_GPT_IMAGES_2_API_KEY=replace-me
+```bash
+# Backend
+cd kuti-backend-v2
+bun install
+cp .env.example .env
+# Éditer .env avec DATABASE_URL
 
-KUTI_ELEVEN_LABS_BASE_URL=https://example.invalid/eleven-labs
-KUTI_ELEVEN_LABS_API_KEY=replace-me
+bun run db:generate
+bun run db:migrate
+bun run dev
+
+# Frontend (nouveau terminal)
+cd kuti-frontend
+yarn install
+cp .env.example .env
+yarn dev
 ```
 
-You can also set `KUTI_DATA_DIR` to point the backend at a different local storage directory.
+## Structure du projet
 
-### Frontend env
+```
+.
+├── kuti-backend-v2/          # Backend ElysiaJS
+│   ├── src/
+│   │   ├── modules/          # Modules métier (14 modules)
+│   │   ├── lib/              # Librairies partagées
+│   │   └── index.ts          # Entry point
+│   └── prisma/
+│       └── schema.prisma     # Schéma de données
+├── kuti-frontend/            # Frontend React Router 7
+│   ├── app/
+│   │   ├── routes/           # Pages et layouts
+│   │   ├── components/       # Composants React
+│   │   └── lib/              # API client, stores
+│   └── locales/              # i18n (fr/en)
+├── kuti-data/                # Stockage local des projets
+└── docs/                     # Documentation
+```
 
-Configure the API base URL in `kuti-frontend/.env`:
+## Documentation
+
+- [Guide pour Agents](AGENTS.md) - Documentation de référence pour développer
+- [Architecture](docs/overview.md) - Vue d'ensemble technique
+- [Backend](docs/backend.md) - Conventions ElysiaJS
+- [Frontend](docs/frontend.md) - Guidelines React Router 7
+- [Base de données](docs/database.md) - Schéma Prisma
+- [Déploiement](docs/deployment.md) - Configuration et déploiement
+- [API](docs/api-conventions.md) - Conventions REST
+- [Workflows](docs/workflows.md) - Inngest et jobs
+- [Checklist](docs/checklist.md) - Checklist de développement
+
+## Modules backend
+
+| Module | Endpoint | Description |
+|--------|----------|-------------|
+| health | `/api/v1/health` | Santé et configuration |
+| authentication | `/api/v1/auth/*` | Auth Better Auth |
+| projects | `/api/v1/projects` | Projets |
+| characters | `/api/v1/projects/:id/characters` | Personnages |
+| story | `/api/v1/projects/:id/story/*` | Tomes/Chapitres/Scènes |
+| generation | `/api/v1/projects/:id/generation` | Génération IA |
+| assets | `/api/v1/projects/:id/assets` | Médias |
+| exports | `/api/v1/projects/:id/exports` | Exports |
+| versions | `/api/v1/projects/:id/versions` | Historique |
+| warnings | `/api/v1/projects/:id/warnings` | Cohérence |
+| inngest | `/api/inngest` | Workflows |
+
+## Commandes utiles
+
+### Backend
+```bash
+cd kuti-backend-v2
+bun run dev              # Démarrer
+bun run db:migrate       # Migrations
+bun run db:studio        # Prisma Studio
+bun run typecheck        # TypeScript
+```
+
+### Frontend
+```bash
+cd kuti-frontend
+yarn dev                 # Démarrer
+yarn build               # Build production
+yarn openapi-ts          # Générer SDK API
+yarn typecheck           # TypeScript
+```
+
+## Configuration
+
+### Variables d'environnement backend (.env)
+
+```env
+NODE_ENV=development
+PORT=8000
+DATABASE_URL=postgresql://user:pass@localhost:5432/kuti_studio
+KUTI_DATA_DIR=./kuti-data
+BETTER_AUTH_URL=http://localhost:8000
+BETTER_AUTH_SECRET=your_secret
+GPT_IMAGES_2_API_KEY=your_openai_key
+```
+
+### Variables d'environnement frontend (.env)
 
 ```env
 VITE_KUTI_API_URL=http://localhost:8000
 ```
 
-## How to run
+## Principes
 
-### 1. Start the backend
+1. **OpenAPI primauté** - Le backend expose Swagger UI, le frontend consomme le SDK généré
+2. **Type safety** - Types Prisma partagés, Zod pour validation
+3. **Durable execution** - Jobs longs via Inngest (survient aux redémarrages)
+4. **Modularité** - Un module Elysia par domaine métier
+5. **Local-first** - Stockage local dans `kuti-data/`
 
-From `kuti-backend/`:
+## Contribution
 
-```bash
-uv run uvicorn kuti_backend.api.main:create_app --factory --reload
-```
+Voir [AGENTS.md](AGENTS.md) et [docs/checklist.md](docs/checklist.md) pour les conventions de développement.
 
-The backend serves the local API and OpenAPI document on port `8000` by default.
+## Licence
 
-### 2. Start the frontend
-
-From `kuti-frontend/`:
-
-```bash
-yarn install
-yarn dev
-```
-
-The frontend connects to the backend through `VITE_KUTI_API_URL`.
-
-### 3. Verify the build
-
-From the repository root or each package directory:
-
-```bash
-cd kuti-backend && uv run pytest
-cd kuti-frontend && yarn build
-```
-
-## Notes
-
-- The app is designed to run locally without authentication.
-- The backend is the source of truth for domain data and exposes the contract through OpenAPI.
-- The frontend consumes the backend through the generated API client and local UI state.
+Propriétaire - Tous droits réservés
