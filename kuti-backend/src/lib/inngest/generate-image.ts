@@ -86,6 +86,7 @@ export const generateImageFunction = inngest.createFunction(
     const generatedImages: Array<{
       stepId: string;
       filePath: string;
+      publicUrl: string;
       fileName: string;
       fileSize: number;
       variationIndex: number;
@@ -107,7 +108,7 @@ export const generateImageFunction = inngest.createFunction(
           const imageData = await callImageGenerationAPI(provider, prompt, style);
 
           // Sauvegarder l'image
-          const saved = await saveCharacterImage(project.slug, characterId, imageData, strategy, style, index);
+          const saved = await saveCharacterImage(projectId, characterId, imageData, strategy, style, index);
 
           // Mettre à jour le step à "ready"
           await db.generationJobStep.update({
@@ -123,6 +124,7 @@ export const generateImageFunction = inngest.createFunction(
           return {
             stepId,
             filePath: saved.filePath,
+            publicUrl: saved.publicUrl,
             fileName: saved.fileName,
             fileSize: saved.fileSize,
             variationIndex: index,
@@ -163,6 +165,7 @@ export const generateImageFunction = inngest.createFunction(
             projectId,
             characterId,
             filePath: img.filePath,
+            publicUrl: img.publicUrl,
             fileName: img.fileName,
             fileSize: img.fileSize,
             mimeType: "image/png",

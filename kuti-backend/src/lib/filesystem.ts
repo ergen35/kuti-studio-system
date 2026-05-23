@@ -158,37 +158,38 @@ export async function saveAsset(
 }
 
 /**
- * Sauvegarde une image de personnage générée
+ * Sauvegarde une image de personnage générée (nouveau format projectId-based)
  */
 export async function saveCharacterImage(
-  projectSlug: string,
+  projectId: string,
   characterId: string,
   imageData: Buffer,
   strategy: string,
   style?: string,
   variationIndex?: number
-): Promise<{ filePath: string; fileName: string; fileSize: number }> {
-  const prompt = require("./config").config;
-  const { getProjectDir } = require("./paths");
+): Promise<{
+  filePath: string;
+  publicUrl: string;
+  fileName: string;
+  fileSize: number;
+}> {
+  const { getCharacterImagesDir, getCharacterImagePublicUrl } = require("./paths");
 
-  const ext = ".png"; // Les images générées sont en PNG par défaut
-  const styleSuffix = style ? `_${style}` : "";
-  const varSuffix =
-    variationIndex !== undefined ? `_v${variationIndex + 1}` : "";
-  const fileName = `char_${characterId}_${strategy}${styleSuffix}${varSuffix}_${randomUUIDv7(
+  const dir = getCharacterImagesDir(projectId);
+  const suffix = style ? `_${style}` : "";
+  const varSuffix = variationIndex !== undefined ? `_v${variationIndex + 1}` : "";
+  const fileName = `char_${characterId}_${strategy}${suffix}${varSuffix}_${randomUUIDv7(
     "base64url"
-  )}${ext}`;
-
-  const filePath = `${getProjectDir(
-    projectSlug
-  )}/generation/character_images/${fileName}`;
+  )}.png`;
+  const filePath = `${dir}/${fileName}`;
 
   await writeFile(filePath, imageData);
 
   const stats = await getFileStats(filePath);
 
   return {
-    filePath,
+    filePath: `projects/${projectId}/generation/character_images/${fileName}`,
+    publicUrl: getCharacterImagePublicUrl(projectId, fileName),
     fileName,
     fileSize: stats.size,
   };

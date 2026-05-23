@@ -71,7 +71,10 @@ export const app = new Elysia({
   })
 
   // Static plugins
-  .use(staticPlugin())
+  .use(staticPlugin({
+    assets: './public',
+    prefix: '/',
+  }))
 
   // Cron jobs
   .use(orphanCheckerCron)

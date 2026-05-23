@@ -4,38 +4,34 @@
 
 import { Elysia } from "elysia";
 import {
-  characterIdParamsSchema,
-  relationIdParamsSchema,
-  imageIdParamsSchema,
-  createCharacterBodySchema,
-  updateCharacterBodySchema,
-  createRelationBodySchema,
-  characterResponseSchema,
+  archiveCharacter,
+  createCharacter,
+  createRelation,
+  createVoiceSample,
+  deleteCharacter,
+  deleteCharacterImage,
+  generateCharacterImage,
+  getAllProjectCharacterImages,
+  getCharacter,
+  listCharacterImages,
+  listCharacters,
+  updateCharacter
+} from "./controller";
+import {
   characterDetailResponseSchema,
+  characterIdParamsSchema,
+  characterImageListResponseSchema,
   characterListResponseSchema,
   characterRelationResponseSchema,
-  voiceSampleResponseSchema,
-  characterImageResponseSchema,
-  characterImageListResponseSchema,
-  projectCharacterImagesResponseSchema,
+  characterResponseSchema,
+  createCharacterBodySchema,
+  createRelationBodySchema,
   generateCharacterImageQuerySchema,
+  imageIdParamsSchema,
+  projectCharacterImagesResponseSchema,
+  updateCharacterBodySchema,
+  voiceSampleResponseSchema
 } from "./dto";
-import {
-  listCharacters,
-  getCharacter,
-  createCharacter,
-  updateCharacter,
-  archiveCharacter,
-  deleteCharacter,
-  createRelation,
-  listRelations,
-  createVoiceSample,
-  listCharacterImages,
-  getAllProjectCharacterImages,
-  deleteCharacterImage,
-  getCharacterImageFile,
-  generateCharacterImage,
-} from "./controller";
 
 export const charactersModule = new Elysia({
   prefix: "/api/projects/:projectId/characters",
@@ -107,8 +103,8 @@ export const charactersModule = new Elysia({
   })
 
   // Create relation
-  .post("/:characterId/relations", async ({ params: { projectId, characterId }, body }) => {
-    const relation = await createRelation(projectId, characterId, body);
+  .post("/:characterId/relations", async ({ params, body }) => {
+    const relation = await createRelation(params.projectId, params.characterId, body);
     return relation;
   }, {
     params: characterIdParamsSchema,
@@ -157,16 +153,4 @@ export const charactersModule = new Elysia({
   }, {
     params: imageIdParamsSchema,
     detail: { operationId: "deleteCharacterImage", summary: "Delete a character image" },
-  })
-
-  // Get character image file
-  .get("/:characterId/images/:imageId/file", async ({ params: { projectId, characterId, imageId } }) => {
-    const file = await getCharacterImageFile(projectId, characterId, imageId);
-    if (!file) throw new Error("Image not found");
-    return new Response(file.buffer, {
-      headers: { "Content-Type": file.mimeType },
-    });
-  }, {
-    params: imageIdParamsSchema,
-    detail: { operationId: "getCharacterImageFile", summary: "Get character image file" },
   });

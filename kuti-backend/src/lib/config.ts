@@ -26,6 +26,7 @@ const configSchema = z.object({
 
   // Paths
   dataDir: z.string().default("./kuti-data"),
+  assetsDir: z.string().default("./public"),
 
   // Database
   databaseUrl: z.string(),
@@ -103,6 +104,7 @@ function parseConfig(): Config {
 
     // Paths
     dataDir: process.env.KUTI_DATA_DIR,
+    assetsDir: process.env.ASSETS_DIR,
 
     // Database
     databaseUrl: process.env.DATABASE_URL,
@@ -308,4 +310,8 @@ export function getExportsDir(projectSlug: string): string {
 
 export function getAssetsDir(projectSlug: string): string {
   return `${config.dataDir}/projects/${projectSlug}/assets`;
+}
+
+export function getAssetsRootDir(): string {
+  return config.assetsDir;
 }

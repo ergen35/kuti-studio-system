@@ -219,6 +219,7 @@ model CharacterImage {
   characterId     String    @map("character_id")
   boardPanelId    String?   @map("board_panel_id")
   filePath        String    @map("file_path")
+  publicUrl       String    @default("") @map("public_url")
   fileName        String    @map("file_name")
   fileSize        Int?      @map("file_size")
   mimeType        String    @default("image/png") @map("mime_type")

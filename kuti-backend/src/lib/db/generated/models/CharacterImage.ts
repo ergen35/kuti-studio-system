@@ -42,6 +42,7 @@ export type CharacterImageMinAggregateOutputType = {
   characterId: string | null
   boardPanelId: string | null
   filePath: string | null
+  publicUrl: string | null
   fileName: string | null
   fileSize: number | null
   mimeType: string | null
@@ -58,6 +59,7 @@ export type CharacterImageMaxAggregateOutputType = {
   characterId: string | null
   boardPanelId: string | null
   filePath: string | null
+  publicUrl: string | null
   fileName: string | null
   fileSize: number | null
   mimeType: string | null
@@ -74,6 +76,7 @@ export type CharacterImageCountAggregateOutputType = {
   characterId: number
   boardPanelId: number
   filePath: number
+  publicUrl: number
   fileName: number
   fileSize: number
   mimeType: number
@@ -102,6 +105,7 @@ export type CharacterImageMinAggregateInputType = {
   characterId?: true
   boardPanelId?: true
   filePath?: true
+  publicUrl?: true
   fileName?: true
   fileSize?: true
   mimeType?: true
@@ -118,6 +122,7 @@ export type CharacterImageMaxAggregateInputType = {
   characterId?: true
   boardPanelId?: true
   filePath?: true
+  publicUrl?: true
   fileName?: true
   fileSize?: true
   mimeType?: true
@@ -134,6 +139,7 @@ export type CharacterImageCountAggregateInputType = {
   characterId?: true
   boardPanelId?: true
   filePath?: true
+  publicUrl?: true
   fileName?: true
   fileSize?: true
   mimeType?: true
@@ -237,6 +243,7 @@ export type CharacterImageGroupByOutputType = {
   characterId: string
   boardPanelId: string | null
   filePath: string
+  publicUrl: string
   fileName: string
   fileSize: number | null
   mimeType: string
@@ -276,6 +283,7 @@ export type CharacterImageWhereInput = {
   characterId?: Prisma.StringFilter<"CharacterImage"> | string
   boardPanelId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringFilter<"CharacterImage"> | string
+  publicUrl?: Prisma.StringFilter<"CharacterImage"> | string
   fileName?: Prisma.StringFilter<"CharacterImage"> | string
   fileSize?: Prisma.IntNullableFilter<"CharacterImage"> | number | null
   mimeType?: Prisma.StringFilter<"CharacterImage"> | string
@@ -294,6 +302,7 @@ export type CharacterImageOrderByWithRelationInput = {
   characterId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrderInput | Prisma.SortOrder
   filePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileSize?: Prisma.SortOrderInput | Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -316,6 +325,7 @@ export type CharacterImageWhereUniqueInput = Prisma.AtLeast<{
   characterId?: Prisma.StringFilter<"CharacterImage"> | string
   boardPanelId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringFilter<"CharacterImage"> | string
+  publicUrl?: Prisma.StringFilter<"CharacterImage"> | string
   fileName?: Prisma.StringFilter<"CharacterImage"> | string
   fileSize?: Prisma.IntNullableFilter<"CharacterImage"> | number | null
   mimeType?: Prisma.StringFilter<"CharacterImage"> | string
@@ -334,6 +344,7 @@ export type CharacterImageOrderByWithAggregationInput = {
   characterId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrderInput | Prisma.SortOrder
   filePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileSize?: Prisma.SortOrderInput | Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -358,6 +369,7 @@ export type CharacterImageScalarWhereWithAggregatesInput = {
   characterId?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
   boardPanelId?: Prisma.StringNullableWithAggregatesFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
+  publicUrl?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
   fileName?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
   fileSize?: Prisma.IntNullableWithAggregatesFilter<"CharacterImage"> | number | null
   mimeType?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
@@ -372,6 +384,7 @@ export type CharacterImageCreateInput = {
   id?: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -390,6 +403,7 @@ export type CharacterImageUncheckedCreateInput = {
   characterId: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -404,6 +418,7 @@ export type CharacterImageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -422,6 +437,7 @@ export type CharacterImageUncheckedUpdateInput = {
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -438,6 +454,7 @@ export type CharacterImageCreateManyInput = {
   characterId: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -452,6 +469,7 @@ export type CharacterImageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -468,6 +486,7 @@ export type CharacterImageUncheckedUpdateManyInput = {
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -499,6 +518,7 @@ export type CharacterImageCountOrderByAggregateInput = {
   characterId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -520,6 +540,7 @@ export type CharacterImageMaxOrderByAggregateInput = {
   characterId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -536,6 +557,7 @@ export type CharacterImageMinOrderByAggregateInput = {
   characterId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
@@ -647,6 +669,7 @@ export type CharacterImageCreateWithoutProjectInput = {
   id?: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -663,6 +686,7 @@ export type CharacterImageUncheckedCreateWithoutProjectInput = {
   characterId: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -708,6 +732,7 @@ export type CharacterImageScalarWhereInput = {
   characterId?: Prisma.StringFilter<"CharacterImage"> | string
   boardPanelId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringFilter<"CharacterImage"> | string
+  publicUrl?: Prisma.StringFilter<"CharacterImage"> | string
   fileName?: Prisma.StringFilter<"CharacterImage"> | string
   fileSize?: Prisma.IntNullableFilter<"CharacterImage"> | number | null
   mimeType?: Prisma.StringFilter<"CharacterImage"> | string
@@ -722,6 +747,7 @@ export type CharacterImageCreateWithoutCharacterInput = {
   id?: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -738,6 +764,7 @@ export type CharacterImageUncheckedCreateWithoutCharacterInput = {
   projectId: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -779,6 +806,7 @@ export type CharacterImageCreateManyProjectInput = {
   characterId: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -793,6 +821,7 @@ export type CharacterImageUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -809,6 +838,7 @@ export type CharacterImageUncheckedUpdateWithoutProjectInput = {
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -824,6 +854,7 @@ export type CharacterImageUncheckedUpdateManyWithoutProjectInput = {
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -839,6 +870,7 @@ export type CharacterImageCreateManyCharacterInput = {
   projectId: string
   boardPanelId?: string | null
   filePath: string
+  publicUrl?: string
   fileName: string
   fileSize?: number | null
   mimeType?: string
@@ -853,6 +885,7 @@ export type CharacterImageUpdateWithoutCharacterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -869,6 +902,7 @@ export type CharacterImageUncheckedUpdateWithoutCharacterInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -884,6 +918,7 @@ export type CharacterImageUncheckedUpdateManyWithoutCharacterInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -902,6 +937,7 @@ export type CharacterImageSelect<ExtArgs extends runtime.Types.Extensions.Intern
   characterId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
+  publicUrl?: boolean
   fileName?: boolean
   fileSize?: boolean
   mimeType?: boolean
@@ -920,6 +956,7 @@ export type CharacterImageSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   characterId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
+  publicUrl?: boolean
   fileName?: boolean
   fileSize?: boolean
   mimeType?: boolean
@@ -938,6 +975,7 @@ export type CharacterImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   characterId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
+  publicUrl?: boolean
   fileName?: boolean
   fileSize?: boolean
   mimeType?: boolean
@@ -956,6 +994,7 @@ export type CharacterImageSelectScalar = {
   characterId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
+  publicUrl?: boolean
   fileName?: boolean
   fileSize?: boolean
   mimeType?: boolean
@@ -966,7 +1005,7 @@ export type CharacterImageSelectScalar = {
   createdAt?: boolean
 }
 
-export type CharacterImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "characterId" | "boardPanelId" | "filePath" | "fileName" | "fileSize" | "mimeType" | "prompt" | "strategy" | "style" | "variationIndex" | "createdAt", ExtArgs["result"]["characterImage"]>
+export type CharacterImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "characterId" | "boardPanelId" | "filePath" | "publicUrl" | "fileName" | "fileSize" | "mimeType" | "prompt" | "strategy" | "style" | "variationIndex" | "createdAt", ExtArgs["result"]["characterImage"]>
 export type CharacterImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
@@ -992,6 +1031,7 @@ export type $CharacterImagePayload<ExtArgs extends runtime.Types.Extensions.Inte
     characterId: string
     boardPanelId: string | null
     filePath: string
+    publicUrl: string
     fileName: string
     fileSize: number | null
     mimeType: string
@@ -1430,6 +1470,7 @@ export interface CharacterImageFieldRefs {
   readonly characterId: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly boardPanelId: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly filePath: Prisma.FieldRef<"CharacterImage", 'String'>
+  readonly publicUrl: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly fileName: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly fileSize: Prisma.FieldRef<"CharacterImage", 'Int'>
   readonly mimeType: Prisma.FieldRef<"CharacterImage", 'String'>

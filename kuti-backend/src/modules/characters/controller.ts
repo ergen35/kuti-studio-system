@@ -133,6 +133,7 @@ function serializeImage(img: {
   projectId: string;
   characterId: string;
   filePath: string;
+  publicUrl: string;
   fileName: string;
   fileSize: number | null;
   mimeType: string;
@@ -147,6 +148,7 @@ function serializeImage(img: {
     projectId: img.projectId,
     characterId: img.characterId,
     filePath: img.filePath,
+    publicUrl: img.publicUrl,
     fileName: img.fileName,
     fileSize: img.fileSize,
     mimeType: img.mimeType,
@@ -447,30 +449,15 @@ export async function deleteCharacterImage(
   // Supprimer le fichier physique
   try {
     const { deleteFile } = await import("@lib/filesystem");
-    await deleteFile(image.filePath);
+    const { getAssetsRootDir } = await import("@lib/config");
+    const fullPath = `${getAssetsRootDir()}/${image.filePath}`;
+    await deleteFile(fullPath);
   } catch {
     // Ignorer les erreurs de suppression de fichier
   }
 
   await prisma.characterImage.delete({ where: { id: imageId } });
   return true;
-}
-
-export async function getCharacterImageFile(
-  projectId: string,
-  characterId: string,
-  imageId: string
-): Promise<{ buffer: Buffer; mimeType: string } | null> {
-  const image = await prisma.characterImage.findFirst({
-    where: { id: imageId, projectId, characterId },
-  });
-
-  if (!image) return null;
-
-  const { readFile } = await import("@lib/filesystem");
-  const buffer = await readFile(image.filePath);
-
-  return { buffer, mimeType: image.mimeType };
 }
 
 // ============================================================================

@@ -118,6 +118,7 @@ export const characterImageResponseSchema = z.object({
   projectId: z.string(),
   characterId: z.string(),
   filePath: z.string(),
+  publicUrl: z.string(),
   fileName: z.string(),
   fileSize: z.number().nullable(),
   mimeType: z.string(),

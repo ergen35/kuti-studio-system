@@ -231,6 +231,7 @@ export const CharacterImageScalarFieldEnum = {
   characterId: 'characterId',
   boardPanelId: 'boardPanelId',
   filePath: 'filePath',
+  publicUrl: 'publicUrl',
   fileName: 'fileName',
   fileSize: 'fileSize',
   mimeType: 'mimeType',

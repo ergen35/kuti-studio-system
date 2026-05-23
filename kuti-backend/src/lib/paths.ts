@@ -100,17 +100,6 @@ export function getGenerationBoardDir(
 // ============================================================================
 
 /**
- * Génère une URL publique pour un fichier character image
- */
-export function getCharacterImageUrl(
-  projectId: string,
-  characterId: string,
-  imageId: string
-): string {
-  return `/api/projects/${projectId}/characters/${characterId}/images/${imageId}/file`;
-}
-
-/**
  * Génère une URL publique pour un panel de génération
  */
 export function getGenerationPanelImageUrl(
@@ -119,6 +108,24 @@ export function getGenerationPanelImageUrl(
   panelId: string
 ): string {
   return `/api/projects/${projectId}/generation/boards/${boardId}/panels/${panelId}/image`;
+}
+
+// ============================================================================
+// Nouvelles fonctions projectId-based (public/)
+// ============================================================================
+
+/**
+ * Retourne le répertoire des images de personnages pour un projet (projectId-based)
+ */
+export function getCharacterImagesDir(projectId: string): string {
+  return `public/projects/${projectId}/generation/character_images`;
+}
+
+/**
+ * Génère l'URL publique statique pour une image de personnage
+ */
+export function getCharacterImagePublicUrl(projectId: string, fileName: string): string {
+  return `/projects/${projectId}/generation/character_images/${fileName}`;
 }
 
 // ============================================================================
