@@ -413,7 +413,7 @@ export default function TomeRoute() {
       body: {
         tomeId: tomeId,
         title: body.title,
-        orderIndex: tomeData?.chapters.length || 0,
+        orderIndex: tomeData?.chapters.length ?? 0,
       }
     });
   };

@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
 import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles } from 'lucide-react';
@@ -171,37 +171,49 @@ export default function SceneRoute() {
   }, [story.data, context]);
 
   // Mutations using SDK
-  const updateSceneConfig = updateSceneMutation();
   const updateScene = useMutation({
-    ...updateSceneConfig,
+    ...updateSceneMutation(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['story', projectId] });
       setIsSaving(false);
     },
   });
 
-  const deleteSceneConfig = deleteSceneMutation();
   const deleteScene = useMutation({
-    ...deleteSceneConfig,
+    ...deleteSceneMutation(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['story', projectId] });
       navigate(`/projects/${projectId}/story/${tomeId}/chapters/${scene?.chapterId}`);
     },
   });
   
-  const { register, handleSubmit, control, watch, formState: { errors, isDirty } } = useForm<SceneInput>({
+  const { register, handleSubmit, control, watch, reset, formState: { errors, isDirty } } = useForm<SceneInput>({
     resolver: zodResolver(sceneSchema),
-    defaultValues: useMemo(() => ({
-      title: scene?.title || '',
-      summary: scene?.summary || '',
-      content: scene?.content || '',
-      characters_json: toCsv(scene?.charactersJson),
-      tags_json: toCsv(scene?.tagsJson),
-      notes: scene?.notes || '',
-    }), [scene]),
+    defaultValues: {
+      title: '',
+      summary: '',
+      content: '',
+      characters_json: '',
+      tags_json: '',
+      notes: '',
+    },
   });
 
-  // Reset form when scene changes
+  // Reset form when scene data loads or changes
+  useEffect(() => {
+    if (scene) {
+      reset({
+        title: scene.title ?? '',
+        summary: scene.summary ?? '',
+        content: scene.content ?? '',
+        characters_json: toCsv(scene.charactersJson) ?? '',
+        tags_json: toCsv(scene.tagsJson) ?? '',
+        notes: scene.notes ?? '',
+      });
+    }
+  }, [scene, reset]);
+
+  // Watch for changes (kept for intentional re-render triggers)
   const watchedSceneId = watch('title');
 
   const onSubmit = useCallback((data: SceneInput) => {
