@@ -3,7 +3,7 @@
  * Remplace le background thread de génération du backend v1
  */
 
-import { resolveModelProvider } from "../config";
+import { config, resolveModelProvider } from "../config";
 import { db } from "../db";
 import type { GenerationJobStatus, GenerationStepStatus } from "../db/generated/enums";
 import { saveCharacterImage } from "../filesystem";
@@ -327,7 +327,8 @@ async function callImageGenerationAPI(
   }
 
   const baseUrl = provider.baseUrl.replace(/\/$/, "");
-  const requestUrl = `${baseUrl}/images/generations`;
+  const urlPath = config.gptImages2UrlPath;
+  const requestUrl = `${baseUrl}${urlPath}`;
   console.log(`[callImageGenerationAPI] Sending POST request to: ${requestUrl}`);
 
   const requestBody = {

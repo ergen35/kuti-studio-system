@@ -49,6 +49,7 @@ const configSchema = z.object({
   gptImages2BaseUrl: z.string().optional(),
   gptImages2ApiKey: z.string().optional(),
   gptImages2Enabled: z.boolean().default(true),
+  gptImages2UrlPath: z.string().default("/images/generations"),
 
   // Model Providers (Video)
   sora2BaseUrl: z.string().optional(),
@@ -126,6 +127,7 @@ function parseConfig(): Config {
     gptImages2BaseUrl: process.env.GPT_IMAGES_2_BASE_URL,
     gptImages2ApiKey: process.env.GPT_IMAGES_2_API_KEY,
     gptImages2Enabled: process.env.GPT_IMAGES_2_ENABLED === "false" ? false : undefined,
+    gptImages2UrlPath: process.env.GPT_IMAGES_2_URL_PATH,
 
     // Model Providers - Sora 2
     sora2BaseUrl: process.env.SORA_2_BASE_URL,

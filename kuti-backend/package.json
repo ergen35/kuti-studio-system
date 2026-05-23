@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@better-auth/prisma-adapter": "^1.6.11",
+    "@elysia/static": "^1.4.11",
     "@elysiajs/cors": "^1.4.2",
     "@elysiajs/cron": "^1.4.2",
     "@elysiajs/openapi": "^1.4.15",

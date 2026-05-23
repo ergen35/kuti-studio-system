@@ -10,6 +10,7 @@ import { orphanCheckerCron } from "@lib/cron";
 import { assetsModule } from "@modules/assets";
 // Modules métier
 // Modules
+import { staticPlugin } from '@elysia/static';
 import { authModule } from "@modules/authentication";
 import { charactersModule } from "@modules/characters";
 import { exportsModule } from "@modules/exports";
@@ -68,6 +69,9 @@ export const app = new Elysia({
   .onError(({ error }) => {
     console.error("error", error);
   })
+
+  // Static plugins
+  .use(staticPlugin())
 
   // Cron jobs
   .use(orphanCheckerCron)

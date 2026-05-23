@@ -8,8 +8,8 @@ import { resolveModelProvider } from "../config";
 import { db } from "../db";
 import type { GenerationJobStatus, GenerationSourceKind, GenerationStepStatus } from "../db/generated/enums";
 import { getFileStats, writeFile } from "../filesystem";
-import { inngest } from "./client";
 import { getProjectDir } from "../paths";
+import { inngest } from "./client";
 
 // ============================================================================
 // Fonction Inngest
@@ -381,7 +381,7 @@ function buildScenePrompt(
 
 function buildPanelPrompt(
   basePrompt: string,
-  characters: Array<{ name: string; description: string }>,
+  characters: Array<{ id: string; name: string; description: string; }>,
   characterImageRefs?: Record<string, string>,
   config?: {
     systemPrompt?: string;
