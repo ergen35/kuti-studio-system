@@ -8,7 +8,6 @@ import { db } from "../db";
 import type { GenerationJobStatus, GenerationStepStatus } from "../db/generated/enums";
 import { saveCharacterImage } from "../filesystem";
 import { inngest } from "./client";
-import { getProjectDir } from "../paths";
 
 // ============================================================================
 // Fonction Inngest
@@ -315,48 +314,112 @@ async function callImageGenerationAPI(
   prompt: string,
   style?: string,
 ): Promise<Buffer> {
+  console.log("[callImageGenerationAPI] Starting image generation call");
+  console.log(`[callImageGenerationAPI] Provider baseUrl: ${provider.baseUrl ? provider.baseUrl : "NOT SET"}`);
+  console.log(`[callImageGenerationAPI] Provider apiKey: ${provider.apiKey ? "set (" + provider.apiKey + ")" : "NOT SET"}`);
+  console.log(`[callImageGenerationAPI] Provider apiModel: ${provider.apiModel || "default (gpt-image-2)"}`);
+  console.log(`[callImageGenerationAPI] Style: ${style || "default (vivid)"}`);
+  console.log(`[callImageGenerationAPI] Prompt length: ${prompt.length} characters`);
+
   if (!provider.baseUrl || !provider.apiKey) {
+    console.error("[callImageGenerationAPI] ERROR: Provider not configured");
     throw new Error("Provider not configured");
   }
 
-  const response = await fetch(`${provider.baseUrl}/v1/images/generations`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${provider.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: provider.apiModel || "gpt-image-2",
-      prompt,
-      n: 1,
-      size: "1024x1024",
-      quality: "high",
-      style: style || "vivid",
-    }),
-  });
+  const baseUrl = provider.baseUrl.replace(/\/$/, "");
+  const requestUrl = `${baseUrl}/images/generations`;
+  console.log(`[callImageGenerationAPI] Sending POST request to: ${requestUrl}`);
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Image generation failed: ${error}`);
+  const requestBody = {
+    model: provider.apiModel || "gpt-image-2",
+    prompt,
+    n: 1,
+    size: "1024x1024",
+    quality: "high",
+    style: style || "vivid",
+  };
+  console.log(`[callImageGenerationAPI] Request body: ${JSON.stringify(requestBody, null, 2)}`);
+
+  let response;
+  try {
+    response = await fetch(requestUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${provider.apiKey}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+    console.log(`[callImageGenerationAPI] Response received - Status: ${response.status} ${response.statusText}`);
+  } catch (fetchError) {
+    console.error("[callImageGenerationAPI] FETCH ERROR:", fetchError);
+    throw new Error(`Network error during fetch: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
   }
 
-  const result = (await response.json()) as {
-    data: Array<{ b64_json?: string; url?: string }>;
-  };
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[callImageGenerationAPI] ERROR - Response not OK`);
+    console.error(`[callImageGenerationAPI] Status: ${response.status} ${response.statusText}`);
+    console.error(`[callImageGenerationAPI] Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+    console.error(`[callImageGenerationAPI] Response body: ${errorText}`);
+    throw new Error(`Image generation failed: HTTP ${response.status} - ${errorText || "No error message"}`);
+  }
+
+  console.log("[callImageGenerationAPI] Response OK, parsing JSON...");
+  let result;
+  try {
+    result = (await response.json()) as {
+      data: Array<{ b64_json?: string; url?: string }>;
+    };
+    console.log("[callImageGenerationAPI] Response parsed successfully");
+    console.log(`[callImageGenerationAPI] Result has ${result.data?.length || 0} image(s)`);
+  } catch (jsonError) {
+    console.error("[callImageGenerationAPI] JSON PARSE ERROR:", jsonError);
+    throw new Error(`Failed to parse API response: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
+  }
 
   const imageData = result.data[0];
 
+  if (!imageData) {
+    console.error("[callImageGenerationAPI] ERROR: No image data in response");
+    console.error(`[callImageGenerationAPI] Full result: ${JSON.stringify(result)}`);
+    throw new Error("No image data received from API - empty data array");
+  }
+
+  console.log(`[callImageGenerationAPI] Image data received - has b64_json: ${!!imageData.b64_json}, has url: ${!!imageData.url}`);
+
   if (imageData.b64_json) {
-    return Buffer.from(imageData.b64_json, "base64");
+    console.log("[callImageGenerationAPI] Processing base64 image data");
+    try {
+      const buffer = Buffer.from(imageData.b64_json, "base64");
+      console.log(`[callImageGenerationAPI] Base64 decoded successfully - buffer size: ${buffer.length} bytes`);
+      return buffer;
+    } catch (bufferError) {
+      console.error("[callImageGenerationAPI] BUFFER ERROR (base64):", bufferError);
+      throw new Error(`Failed to decode base64 image: ${bufferError instanceof Error ? bufferError.message : String(bufferError)}`);
+    }
   }
 
   if (imageData.url) {
-    const imageResponse = await fetch(imageData.url);
-    if (!imageResponse.ok) {
-      throw new Error("Failed to download generated image");
+    console.log(`[callImageGenerationAPI] Processing URL image: ${imageData.url}`);
+    try {
+      const imageResponse = await fetch(imageData.url);
+      console.log(`[callImageGenerationAPI] Image download response - Status: ${imageResponse.status}`);
+      if (!imageResponse.ok) {
+        console.error(`[callImageGenerationAPI] Failed to download image from URL: ${imageResponse.status} ${imageResponse.statusText}`);
+        throw new Error(`Failed to download generated image: HTTP ${imageResponse.status}`);
+      }
+      const arrayBuffer = await imageResponse.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      console.log(`[callImageGenerationAPI] Image downloaded successfully - size: ${buffer.length} bytes`);
+      return buffer;
+    } catch (downloadError) {
+      console.error("[callImageGenerationAPI] DOWNLOAD ERROR:", downloadError);
+      throw new Error(`Failed to download image: ${downloadError instanceof Error ? downloadError.message : String(downloadError)}`);
     }
-    return Buffer.from(await imageResponse.arrayBuffer());
   }
 
-  throw new Error("No image data received from API");
+  console.error("[callImageGenerationAPI] ERROR: Image data has neither b64_json nor url");
+  console.error(`[callImageGenerationAPI] Image data: ${JSON.stringify(imageData)}`);
+  throw new Error("No image data received from API - missing b64_json and url");
 }

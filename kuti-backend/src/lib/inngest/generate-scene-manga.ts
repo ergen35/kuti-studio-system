@@ -482,7 +482,8 @@ async function callImageGenerationAPI(
     throw new Error("Provider not configured");
   }
 
-  const response = await fetch(`${provider.baseUrl}/v1/images/generations`, {
+  const baseUrl = provider.baseUrl.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/images/generations`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
