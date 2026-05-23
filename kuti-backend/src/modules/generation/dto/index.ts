@@ -21,10 +21,10 @@ export const generationJobResponseSchema = z.object({
   status: generationJobStatusSchema,
   progress: z.number(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  completedAt: z.string().datetime().nullable(),
-  failedAt: z.string().datetime().nullable(),
+  createdAt: z.string().iso.datetime(),
+  updatedAt: z.string().iso.datetime(),
+  completedAt: z.string().iso.datetime().nullable(),
+  failedAt: z.string().iso.datetime().nullable(),
   errorMessage: z.string().nullable(),
 });
 
@@ -39,10 +39,10 @@ export const generationJobStepResponseSchema = z.object({
   artifactPath: z.string().nullable(),
   artifactName: z.string().nullable(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  completedAt: z.string().datetime().nullable(),
-  failedAt: z.string().datetime().nullable(),
+  createdAt: z.string().iso.datetime(),
+  updatedAt: z.string().iso.datetime(),
+  completedAt: z.string().iso.datetime().nullable(),
+  failedAt: z.string().iso.datetime().nullable(),
   errorMessage: z.string().nullable(),
 });
 
@@ -58,8 +58,8 @@ export const generationPanelResponseSchema = z.object({
   imagePath: z.string(),
   imageName: z.string(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.string().iso.datetime(),
+  updatedAt: z.string().iso.datetime(),
 });
 
 export const generationBoardResponseSchema = z.object({
@@ -74,9 +74,9 @@ export const generationBoardResponseSchema = z.object({
   artifactPath: z.string().nullable(),
   artifactName: z.string().nullable(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  validatedAt: z.string().datetime().nullable(),
+  createdAt: z.string().iso.datetime(),
+  updatedAt: z.string().iso.datetime(),
+  validatedAt: z.string().iso.datetime().nullable(),
   panels: z.array(generationPanelResponseSchema),
 });
 

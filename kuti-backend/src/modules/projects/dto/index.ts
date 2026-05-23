@@ -99,10 +99,10 @@ export const projectResponseSchema = z.object({
   status: projectStatusSchema,
   rootPath: z.string(),
   settingsJson: z.record(z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  lastOpenedAt: z.string().datetime().nullable(),
-  archivedAt: z.string().datetime().nullable(),
+  createdAt: z.string().iso.datetime(),
+  updatedAt: z.string().iso.datetime(),
+  lastOpenedAt: z.string().iso.datetime().nullable(),
+  archivedAt: z.string().iso.datetime().nullable(),
 });
 
 export type ProjectResponse = z.infer<typeof projectResponseSchema>;

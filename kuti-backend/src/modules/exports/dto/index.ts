@@ -69,10 +69,10 @@ export const exportResponseSchema = z.object({
   artifactName: z.string().nullable(),
   metadataJson: z.record(z.unknown()),
   sizeBytes: z.number().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  completedAt: z.string().datetime().nullable(),
-  failedAt: z.string().datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  completedAt: z.iso.datetime().nullable(),
+  failedAt: z.iso.datetime().nullable(),
   errorMessage: z.string().nullable(),
 });
 

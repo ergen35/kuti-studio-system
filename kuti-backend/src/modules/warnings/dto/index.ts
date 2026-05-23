@@ -65,9 +65,9 @@ export const warningResponseSchema = z.object({
   entityKind: z.string(),
   entityId: z.string(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  resolvedAt: z.string().datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  resolvedAt: z.iso.datetime().nullable(),
 });
 
 export type WarningResponse = z.infer<typeof warningResponseSchema>;

@@ -12,8 +12,8 @@ export const tomeResponseSchema = z.object({
   synopsis: z.string(),
   status: storyStatusSchema,
   orderIndex: z.number(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const createTomeBodySchema = z.object({
@@ -40,8 +40,8 @@ export const chapterResponseSchema = z.object({
   synopsis: z.string(),
   status: storyStatusSchema,
   orderIndex: z.number(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const createChapterBodySchema = z.object({
@@ -77,8 +77,8 @@ export const sceneResponseSchema = z.object({
   tagsJson: z.array(z.string()),
   status: storyStatusSchema,
   orderIndex: z.number(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const createSceneBodySchema = z.object({
@@ -119,7 +119,7 @@ export const storyReferenceSchema = z.object({
   referenceKind: z.string(),
   targetSlug: z.string(),
   rawToken: z.string(),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
 });
 
 export const storySummaryResponseSchema = z.object({

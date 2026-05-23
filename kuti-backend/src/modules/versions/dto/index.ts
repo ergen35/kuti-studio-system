@@ -53,7 +53,7 @@ export const versionResponseSchema = z.object({
   versionIndex: z.number(),
   label: z.string(),
   summary: z.string(),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
 });
 
 export type VersionResponse = z.infer<typeof versionResponseSchema>;
@@ -62,7 +62,7 @@ export const versionBranchSchema = z.object({
   branchName: z.string(),
   versionCount: z.number(),
   latestVersionId: z.string().nullable(),
-  latestCreatedAt: z.string().datetime().nullable(),
+  latestCreatedAt: z.iso.datetime().nullable(),
 });
 
 export type VersionBranch = z.infer<typeof versionBranchSchema>;
