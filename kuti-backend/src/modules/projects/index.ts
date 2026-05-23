@@ -8,6 +8,7 @@ import {
   archiveProject,
   cloneProject,
   createProject,
+  deleteProject,
   exportProject,
   getProject,
   listProjects,
@@ -17,6 +18,8 @@ import {
 import {
   cloneProjectBodySchema,
   createProjectBodySchema,
+  deleteProjectBodySchema,
+  deleteProjectResponseSchema,
   projectIdParamsSchema,
   projectListResponseSchema,
   projectResponseSchema,
@@ -182,6 +185,27 @@ export const projectsModule = new Elysia({
       detail: {
         operationId: "exportProject",
         summary: "Export project data",
+      },
+    }
+  )
+
+  // DELETE /api/projects/:projectId - Supprimer un projet
+  .delete(
+    "/:projectId",
+    async ({ params: { projectId }, body }) => {
+      const result = await deleteProject(projectId, body);
+      if (!result) {
+        throw new Error("Project not found");
+      }
+      return result;
+    },
+    {
+      params: projectIdParamsSchema,
+      body: deleteProjectBodySchema,
+      response: deleteProjectResponseSchema,
+      detail: {
+        operationId: "deleteProject",
+        summary: "Delete a project",
       },
     }
   );

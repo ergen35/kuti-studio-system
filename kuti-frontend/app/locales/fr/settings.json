@@ -9,5 +9,18 @@
   },
   "actions": {
     "save": "Enregistrer les paramètres"
+  },
+  "delete": {
+    "sectionTitle": "Zone de danger",
+    "sectionDescription": "Une fois supprimé, ce projet et toutes les données associées (personnages, scènes, assets) ne pourront pas être récupérés.",
+    "buttonLabel": "Supprimer le projet",
+    "dialogTitle": "Supprimer le projet",
+    "dialogDescription": "Cette action est irréversible. Pour confirmer, veuillez saisir le nom du projet ci-dessous :",
+    "inputLabel": "Nom du projet",
+    "inputPlaceholder": "Entrez le nom du projet",
+    "cancelButton": "Annuler",
+    "confirmButton": "Confirmer la suppression",
+    "errorNameMismatch": "Le nom saisi ne correspond pas au nom du projet",
+    "errorDelete": "Échec de la suppression du projet"
   }
 }

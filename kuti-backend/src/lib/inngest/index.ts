@@ -7,9 +7,10 @@
 export { inngest } from "./client";
 
 // Re-exports des fonctions Inngest
+export { deleteProjectFunction, sendDeleteProjectEvent } from "./delete-project";
+export { exportProjectFunction } from "./export-project";
 export { generateImageFunction } from "./generate-image";
 export { generateSceneMangaFunction } from "./generate-scene-manga";
-export { exportProjectFunction } from "./export-project";
 
 import { inngest } from "./client";
 
@@ -46,6 +47,13 @@ type ExportProjectEvent = {
     exportId: string;
     kind: "work" | "publication";
     format: "json" | "tree" | "zip";
+  };
+};
+
+type DeleteProjectEvent = {
+  data: {
+    projectId: string;
+    jobId: string;
   };
 };
 
@@ -111,14 +119,16 @@ export async function sendCheckOrphanImagesEvent(
 // Liste de toutes les fonctions pour le serveur Inngest
 // ============================================================================
 
+import { deleteProjectFunction } from "./delete-project";
+import { exportProjectFunction } from "./export-project";
 import { generateImageFunction } from "./generate-image";
 import { generateSceneMangaFunction } from "./generate-scene-manga";
-import { exportProjectFunction } from "./export-project";
 
 export const inngestFunctions = [
+  deleteProjectFunction,
+  exportProjectFunction,
   generateImageFunction,
   generateSceneMangaFunction,
-  exportProjectFunction,
 ];
 
 // Déclaration des événements pour type-safety
@@ -127,6 +137,7 @@ declare module "inngest" {
     "kuti/generate-image": GenerateImageEvent;
     "kuti/generate-scene-manga": GenerateSceneMangaEvent;
     "kuti/export-project": ExportProjectEvent;
+    "kuti/delete-project": DeleteProjectEvent;
     "kuti/check-orphan-images": CheckOrphanImagesEvent;
   }
 }

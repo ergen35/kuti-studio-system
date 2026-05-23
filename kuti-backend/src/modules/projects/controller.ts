@@ -13,6 +13,7 @@ import type {
   CreateProjectBody,
   UpdateProjectBody,
   CloneProjectBody,
+  DeleteProjectBody,
   ProjectResponse,
 } from "./dto";
 
@@ -261,4 +262,37 @@ export async function exportProject(
 
   // Retourner une version simplifiée du projet
   return serializeProject(project);
+}
+
+import { sendDeleteProjectEvent } from "@lib/inngest";
+
+/**
+ * Supprime un projet (déclenche un job Inngest)
+ */
+export async function deleteProject(
+  projectId: string,
+  data: DeleteProjectBody
+): Promise<{ jobId: string; status: string } | null> {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+  });
+
+  if (!project) {
+    return null;
+  }
+
+  // Vérifier que le nom confirmé correspond
+  if (data.confirmedName !== project.name) {
+    throw new Error("Le nom confirmé ne correspond pas au nom du projet");
+  }
+
+  const jobId = randomUUIDv7();
+
+  // Déclencher le job Inngest pour la suppression
+  await sendDeleteProjectEvent({
+    projectId,
+    jobId,
+  });
+
+  return { jobId, status: "pending" };
 }

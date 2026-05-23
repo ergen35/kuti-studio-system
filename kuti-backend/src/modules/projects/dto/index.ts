@@ -62,6 +62,23 @@ export const cloneProjectBodySchema = z.object({
 export type CloneProjectBody = z.infer<typeof cloneProjectBodySchema>;
 
 // ============================================================================
+// Delete
+// ============================================================================
+
+export const deleteProjectBodySchema = z.object({
+  confirmedName: z.string().min(1),
+});
+
+export type DeleteProjectBody = z.infer<typeof deleteProjectBodySchema>;
+
+export const deleteProjectResponseSchema = z.object({
+  jobId: z.string(),
+  status: z.string(),
+});
+
+export type DeleteProjectResponse = z.infer<typeof deleteProjectResponseSchema>;
+
+// ============================================================================
 // Params
 // ============================================================================
 

@@ -176,6 +176,29 @@ export type CreateProjectResponses = {
 
 export type CreateProjectResponse = CreateProjectResponses[keyof CreateProjectResponses];
 
+export type DeleteProjectData = {
+    body: {
+        confirmedName: string;
+    };
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}';
+};
+
+export type DeleteProjectResponses = {
+    /**
+     * Response for status 200
+     */
+    200: {
+        jobId: string;
+        status: string;
+    };
+};
+
+export type DeleteProjectResponse = DeleteProjectResponses[keyof DeleteProjectResponses];
+
 export type GetProjectData = {
     body?: never;
     path: {

@@ -9,5 +9,18 @@
   },
   "actions": {
     "save": "Save settings"
+  },
+  "delete": {
+    "sectionTitle": "Danger Zone",
+    "sectionDescription": "Once deleted, this project and all associated data (characters, scenes, assets) cannot be recovered.",
+    "buttonLabel": "Delete project",
+    "dialogTitle": "Delete project",
+    "dialogDescription": "This action is irreversible. To confirm, please type the project name below:",
+    "inputLabel": "Project name",
+    "inputPlaceholder": "Enter the project name",
+    "cancelButton": "Cancel",
+    "confirmButton": "Confirm deletion",
+    "errorNameMismatch": "The entered name does not match the project name",
+    "errorDelete": "Failed to delete project"
   }
 }
