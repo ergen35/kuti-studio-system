@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import { Image, Trash2 } from 'lucide-react';
-import { characterImageUrl } from '~/lib/image-urls';
+import { characterImageUrlFromData, type CharacterImageWithUrl } from '~/lib/image-urls';
 import type { ListCharacterImagesResponse } from '~/lib/backend';
 
 type CharacterImage = ListCharacterImagesResponse[number];
@@ -17,8 +17,8 @@ interface CharacterImageGalleryProps {
 export function CharacterImageGallery({ images = [], projectId, characterId, onImageClick, onDelete }: CharacterImageGalleryProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // Build image URL from backend
-  const getImageUrl = (imageId: string) => characterImageUrl(projectId, characterId, imageId);
+  // Build image URL from API response using publicUrl or fallback
+  const getImageUrl = (image: CharacterImageWithUrl) => characterImageUrlFromData(image);
 
   // Get readable strategy name
   const getStrategyLabel = (strategy: string | null) => {
@@ -67,7 +67,7 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
           onClick={() => onImageClick(image, index)}
         >
           <img
-            src={getImageUrl(image.id)}
+            src={getImageUrl(image)}
             alt={image.fileName}
             className="w-full h-full object-cover"
             loading="lazy"
@@ -77,14 +77,14 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
           {hoveredId === image.id && (
             <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm flex flex-col justify-end p-2">
               <div className="flex items-center gap-1 flex-wrap">
-                {image.strategy && (
+                {typeof image.strategy === 'string' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
-                    {getStrategyLabel(image.strategy as string)}
+                    {getStrategyLabel(image.strategy)}
                   </span>
                 )}
-                {image.style && (
+                {typeof image.style === 'string' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
-                    {getStyleLabel(image.style as string)}
+                    {getStyleLabel(image.style)}
                   </span>
                 )}
               </div>

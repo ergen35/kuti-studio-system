@@ -5,7 +5,7 @@ import { clsx } from "clsx";
 import { Check, ImageIcon, X } from "lucide-react";
 import { Button } from "~/components/ui";
 import type { ListCharactersResponse, GetProjectCharacterImagesResponse } from "~/lib/backend";
-import { characterImageUrl } from "~/lib/image-urls";
+import { characterImageUrlFromData, type CharacterImageWithUrl } from "~/lib/image-urls";
 
 type Character = ListCharactersResponse[number];
 type CharacterImage = GetProjectCharacterImagesResponse[string][number];
@@ -16,6 +16,18 @@ interface CharacterImageSelectorProps {
   characterImages: Record<string, CharacterImage>;
   selectedImages: Record<string, string>;
   onSelect: (characterSlug: string, imageId: string | null) => void;
+}
+
+// Helper to convert CharacterImage to CharacterImageWithUrl
+function getImageUrl(image: CharacterImage | undefined, projectId: string, characterId: string): string {
+  if (!image) return '';
+  return characterImageUrlFromData({
+    id: image.id,
+    projectId: image.projectId || projectId,
+    characterId: image.characterId || characterId,
+    fileName: image.fileName,
+    publicUrl: (image as unknown as CharacterImageWithUrl).publicUrl,
+  });
 }
 
 export function CharacterImageSelector({
@@ -58,9 +70,9 @@ export function CharacterImageSelector({
                     hasImage ? "bg-accent/10" : "bg-muted/20"
                   )}
                 >
-                  {selectedImageId ? (
+                  {selectedImageId && characterImages[character.slug] ? (
                     <img
-                      src={characterImageUrl(projectId, character.id, selectedImageId)}
+                      src={getImageUrl(characterImages[character.slug], projectId, character.id)}
                       alt={character.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -122,11 +134,7 @@ export function CharacterImageSelector({
                       )}
                     >
                       <img
-                        src={characterImageUrl(
-                          projectId,
-                          character.id,
-                          characterImages[character.slug].id
-                        )}
+                        src={getImageUrl(characterImages[character.slug], projectId, character.id)}
                         alt={character.name}
                         className="w-full h-full object-cover"
                       />

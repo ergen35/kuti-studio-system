@@ -5,7 +5,45 @@
 import { API_BASE_URL } from "~/lib/errors";
 
 /**
- * Build the URL for a character image file
+ * Extended character image interface with optional publicUrl
+ * Compatible with both ListCharacterImagesResponse and GetProjectCharacterImagesResponse
+ */
+export interface CharacterImageWithUrl {
+  id: string;
+  projectId: string;
+  characterId: string;
+  fileName: string;
+  publicUrl?: string;
+  filePath?: string;
+  fileSize?: unknown;
+  mimeType?: string | unknown;
+  strategy?: string | null | unknown;
+  style?: string | null | unknown;
+  variationIndex?: number | null | unknown;
+  createdAt?: string;
+  prompt?: string;
+}
+
+/**
+ * Build the URL for a character image using publicUrl from API
+ * Falls back to constructing from fileName if publicUrl not available
+ */
+export function characterImageUrlFromData(
+  image: CharacterImageWithUrl
+): string {
+  // If publicUrl is available and non-empty
+  if (image.publicUrl && image.publicUrl.trim() !== '') {
+    return `${API_BASE_URL}${image.publicUrl}`;
+  }
+
+  // Fallback: construct URL from fileName (new convention)
+  // Format: /projects/{projectId}/generation/character_images/{fileName}
+  return `${API_BASE_URL}/projects/${image.projectId}/generation/character_images/${image.fileName}`;
+}
+
+/**
+ * @deprecated Use characterImageUrlFromData() instead with publicUrl
+ * Build the URL for a character image file via API endpoint
  */
 export function characterImageUrl(
   projectId: string,

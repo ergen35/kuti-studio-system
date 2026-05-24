@@ -2,7 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { clsx } from 'clsx';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import type { ListCharacterImagesResponse } from '~/lib/backend';
-import { characterImageUrl } from '~/lib/image-urls';
+import { characterImageUrlFromData, type CharacterImageWithUrl } from '~/lib/image-urls';
 
 interface ImageLightboxProps {
   image: ListCharacterImagesResponse[number] | null;
@@ -49,8 +49,8 @@ export function ImageLightbox({
     };
   }, [isOpen, handleKeyDown]);
 
-  // Get image URL - use the character image file endpoint
-  const getImageUrl = (imageId: string) => characterImageUrl(projectId, characterId, imageId);
+  // Get image URL using publicUrl or fallback
+  const getImageUrl = (img: CharacterImageWithUrl) => characterImageUrlFromData(img);
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -66,9 +66,9 @@ export function ImageLightbox({
   // Download image
   const handleDownload = async () => {
     if (!image) return;
-    
+
     try {
-      const response = await fetch(getImageUrl(image.id));
+      const response = await fetch(getImageUrl(image));
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -133,7 +133,7 @@ export function ImageLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         <img
-          src={getImageUrl(image.id)}
+          src={getImageUrl(image)}
           alt={image.fileName}
           className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
         />

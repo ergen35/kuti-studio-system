@@ -21,6 +21,7 @@ import {
   dateLabel,
 } from "~/components/ui";
 import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
+import { characterImageUrlFromData, type CharacterImageWithUrl } from "~/lib/image-urls";
 import type { Project } from "~/lib/backend/types.gen";
 import {
   listProjectsOptions,
@@ -75,7 +76,13 @@ function useBackgroundImages() {
           if (images) {
             const imageUrls = Object.values(images).flat().slice(0, 2);
             for (const img of imageUrls) {
-              results.push(`${API_BASE_URL}/api/projects/${projectId}/characters/${img.characterId}/images/${img.id}/file`);
+              results.push(characterImageUrlFromData({
+                publicUrl: (img as unknown as CharacterImageWithUrl).publicUrl,
+                fileName: img.fileName,
+                projectId: img.projectId || projectId,
+                characterId: img.characterId,
+                id: img.id,
+              }));
             }
           }
         } catch {

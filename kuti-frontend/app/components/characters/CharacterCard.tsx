@@ -1,6 +1,6 @@
 import { useTranslation } from '~/hooks/useTranslation';
 import { CharacterAvatar } from './CharacterAvatar';
-import { characterImageUrl } from '~/lib/image-urls';
+import { characterImageUrlFromData } from '~/lib/image-urls';
 import type { ListCharactersResponse, ListCharacterImagesResponse } from '~/lib/backend';
 
 type Character = ListCharactersResponse[number];
@@ -71,7 +71,13 @@ export function CharacterCard({ character, image, onClick, className = '' }: Cha
               {/* Image area - takes most of the card */}
               <div className="relative aspect-[3/4] overflow-hidden">
                 <img
-                  src={characterImageUrl(character.projectId, character.id, image.id)}
+                  src={image ? characterImageUrlFromData({
+                    publicUrl: (image as unknown as { publicUrl?: string }).publicUrl,
+                    fileName: image.fileName,
+                    projectId: image.projectId,
+                    characterId: image.characterId,
+                    id: image.id,
+                  }) : ''}
                   alt={character.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
