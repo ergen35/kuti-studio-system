@@ -34,6 +34,27 @@ export type ProjectList = Array<{
     archivedAt: string | unknown;
 }>;
 
+export type GetApiInngestData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/inngest/';
+};
+
+export type PostApiInngestData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/inngest/';
+};
+
+export type PutApiInngestData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/inngest/';
+};
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -476,6 +497,7 @@ export type GetProjectCharacterImagesResponses = {
             projectId: string;
             characterId: string;
             filePath: string;
+            publicUrl: string;
             fileName: string;
             fileSize: number | unknown;
             mimeType: string;
@@ -754,6 +776,7 @@ export type ListCharacterImagesResponses = {
         projectId: string;
         characterId: string;
         filePath: string;
+        publicUrl: string;
         fileName: string;
         fileSize: number | unknown;
         mimeType: string;
@@ -776,17 +799,6 @@ export type DeleteCharacterImageData = {
     };
     query?: never;
     url: '/api/projects/{projectId}/characters/{characterId}/images/{imageId}';
-};
-
-export type GetCharacterImageFileData = {
-    body?: never;
-    path: {
-        projectId: string;
-        characterId: string;
-        imageId: string;
-    };
-    query?: never;
-    url: '/api/projects/{projectId}/characters/{characterId}/images/{imageId}/file';
 };
 
 export type GetStorySummaryData = {
@@ -2349,23 +2361,16 @@ export type DownloadExportData = {
     url: '/api/projects/{projectId}/exports/{exportId}/download';
 };
 
-export type GetApiInngestData = {
+export type GetData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/inngest/';
+    url: '/*';
 };
 
-export type PostApiInngestData = {
+export type GetIndexData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/inngest/';
-};
-
-export type PutApiInngestData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/inngest/';
+    url: '/';
 };

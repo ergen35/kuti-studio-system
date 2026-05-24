@@ -1,13 +1,15 @@
-import { BookOpen, Boxes, Brush, ChevronLeft, Clock3, FileArchive, FolderKanban, Menu, Moon, Settings, ShieldAlert, Sun, UsersRound, X } from "lucide-react";
-import { NavLink, Outlet, useParams, useLocation } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { clsx } from "clsx";
-import { type ReactNode, useState, useEffect, useRef } from "react";
-import { getProjectOptions } from "~/lib/backend/@tanstack/react-query.gen";
-import { useUiStore } from "~/stores/ui";
-import { useTranslation } from "~/hooks/useTranslation";
-import { Button } from "~/components/ui";
+import { Activity, BookOpen, Boxes, Brush, ChevronLeft, Clock3, FileArchive, FolderKanban, Menu, Moon, Settings, ShieldAlert, Sun, UsersRound, X } from "lucide-react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { NavLink, Outlet, useLocation, useParams } from "react-router";
 import { LanguageSwitcher } from "~/components/LanguageSwitcher";
+import { TaskSideSheet } from "~/components/tasks";
+import { Button } from "~/components/ui";
+import { useTranslation } from "~/hooks/useTranslation";
+import { getProjectOptions, listGenerationJobsOptions } from "~/lib/backend/@tanstack/react-query.gen";
+import { useTasksStore } from "~/stores/tasks";
+import { useUiStore } from "~/stores/ui";
 
 // Mobile sidebar state hook
 function useMobileSidebar() {
@@ -43,12 +45,23 @@ export function AppShell({ children }: { children?: ReactNode }) {
   const { projectId } = useParams();
   const { t } = useTranslation('common');
   const { theme, density, toggleTheme, setDensity } = useUiStore();
+  const { toggleSideSheet } = useTasksStore();
   const { isOpen, setIsOpen, toggle } = useMobileSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const project = useQuery({
     ...getProjectOptions({ path: { projectId: projectId ?? '' } }),
     enabled: Boolean(projectId),
   });
+
+  // Query running tasks count for badge
+  const { data: jobs } = useQuery({
+    ...listGenerationJobsOptions({ path: { projectId: projectId ?? '' } }),
+    enabled: Boolean(projectId),
+    refetchInterval: 15000,
+  });
+  const runningTaskCount = (jobs as Array<{ status: string }> | undefined)?.filter(
+    (j) => j.status === 'running'
+  ).length ?? 0;
 
   const base = projectId ? `/projects/${projectId}` : "/";
 
@@ -57,6 +70,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
     { to: "characters", label: t('sidebar.characters'), icon: UsersRound },
     { to: "story", label: t('sidebar.storyline'), icon: BookOpen },
     { to: "generation", label: t('sidebar.generation'), icon: Brush },
+    { to: "tasks", label: "Tâches", icon: Activity },
     { to: "assets", label: t('sidebar.assets'), icon: Boxes },
     { to: "exports", label: t('sidebar.exports'), icon: FileArchive },
     { to: "warnings", label: t('sidebar.warnings'), icon: ShieldAlert },
@@ -149,21 +163,46 @@ export function AppShell({ children }: { children?: ReactNode }) {
             >
               <Menu size={22} />
             </button>
-            
+
             <div className="min-w-0">
               <b className="block truncate text-sm text-ink">{project.data?.name || t('sidebar.projectHub')}</b>
               <span className="block truncate text-xs text-muted">{project.data ? `${project.data.status} · ${project.data.rootPath}` : "Backend-driven workspace"}</span>
             </div>
           </div>
-          
-          <span className="hidden sm:block font-mono text-xs text-muted">API {import.meta.env.VITE_KUTI_API_URL || "http://127.0.0.1:8000"}</span>
+
+          {/* Right side actions */}
+          <div className="flex items-center gap-2">
+            {/* Task toggle - only in project context */}
+            {projectId && (
+              <button
+                onClick={toggleSideSheet}
+                className="relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-ink hover:bg-surface-2 transition-colors"
+                title="Ouvrir le gestionnaire de tâches"
+              >
+                <Activity size={18} />
+                {runningTaskCount > 0 && (
+                  <>
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    <span className="hidden sm:inline text-xs font-medium bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded-full">
+                      {runningTaskCount}
+                    </span>
+                  </>
+                )}
+                <span className="hidden sm:inline text-sm">Tâches</span>
+              </button>
+            )}
+            <span className="hidden sm:block font-mono text-xs text-muted">API {import.meta.env.VITE_KUTI_API_URL || "http://127.0.0.1:8000"}</span>
+          </div>
         </div>
-        
+
         {/* Page content */}
         <div className="flex-1 mx-auto w-full max-w-[1500px] p-4 sm:p-5 compact:p-3">
           {children ?? <Outlet />}
         </div>
       </main>
+
+      {/* Task Side Sheet */}
+      {projectId && <TaskSideSheet />}
     </div>
   );
 }

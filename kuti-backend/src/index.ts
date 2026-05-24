@@ -32,14 +32,6 @@ export const app = new Elysia({
   analytic: true,
   name: config.appName,
 })
-  // Logging global
-  .use(
-    wideEvent({
-      generateRequestId: () => `req-${randomUUIDv7()}`,
-      start: { version: config.appVersion },
-    }),
-  )
-
   // CORS
   .use(
     cors({
@@ -49,7 +41,15 @@ export const app = new Elysia({
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     }),
   )
+  .use(inngestModule)
 
+    // Logging global
+    .use(
+      wideEvent({
+        generateRequestId: () => `req-${randomUUIDv7()}`,
+        start: { version: config.appVersion },
+      }),
+    )
   // API Documentation
   .use(
     openapi({
@@ -91,7 +91,6 @@ export const app = new Elysia({
   .use(versionsModule)
   .use(warningsModule)
   .use(exportsModule)
-  .use(inngestModule)
 
   // Start server
   .listen(Number(config.port), () => {

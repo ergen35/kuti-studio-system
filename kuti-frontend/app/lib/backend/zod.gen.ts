@@ -458,6 +458,7 @@ export const zGetProjectCharacterImagesResponse = z.record(z.array(z.object({
     projectId: z.string(),
     characterId: z.string(),
     filePath: z.string(),
+    publicUrl: z.string(),
     fileName: z.string(),
     fileSize: z.union([
         z.number(),
@@ -743,6 +744,7 @@ export const zListCharacterImagesResponse = z.array(z.object({
     projectId: z.string(),
     characterId: z.string(),
     filePath: z.string(),
+    publicUrl: z.string(),
     fileName: z.string(),
     fileSize: z.union([
         z.number(),
@@ -766,12 +768,6 @@ export const zListCharacterImagesResponse = z.array(z.object({
 }));
 
 export const zDeleteCharacterImagePath = z.object({
-    projectId: z.string(),
-    characterId: z.string(),
-    imageId: z.string()
-});
-
-export const zGetCharacterImageFilePath = z.object({
     projectId: z.string(),
     characterId: z.string(),
     imageId: z.string()

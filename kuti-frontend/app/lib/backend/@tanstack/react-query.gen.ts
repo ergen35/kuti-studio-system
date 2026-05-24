@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { archiveAsset, archiveCharacter, archiveProject, cloneProject, compareVersions, createAssetLink, createChapter, createCharacter, createExport, createGenerationJob, createProject, createRelation, createScene, createSceneConfig, createTome, createVersion, createVoiceSample, deleteAsset, deleteAssetLink, deleteChapter, deleteCharacter, deleteCharacterImage, deleteProject, deleteScene, deleteSceneConfig, deleteSceneMangaPage, deleteTome, downloadBoardArtifact, downloadExport, exportProject, generateCharacterImage, generateSceneManga, getApiInngest, getAsset, getAssetFile, getCharacter, getCharacterImageFile, getConfig, getExport, getGenerationBoard, getGenerationJob, getGenerationPanelImage, getHealth, getHealthz, getProject, getProjectCharacterImages, getReferenceSuggestions, getStorySummary, getVersion, importAsset, listAssets, listBranches, listChapters, listCharacterImages, listCharacters, listExports, listGenerationBoards, listGenerationJobs, listModels, listProjects, listSceneConfigs, listSceneMangaPages, listScenes, listTomes, listVersions, listWarnings, openProject, type Options, postApiInngest, previewPrompt, putApiInngest, restoreVersion, scanWarnings, setDefaultConfig, updateAsset, updateChapter, updateCharacter, updateGenerationPanel, updateProject, updateScene, updateSceneConfig, updateSceneMangaPage, updateTome, updateWarning, validateGenerationBoard } from '../sdk.gen';
-import type { ArchiveAssetData, ArchiveAssetResponse, ArchiveCharacterData, ArchiveCharacterResponse, ArchiveProjectData, ArchiveProjectResponse, CloneProjectData, CloneProjectResponse, CompareVersionsData, CompareVersionsResponse, CreateAssetLinkData, CreateAssetLinkResponse, CreateChapterData, CreateChapterResponse, CreateCharacterData, CreateCharacterResponse, CreateExportData, CreateExportResponse, CreateGenerationJobData, CreateGenerationJobResponse, CreateProjectData, CreateProjectResponse, CreateRelationData, CreateRelationResponse, CreateSceneConfigData, CreateSceneConfigResponse, CreateSceneData, CreateSceneResponse, CreateTomeData, CreateTomeResponse, CreateVersionData, CreateVersionResponse, CreateVoiceSampleData, CreateVoiceSampleResponse, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponse, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponse, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponse, GetCharacterData, GetCharacterImageFileData, GetCharacterResponse, GetConfigData, GetConfigResponse, GetExportData, GetExportResponse, GetGenerationBoardData, GetGenerationBoardResponse, GetGenerationJobData, GetGenerationJobResponse, GetGenerationPanelImageData, GetHealthData, GetHealthResponse, GetHealthzData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponse, GetProjectData, GetProjectResponse, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponse, GetVersionData, GetVersionResponse, ImportAssetData, ImportAssetResponse, ListAssetsData, ListAssetsResponse, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponse, ListCharactersData, ListCharactersResponse, ListExportsData, ListExportsResponse, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponse, ListProjectsData, ListProjectsResponse, ListSceneConfigsData, ListSceneConfigsResponse, ListSceneMangaPagesData, ListSceneMangaPagesResponse, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponse, OpenProjectData, OpenProjectResponse, PostApiInngestData, PreviewPromptData, PreviewPromptResponse, PutApiInngestData, RestoreVersionData, RestoreVersionResponse, ScanWarningsData, ScanWarningsResponse, SetDefaultConfigData, SetDefaultConfigResponse, UpdateAssetData, UpdateAssetResponse, UpdateChapterData, UpdateChapterResponse, UpdateCharacterData, UpdateCharacterResponse, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponse, UpdateSceneConfigData, UpdateSceneConfigResponse, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponse, UpdateSceneResponse, UpdateTomeData, UpdateTomeResponse, UpdateWarningData, UpdateWarningResponse, ValidateGenerationBoardData, ValidateGenerationBoardResponse } from '../types.gen';
+import { archiveAsset, archiveCharacter, archiveProject, cloneProject, compareVersions, createAssetLink, createChapter, createCharacter, createExport, createGenerationJob, createProject, createRelation, createScene, createSceneConfig, createTome, createVersion, createVoiceSample, deleteAsset, deleteAssetLink, deleteChapter, deleteCharacter, deleteCharacterImage, deleteProject, deleteScene, deleteSceneConfig, deleteSceneMangaPage, deleteTome, downloadBoardArtifact, downloadExport, exportProject, generateCharacterImage, generateSceneManga, get_, getApiInngest, getAsset, getAssetFile, getCharacter, getConfig, getExport, getGenerationBoard, getGenerationJob, getGenerationPanelImage, getHealth, getHealthz, getIndex, getProject, getProjectCharacterImages, getReferenceSuggestions, getStorySummary, getVersion, importAsset, listAssets, listBranches, listChapters, listCharacterImages, listCharacters, listExports, listGenerationBoards, listGenerationJobs, listModels, listProjects, listSceneConfigs, listSceneMangaPages, listScenes, listTomes, listVersions, listWarnings, openProject, type Options, postApiInngest, previewPrompt, putApiInngest, restoreVersion, scanWarnings, setDefaultConfig, updateAsset, updateChapter, updateCharacter, updateGenerationPanel, updateProject, updateScene, updateSceneConfig, updateSceneMangaPage, updateTome, updateWarning, validateGenerationBoard } from '../sdk.gen';
+import type { ArchiveAssetData, ArchiveAssetResponse, ArchiveCharacterData, ArchiveCharacterResponse, ArchiveProjectData, ArchiveProjectResponse, CloneProjectData, CloneProjectResponse, CompareVersionsData, CompareVersionsResponse, CreateAssetLinkData, CreateAssetLinkResponse, CreateChapterData, CreateChapterResponse, CreateCharacterData, CreateCharacterResponse, CreateExportData, CreateExportResponse, CreateGenerationJobData, CreateGenerationJobResponse, CreateProjectData, CreateProjectResponse, CreateRelationData, CreateRelationResponse, CreateSceneConfigData, CreateSceneConfigResponse, CreateSceneData, CreateSceneResponse, CreateTomeData, CreateTomeResponse, CreateVersionData, CreateVersionResponse, CreateVoiceSampleData, CreateVoiceSampleResponse, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponse, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponse, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponse, GetCharacterData, GetCharacterResponse, GetConfigData, GetConfigResponse, GetData, GetExportData, GetExportResponse, GetGenerationBoardData, GetGenerationBoardResponse, GetGenerationJobData, GetGenerationJobResponse, GetGenerationPanelImageData, GetHealthData, GetHealthResponse, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponse, GetProjectData, GetProjectResponse, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponse, GetVersionData, GetVersionResponse, ImportAssetData, ImportAssetResponse, ListAssetsData, ListAssetsResponse, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponse, ListCharactersData, ListCharactersResponse, ListExportsData, ListExportsResponse, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponse, ListProjectsData, ListProjectsResponse, ListSceneConfigsData, ListSceneConfigsResponse, ListSceneMangaPagesData, ListSceneMangaPagesResponse, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponse, OpenProjectData, OpenProjectResponse, PostApiInngestData, PreviewPromptData, PreviewPromptResponse, PutApiInngestData, RestoreVersionData, RestoreVersionResponse, ScanWarningsData, ScanWarningsResponse, SetDefaultConfigData, SetDefaultConfigResponse, UpdateAssetData, UpdateAssetResponse, UpdateChapterData, UpdateChapterResponse, UpdateCharacterData, UpdateCharacterResponse, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponse, UpdateSceneConfigData, UpdateSceneConfigResponse, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponse, UpdateSceneResponse, UpdateTomeData, UpdateTomeResponse, UpdateWarningData, UpdateWarningResponse, ValidateGenerationBoardData, ValidateGenerationBoardResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -37,6 +37,49 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
         params.query = options.query;
     }
     return [params];
+};
+
+export const getApiInngestQueryKey = (options?: Options<GetApiInngestData>) => createQueryKey('getApiInngest', options);
+
+export const getApiInngestOptions = (options?: Options<GetApiInngestData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getApiInngestQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getApiInngest({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getApiInngestQueryKey(options)
+});
+
+export const postApiInngestMutation = (options?: Partial<Options<PostApiInngestData>>): UseMutationOptions<unknown, DefaultError, Options<PostApiInngestData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<PostApiInngestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await postApiInngest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const putApiInngestMutation = (options?: Partial<Options<PutApiInngestData>>): UseMutationOptions<unknown, DefaultError, Options<PutApiInngestData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<PutApiInngestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await putApiInngest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const getHealthQueryKey = (options?: Options<GetHealthData>) => createQueryKey('getHealth', options);
@@ -474,24 +517,6 @@ export const deleteCharacterImageMutation = (options?: Partial<Options<DeleteCha
     };
     return mutationOptions;
 };
-
-export const getCharacterImageFileQueryKey = (options: Options<GetCharacterImageFileData>) => createQueryKey('getCharacterImageFile', options);
-
-/**
- * Get character image file
- */
-export const getCharacterImageFileOptions = (options: Options<GetCharacterImageFileData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getCharacterImageFileQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getCharacterImageFile({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getCharacterImageFileQueryKey(options)
-});
 
 export const getStorySummaryQueryKey = (options: Options<GetStorySummaryData>) => createQueryKey('getStorySummary', options);
 
@@ -1451,11 +1476,11 @@ export const downloadExportOptions = (options: Options<DownloadExportData>) => q
     queryKey: downloadExportQueryKey(options)
 });
 
-export const getApiInngestQueryKey = (options?: Options<GetApiInngestData>) => createQueryKey('getApiInngest', options);
+export const getQueryKey = (options?: Options<GetData>) => createQueryKey('get', options);
 
-export const getApiInngestOptions = (options?: Options<GetApiInngestData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getApiInngestQueryKey>>({
+export const getOptions = (options?: Options<GetData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getApiInngest({
+        const { data } = await get_({
             ...options,
             ...queryKey[0],
             signal,
@@ -1463,33 +1488,20 @@ export const getApiInngestOptions = (options?: Options<GetApiInngestData>) => qu
         });
         return data;
     },
-    queryKey: getApiInngestQueryKey(options)
+    queryKey: getQueryKey(options)
 });
 
-export const postApiInngestMutation = (options?: Partial<Options<PostApiInngestData>>): UseMutationOptions<unknown, DefaultError, Options<PostApiInngestData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<PostApiInngestData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await postApiInngest({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const getIndexQueryKey = (options?: Options<GetIndexData>) => createQueryKey('getIndex', options);
 
-export const putApiInngestMutation = (options?: Partial<Options<PutApiInngestData>>): UseMutationOptions<unknown, DefaultError, Options<PutApiInngestData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<PutApiInngestData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await putApiInngest({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const getIndexOptions = (options?: Options<GetIndexData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getIndexQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getIndex({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getIndexQueryKey(options)
+});

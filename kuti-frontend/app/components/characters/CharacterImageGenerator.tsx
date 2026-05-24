@@ -1,13 +1,13 @@
-import { useState, useMemo } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Sparkles, X, Loader2, Wand2, ImageIcon } from 'lucide-react';
 import { clsx } from 'clsx';
+import { ImageIcon, Loader2, Sparkles, Wand2, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Button, ErrorState } from '~/components/ui';
 import { useTranslation } from '~/hooks/useTranslation';
 import type { ListCharactersResponse } from '~/lib/backend';
-import { apiErrorMessage } from '~/lib/errors';
 import { generateCharacterImageMutation, getGenerationJobOptions } from '~/lib/backend/@tanstack/react-query.gen';
-import { invalidateWorkspace, keys } from '~/lib/query';
-import { Button, Badge, ErrorState, Field } from '~/components/ui';
+import { apiErrorMessage } from '~/lib/errors';
+import { invalidateWorkspace } from '~/lib/query';
 import { GenerationPanelGrid } from './GenerationPanelGrid';
 
 interface CharacterImageGeneratorProps {
@@ -79,7 +79,7 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
     refetchInterval: (query: { state?: { data?: { status?: string } } }) => {
       const status = query.state?.data?.status;
       if (status === 'ready' || status === 'failed') return false;
-      return 2000;
+      return 30000;
     },
     staleTime: 0,
   });
