@@ -21,10 +21,10 @@ export const generationJobResponseSchema = z.object({
   status: generationJobStatusSchema,
   progress: z.number(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().iso.datetime(),
-  updatedAt: z.string().iso.datetime(),
-  completedAt: z.string().iso.datetime().nullable(),
-  failedAt: z.string().iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  completedAt: z.iso.datetime().nullable(),
+  failedAt: z.iso.datetime().nullable(),
   errorMessage: z.string().nullable(),
 });
 
@@ -39,10 +39,10 @@ export const generationJobStepResponseSchema = z.object({
   artifactPath: z.string().nullable(),
   artifactName: z.string().nullable(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().iso.datetime(),
-  updatedAt: z.string().iso.datetime(),
-  completedAt: z.string().iso.datetime().nullable(),
-  failedAt: z.string().iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  completedAt: z.iso.datetime().nullable(),
+  failedAt: z.iso.datetime().nullable(),
   errorMessage: z.string().nullable(),
 });
 
@@ -58,8 +58,8 @@ export const generationPanelResponseSchema = z.object({
   imagePath: z.string(),
   imageName: z.string(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().iso.datetime(),
-  updatedAt: z.string().iso.datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const generationBoardResponseSchema = z.object({
@@ -74,9 +74,9 @@ export const generationBoardResponseSchema = z.object({
   artifactPath: z.string().nullable(),
   artifactName: z.string().nullable(),
   metadataJson: z.record(z.unknown()),
-  createdAt: z.string().iso.datetime(),
-  updatedAt: z.string().iso.datetime(),
-  validatedAt: z.string().iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  validatedAt: z.iso.datetime().nullable(),
   panels: z.array(generationPanelResponseSchema),
 });
 

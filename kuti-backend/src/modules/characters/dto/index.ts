@@ -24,9 +24,9 @@ export const characterResponseSchema = z.object({
   narrativeArc: z.string(),
   tagsJson: z.array(z.string()),
   status: characterStatusSchema,
-  createdAt: z.string().iso.datetime(),
-  updatedAt: z.string().iso.datetime(),
-  archivedAt: z.string().iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  archivedAt: z.iso.datetime().nullable(),
 });
 
 export type CharacterResponse = z.infer<typeof characterResponseSchema>;
@@ -76,8 +76,8 @@ export const characterRelationResponseSchema = z.object({
   strength: z.number(),
   narrativeDependency: z.string(),
   notes: z.string(),
-  createdAt: z.string().iso.datetime(),
-  updatedAt: z.string().iso.datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type CharacterRelationResponse = z.infer<typeof characterRelationResponseSchema>;
@@ -101,7 +101,7 @@ export const voiceSampleResponseSchema = z.object({
   assetPath: z.string().nullable(),
   label: z.string(),
   voiceNotes: z.string(),
-  createdAt: z.string().iso.datetime(),
+  createdAt: z.iso.datetime(),
 });
 
 export type VoiceSampleResponse = z.infer<typeof voiceSampleResponseSchema>;
@@ -126,7 +126,7 @@ export const characterImageResponseSchema = z.object({
   strategy: z.string().nullable(),
   style: z.string().nullable(),
   variationIndex: z.number().nullable(),
-  createdAt: z.string().iso.datetime(),
+  createdAt: z.iso.datetime(),
 });
 
 export type CharacterImageResponse = z.infer<typeof characterImageResponseSchema>;
