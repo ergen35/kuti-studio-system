@@ -8,6 +8,7 @@
       "source": "Source",
       "selectSource": "Select source",
       "model": "Model",
+      "selectModel": "Select a model...",
       "defaultModel": "Backend default",
       "notConfigured": "(not configured)",
       "mode": "Mode",

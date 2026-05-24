@@ -2,7 +2,6 @@
  * Utilitaires pour le module Projects
  */
 
-import { writeFile } from "node:fs/promises";
 import type { Project } from "@lib/db/generated/client";
 
 /**
@@ -36,16 +35,4 @@ export function serializeProject(
   };
 }
 
-/**
- * Écrit le fichier project.json dans le répertoire du projet
- */
-export async function writeProjectFile(project: Project): Promise<void> {
-  const data = serializeProject(project);
-  const path = `${project.rootPath}/project.json`;
 
-  await writeFile(
-    path,
-    JSON.stringify(data, null, 2) + "\n",
-    "utf-8"
-  );
-}

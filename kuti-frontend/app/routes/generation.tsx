@@ -1,5 +1,5 @@
-import { Check, ImagePlus, RefreshCw } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+import { Check, ImagePlus, RefreshCw, Image, Video, AudioLines } from "lucide-react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
@@ -18,6 +18,91 @@ import {
   validateGenerationBoardMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
 import { generationJobSchema, type GenerationJobInput } from "~/lib/schemas";
+import type { ListModelsResponses } from "~/lib/backend/types.gen";
+
+type Model = ListModelsResponses['200'][number];
+
+interface CustomModelSelectProps {
+  modelsByKind: { image: Model[]; video: Model[]; audio: Model[] };
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  notConfiguredLabel: string;
+}
+
+function CustomModelSelect({ modelsByKind, value, onChange, placeholder, notConfiguredLabel }: CustomModelSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const selectedModel = useMemo(() => {
+    const all = [...modelsByKind.image, ...modelsByKind.video, ...modelsByKind.audio];
+    return all.find(m => m.key === value);
+  }, [value, modelsByKind]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const groups = [
+    { kind: 'image' as const, label: 'Images', icon: Image, items: modelsByKind.image },
+    { kind: 'video' as const, label: 'Vidéos', icon: Video, items: modelsByKind.video },
+    { kind: 'audio' as const, label: 'Audio', icon: AudioLines, items: modelsByKind.audio },
+  ].filter(g => g.items.length > 0);
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex min-h-9 w-full items-center justify-between gap-2 rounded-[7px] border border-line bg-surface px-2.5 py-2 text-sm text-ink outline-none transition-colors hover:bg-surface-2 focus:border-accent"
+      >
+        <span className={selectedModel ? 'text-ink' : 'text-muted'}>
+          {selectedModel ? selectedModel.displayName : placeholder}
+        </span>
+        <svg className={`h-4 w-4 shrink-0 text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-[7px] border border-line bg-surface shadow-card">
+          {groups.map((group) => {
+            const Icon = group.icon;
+            return (
+              <div key={group.kind} className="border-b border-line last:border-b-0">
+                <div className="flex items-center gap-2 bg-surface-2 px-2.5 py-1.5 text-xs font-medium uppercase text-muted">
+                  <Icon size={14} />
+                  <span>{group.label}</span>
+                </div>
+                {group.items.map((model) => (
+                  <button
+                    type="button"
+                    key={model.key}
+                    onClick={() => {
+                      onChange(model.key);
+                      setIsOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between px-2.5 py-2 text-left text-sm transition-colors hover:bg-accent/10 ${value === model.key ? 'bg-accent/10 text-accent' : 'text-ink'}`}
+                  >
+                    <span>{model.displayName}</span>
+                    {!model.configured && (
+                      <span className="text-xs text-muted">({notConfiguredLabel})</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function GenerationRoute() {
   const { projectId = "" } = useParams();
@@ -28,10 +113,12 @@ export default function GenerationRoute() {
   const jobs = useQuery({ ...listGenerationJobsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   const boards = useQuery({ ...listGenerationBoardsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, control, setValue } = useForm<GenerationJobInput>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, control, setValue, watch } = useForm<GenerationJobInput>({
     resolver: zodResolver(generationJobSchema),
     defaultValues: { source_kind: 'scene', source_id: '', model_key: '', mode: 'separate' },
   });
+  
+  const model_key = watch('model_key');
   
   const sourceKind = useWatch({ control, name: 'source_kind' });
   const [prevKind, setPrevKind] = useState(sourceKind);
@@ -48,6 +135,28 @@ export default function GenerationRoute() {
     sourceKind === "chapter" ? story.data?.chapters || [] : 
     story.data?.scenes || [], 
   [sourceKind, story.data]);
+  
+  // Group models by kind for organized display
+  const modelsByKind = useMemo(() => {
+    const all = (models.data as Model[] | undefined) ?? [];
+    return {
+      image: all.filter(m => m.kind === 'image'),
+      video: all.filter(m => m.kind === 'video'),
+      audio: all.filter(m => m.kind === 'audio'),
+    };
+  }, [models.data]);
+  
+  // Set default model to gpt_images_2 if configured, otherwise first configured image model
+  useEffect(() => {
+    if (models.data && !model_key) {
+      const all = models.data as Model[];
+      const defaultModel = all.find(m => m.key === 'gpt_images_2' && m.configured)
+        || all.find(m => m.kind === 'image' && m.configured);
+      if (defaultModel) {
+        setValue('model_key', defaultModel.key);
+      }
+    }
+  }, [models.data, model_key, setValue]);
   
   const create = useMutation({
     ...createGenerationJobMutation(),
@@ -99,10 +208,15 @@ export default function GenerationRoute() {
               </select>
             </FormField>
             <FormField label={t('panels.create.model')} error={errors.model_key}>
-              <select {...register('model_key')}>
-                <option value="">{t('panels.create.defaultModel')}</option>
-                {((models.data as Array<{ key: string; display_name: string; kind: string; configured: boolean }> | undefined ?? [])).map((model) => <option key={model.key} value={model.key}>{model.display_name} · {model.kind} {model.configured ? "" : t('panels.create.notConfigured')}</option>)}
-              </select>
+              <CustomModelSelect
+                modelsByKind={modelsByKind}
+                value={model_key}
+                onChange={(value) => setValue('model_key', value)}
+                placeholder={t('panels.create.selectModel')}
+                notConfiguredLabel={t('panels.create.notConfigured')}
+              />
+              {/* Hidden input for react-hook-form */}
+              <input type="hidden" {...register('model_key')} value={model_key} />
             </FormField>
             <FormField label={t('panels.create.mode')} error={errors.mode}>
               <select {...register('mode')}>

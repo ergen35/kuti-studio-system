@@ -5,10 +5,10 @@
 
 import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
-import { mkdir, writeFile, cp } from "node:fs/promises";
+import { mkdir, cp } from "node:fs/promises";
 import { config, getProjectDir } from "@lib/config";
 import { prisma } from "@lib/db";
-import { serializeProject, writeProjectFile } from "./utils";
+import { serializeProject } from "./utils";
 import type {
   CreateProjectBody,
   UpdateProjectBody,
@@ -99,9 +99,6 @@ export async function createProject(
     },
   });
 
-  // Écrire le fichier project.json
-  await writeProjectFile(project);
-
   return serializeProject(project);
 }
 
@@ -130,9 +127,6 @@ export async function updateProject(
     },
   });
 
-  // Mettre à jour le fichier project.json
-  await writeProjectFile(updated);
-
   return serializeProject(updated);
 }
 
@@ -159,8 +153,6 @@ export async function archiveProject(
     },
   });
 
-  await writeProjectFile(updated);
-
   return serializeProject(updated);
 }
 
@@ -185,8 +177,6 @@ export async function openProject(
       updatedAt: new Date(),
     },
   });
-
-  await writeProjectFile(updated);
 
   return serializeProject(updated);
 }
@@ -240,8 +230,6 @@ export async function cloneProject(
       updatedAt: now,
     },
   });
-
-  await writeProjectFile(clone);
 
   return serializeProject(clone);
 }
