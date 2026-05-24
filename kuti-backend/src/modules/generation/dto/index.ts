@@ -108,3 +108,8 @@ export type CreateGenerationJobBody = z.infer<typeof createGenerationJobBodySche
 export const validateBoardBodySchema = z.object({
   note: z.string().optional(),
 });
+
+export const cancelJobResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});

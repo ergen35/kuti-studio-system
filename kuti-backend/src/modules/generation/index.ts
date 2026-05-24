@@ -5,11 +5,15 @@ import {
   generationBoardResponseSchema,
   createGenerationJobBodySchema,
   updatePanelBodySchema,
+  cancelJobResponseSchema,
 } from "./dto";
+import { z } from "zod";
 import {
   listGenerationJobs,
   getGenerationJob,
   createGenerationJob,
+  cancelGenerationJob,
+  relaunchGenerationJob,
   listGenerationBoards,
   getGenerationBoard,
   validateGenerationBoard,
@@ -29,7 +33,7 @@ export const generationModule = new Elysia({
     detail: { operationId: "listGenerationJobs", summary: "List generation jobs" },
   })
   .post("/jobs", ({ params: { projectId }, body }) => createGenerationJob(projectId, body), {
-    params: { projectId: "string" },
+    params: z.object({ projectId: z.string() }),
     body: createGenerationJobBodySchema,
     response: generationJobResponseSchema,
     detail: { operationId: "createGenerationJob", summary: "Create a generation job" },
@@ -39,7 +43,7 @@ export const generationModule = new Elysia({
     if (!job) throw new Error("Job not found");
     return job;
   }, {
-    params: { projectId: "string", jobId: "string" },
+    params: z.object({ projectId: z.string(), jobId: z.string() }),
     response: generationJobResponseSchema,
     detail: { operationId: "getGenerationJob", summary: "Get a generation job" },
   })
@@ -54,7 +58,7 @@ export const generationModule = new Elysia({
     if (!board) throw new Error("Board not found");
     return board;
   }, {
-    params: { projectId: "string", boardId: "string" },
+    params: z.object({ projectId: z.string(), boardId: z.string() }),
     response: generationBoardResponseSchema,
     detail: { operationId: "getGenerationBoard", summary: "Get a generation board" },
   })
@@ -63,7 +67,7 @@ export const generationModule = new Elysia({
     if (!board) throw new Error("Board not found");
     return board;
   }, {
-    params: { projectId: "string", boardId: "string" },
+    params: z.object({ projectId: z.string(), boardId: z.string() }),
     body: validateBoardBodySchema,
     response: generationBoardResponseSchema,
     detail: { operationId: "validateGenerationBoard", summary: "Validate a board" },
@@ -75,7 +79,7 @@ export const generationModule = new Elysia({
     if (!panel) throw new Error("Panel not found");
     return panel;
   }, {
-    params: { projectId: "string", boardId: "string", panelId: "string" },
+    params: z.object({ projectId: z.string(), boardId: z.string(), panelId: z.string() }),
     body: updatePanelBodySchema,
     detail: { operationId: "updateGenerationPanel", summary: "Update a panel" },
   })
@@ -86,7 +90,7 @@ export const generationModule = new Elysia({
       headers: { "Content-Type": file.mimeType },
     });
   }, {
-    params: { projectId: "string", boardId: "string", panelId: "string" },
+    params: z.object({ projectId: z.string(), boardId: z.string(), panelId: z.string() }),
     detail: { operationId: "getGenerationPanelImage", summary: "Get panel image" },
   })
 
@@ -101,6 +105,34 @@ export const generationModule = new Elysia({
       },
     });
   }, {
-    params: { projectId: "string", boardId: "string" },
+    params: z.object({ projectId: z.string(), boardId: z.string() }),
     detail: { operationId: "downloadBoardArtifact", summary: "Download board artifact" },
+  })
+
+  // Cancel job
+  .post("/jobs/:jobId/cancel", async ({ params: { projectId, jobId } }) => {
+    const result = await cancelGenerationJob(projectId, jobId);
+    return result;
+  }, {
+    params: z.object({ projectId: z.string(), jobId: z.string() }),
+    response: cancelJobResponseSchema,
+    detail: {
+      operationId: "cancelGenerationJob",
+      summary: "Cancel a running generation job",
+      tags: ["Generation"],
+    },
+  })
+
+  // Relaunch job
+  .post("/jobs/:jobId/relaunch", async ({ params: { projectId, jobId } }) => {
+    const result = await relaunchGenerationJob(projectId, jobId);
+    return result;
+  }, {
+    params: z.object({ projectId: z.string(), jobId: z.string() }),
+    response: generationJobResponseSchema,
+    detail: {
+      operationId: "relaunchGenerationJob",
+      summary: "Relaunch a completed or failed generation job",
+      tags: ["Generation"],
+    },
   });

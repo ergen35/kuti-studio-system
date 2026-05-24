@@ -2,6 +2,7 @@ import { randomUUIDv7 } from "bun";
 import { writeFile, mkdir } from "node:fs/promises";
 import { prisma } from "@lib/db";
 import { throwIfNotExists } from "@lib/db/utils";
+import { sendCancelJobEvent, sendRelaunchJobEvent } from "@lib/inngest";
 import type {
   GenerationJobResponse,
   GenerationBoardResponse,
@@ -325,4 +326,92 @@ export async function getBoardArtifact(
     buffer,
     fileName: board.artifactName || "board.json",
   };
+}
+
+// ============================================================================
+// Cancel Job
+// ============================================================================
+
+export async function cancelGenerationJob(
+  projectId: string,
+  jobId: string
+): Promise<{ success: boolean; message: string }> {
+  // Vérifier que le job existe et appartient au projet
+  const job = await prisma.generationJob.findFirst({
+    where: { id: jobId, projectId },
+  });
+
+  if (!job) {
+    throw new Error("generation_job_not_found");
+  }
+
+  // Vérifier que le job est en status "running" ou "pending"
+  if (job.status !== "running" && job.status !== "pending") {
+    throw new Error("cannot_cancel_job_not_running");
+  }
+
+  // Envoyer un événement Inngest pour annuler le job
+  await sendCancelJobEvent({ jobId, projectId });
+
+  return { success: true, message: "Cancel request sent" };
+}
+
+// ============================================================================
+// Relaunch Job
+// ============================================================================
+
+export async function relaunchGenerationJob(
+  projectId: string,
+  jobId: string
+): Promise<GenerationJobResponse> {
+  // Vérifier que le job existe et appartient au projet
+  const originalJob = await prisma.generationJob.findFirst({
+    where: { id: jobId, projectId },
+  });
+
+  if (!originalJob) {
+    throw new Error("generation_job_not_found");
+  }
+
+  // Vérifier que le job est en status autorisé pour relaunch
+  const allowedStatuses = ["ready", "validated", "failed", "pending"];
+  if (!allowedStatuses.includes(originalJob.status)) {
+    throw new Error("cannot_relaunch_job_invalid_status");
+  }
+
+  // Créer un nouveau job basé sur les données du job existant
+  const now = new Date();
+  const newJobId = randomUUIDv7();
+
+  const newJob = await prisma.generationJob.create({
+    data: {
+      id: newJobId,
+      projectId,
+      sourceKind: originalJob.sourceKind,
+      sourceId: originalJob.sourceId,
+      sourceLabel: originalJob.sourceLabel,
+      sourceVersionId: originalJob.sourceVersionId,
+      strategy: originalJob.strategy,
+      entrypoint: originalJob.entrypoint,
+      title: `${originalJob.title} (relaunch)`,
+      prompt: originalJob.prompt,
+      summary: originalJob.summary,
+      status: "pending",
+      progress: 0,
+      metadataJson: originalJob.metadataJson,
+      createdAt: now,
+      updatedAt: now,
+    },
+  });
+
+  // Envoyer un événement Inngest pour exécuter le nouveau job
+  await sendRelaunchJobEvent({
+    newJobId,
+    originalJobId: jobId,
+    projectId,
+    sourceKind: originalJob.sourceKind,
+    sourceId: originalJob.sourceId,
+  });
+
+  return serializeJob(newJob);
 }

@@ -109,6 +109,7 @@ export default function TasksRoute() {
       {selectedTaskId && (
         <TaskDetailDialog
           task={tasks.find(t => t.id === selectedTaskId)!}
+          projectId={projectId}
           isOpen={!!selectedTaskId}
           onClose={() => setSelectedTask(null)}
         />

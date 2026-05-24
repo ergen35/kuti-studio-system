@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { clsx } from "clsx";
 import {
   X,
@@ -12,8 +12,12 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
+  Square,
+  RefreshCw,
 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Badge } from "~/components/ui";
+import { client } from "~/lib/backend/client.gen";
 import type {
   TaskItem,
   TaskStatus,
@@ -59,15 +63,67 @@ const STATUS_BG_COLORS: Record<TaskStatus, string> = {
 
 interface TaskDetailDialogProps {
   task: TaskItem;
+  projectId: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export function TaskDetailDialog({
   task,
+  projectId,
   isOpen,
   onClose,
 }: TaskDetailDialogProps) {
+  const queryClient = useQueryClient();
+
+  // Conditions d'affichage des boutons
+  const canCancel = task.status === "running" || task.status === "pending";
+  const canRelaunch = task.status === "ready" || task.status === "validated" || task.status === "failed";
+
+  // Mutation Cancel
+  const cancelMutation = useMutation({
+    mutationFn: async () => {
+      const result = await client.post<{
+        success: boolean;
+        message: string;
+      }>({
+        url: `/api/projects/${projectId}/generation/jobs/${task.id}/cancel`,
+      });
+      if (!result.response || !result.response.ok) {
+        throw new Error("Failed to cancel job");
+      }
+      return result.data!;
+    },
+    onSuccess: () => {
+      // Fermer la boîte de dialogue
+      onClose();
+      // Actualiser la liste des tâches
+      queryClient.invalidateQueries({ queryKey: ["listGenerationJobs", { path: { projectId } }] });
+    },
+  });
+
+  // Mutation Relaunch
+  const relaunchMutation = useMutation({
+    mutationFn: async () => {
+      const result = await client.post<{
+        id: string;
+        title: string;
+        status: string;
+      }>({
+        url: `/api/projects/${projectId}/generation/jobs/${task.id}/relaunch`,
+      });
+      if (!result.response || !result.response.ok) {
+        throw new Error("Failed to relaunch job");
+      }
+      return result.data!;
+    },
+    onSuccess: () => {
+      // Fermer la boîte de dialogue
+      onClose();
+      // Actualiser la liste des tâches
+      queryClient.invalidateQueries({ queryKey: ["listGenerationJobs", { path: { projectId } }] });
+    },
+  });
   const SourceIcon = SOURCE_ICONS[task.sourceKind] || Sparkles;
   const StatusIcon = STATUS_ICONS[task.status];
 
@@ -237,8 +293,40 @@ export function TaskDetailDialog({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end p-4 border-t border-line bg-surface-2/30">
+        {/* Footer avec Actions */}
+        <div className="flex items-center justify-end gap-2 p-4 border-t border-line bg-surface-2/30">
+          {canCancel && (
+            <Button
+              variant="danger"
+              onClick={() => cancelMutation.mutate()}
+              disabled={cancelMutation.isPending}
+              className="flex items-center gap-2"
+            >
+              {cancelMutation.isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Square size={16} />
+              )}
+              Annuler
+            </Button>
+          )}
+
+          {canRelaunch && (
+            <Button
+              variant="primary"
+              onClick={() => relaunchMutation.mutate()}
+              disabled={relaunchMutation.isPending}
+              className="flex items-center gap-2"
+            >
+              {relaunchMutation.isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <RefreshCw size={16} />
+              )}
+              Relancer
+            </Button>
+          )}
+
           <Button variant="ghost" onClick={onClose}>
             Fermer
           </Button>

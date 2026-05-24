@@ -34,8 +34,8 @@ export type CharacterResponse = z.infer<typeof characterResponseSchema>;
 // Create
 export const createCharacterBodySchema = z.object({
   name: z.string().min(1).max(255),
-  alias: z.string().max(255).optional(),
-  narrativeRole: z.string().max(255).optional(),
+  alias: z.string().max(255).nullable().optional(),
+  narrativeRole: z.string().max(255).nullable().optional(),
   description: z.string().optional(),
   physicalDescription: z.string().optional(),
   colorPaletteJson: z.array(z.string()).optional(),

@@ -11,6 +11,12 @@ export { deleteProjectFunction, sendDeleteProjectEvent } from "./delete-project"
 export { exportProjectFunction } from "./export-project";
 export { generateImageFunction } from "./generate-image";
 export { generateSceneMangaFunction } from "./generate-scene-manga";
+export {
+  cancelJobFunction,
+  relaunchJobFunction,
+  sendCancelJobEvent,
+  sendRelaunchJobEvent,
+} from "./job-control";
 
 import { inngest } from "./client";
 
@@ -60,6 +66,23 @@ type DeleteProjectEvent = {
 type CheckOrphanImagesEvent = {
   data: {
     projectId?: string;
+  };
+};
+
+type CancelJobEvent = {
+  data: {
+    jobId: string;
+    projectId: string;
+  };
+};
+
+type RelaunchJobEvent = {
+  data: {
+    newJobId: string;
+    originalJobId: string;
+    projectId: string;
+    sourceKind: string;
+    sourceId: string;
   };
 };
 
@@ -123,12 +146,15 @@ import { deleteProjectFunction } from "./delete-project";
 import { exportProjectFunction } from "./export-project";
 import { generateImageFunction } from "./generate-image";
 import { generateSceneMangaFunction } from "./generate-scene-manga";
+import { cancelJobFunction, relaunchJobFunction } from "./job-control";
 
 export const inngestFunctions = [
   deleteProjectFunction,
   exportProjectFunction,
   generateImageFunction,
   generateSceneMangaFunction,
+  cancelJobFunction,
+  relaunchJobFunction,
 ];
 
 // Déclaration des événements pour type-safety
@@ -139,5 +165,7 @@ declare module "inngest" {
     "kuti/export-project": ExportProjectEvent;
     "kuti/delete-project": DeleteProjectEvent;
     "kuti/check-orphan-images": CheckOrphanImagesEvent;
+    "kuti/job.cancel": CancelJobEvent;
+    "kuti/job.relaunch": RelaunchJobEvent;
   }
 }
