@@ -285,52 +285,55 @@ export default function SceneRoute() {
   if (orchestraMode) {
     return (
       <AppShell reducedSidebar>
-        <div className="grid h-[calc(100vh-64px)] grid-cols-[1fr_280px] -m-4 -mt-5 sm:-m-5">
-          {/* Canvas 2D PixiJS */}
-          <div className="relative">
-            <PixiOrchestra
+        {/* Full width override - sort du flux max-w-[1500px] du AppShell */}
+        <div className="fixed inset-0 top-14 left-0 lg:left-[56px] right-0 bottom-0 z-10">
+          <div className="grid h-full w-full grid-cols-[1fr_280px]">
+            {/* Canvas 2D PixiJS */}
+            <div className="relative w-full h-full">
+              <PixiOrchestra
+                tomes={story.data?.tomes || []}
+                chapters={story.data?.chapters || []}
+                scenes={story.data?.scenes || []}
+                currentSceneId={sceneId}
+                onNavigateToScene={(selectedSceneId, selectedChapterId, selectedTomeId) => {
+                  navigate(`/projects/${projectId}/story/${selectedTomeId}/scenes/${selectedSceneId}`, {
+                    replace: true,
+                  });
+                }}
+              />
+
+              {/* Overlay: Button to switch back to classic mode */}
+              <button
+                onClick={toggleOrchestra}
+                className="absolute top-4 left-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-surface/90 backdrop-blur border border-line text-sm text-ink hover:bg-surface transition-colors shadow-lg"
+                title="Retour au mode classique"
+              >
+                <Layout size={16} />
+                <span>Mode Classique</span>
+              </button>
+
+              {/* Overlay: Title */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none">
+                <div className="bg-surface/90 backdrop-blur border border-line rounded-lg px-4 py-2 shadow-lg">
+                  <p className="text-xs text-muted uppercase tracking-wide">Mode Orchestra</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tree Navigator */}
+            <StoryTreeNavigator
+              projectId={projectId}
               tomes={story.data?.tomes || []}
               chapters={story.data?.chapters || []}
               scenes={story.data?.scenes || []}
               currentSceneId={sceneId}
-              onNavigateToScene={(selectedSceneId, selectedChapterId, selectedTomeId) => {
+              onSelectScene={(selectedSceneId, selectedChapterId, selectedTomeId) => {
                 navigate(`/projects/${projectId}/story/${selectedTomeId}/scenes/${selectedSceneId}`, {
                   replace: true,
                 });
               }}
             />
-
-            {/* Overlay: Button to switch back to classic mode */}
-            <button
-              onClick={toggleOrchestra}
-              className="absolute top-4 left-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-surface/90 backdrop-blur border border-line text-sm text-ink hover:bg-surface transition-colors shadow-lg"
-              title="Retour au mode classique"
-            >
-              <Layout size={16} />
-              <span>Mode Classique</span>
-            </button>
-
-            {/* Overlay: Title */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none">
-              <div className="bg-surface/90 backdrop-blur border border-line rounded-lg px-4 py-2 shadow-lg">
-                <p className="text-xs text-muted uppercase tracking-wide">Mode Orchestra</p>
-              </div>
-            </div>
           </div>
-
-          {/* Tree Navigator */}
-          <StoryTreeNavigator
-            projectId={projectId}
-            tomes={story.data?.tomes || []}
-            chapters={story.data?.chapters || []}
-            scenes={story.data?.scenes || []}
-            currentSceneId={sceneId}
-            onSelectScene={(selectedSceneId, selectedChapterId, selectedTomeId) => {
-              navigate(`/projects/${projectId}/story/${selectedTomeId}/scenes/${selectedSceneId}`, {
-                replace: true,
-              });
-            }}
-          />
         </div>
       </AppShell>
     );

@@ -48,23 +48,29 @@ export function PixiOrchestra({
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
-        const { clientWidth, clientHeight } = containerRef.current;
+        const rect = containerRef.current.getBoundingClientRect();
         setSize({
-          width: clientWidth,
-          height: clientHeight,
+          width: Math.floor(rect.width),
+          height: Math.floor(rect.height),
         });
       }
     };
 
-    updateSize();
+    // Delay initial measurement to ensure layout is complete
+    const timer = setTimeout(updateSize, 0);
     window.addEventListener('resize', updateSize);
 
-    const observer = new ResizeObserver(updateSize);
+    const observer = new ResizeObserver(() => {
+      // Use requestAnimationFrame to batch updates
+      requestAnimationFrame(updateSize);
+    });
+    
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', updateSize);
       observer.disconnect();
     };

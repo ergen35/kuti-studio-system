@@ -3,18 +3,18 @@ import { Application, extend, useApplication } from '@pixi/react';
 import {
   Container as PixiContainer,
   Graphics as PixiGraphics,
-  Text as PixiText,
 } from 'pixi.js';
 import { Viewport as PixiViewportBase } from 'pixi-viewport';
 import type { Tome, Chapter, Scene, NodePosition } from '~/lib/orchestra/types';
 import { calculateConnections } from '~/lib/orchestra/layout-engine';
 import { useOrchestraStore } from '~/stores/orchestra';
+import { NarrativeNode2D } from './NarrativeNode2D';
+import { drawAllCables } from './ConnectionCable';
 
 // Extend Pixi components for React usage
 extend({
   Container: PixiContainer,
   Graphics: PixiGraphics,
-  Text: PixiText,
 });
 
 interface PixiCanvasProps {
@@ -36,6 +36,7 @@ export function PixiCanvas(props: PixiCanvasProps) {
 
   return (
     <Application
+      resizeTo={undefined}
       width={width}
       height={height}
       background="#0f172a"
@@ -66,6 +67,10 @@ function PixiCanvasInner({
   const { viewport: viewportState, setViewport } = useOrchestraStore();
   const [isReady, setIsReady] = useState(false);
 
+  // Node and cable refs for cleanup
+  const nodesRef = useRef<Map<string, NarrativeNode2D>>(new Map());
+  const cablesGraphicsRef = useRef<PixiGraphics | null>(null);
+
   // Calculate connections
   const connections = useMemo(
     () => calculateConnections(tomes, chapters, scenes, positions),
@@ -86,8 +91,8 @@ function PixiCanvasInner({
     const minY = Math.min(...ys);
     const maxY = Math.max(...ys);
 
-    const padX = 400;
-    const padY = 300;
+    const padX = 600; // Increased padding for card sizes
+    const padY = 400;
 
     return {
       width: maxX - minX + padX * 2,
@@ -134,15 +139,30 @@ function PixiCanvasInner({
       });
 
       viewportRef.current = viewport;
+
+      // Enable z-index sorting
+      viewport.sortableChildren = true;
+
       if (app.stage) {
         app.stage.addChild(viewport);
       }
+
       setIsReady(true);
     }, 0);
 
     return () => {
       clearTimeout(timeoutId);
       setIsReady(false);
+      
+      // Cleanup
+      nodesRef.current.forEach((node) => node.destroy());
+      nodesRef.current.clear();
+      
+      if (cablesGraphicsRef.current) {
+        cablesGraphicsRef.current.destroy();
+        cablesGraphicsRef.current = null;
+      }
+      
       const viewport = viewportRef.current;
       if (viewport) {
         viewport.destroy();
@@ -151,6 +171,17 @@ function PixiCanvasInner({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app, worldBounds.width, worldBounds.height, width, height]);
+
+  // Sync external changes from props (resize)
+  useEffect(() => {
+    if (!app || !('renderer' in app)) return;
+    
+    // Resize the renderer when width/height props change
+    const appWithRenderer = app as typeof app & { renderer?: { resize: (w: number, h: number) => void } };
+    if (appWithRenderer.renderer?.resize) {
+      appWithRenderer.renderer.resize(width, height);
+    }
+  }, [app, width, height]);
 
   // Sync external changes (GSAP animations)
   useEffect(() => {
@@ -169,202 +200,151 @@ function PixiCanvasInner({
     }
   }, [viewportState]);
 
-  // Render elements directly into viewport using refs
-  const viewport = viewportRef.current;
-
-  // Manage connections
+  // Render connections (cables)
   useEffect(() => {
-    if (!viewport) return;
+    if (!isReady || !viewportRef.current) return;
 
-    const graphicsMap = new Map<string, PixiGraphics>();
+    const viewport = viewportRef.current;
 
-    connections.forEach((conn) => {
-      const g = new PixiGraphics();
+    // Clean up existing cables
+    if (cablesGraphicsRef.current) {
+      viewport.removeChild(cablesGraphicsRef.current);
+      cablesGraphicsRef.current.destroy();
+    }
 
-      // Draw connection based on type
-      g.clear();
+    // Create cables graphics (batched for performance)
+    const cablesGraphics = new PixiGraphics();
+    cablesGraphics.zIndex = 10;
+    cablesGraphicsRef.current = cablesGraphics;
+    viewport.addChild(cablesGraphics);
 
-      let strokeStyle: { width: number; color: number; alpha: number };
-
-      switch (conn.type) {
-        case 'tome-chapter':
-          strokeStyle = { width: 2, color: 0xe2e8f0, alpha: 0.6 };
-          break;
-        case 'chapter-scene':
-          strokeStyle = { width: 3, color: 0xe2e8f0, alpha: 0.7 };
-          break;
-        case 'scene-scene':
-          strokeStyle = { width: 1, color: 0xe2e8f0, alpha: 0.5 };
-          break;
-      }
-
-      // Draw the line: moveTo -> lineTo -> stroke
-      g.moveTo(conn.start.x, conn.start.y);
-      g.lineTo(conn.end.x, conn.end.y);
-      g.stroke(strokeStyle);
-
-      graphicsMap.set(conn.id, g);
-      viewport.addChild(g);
-    });
+    // Draw cables using the batched approach
+    drawAllCables(cablesGraphics, connections, nodesRef.current);
 
     return () => {
-      graphicsMap.forEach((g) => {
-        viewport.removeChild(g);
-        g.destroy();
-      });
-      graphicsMap.clear();
+      if (cablesGraphicsRef.current && viewport) {
+        viewport.removeChild(cablesGraphicsRef.current);
+        cablesGraphicsRef.current.destroy();
+        cablesGraphicsRef.current = null;
+      }
     };
-  }, [viewport, connections]);
+  }, [isReady, connections]);
 
-  // Manage nodes
+  // Render nodes
   useEffect(() => {
-    if (!viewport) return;
+    if (!isReady || !viewportRef.current) return;
 
-    const nodeMap = new Map<string, PixiContainer>();
-    const allItems: Array<{ id: string; type: 'tome' | 'chapter' | 'scene'; title: string; pos?: NodePosition }> = [
-      ...tomes.map(t => ({ ...t, type: 'tome' as const })),
-      ...chapters.map(c => ({ ...c, type: 'chapter' as const })),
-      ...scenes.map(s => ({ ...s, type: 'scene' as const })),
+    const viewport = viewportRef.current;
+    const nodeMap = nodesRef.current;
+
+    // Build all items to render
+    const allItems: Array<{
+      id: string;
+      type: 'tome' | 'chapter' | 'scene';
+      title: string;
+      orderIndex: number;
+      subtitle: string;
+    }> = [
+      ...tomes.map((t, index) => ({
+        id: t.id,
+        type: 'tome' as const,
+        title: t.title,
+        orderIndex: index,
+        subtitle: `Tome ${index + 1}`,
+      })),
+      ...chapters.map((c, index) => ({
+        id: c.id,
+        type: 'chapter' as const,
+        title: c.title,
+        orderIndex: index,
+        subtitle: `Chapitre ${index + 1}`,
+      })),
+      ...scenes.map((s, index) => ({
+        id: s.id,
+        type: 'scene' as const,
+        title: s.title,
+        orderIndex: index,
+        subtitle: '',
+      })),
     ];
 
+    // Track which nodes to keep
+    const currentIds = new Set<string>();
+
+    // Create or update nodes
     allItems.forEach((item) => {
       const pos = positions.get(item.id);
       if (!pos) return;
 
-      const container = new PixiContainer();
-      container.x = pos.x;
-      container.y = pos.y;
-      container.eventMode = 'static';
-      container.cursor = 'pointer';
+      currentIds.add(item.id);
 
-      // Determine visual properties
       const isSelected =
         (item.type === 'tome' && selectedTomeId === item.id) ||
         (item.type === 'chapter' && selectedChapterId === item.id) ||
         (item.type === 'scene' && selectedSceneId === item.id);
+      
       const isActive = item.type === 'scene' && currentSceneId === item.id;
 
-      // Draw node graphics
-      const radius = getNodeSize(item.type) / 2;
-      const color = getNodeColor(item.type, isActive);
+      let node = nodeMap.get(item.id);
 
-      const g = new PixiGraphics();
+      if (!node) {
+        // Create new node
+        node = new NarrativeNode2D(
+          item.id,
+          item.type,
+          item.title,
+          item.orderIndex,
+          item.subtitle,
+          isActive
+        );
 
-      // Shadow
-      g.fill({ color: 0x000000, alpha: 0.2 });
-      g.circle(2, 2, radius);
-      g.fill();
+        node.setPosition(pos.x, pos.y);
 
-      // Main shape
-      g.fill({ color, alpha: 1 });
-      if (item.type === 'tome') {
-        drawOctagon(g, 0, 0, radius);
-      } else if (item.type === 'chapter') {
-        g.roundRect(-radius, -radius, radius * 2, radius * 2, 6);
+        // Set up interactions
+        node.onClick = () => {
+          onSelectNode(item.type, item.id);
+        };
+
+        nodeMap.set(item.id, node);
+        viewport.addChild(node.getContainer());
       } else {
-        g.circle(0, 0, radius);
+        // Update existing node state
+        node.setSelected(isSelected);
+        // Note: Active state is set at construction, would need update method if dynamic
       }
-      g.fill();
-
-      // Selection border
-      if (isSelected) {
-        g.stroke({ width: 2, color: 0xffffff, alpha: 0.9 });
-        if (item.type === 'tome') {
-          drawOctagon(g, 0, 0, radius + 6);
-        } else if (item.type === 'chapter') {
-          g.roundRect(-radius - 6, -radius - 6, (radius + 6) * 2, (radius + 6) * 2, 8);
-        } else {
-          g.circle(0, 0, radius + 6);
-        }
-        g.stroke();
-      }
-
-      container.addChild(g);
-
-      // Label (initially hidden, shown on hover)
-      const text = new PixiText({
-        text: item.title,
-        style: {
-          fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 12,
-          fill: 0xffffff,
-        },
-        x: 0,
-        y: -radius - 16,
-      });
-      text.anchor.set(0.5);
-      text.visible = false;
-      container.addChild(text);
-
-      // Interactive handlers
-      const handlePointerEnter = () => {
-        // Scale up
-        container.scale.set(1.15);
-        text.visible = true;
-      };
-
-      const handlePointerLeave = () => {
-        container.scale.set(1);
-        text.visible = isSelected;
-      };
-
-      const handlePointerDown = () => {
-        onSelectNode(item.type, item.id);
-      };
-
-      container.on('pointerenter', handlePointerEnter);
-      container.on('pointerleave', handlePointerLeave);
-      container.on('pointerdown', handlePointerDown);
-
-      nodeMap.set(item.id, container);
-      viewport.addChild(container);
     });
 
+    // Remove nodes that no longer exist
+    nodeMap.forEach((node, id) => {
+      if (!currentIds.has(id)) {
+        viewport.removeChild(node.getContainer());
+        node.destroy();
+        nodeMap.delete(id);
+      }
+    });
+
+    // Redraw cables after nodes are updated
+    const cablesGraphics = cablesGraphicsRef.current;
+    if (cablesGraphics) {
+      drawAllCables(cablesGraphics, connections, nodeMap);
+    }
+
     return () => {
-      nodeMap.forEach((c) => {
-        viewport.removeChild(c);
-        c.destroy();
-      });
-      nodeMap.clear();
+      // Cleanup handled in other effects or on unmount
     };
-  }, [viewport, tomes, chapters, scenes, positions, selectedTomeId, selectedChapterId, selectedSceneId, currentSceneId, onSelectNode]);
+  }, [
+    isReady,
+    tomes,
+    chapters,
+    scenes,
+    positions,
+    selectedTomeId,
+    selectedChapterId,
+    selectedSceneId,
+    currentSceneId,
+    onSelectNode,
+    connections,
+  ]);
 
   return null;
-}
-
-function getNodeSize(type: 'tome' | 'chapter' | 'scene'): number {
-  switch (type) {
-    case 'tome': return 48;
-    case 'chapter': return 32;
-    case 'scene': return 16;
-  }
-}
-
-function getNodeColor(type: 'tome' | 'chapter' | 'scene', isActive: boolean): number {
-  if (isActive && type === 'scene') {
-    return colorToHex('#f59e0b'); // Scene active
-  }
-  switch (type) {
-    case 'tome': return colorToHex('#4f46e5');
-    case 'chapter': return colorToHex('#6366f1');
-    case 'scene': return colorToHex('#94a3b8');
-  }
-}
-
-function colorToHex(color: string): number {
-  return parseInt(color.replace('#', ''), 16);
-}
-
-function drawOctagon(g: PixiGraphics, cx: number, cy: number, radius: number) {
-  const sides = 8;
-  const startAngle = Math.PI / 8;
-
-  const points: number[] = [];
-  for (let i = 0; i < sides; i++) {
-    const angle = startAngle + (i * 2 * Math.PI) / sides;
-    points.push(cx + Math.cos(angle) * radius);
-    points.push(cy + Math.sin(angle) * radius);
-  }
-
-  g.poly(points);
 }

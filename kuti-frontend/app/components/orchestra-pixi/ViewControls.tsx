@@ -22,6 +22,7 @@ export function ViewControls({
     focusNode,
     fitToBounds,
     nodePositions,
+    viewport,
   } = useOrchestraStore();
 
   const handleZoomIn = useCallback(() => {
@@ -47,10 +48,10 @@ export function ViewControls({
     if (bounds) {
       fitToBounds(
         {
-          x: bounds.min.x - 100,
-          y: bounds.min.y - 100,
-          width: bounds.size.x + 200,
-          height: bounds.size.y + 200,
+          x: bounds.min.x - 150, // Increased padding for card sizes
+          y: bounds.min.y - 120,
+          width: bounds.size.x + 300,
+          height: bounds.size.y + 240,
         },
         canvasWidth,
         canvasHeight
@@ -58,53 +59,121 @@ export function ViewControls({
     }
   }, [fitToBounds, nodePositions, canvasWidth, canvasHeight]);
 
+  // Calculate zoom percentage for display
+  const zoomPercent = Math.round(viewport.zoom * 100);
+
   return (
-    <div className="absolute bottom-4 left-4 flex flex-col gap-2 pointer-events-auto">
-      <div className="flex flex-col gap-1.5 bg-slate-800/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-slate-700">
-        <button
-          onClick={handleZoomIn}
-          className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-md transition-colors"
-          title="Zoom in"
-          type="button"
+    <div className="absolute bottom-4 left-4 pointer-events-auto">
+      {/* Main controls panel - Blender-like compact style */}
+      <div 
+        className="flex flex-col gap-1 rounded-md p-1.5 shadow-lg"
+        style={{
+          backgroundColor: 'rgba(35, 38, 43, 0.94)',
+          border: '1px solid #3a3e45',
+        }}
+      >
+        {/* Zoom percentage display */}
+        <div 
+          className="flex items-center justify-center py-1 px-2 text-[11px] font-medium tracking-wide"
+          style={{ color: '#9aa1aa' }}
         >
-          <ZoomIn size={18} className="text-slate-200" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-md transition-colors"
-          title="Zoom out"
-          type="button"
-        >
-          <ZoomOut size={18} className="text-slate-200" />
-        </button>
-        <div className="h-px bg-slate-600 my-1" />
-        <button
-          onClick={handleFocus}
-          disabled={!selectedNodeId}
-          className="p-2 bg-slate-700/50 hover:bg-slate-600/50 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-colors"
-          title={selectedNodeId ? "Focus on selected node" : "Select a node first"}
-          type="button"
-        >
-          <Focus size={18} className="text-indigo-400" />
-        </button>
-        <button
-          onClick={handleFit}
-          className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-md transition-colors"
-          title="Fit all nodes"
-          type="button"
-        >
-          <Maximize size={18} className="text-slate-200" />
-        </button>
-        <div className="h-px bg-slate-600 my-1" />
-        <button
+          {zoomPercent}%
+        </div>
+
+        {/* Divider */}
+        <div 
+          className="h-px my-0.5"
+          style={{ backgroundColor: '#3a3e45' }}
+        />
+
+        {/* Zoom controls */}
+        <div className="flex flex-col gap-0.5">
+          <ControlButton
+            onClick={handleZoomIn}
+            title="Zoom in (+)"
+            icon={<ZoomIn size={16} />}
+          />
+          <ControlButton
+            onClick={handleZoomOut}
+            title="Zoom out (-)"
+            icon={<ZoomOut size={16} />}
+          />
+        </div>
+
+        {/* Divider */}
+        <div 
+          className="h-px my-0.5"
+          style={{ backgroundColor: '#3a3e45' }}
+        />
+
+        {/* Navigation controls */}
+        <div className="flex flex-col gap-0.5">
+          <ControlButton
+            onClick={handleFocus}
+            disabled={!selectedNodeId}
+            title={selectedNodeId ? "Focus selected node (F)" : "Select a node first"}
+            icon={<Focus size={16} />}
+            accent={!!selectedNodeId}
+          />
+          <ControlButton
+            onClick={handleFit}
+            title="Fit all nodes (Home)"
+            icon={<Maximize size={16} />}
+          />
+        </div>
+
+        {/* Divider */}
+        <div 
+          className="h-px my-0.5"
+          style={{ backgroundColor: '#3a3e45' }}
+        />
+
+        {/* Reset */}
+        <ControlButton
           onClick={handleReset}
-          className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-md transition-colors"
           title="Reset view"
-          type="button"
-        >
-          <RotateCcw size={18} className="text-slate-200" />
-        </button>
+          icon={<RotateCcw size={16} />}
+        />
       </div>
     </div>
+  );
+}
+
+/**
+ * Individual control button with Blender-like styling
+ */
+interface ControlButtonProps {
+  onClick: () => void;
+  icon: React.ReactNode;
+  title: string;
+  disabled?: boolean;
+  accent?: boolean;
+}
+
+function ControlButton({ onClick, icon, title, disabled, accent }: ControlButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      type="button"
+      className={`
+        flex items-center justify-center w-7 h-7 rounded transition-colors
+        ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#343941]'}
+      `}
+      style={{
+        color: accent ? '#f6a63a' : '#b5bbc5',
+      }}
+      onMouseEnter={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = '#343941';
+        }
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+      }}
+    >
+      {icon}
+    </button>
   );
 }

@@ -41,8 +41,8 @@ export interface LayoutConfig {
 export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
   tomeSpacing: 240,
   chapterSpacing: 120,
-  sceneSpacing: 100, // Modified: 64 → 100
-  verticalOffset: 120,
+  sceneSpacing: 210, // Increased for card sizes
+  verticalOffset: 170, // Increased for card heights
 };
 
 // Configuration couleurs CSS pour PixiJS (format string)
