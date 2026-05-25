@@ -41,7 +41,13 @@ function useMobileSidebar() {
   return { isOpen, setIsOpen, toggle: () => setIsOpen(v => !v) };
 }
 
-export function AppShell({ children }: { children?: ReactNode }) {
+interface AppShellProps {
+  children?: ReactNode;
+  /** Mode réduit sidebar (icônes uniquement) pour mode Orchestra */
+  reducedSidebar?: boolean;
+}
+
+export function AppShell({ children, reducedSidebar }: AppShellProps) {
   const { projectId } = useParams();
   const { t } = useTranslation('common');
   const { theme, density, toggleTheme, setDensity } = useUiStore();
@@ -101,10 +107,12 @@ export function AppShell({ children }: { children?: ReactNode }) {
       )}
 
       {/* Sidebar - Desktop: fixed position, Mobile: slide drawer */}
-      <aside 
+      <aside
         ref={sidebarRef}
         className={clsx(
-          "fixed lg:sticky top-0 z-50 flex h-screen flex-col gap-5 border-r border-line bg-surface p-3.5 transition-transform duration-300 ease-out lg:translate-x-0 lg:w-[248px] w-[280px]",
+          "fixed lg:sticky top-0 z-50 flex h-screen flex-col gap-5 border-r border-line bg-surface p-3.5 transition-all duration-300 ease-out lg:translate-x-0",
+          reducedSidebar ? "lg:w-[56px] !p-2" : "lg:w-[248px]",
+          "w-[280px]",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -117,33 +125,81 @@ export function AppShell({ children }: { children?: ReactNode }) {
           <X size={20} />
         </button>
 
-        <div className="grid gap-1 border-b border-line px-2.5 pb-3.5 pt-2">
-          <b className="text-[17px] text-ink">{t('appName')}</b>
-          <span className="text-xs text-muted">{t('tagline')}</span>
+        <div className={clsx(
+          "grid gap-1 border-b border-line pb-3.5 pt-2",
+          reducedSidebar ? "px-1.5 items-center" : "px-2.5"
+        )}>
+          <b className={clsx(
+            "text-[17px] text-ink",
+            reducedSidebar && "hidden"
+          )}>{t('appName')}</b>
+          <span className={clsx(
+            "text-xs text-muted",
+            reducedSidebar && "hidden"
+          )}>{t('tagline')}</span>
+          {reducedSidebar && (
+            <b className="text-accent text-lg text-center">K</b>
+          )}
         </div>
         
-        <nav className="grid gap-1.5 overflow-y-auto flex-1">
+        <nav className={clsx(
+          "grid gap-1.5 overflow-y-auto flex-1",
+          reducedSidebar && "justify-items-center"
+        )}>
           <NavLink className={navClass} to="/" end>
-            <ChevronLeft size={17} /> {t('sidebar.projectHub')}
+            <ChevronLeft size={17} />
+            <span className={clsx(reducedSidebar && "hidden")}>{t('sidebar.projectHub')}</span>
           </NavLink>
           {projectId ? nav.map((item) => {
             const Icon = item.icon;
             const to = item.to ? `${base}/${item.to}` : base;
             return (
-              <NavLink key={item.label} className={navClass} to={to} end={item.to === ""}>
-                <Icon size={17} /> {item.label}
+              <NavLink
+                key={item.label}
+                className={({ isActive }) => clsx(
+                  navClass({ isActive }),
+                  reducedSidebar && "!px-2 !min-w-0 w-10 h-10 justify-center"
+                )}
+                to={to}
+                end={item.to === ""}
+                title={reducedSidebar ? item.label : undefined}
+              >
+                <Icon size={17} />
+                <span className={clsx(reducedSidebar && "hidden")}>{item.label}</span>
               </NavLink>
             );
           }) : null}
         </nav>
         
-        <div className="grid gap-2 border-t border-line pt-3">
-          <LanguageSwitcher />
-          <Button variant="ghost" onClick={toggleTheme} className="justify-start">
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />} 
-            <span className="ml-2">{theme === "dark" ? t('actions.light') : t('actions.dark')}</span>
+        <div className={clsx(
+          "grid gap-2 border-t border-line pt-3",
+          reducedSidebar && "justify-items-center"
+        )}>
+          <div className={clsx(reducedSidebar && "hidden")}>
+            <LanguageSwitcher />
+          </div>
+          <Button
+            variant="ghost"
+            onClick={toggleTheme}
+            className={clsx(
+              "justify-start",
+              reducedSidebar && "!px-2 !min-w-0 w-10 h-10 justify-center"
+            )}
+            title={reducedSidebar ? (theme === "dark" ? t('actions.light') : t('actions.dark')) : undefined}
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            <span className={clsx("ml-2", reducedSidebar && "hidden")}>
+              {theme === "dark" ? t('actions.light') : t('actions.dark')}
+            </span>
           </Button>
-          <Button variant="ghost" onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")} className="justify-start">
+          <Button
+            variant="ghost"
+            onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
+            className={clsx(
+              "justify-start",
+              reducedSidebar && "!px-2 !min-w-0 w-10 h-10 justify-center hidden"
+            )}
+          >
             {density === "compact" ? t('actions.comfortable') : t('actions.compact')}
           </Button>
         </div>

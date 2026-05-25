@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
-import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles } from 'lucide-react';
+import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles, Layout, Monitor } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,6 +18,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getStorySummaryOptions, updateSceneMutation, deleteSceneMutation, listCharactersOptions } from '~/lib/backend/@tanstack/react-query.gen';
 import { StoryBreadcrumb } from '~/components/story';
 import { SceneGenerationModal, SceneMangaGallery } from '~/components/scene';
+
+// Orchestra Mode imports
+import { useOrchestraStore } from '~/stores/orchestra';
+import { PixiOrchestra } from '~/components/orchestra-pixi';
+import { StoryTreeNavigator } from '~/components/navigation/StoryTreeNavigator';
 
 type Tome = GetStorySummaryResponse['tomes'][number];
 type Chapter = GetStorySummaryResponse['chapters'][number];
@@ -216,6 +221,16 @@ export default function SceneRoute() {
   // Watch for changes (kept for intentional re-render triggers)
   const watchedSceneId = watch('title');
 
+  // Orchestra mode state
+  const { isActive: orchestraMode, toggle: toggleOrchestra, selectScene } = useOrchestraStore();
+
+  // Select current scene in orchestra store
+  useEffect(() => {
+    if (sceneId) {
+      selectScene(sceneId);
+    }
+  }, [sceneId, selectScene]);
+
   const onSubmit = useCallback((data: SceneInput) => {
     setIsSaving(true);
     updateScene.mutate({
@@ -266,8 +281,76 @@ export default function SceneRoute() {
     minute: '2-digit',
   });
 
+  // Orchestra Mode View
+  if (orchestraMode) {
+    return (
+      <AppShell reducedSidebar>
+        <div className="grid h-[calc(100vh-64px)] grid-cols-[1fr_280px] -m-4 -mt-5 sm:-m-5">
+          {/* Canvas 2D PixiJS */}
+          <div className="relative">
+            <PixiOrchestra
+              tomes={story.data?.tomes || []}
+              chapters={story.data?.chapters || []}
+              scenes={story.data?.scenes || []}
+              currentSceneId={sceneId}
+              onNavigateToScene={(selectedSceneId, selectedChapterId, selectedTomeId) => {
+                navigate(`/projects/${projectId}/story/${selectedTomeId}/scenes/${selectedSceneId}`, {
+                  replace: true,
+                });
+              }}
+            />
+
+            {/* Overlay: Button to switch back to classic mode */}
+            <button
+              onClick={toggleOrchestra}
+              className="absolute top-4 left-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-surface/90 backdrop-blur border border-line text-sm text-ink hover:bg-surface transition-colors shadow-lg"
+              title="Retour au mode classique"
+            >
+              <Layout size={16} />
+              <span>Mode Classique</span>
+            </button>
+
+            {/* Overlay: Title */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none">
+              <div className="bg-surface/90 backdrop-blur border border-line rounded-lg px-4 py-2 shadow-lg">
+                <p className="text-xs text-muted uppercase tracking-wide">Mode Orchestra</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tree Navigator */}
+          <StoryTreeNavigator
+            projectId={projectId}
+            tomes={story.data?.tomes || []}
+            chapters={story.data?.chapters || []}
+            scenes={story.data?.scenes || []}
+            currentSceneId={sceneId}
+            onSelectScene={(selectedSceneId, selectedChapterId, selectedTomeId) => {
+              navigate(`/projects/${projectId}/story/${selectedTomeId}/scenes/${selectedSceneId}`, {
+                replace: true,
+              });
+            }}
+          />
+        </div>
+      </AppShell>
+    );
+  }
+
+  // Classic Mode View
   return (
     <AppShell>
+      {/* Mode switch button */}
+      <div className="fixed top-20 right-4 z-40">
+        <button
+          onClick={toggleOrchestra}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 border border-accent/50 text-accent text-sm hover:bg-accent/20 transition-all shadow-lg"
+          title="Basculer vers le mode Orchestra"
+        >
+          <Monitor size={16} />
+          <span>Mode Orchestra</span>
+        </button>
+      </div>
+
       {/* Breadcrumb */}
       <StoryBreadcrumb
         projectId={projectId}
