@@ -122,6 +122,7 @@ model Project {
   characterImages CharacterImage[]
   sceneGenerationConfigs SceneGenerationConfig[]
   sceneMangaPages SceneMangaPage[]
+  dramaVideos   DramaVideo[]
 
   @@map("projects")
 }
@@ -411,6 +412,8 @@ enum GenerationSourceKind {
   chapter
   tome
   panel
+  manga_page
+  drama_video
   custom
 
   @@map("generation_source_kind")
@@ -466,7 +469,7 @@ model GenerationJob {
   sourceLabel       String              @map("source_label")
   sourceVersionId   String?             @map("source_version_id")
   strategy          GenerationStrategy
-  entrypoint        String              @default("gpt-2-images")
+  entrypoint        String              @default("gpt_images_2")
   title             String              @default("Generation job")
   prompt            String              @default("")
   summary           String              @default("")
@@ -640,6 +643,7 @@ model SceneMangaPage {
 
   // Relations
   project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  dramaVideos DramaVideo[]
 
   @@index([projectId])
   @@index([sceneId])
@@ -648,6 +652,52 @@ model SceneMangaPage {
   @@index([jobId])
   @@index([boardId])
   @@map("scene_manga_pages")
+}
+
+// ============================================================================
+// Drama Video Domain
+// ============================================================================
+
+enum DramaVideoStatus {
+  draft
+  queued
+  running
+  ready
+  failed
+  archived
+
+  @@map("drama_video_status")
+}
+
+model DramaVideo {
+  id                String           @id @default(uuid())
+  projectId         String           @map("project_id")
+  sourceMangaPageId String?          @map("source_manga_page_id")
+  jobId             String?          @map("job_id")
+  title             String
+  prompt            String           @default("")
+  modelKey          String           @default("") @map("model_key")
+  stylePreset       String           @default("korean_drama") @map("style_preset")
+  status            DramaVideoStatus @default(draft)
+  videoPath         String?          @map("video_path")
+  videoUrl          String?          @map("video_url")
+  durationSeconds   Int?             @map("duration_seconds")
+  metadataJson      Json             @default("{}") @map("metadata_json")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  completedAt       DateTime?        @map("completed_at")
+  failedAt          DateTime?        @map("failed_at")
+  errorMessage      String?          @map("error_message")
+
+  // Relations
+  project           Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sourceMangaPage   SceneMangaPage?  @relation(fields: [sourceMangaPageId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([sourceMangaPageId])
+  @@index([jobId])
+  @@index([status])
+  @@map("drama_videos")
 }
 
 // ============================================================================

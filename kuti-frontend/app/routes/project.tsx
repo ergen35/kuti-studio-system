@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, Boxes, Brush, Clock3, FileArchive, Settings, UsersRound, BookOpen, ArrowRight } from "lucide-react";
+import { AlertTriangle, Boxes, Brush, Clapperboard, Clock3, FileArchive, Settings, UsersRound, BookOpen, ArrowRight } from "lucide-react";
 import { AppShell } from "~/components/layout";
 import { apiErrorMessage } from "~/lib/errors";
 import {
@@ -35,6 +35,7 @@ export default function ProjectRoute() {
     { key: "characters", title: t('workspaces.characters.title'), desc: t('workspaces.characters.description'), icon: UsersRound },
     { key: "storyline", title: t('workspaces.storyline.title'), desc: t('workspaces.storyline.description'), icon: BookOpen },
     { key: "generation", title: t('workspaces.generation.title'), desc: t('workspaces.generation.description'), icon: Brush },
+    { key: "dramaVideos", title: t('workspaces.dramaVideos.title'), desc: t('workspaces.dramaVideos.description'), icon: Clapperboard },
     { key: "assets", title: t('workspaces.assets.title'), desc: t('workspaces.assets.description'), icon: Boxes },
     { key: "warnings", title: t('workspaces.warnings.title'), desc: t('workspaces.warnings.description'), icon: AlertTriangle },
     { key: "versions", title: t('workspaces.versions.title'), desc: t('workspaces.versions.description'), icon: Clock3 },
@@ -82,7 +83,7 @@ export default function ProjectRoute() {
                 </div>
                 <h2 className="text-sm font-semibold text-foreground">{title}</h2>
                 <p className="mt-1 min-h-10 text-xs leading-5 text-muted-foreground">{desc}</p>
-                <RouterLinkButton className="mt-4 justify-between" to={`/projects/${projectId}/${key === 'storyline' ? 'story' : key}`}>
+                <RouterLinkButton className="mt-4 justify-between" to={`/projects/${projectId}/${key === 'storyline' ? 'story' : key === 'dramaVideos' ? 'drama-videos' : key}`}>
                   {t('common:workspace.open', { name: title })}
                   <ArrowRight size={14} className="opacity-60 transition-transform group-hover:translate-x-0.5" />
                 </RouterLinkButton>

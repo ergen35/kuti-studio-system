@@ -23,6 +23,10 @@
       "title": "Génération",
       "description": "Lancez des jobs de génération d'images ou vidéos depuis l'histoire."
     },
+    "dramaVideos": {
+      "title": "Vidéos drama",
+      "description": "Consultez les vidéos style drama coréen générées depuis les pages manga validées."
+    },
     "assets": {
       "title": "Ressources",
       "description": "Importez des fichiers locaux et liez-aux aux entités."

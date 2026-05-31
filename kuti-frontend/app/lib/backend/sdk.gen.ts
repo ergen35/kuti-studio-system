@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ArchiveAssetData, ArchiveAssetResponses, ArchiveCharacterData, ArchiveCharacterResponses, ArchiveProjectData, ArchiveProjectResponses, CancelGenerationJobData, CancelGenerationJobResponses, CloneProjectData, CloneProjectResponses, CompareVersionsData, CompareVersionsResponses, CreateAssetLinkData, CreateAssetLinkResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVersionData, CreateVersionResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponses, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponses, GetCharacterData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetData, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, GetVersionData, GetVersionResponses, ImportAssetData, ImportAssetResponses, ListAssetsData, ListAssetsResponses, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RelaunchGenerationJobData, RelaunchGenerationJobResponses, RestoreVersionData, RestoreVersionResponses, ScanWarningsData, ScanWarningsResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateAssetData, UpdateAssetResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
+import type { ArchiveAssetData, ArchiveAssetResponses, ArchiveCharacterData, ArchiveCharacterResponses, ArchiveProjectData, ArchiveProjectResponses, CancelGenerationJobData, CancelGenerationJobResponses, CloneProjectData, CloneProjectResponses, CompareVersionsData, CompareVersionsResponses, CompleteStoryFieldData, CompleteStoryFieldResponses, CreateAssetLinkData, CreateAssetLinkResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVersionData, CreateVersionResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponses, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateDramaVideoData, GenerateDramaVideoResponses, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponses, GetCharacterData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetData, GetDramaVideoFileData, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, GetVersionData, GetVersionResponses, ImportAssetData, ImportAssetResponses, ListAssetsData, ListAssetsResponses, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListDramaVideosData, ListDramaVideosResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListMangaPageDramaVideosData, ListMangaPageDramaVideosResponses, ListModelsData, ListModelsResponses, ListProjectDramaVideosData, ListProjectDramaVideosResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListStoryCompletionModelsData, ListStoryCompletionModelsResponses, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RelaunchGenerationJobData, RelaunchGenerationJobResponses, RestoreVersionData, RestoreVersionResponses, ScanWarningsData, ScanWarningsResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateAssetData, UpdateAssetResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -211,6 +211,23 @@ export const deleteCharacterImage = <ThrowOnError extends boolean = false>(optio
 export const getStorySummary = <ThrowOnError extends boolean = false>(options: Options<GetStorySummaryData, ThrowOnError>) => (options.client ?? client).get<GetStorySummaryResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story', ...options });
 
 /**
+ * List story completion models
+ */
+export const listStoryCompletionModels = <ThrowOnError extends boolean = false>(options: Options<ListStoryCompletionModelsData, ThrowOnError>) => (options.client ?? client).get<ListStoryCompletionModelsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/completion-models', ...options });
+
+/**
+ * Complete a tome, chapter, or scene field
+ */
+export const completeStoryField = <ThrowOnError extends boolean = false>(options: Options<CompleteStoryFieldData, ThrowOnError>) => (options.client ?? client).post<CompleteStoryFieldResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/complete-field',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Get reference suggestions
  */
 export const getReferenceSuggestions = <ThrowOnError extends boolean = false>(options: Options<GetReferenceSuggestionsData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/references/{type}', ...options });
@@ -394,6 +411,11 @@ export const cancelGenerationJob = <ThrowOnError extends boolean = false>(option
 export const relaunchGenerationJob = <ThrowOnError extends boolean = false>(options: Options<RelaunchGenerationJobData, ThrowOnError>) => (options.client ?? client).post<RelaunchGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}/relaunch', ...options });
 
 /**
+ * List Korean drama videos for a project
+ */
+export const listProjectDramaVideos = <ThrowOnError extends boolean = false>(options: Options<ListProjectDramaVideosData, ThrowOnError>) => (options.client ?? client).get<ListProjectDramaVideosResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/drama-videos/', ...options });
+
+/**
  * List all assets
  */
 export const listAssets = <ThrowOnError extends boolean = false>(options: Options<ListAssetsData, ThrowOnError>) => (options.client ?? client).get<ListAssetsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/', ...options });
@@ -550,6 +572,33 @@ export const updateSceneMangaPage = <ThrowOnError extends boolean = false>(optio
         ...options.headers
     }
 });
+
+/**
+ * List Korean drama videos for scene
+ */
+export const listDramaVideos = <ThrowOnError extends boolean = false>(options: Options<ListDramaVideosData, ThrowOnError>) => (options.client ?? client).get<ListDramaVideosResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/drama-videos', ...options });
+
+/**
+ * List Korean drama videos for a manga page
+ */
+export const listMangaPageDramaVideos = <ThrowOnError extends boolean = false>(options: Options<ListMangaPageDramaVideosData, ThrowOnError>) => (options.client ?? client).get<ListMangaPageDramaVideosResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}/drama-videos', ...options });
+
+/**
+ * Generate Korean drama video from a manga page
+ */
+export const generateDramaVideo = <ThrowOnError extends boolean = false>(options: Options<GenerateDramaVideoData, ThrowOnError>) => (options.client ?? client).post<GenerateDramaVideoResponses, unknown, ThrowOnError>({
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}/drama-videos',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get drama video file
+ */
+export const getDramaVideoFile = <ThrowOnError extends boolean = false>(options: Options<GetDramaVideoFileData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/drama-videos/{dramaVideoId}/file', ...options });
 
 /**
  * List all versions

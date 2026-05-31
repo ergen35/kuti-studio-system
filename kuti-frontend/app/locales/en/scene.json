@@ -10,6 +10,9 @@
     "config": "Configuration",
     "selectConfig": "Select a configuration",
     "defaultConfig": "(default)",
+    "implicitConfig": "No saved configuration yet. Kuti will use the built-in manga defaults.",
+    "model": "Image model",
+    "selectModel": "Select an image model",
     "colorMode": {
       "bw": "Black and white",
       "color": "Color"
@@ -43,6 +46,19 @@
     "approve": "Approve",
     "reject": "Reject",
     "view": "View"
+  },
+  "drama": {
+    "title": "Korean drama video",
+    "description": "Turn the approved manga page into a live-action drama-style sequence.",
+    "generate": "Generate drama",
+    "queued": "Queued...",
+    "videos": "video",
+    "videos_plural": "videos",
+    "model": "Video model",
+    "localFallback": "Local fallback",
+    "fallbackReason": "Provider fallback: {{reason}}",
+    "selectFirst": "Approve the manga page before generating video",
+    "empty": "No drama video generated from this page yet."
   },
   "characterSelector": {
     "empty": "No character in this scene.",

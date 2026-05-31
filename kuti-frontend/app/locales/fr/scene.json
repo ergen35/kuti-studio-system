@@ -10,6 +10,9 @@
     "config": "Configuration",
     "selectConfig": "Sélectionner une configuration",
     "defaultConfig": "(défaut)",
+    "implicitConfig": "Aucune configuration enregistrée. Kuti utilisera les réglages manga intégrés.",
+    "model": "Modèle image",
+    "selectModel": "Sélectionner un modèle image",
     "colorMode": {
       "bw": "Noir et blanc",
       "color": "Couleur"
@@ -43,6 +46,19 @@
     "approve": "Valider",
     "reject": "Rejeter",
     "view": "Voir"
+  },
+  "drama": {
+    "title": "Vidéo drama coréen",
+    "description": "Transformez la planche validée en séquence façon drama live-action.",
+    "generate": "Générer drama",
+    "queued": "En file...",
+    "videos": "vidéo",
+    "videos_plural": "vidéos",
+    "model": "Modèle vidéo",
+    "localFallback": "Fallback local",
+    "fallbackReason": "Fallback provider : {{reason}}",
+    "selectFirst": "Validez la planche manga avant de générer une vidéo",
+    "empty": "Aucune vidéo drama générée depuis cette planche."
   },
   "characterSelector": {
     "empty": "Aucun personnage dans cette scène.",

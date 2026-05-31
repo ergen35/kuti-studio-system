@@ -1,0 +1,21 @@
+{
+  "title": "Drama videos",
+  "description": "Korean-drama-style video library generated from approved manga pages.",
+  "style": "Korean drama",
+  "library": "Video library",
+  "defaultModel": "Default video model",
+  "localFallback": "Local fallback",
+  "fallbackReason": "Provider fallback: {{reason}}",
+  "openScene": "Open source scene",
+  "page": "Page {{number}}",
+  "stats": {
+    "total": "Videos",
+    "ready": "Ready",
+    "running": "In progress",
+    "failed": "Failed"
+  },
+  "empty": {
+    "title": "No drama videos yet",
+    "description": "Generate one from an approved manga page inside a scene gallery."
+  }
+}

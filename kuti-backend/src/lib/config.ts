@@ -56,15 +56,30 @@ const configSchema = z.object({
   sora2BaseUrl: z.string().optional(),
   sora2ApiKey: z.string().optional(),
   sora2Enabled: z.boolean().default(true),
+  sora2VideosPath: z.string().default("/v1/videos"),
+  sora2ResponsesPath: z.string().default("/v1/responses"),
 
   seedance2BaseUrl: z.string().optional(),
   seedance2ApiKey: z.string().optional(),
   seedance2Enabled: z.boolean().default(true),
+  seedance2GeneratePath: z.string().default("/v1/videos/generations"),
+  seedance2PollPath: z.string().default("/v1/videos/generations/:taskId"),
 
   // Model Providers (Audio)
   elevenLabsBaseUrl: z.string().optional(),
   elevenLabsApiKey: z.string().optional(),
   elevenLabsEnabled: z.boolean().default(true),
+
+  // Model Providers (Text completion)
+  storyCompletionEndpoint: z.string().optional(),
+  storyCompletionApiKey: z.string().optional(),
+  storyCompletionEnabled: z.boolean().default(true),
+  storyCompletionDefaultModel: z.string().default("gpt-5.4-nano"),
+  storyCompletionModels: z.array(z.string()).default([
+    "gpt-5.4-nano",
+    "kimi-k2.5",
+    "gtp-5.4-mini",
+  ]),
 });
 
 // ============================================================================
@@ -73,7 +88,7 @@ const configSchema = z.object({
 
 export type Config = z.infer<typeof configSchema>;
 
-export type ModelKind = "image" | "video" | "audio";
+export type ModelKind = "image" | "video" | "audio" | "text";
 
 export type ModelProvider = {
   key: string;
@@ -135,16 +150,29 @@ function parseConfig(): Config {
     sora2BaseUrl: process.env.SORA_2_BASE_URL,
     sora2ApiKey: process.env.SORA_2_API_KEY,
     sora2Enabled: process.env.SORA_2_ENABLED === "false" ? false : undefined,
+    sora2VideosPath: process.env.SORA_2_VIDEOS_PATH ?? process.env.SORA_2_RESPONSES_PATH,
+    sora2ResponsesPath: process.env.SORA_2_RESPONSES_PATH,
 
     // Model Providers - Seedance 2
     seedance2BaseUrl: process.env.SEEDANCE_2_BASE_URL,
     seedance2ApiKey: process.env.SEEDANCE_2_API_KEY,
     seedance2Enabled: process.env.SEEDANCE_2_ENABLED === "false" ? false : undefined,
+    seedance2GeneratePath: process.env.SEEDANCE_2_GENERATE_PATH,
+    seedance2PollPath: process.env.SEEDANCE_2_POLL_PATH,
 
     // Model Providers - ElevenLabs
     elevenLabsBaseUrl: process.env.ELEVEN_LABS_BASE_URL,
     elevenLabsApiKey: process.env.ELEVEN_LABS_API_KEY,
     elevenLabsEnabled: process.env.ELEVEN_LABS_ENABLED === "false" ? false : undefined,
+
+    // Model Providers - Story completion
+    storyCompletionEndpoint: process.env.STORY_COMPLETION_ENDPOINT,
+    storyCompletionApiKey: process.env.STORY_COMPLETION_API_KEY,
+    storyCompletionEnabled: process.env.STORY_COMPLETION_ENABLED === "false" ? false : undefined,
+    storyCompletionDefaultModel: process.env.STORY_COMPLETION_DEFAULT_MODEL,
+    storyCompletionModels: process.env.STORY_COMPLETION_MODELS
+      ? process.env.STORY_COMPLETION_MODELS.split(",").map((s) => s.trim()).filter(Boolean)
+      : undefined,
   };
 
   return configSchema.parse(rawConfig);
@@ -207,6 +235,15 @@ export function buildModelCatalog(): Record<string, ModelProvider> {
       enabled: config.elevenLabsEnabled,
       apiModel: "eleven-labs",
     },
+    story_completion: {
+      key: "story_completion",
+      kind: "text",
+      displayName: "Story Completion",
+      baseUrl: config.storyCompletionEndpoint ?? null,
+      apiKey: config.storyCompletionApiKey ?? null,
+      enabled: config.storyCompletionEnabled,
+      apiModel: config.storyCompletionDefaultModel,
+    },
   };
 }
 
@@ -262,6 +299,7 @@ export function resolveModelProvider(
       video: ["sora_2", "seedance_2"],
       image: ["gpt_images_2", "gpt_images_1_5"],
       audio: ["eleven_labs"],
+      text: ["story_completion"],
     };
 
     for (const key of preferredKeys[kind]) {

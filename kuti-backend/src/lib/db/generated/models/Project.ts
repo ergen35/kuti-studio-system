@@ -235,6 +235,7 @@ export type ProjectWhereInput = {
   characterImages?: Prisma.CharacterImageListRelationFilter
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigListRelationFilter
   sceneMangaPages?: Prisma.SceneMangaPageListRelationFilter
+  dramaVideos?: Prisma.DramaVideoListRelationFilter
 }
 
 export type ProjectOrderByWithRelationInput = {
@@ -265,6 +266,7 @@ export type ProjectOrderByWithRelationInput = {
   characterImages?: Prisma.CharacterImageOrderByRelationAggregateInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigOrderByRelationAggregateInput
   sceneMangaPages?: Prisma.SceneMangaPageOrderByRelationAggregateInput
+  dramaVideos?: Prisma.DramaVideoOrderByRelationAggregateInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -298,6 +300,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   characterImages?: Prisma.CharacterImageListRelationFilter
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigListRelationFilter
   sceneMangaPages?: Prisma.SceneMangaPageListRelationFilter
+  dramaVideos?: Prisma.DramaVideoListRelationFilter
 }, "id" | "slug">
 
 export type ProjectOrderByWithAggregationInput = {
@@ -360,6 +363,7 @@ export type ProjectCreateInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
@@ -390,6 +394,7 @@ export type ProjectUncheckedCreateInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUpdateInput = {
@@ -420,6 +425,7 @@ export type ProjectUpdateInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
@@ -450,6 +456,7 @@ export type ProjectUncheckedUpdateInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyInput = {
@@ -733,6 +740,20 @@ export type ProjectUpdateOneRequiredWithoutSceneMangaPagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutSceneMangaPagesInput, Prisma.ProjectUpdateWithoutSceneMangaPagesInput>, Prisma.ProjectUncheckedUpdateWithoutSceneMangaPagesInput>
 }
 
+export type ProjectCreateNestedOneWithoutDramaVideosInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDramaVideosInput, Prisma.ProjectUncheckedCreateWithoutDramaVideosInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDramaVideosInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutDramaVideosNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDramaVideosInput, Prisma.ProjectUncheckedCreateWithoutDramaVideosInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDramaVideosInput
+  upsert?: Prisma.ProjectUpsertWithoutDramaVideosInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutDramaVideosInput, Prisma.ProjectUpdateWithoutDramaVideosInput>, Prisma.ProjectUncheckedUpdateWithoutDramaVideosInput>
+}
+
 export type ProjectCreateNestedOneWithoutVersionsInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutVersionsInput, Prisma.ProjectUncheckedCreateWithoutVersionsInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutVersionsInput
@@ -802,6 +823,7 @@ export type ProjectCreateWithoutCharactersInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutCharactersInput = {
@@ -831,6 +853,7 @@ export type ProjectUncheckedCreateWithoutCharactersInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutCharactersInput = {
@@ -876,6 +899,7 @@ export type ProjectUpdateWithoutCharactersInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutCharactersInput = {
@@ -905,6 +929,7 @@ export type ProjectUncheckedUpdateWithoutCharactersInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutCharacterRelationsInput = {
@@ -934,6 +959,7 @@ export type ProjectCreateWithoutCharacterRelationsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutCharacterRelationsInput = {
@@ -963,6 +989,7 @@ export type ProjectUncheckedCreateWithoutCharacterRelationsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutCharacterRelationsInput = {
@@ -1008,6 +1035,7 @@ export type ProjectUpdateWithoutCharacterRelationsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutCharacterRelationsInput = {
@@ -1037,6 +1065,7 @@ export type ProjectUncheckedUpdateWithoutCharacterRelationsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutVoiceSamplesInput = {
@@ -1066,6 +1095,7 @@ export type ProjectCreateWithoutVoiceSamplesInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutVoiceSamplesInput = {
@@ -1095,6 +1125,7 @@ export type ProjectUncheckedCreateWithoutVoiceSamplesInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutVoiceSamplesInput = {
@@ -1140,6 +1171,7 @@ export type ProjectUpdateWithoutVoiceSamplesInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutVoiceSamplesInput = {
@@ -1169,6 +1201,7 @@ export type ProjectUncheckedUpdateWithoutVoiceSamplesInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutCharacterImagesInput = {
@@ -1198,6 +1231,7 @@ export type ProjectCreateWithoutCharacterImagesInput = {
   exports?: Prisma.ExportRecordCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutCharacterImagesInput = {
@@ -1227,6 +1261,7 @@ export type ProjectUncheckedCreateWithoutCharacterImagesInput = {
   exports?: Prisma.ExportRecordUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutCharacterImagesInput = {
@@ -1272,6 +1307,7 @@ export type ProjectUpdateWithoutCharacterImagesInput = {
   exports?: Prisma.ExportRecordUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutCharacterImagesInput = {
@@ -1301,6 +1337,7 @@ export type ProjectUncheckedUpdateWithoutCharacterImagesInput = {
   exports?: Prisma.ExportRecordUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutTomesInput = {
@@ -1330,6 +1367,7 @@ export type ProjectCreateWithoutTomesInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutTomesInput = {
@@ -1359,6 +1397,7 @@ export type ProjectUncheckedCreateWithoutTomesInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutTomesInput = {
@@ -1404,6 +1443,7 @@ export type ProjectUpdateWithoutTomesInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutTomesInput = {
@@ -1433,6 +1473,7 @@ export type ProjectUncheckedUpdateWithoutTomesInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutChaptersInput = {
@@ -1462,6 +1503,7 @@ export type ProjectCreateWithoutChaptersInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutChaptersInput = {
@@ -1491,6 +1533,7 @@ export type ProjectUncheckedCreateWithoutChaptersInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutChaptersInput = {
@@ -1536,6 +1579,7 @@ export type ProjectUpdateWithoutChaptersInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutChaptersInput = {
@@ -1565,6 +1609,7 @@ export type ProjectUncheckedUpdateWithoutChaptersInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutScenesInput = {
@@ -1594,6 +1639,7 @@ export type ProjectCreateWithoutScenesInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutScenesInput = {
@@ -1623,6 +1669,7 @@ export type ProjectUncheckedCreateWithoutScenesInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutScenesInput = {
@@ -1668,6 +1715,7 @@ export type ProjectUpdateWithoutScenesInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutScenesInput = {
@@ -1697,6 +1745,7 @@ export type ProjectUncheckedUpdateWithoutScenesInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutStoryReferencesInput = {
@@ -1726,6 +1775,7 @@ export type ProjectCreateWithoutStoryReferencesInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutStoryReferencesInput = {
@@ -1755,6 +1805,7 @@ export type ProjectUncheckedCreateWithoutStoryReferencesInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutStoryReferencesInput = {
@@ -1800,6 +1851,7 @@ export type ProjectUpdateWithoutStoryReferencesInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutStoryReferencesInput = {
@@ -1829,6 +1881,7 @@ export type ProjectUncheckedUpdateWithoutStoryReferencesInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutAssetsInput = {
@@ -1858,6 +1911,7 @@ export type ProjectCreateWithoutAssetsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutAssetsInput = {
@@ -1887,6 +1941,7 @@ export type ProjectUncheckedCreateWithoutAssetsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutAssetsInput = {
@@ -1932,6 +1987,7 @@ export type ProjectUpdateWithoutAssetsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutAssetsInput = {
@@ -1961,6 +2017,7 @@ export type ProjectUncheckedUpdateWithoutAssetsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutAssetLinksInput = {
@@ -1990,6 +2047,7 @@ export type ProjectCreateWithoutAssetLinksInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutAssetLinksInput = {
@@ -2019,6 +2077,7 @@ export type ProjectUncheckedCreateWithoutAssetLinksInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutAssetLinksInput = {
@@ -2064,6 +2123,7 @@ export type ProjectUpdateWithoutAssetLinksInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutAssetLinksInput = {
@@ -2093,6 +2153,7 @@ export type ProjectUncheckedUpdateWithoutAssetLinksInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutGenerationJobsInput = {
@@ -2122,6 +2183,7 @@ export type ProjectCreateWithoutGenerationJobsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutGenerationJobsInput = {
@@ -2151,6 +2213,7 @@ export type ProjectUncheckedCreateWithoutGenerationJobsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutGenerationJobsInput = {
@@ -2196,6 +2259,7 @@ export type ProjectUpdateWithoutGenerationJobsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutGenerationJobsInput = {
@@ -2225,6 +2289,7 @@ export type ProjectUncheckedUpdateWithoutGenerationJobsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutGenerationBoardsInput = {
@@ -2254,6 +2319,7 @@ export type ProjectCreateWithoutGenerationBoardsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutGenerationBoardsInput = {
@@ -2283,6 +2349,7 @@ export type ProjectUncheckedCreateWithoutGenerationBoardsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutGenerationBoardsInput = {
@@ -2328,6 +2395,7 @@ export type ProjectUpdateWithoutGenerationBoardsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutGenerationBoardsInput = {
@@ -2357,6 +2425,7 @@ export type ProjectUncheckedUpdateWithoutGenerationBoardsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutSceneGenerationConfigsInput = {
@@ -2386,6 +2455,7 @@ export type ProjectCreateWithoutSceneGenerationConfigsInput = {
   exports?: Prisma.ExportRecordCreateNestedManyWithoutProjectInput
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutSceneGenerationConfigsInput = {
@@ -2415,6 +2485,7 @@ export type ProjectUncheckedCreateWithoutSceneGenerationConfigsInput = {
   exports?: Prisma.ExportRecordUncheckedCreateNestedManyWithoutProjectInput
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutSceneGenerationConfigsInput = {
@@ -2460,6 +2531,7 @@ export type ProjectUpdateWithoutSceneGenerationConfigsInput = {
   exports?: Prisma.ExportRecordUpdateManyWithoutProjectNestedInput
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutSceneGenerationConfigsInput = {
@@ -2489,6 +2561,7 @@ export type ProjectUncheckedUpdateWithoutSceneGenerationConfigsInput = {
   exports?: Prisma.ExportRecordUncheckedUpdateManyWithoutProjectNestedInput
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutSceneMangaPagesInput = {
@@ -2518,6 +2591,7 @@ export type ProjectCreateWithoutSceneMangaPagesInput = {
   exports?: Prisma.ExportRecordCreateNestedManyWithoutProjectInput
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutSceneMangaPagesInput = {
@@ -2547,6 +2621,7 @@ export type ProjectUncheckedCreateWithoutSceneMangaPagesInput = {
   exports?: Prisma.ExportRecordUncheckedCreateNestedManyWithoutProjectInput
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutSceneMangaPagesInput = {
@@ -2592,6 +2667,7 @@ export type ProjectUpdateWithoutSceneMangaPagesInput = {
   exports?: Prisma.ExportRecordUpdateManyWithoutProjectNestedInput
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutSceneMangaPagesInput = {
@@ -2621,6 +2697,143 @@ export type ProjectUncheckedUpdateWithoutSceneMangaPagesInput = {
   exports?: Prisma.ExportRecordUncheckedUpdateManyWithoutProjectNestedInput
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectCreateWithoutDramaVideosInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.ProjectStatus
+  rootPath: string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastOpenedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
+  voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
+  tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
+  chapters?: Prisma.ChapterCreateNestedManyWithoutProjectInput
+  scenes?: Prisma.SceneCreateNestedManyWithoutProjectInput
+  storyReferences?: Prisma.StoryReferenceCreateNestedManyWithoutProjectInput
+  assets?: Prisma.AssetCreateNestedManyWithoutProjectInput
+  assetLinks?: Prisma.AssetLinkCreateNestedManyWithoutProjectInput
+  generationJobs?: Prisma.GenerationJobCreateNestedManyWithoutProjectInput
+  generationBoards?: Prisma.GenerationBoardCreateNestedManyWithoutProjectInput
+  warnings?: Prisma.WarningCreateNestedManyWithoutProjectInput
+  versions?: Prisma.VersionCreateNestedManyWithoutProjectInput
+  exports?: Prisma.ExportRecordCreateNestedManyWithoutProjectInput
+  characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
+  sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutDramaVideosInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.ProjectStatus
+  rootPath: string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastOpenedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
+  voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
+  tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
+  chapters?: Prisma.ChapterUncheckedCreateNestedManyWithoutProjectInput
+  scenes?: Prisma.SceneUncheckedCreateNestedManyWithoutProjectInput
+  storyReferences?: Prisma.StoryReferenceUncheckedCreateNestedManyWithoutProjectInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutProjectInput
+  assetLinks?: Prisma.AssetLinkUncheckedCreateNestedManyWithoutProjectInput
+  generationJobs?: Prisma.GenerationJobUncheckedCreateNestedManyWithoutProjectInput
+  generationBoards?: Prisma.GenerationBoardUncheckedCreateNestedManyWithoutProjectInput
+  warnings?: Prisma.WarningUncheckedCreateNestedManyWithoutProjectInput
+  versions?: Prisma.VersionUncheckedCreateNestedManyWithoutProjectInput
+  exports?: Prisma.ExportRecordUncheckedCreateNestedManyWithoutProjectInput
+  characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
+  sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutDramaVideosInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutDramaVideosInput, Prisma.ProjectUncheckedCreateWithoutDramaVideosInput>
+}
+
+export type ProjectUpsertWithoutDramaVideosInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutDramaVideosInput, Prisma.ProjectUncheckedUpdateWithoutDramaVideosInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutDramaVideosInput, Prisma.ProjectUncheckedCreateWithoutDramaVideosInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutDramaVideosInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutDramaVideosInput, Prisma.ProjectUncheckedUpdateWithoutDramaVideosInput>
+}
+
+export type ProjectUpdateWithoutDramaVideosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  rootPath?: Prisma.StringFieldUpdateOperationsInput | string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
+  voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
+  tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
+  chapters?: Prisma.ChapterUpdateManyWithoutProjectNestedInput
+  scenes?: Prisma.SceneUpdateManyWithoutProjectNestedInput
+  storyReferences?: Prisma.StoryReferenceUpdateManyWithoutProjectNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutProjectNestedInput
+  assetLinks?: Prisma.AssetLinkUpdateManyWithoutProjectNestedInput
+  generationJobs?: Prisma.GenerationJobUpdateManyWithoutProjectNestedInput
+  generationBoards?: Prisma.GenerationBoardUpdateManyWithoutProjectNestedInput
+  warnings?: Prisma.WarningUpdateManyWithoutProjectNestedInput
+  versions?: Prisma.VersionUpdateManyWithoutProjectNestedInput
+  exports?: Prisma.ExportRecordUpdateManyWithoutProjectNestedInput
+  characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
+  sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutDramaVideosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  rootPath?: Prisma.StringFieldUpdateOperationsInput | string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
+  voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
+  tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
+  chapters?: Prisma.ChapterUncheckedUpdateManyWithoutProjectNestedInput
+  scenes?: Prisma.SceneUncheckedUpdateManyWithoutProjectNestedInput
+  storyReferences?: Prisma.StoryReferenceUncheckedUpdateManyWithoutProjectNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutProjectNestedInput
+  assetLinks?: Prisma.AssetLinkUncheckedUpdateManyWithoutProjectNestedInput
+  generationJobs?: Prisma.GenerationJobUncheckedUpdateManyWithoutProjectNestedInput
+  generationBoards?: Prisma.GenerationBoardUncheckedUpdateManyWithoutProjectNestedInput
+  warnings?: Prisma.WarningUncheckedUpdateManyWithoutProjectNestedInput
+  versions?: Prisma.VersionUncheckedUpdateManyWithoutProjectNestedInput
+  exports?: Prisma.ExportRecordUncheckedUpdateManyWithoutProjectNestedInput
+  characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
+  sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutVersionsInput = {
@@ -2650,6 +2863,7 @@ export type ProjectCreateWithoutVersionsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutVersionsInput = {
@@ -2679,6 +2893,7 @@ export type ProjectUncheckedCreateWithoutVersionsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutVersionsInput = {
@@ -2724,6 +2939,7 @@ export type ProjectUpdateWithoutVersionsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutVersionsInput = {
@@ -2753,6 +2969,7 @@ export type ProjectUncheckedUpdateWithoutVersionsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutWarningsInput = {
@@ -2782,6 +2999,7 @@ export type ProjectCreateWithoutWarningsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutWarningsInput = {
@@ -2811,6 +3029,7 @@ export type ProjectUncheckedCreateWithoutWarningsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutWarningsInput = {
@@ -2856,6 +3075,7 @@ export type ProjectUpdateWithoutWarningsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutWarningsInput = {
@@ -2885,6 +3105,7 @@ export type ProjectUncheckedUpdateWithoutWarningsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutExportsInput = {
@@ -2914,6 +3135,7 @@ export type ProjectCreateWithoutExportsInput = {
   characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutExportsInput = {
@@ -2943,6 +3165,7 @@ export type ProjectUncheckedCreateWithoutExportsInput = {
   characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutExportsInput = {
@@ -2988,6 +3211,7 @@ export type ProjectUpdateWithoutExportsInput = {
   characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutExportsInput = {
@@ -3017,6 +3241,7 @@ export type ProjectUncheckedUpdateWithoutExportsInput = {
   characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
   sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
   sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 
@@ -3042,6 +3267,7 @@ export type ProjectCountOutputType = {
   characterImages: number
   sceneGenerationConfigs: number
   sceneMangaPages: number
+  dramaVideos: number
 }
 
 export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3062,6 +3288,7 @@ export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   characterImages?: boolean | ProjectCountOutputTypeCountCharacterImagesArgs
   sceneGenerationConfigs?: boolean | ProjectCountOutputTypeCountSceneGenerationConfigsArgs
   sceneMangaPages?: boolean | ProjectCountOutputTypeCountSceneMangaPagesArgs
+  dramaVideos?: boolean | ProjectCountOutputTypeCountDramaVideosArgs
 }
 
 /**
@@ -3193,6 +3420,13 @@ export type ProjectCountOutputTypeCountSceneMangaPagesArgs<ExtArgs extends runti
   where?: Prisma.SceneMangaPageWhereInput
 }
 
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountDramaVideosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DramaVideoWhereInput
+}
+
 
 export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3222,6 +3456,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   characterImages?: boolean | Prisma.Project$characterImagesArgs<ExtArgs>
   sceneGenerationConfigs?: boolean | Prisma.Project$sceneGenerationConfigsArgs<ExtArgs>
   sceneMangaPages?: boolean | Prisma.Project$sceneMangaPagesArgs<ExtArgs>
+  dramaVideos?: boolean | Prisma.Project$dramaVideosArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
@@ -3283,6 +3518,7 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   characterImages?: boolean | Prisma.Project$characterImagesArgs<ExtArgs>
   sceneGenerationConfigs?: boolean | Prisma.Project$sceneGenerationConfigsArgs<ExtArgs>
   sceneMangaPages?: boolean | Prisma.Project$sceneMangaPagesArgs<ExtArgs>
+  dramaVideos?: boolean | Prisma.Project$dramaVideosArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3308,6 +3544,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     characterImages: Prisma.$CharacterImagePayload<ExtArgs>[]
     sceneGenerationConfigs: Prisma.$SceneGenerationConfigPayload<ExtArgs>[]
     sceneMangaPages: Prisma.$SceneMangaPagePayload<ExtArgs>[]
+    dramaVideos: Prisma.$DramaVideoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3731,6 +3968,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   characterImages<T extends Prisma.Project$characterImagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$characterImagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CharacterImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sceneGenerationConfigs<T extends Prisma.Project$sceneGenerationConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$sceneGenerationConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SceneGenerationConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sceneMangaPages<T extends Prisma.Project$sceneMangaPagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$sceneMangaPagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SceneMangaPagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dramaVideos<T extends Prisma.Project$dramaVideosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$dramaVideosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DramaVideoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4568,6 +4806,30 @@ export type Project$sceneMangaPagesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.SceneMangaPageScalarFieldEnum | Prisma.SceneMangaPageScalarFieldEnum[]
+}
+
+/**
+ * Project.dramaVideos
+ */
+export type Project$dramaVideosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DramaVideo
+   */
+  select?: Prisma.DramaVideoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DramaVideo
+   */
+  omit?: Prisma.DramaVideoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DramaVideoInclude<ExtArgs> | null
+  where?: Prisma.DramaVideoWhereInput
+  orderBy?: Prisma.DramaVideoOrderByWithRelationInput | Prisma.DramaVideoOrderByWithRelationInput[]
+  cursor?: Prisma.DramaVideoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DramaVideoScalarFieldEnum | Prisma.DramaVideoScalarFieldEnum[]
 }
 
 /**

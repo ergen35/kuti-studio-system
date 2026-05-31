@@ -50,6 +50,8 @@ export const GenerationSourceKind = {
   chapter: 'chapter',
   tome: 'tome',
   panel: 'panel',
+  manga_page: 'manga_page',
+  drama_video: 'drama_video',
   custom: 'custom'
 } as const
 
@@ -129,6 +131,18 @@ export const MangaPageStatus = {
 } as const
 
 export type MangaPageStatus = (typeof MangaPageStatus)[keyof typeof MangaPageStatus]
+
+
+export const DramaVideoStatus = {
+  draft: 'draft',
+  queued: 'queued',
+  running: 'running',
+  ready: 'ready',
+  failed: 'failed',
+  archived: 'archived'
+} as const
+
+export type DramaVideoStatus = (typeof DramaVideoStatus)[keyof typeof DramaVideoStatus]
 
 
 export const WarningSeverity = {

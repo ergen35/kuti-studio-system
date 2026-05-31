@@ -32,7 +32,7 @@ const configResponseSchema = z.object({
 
 const modelProviderSchema = z.object({
   key: z.string(),
-  kind: z.enum(["image", "video", "audio"]),
+  kind: z.enum(["image", "video", "audio", "text"]),
   displayName: z.string(),
   baseUrl: z.string().nullable(),
   enabled: z.boolean(),

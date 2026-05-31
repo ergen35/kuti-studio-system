@@ -55,6 +55,11 @@
     "save": "Enregistrer",
     "creating": "Création..."
   },
+  "completion": {
+    "generate": "Générer avec l'IA",
+    "model": "Modèle",
+    "error": "Génération impossible"
+  },
   "fields": {
     "title": "Titre",
     "type": "Type",
@@ -142,6 +147,8 @@
     "mangaBoards": "Planches manga",
     "generateBoard": "Générer une planche",
     "placeholders": {
+      "type": "dialogue, action, révélation...",
+      "location": "Toit, salle de classe, gare...",
       "summary": "Résumé de la scène...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romantique, combat, révélation...",

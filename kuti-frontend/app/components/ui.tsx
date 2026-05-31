@@ -105,7 +105,7 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 const destructiveTones = new Set(["critical", "failed", "failure", "danger", "error", "blocked"]);
 const warningTones = new Set(["draft", "pending", "open", "warning", "running", "queued"]);
 const successTones = new Set(["active", "ready", "validated", "success", "completed", "resolved", "ok"]);
-const infoTones = new Set(["characters", "storyline", "generation", "assets", "versions", "exports", "settings", "info"]);
+const infoTones = new Set(["characters", "storyline", "generation", "dramavideos", "drama-videos", "assets", "versions", "exports", "settings", "info"]);
 
 export function Badge({ children, tone, className }: { children: ReactNode; tone?: string; className?: string }) {
   const key = (tone || String(children)).toLowerCase();

@@ -192,6 +192,25 @@ function getFileExtensionFromMimeType(mimeType: string): string {
   return extMap[mimeType] || ".bin";
 }
 
+function extractTaskId(payload: unknown): string | null {
+  if (typeof payload !== "object" || payload === null) return null;
+  const obj = payload as Record<string, unknown>;
+  for (const key of ["id", "video_id", "task_id", "job_id"]) {
+    const value = obj[key];
+    if (typeof value === "string" && value.trim()) return value;
+  }
+  return null;
+}
+
+function providerEndpoint(provider: ModelProvider, path: string): string {
+  const baseUrl = provider.baseUrl!.replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  if (baseUrl.endsWith("/v1") && normalizedPath.startsWith("/v1/")) {
+    return `${baseUrl}${normalizedPath.slice(3)}`;
+  }
+  return `${baseUrl}${normalizedPath}`;
+}
+
 // ============================================================================
 // GPT Images 2 Generation
 // ============================================================================
@@ -204,7 +223,8 @@ async function generateWithGptImages2(
   const size = options?.size || "1024x1536";
   const timeoutSeconds = options?.timeoutSeconds || 120;
 
-  const endpoint = `${provider.baseUrl!.replace(/\/$/, "")}/images/generations`;
+  const imagePath = provider.key === "gpt_images_2" ? config.gptImages2UrlPath : "/images/generations";
+  const endpoint = providerEndpoint(provider, imagePath);
   const body = {
     model: provider.apiModel,
     prompt,
@@ -280,32 +300,26 @@ async function generateWithSora2(
   sourceImageMimeType?: string,
   options?: GenerationOptions
 ): Promise<GeneratedArtifact> {
-  const timeoutSeconds = options?.timeoutSeconds || 180;
+  const timeoutSeconds = options?.timeoutSeconds || 300;
+  const deadline = Date.now() + timeoutSeconds * 1000;
 
-  const endpoint = `${provider.baseUrl!.replace(/\/$/, "")}/v1/responses`;
+  const endpoint = providerEndpoint(provider, config.sora2VideosPath);
 
-  const content: Array<{ type: string; text?: string; image_url?: string }> = [
-    { type: "input_text", text: prompt },
-  ];
-
-  // Ajouter l'image source si fournie
-  if (sourceImage && sourceImageMimeType) {
-    content.push({
-      type: "input_image",
-      image_url: dataUrl(sourceImage, sourceImageMimeType),
-    });
-  }
-
-  const body = {
+  const body: Record<string, unknown> = {
     model: provider.apiModel,
-    input: [{ role: "user", content }],
-    tools: [{ type: "image_generation" }],
+    prompt,
+    seconds: "4",
+    size: "1280x720",
   };
+
+  if (sourceImage && sourceImageMimeType) {
+    body.input_reference = { image_url: dataUrl(sourceImage, sourceImageMimeType) };
+  }
 
   console.log(`[Sora 2] Request to ${endpoint}`);
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutSeconds * 1000);
+  const timeout = setTimeout(() => controller.abort(), 60000);
 
   try {
     const response = await fetch(endpoint, {
@@ -333,25 +347,113 @@ async function generateWithSora2(
     const payload = await response.json();
     const media = await extractMediaBytes(payload, timeoutSeconds);
 
-    if (!media) {
-      console.error("[Sora 2] Failed to extract video from response:", payload);
+    if (media) {
+      return {
+        content: media.content,
+        mimeType: media.mimeType,
+        fileExtension: getFileExtensionFromMimeType(media.mimeType),
+      };
+    }
+
+    const videoId = extractTaskId(payload);
+    if (!videoId) {
+      console.error("[Sora 2] Failed to extract video ID from response:", payload);
       throw new GenerationError(
-        "Invalid response format",
+        "No video ID in response",
         "generation_provider_invalid_response"
       );
     }
 
-    return {
-      content: media.content,
-      mimeType: media.mimeType,
-      fileExtension: getFileExtensionFromMimeType(media.mimeType),
-    };
+    return await pollSoraVideo(provider, videoId, endpoint, deadline);
   } catch (error) {
     if (error instanceof GenerationError) throw error;
     if ((error as Error).name === "AbortError") {
       throw new GenerationError("Request timeout", "timeout");
     }
     throw new GenerationError(String(error), "generation_provider_failed");
+  }
+}
+
+async function pollSoraVideo(
+  provider: ModelProvider,
+  videoId: string,
+  videosEndpoint: string,
+  deadline: number,
+): Promise<GeneratedArtifact> {
+  const videoEndpoint = `${videosEndpoint.replace(/\/$/, "")}/${encodeURIComponent(videoId)}`;
+  const contentEndpoint = `${videoEndpoint}/content`;
+
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    const response = await fetch(videoEndpoint, {
+      headers: {
+        Authorization: `Bearer ${provider.apiKey}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new GenerationError(`Poll failed: ${response.status}`, "generation_provider_failed");
+    }
+
+    const payload = (await response.json()) as Record<string, unknown>;
+    const media = await extractMediaBytes(payload, 60);
+    if (media) {
+      return {
+        content: media.content,
+        mimeType: media.mimeType,
+        fileExtension: getFileExtensionFromMimeType(media.mimeType),
+      };
+    }
+
+    const status = String(payload.status || "").toLowerCase();
+    if (status === "completed" || status === "succeeded" || status === "success") {
+      const downloaded = await downloadAuthorizedMedia(contentEndpoint, provider.apiKey!, 120);
+      if (!downloaded) {
+        throw new GenerationError("Video completed but content download failed", "generation_provider_invalid_response");
+      }
+      return {
+        content: downloaded.content,
+        mimeType: downloaded.mimeType,
+        fileExtension: getFileExtensionFromMimeType(downloaded.mimeType),
+      };
+    }
+
+    if (status === "failed" || status === "error" || status === "cancelled" || status === "canceled") {
+      const message = typeof payload.error === "object" && payload.error !== null
+        ? JSON.stringify(payload.error)
+        : "Video generation failed";
+      throw new GenerationError(message, "generation_provider_failed");
+    }
+  }
+
+  throw new GenerationError("Polling timeout", "timeout");
+}
+
+async function downloadAuthorizedMedia(
+  url: string,
+  apiKey: string,
+  timeoutSeconds: number,
+): Promise<{ content: Buffer; mimeType: string } | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutSeconds * 1000);
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "video/mp4,video/*,*/*",
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!response.ok) return null;
+    return {
+      content: Buffer.from(await response.arrayBuffer()),
+      mimeType: response.headers.get("content-type") || "video/mp4",
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -365,8 +467,8 @@ async function pollSeedanceTask(
   deadline: number,
   timeoutSeconds: number
 ): Promise<GeneratedArtifact> {
-  const pollEndpoint = `${provider
-    .baseUrl!.replace(/\/$/, "")}/v1/videos/generations/${taskId}`;
+  const pollPath = config.seedance2PollPath.replace(":taskId", encodeURIComponent(taskId));
+  const pollEndpoint = providerEndpoint(provider, pollPath);
 
   while (Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5s between polls
@@ -425,7 +527,7 @@ async function generateWithSeedance2(
   const timeoutSeconds = options?.timeoutSeconds || 300;
   const deadline = Date.now() + timeoutSeconds * 1000;
 
-  const endpoint = `${provider.baseUrl!.replace(/\/$/, "")}/v1/videos/generations`;
+  const endpoint = providerEndpoint(provider, config.seedance2GeneratePath);
 
   const body: Record<string, unknown> = {
     model: provider.apiModel,

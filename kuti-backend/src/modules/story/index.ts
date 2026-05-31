@@ -16,6 +16,9 @@ import {
   sceneResponseSchema,
   storySummaryResponseSchema,
   referenceSuggestionSchema,
+  storyCompletionModelSchema,
+  completeStoryFieldBodySchema,
+  completeStoryFieldResponseSchema,
 } from "./dto";
 import {
   getStorySummary,
@@ -35,6 +38,8 @@ import {
   updateScene,
   deleteScene,
   getReferenceSuggestions,
+  listStoryCompletionModels,
+  completeStoryField,
 } from "./controller";
 
 const projectIdParamsSchema = z.object({ projectId: z.string() });
@@ -55,6 +60,19 @@ export const storyModule = new Elysia({
   .get("/story", ({ params: { projectId } }) => getStorySummary(projectId), {
     response: storySummaryResponseSchema,
     detail: { operationId: "getStorySummary", summary: "Get story summary" },
+  })
+
+  // Story completion models
+  .get("/story/completion-models", () => listStoryCompletionModels(), {
+    response: z.array(storyCompletionModelSchema),
+    detail: { operationId: "listStoryCompletionModels", summary: "List story completion models" },
+  })
+
+  // Complete a narrative field with a configured model
+  .post("/story/complete-field", ({ params: { projectId }, body }) => completeStoryField(projectId, body), {
+    body: completeStoryFieldBodySchema,
+    response: completeStoryFieldResponseSchema,
+    detail: { operationId: "completeStoryField", summary: "Complete a tome, chapter, or scene field" },
   })
 
   // Reference suggestions

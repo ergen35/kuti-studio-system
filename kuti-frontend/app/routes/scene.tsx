@@ -17,8 +17,8 @@ import { apiErrorMessage } from '~/lib/errors';
 import { csv } from '~/lib/utils';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStorySummaryOptions, updateSceneMutation, deleteSceneMutation, listCharactersOptions } from '~/lib/backend/@tanstack/react-query.gen';
-import { StoryBreadcrumb } from '~/components/story';
+import { getProjectCharacterImagesOptions, getStorySummaryOptions, updateSceneMutation, deleteSceneMutation, listCharactersOptions } from '~/lib/backend/@tanstack/react-query.gen';
+import { StoryBreadcrumb, StoryCompletionButton } from '~/components/story';
 import { SceneGenerationModal, SceneMangaGallery } from '~/components/scene';
 
 // Orchestra Mode imports
@@ -32,6 +32,8 @@ type Scene = GetStorySummaryResponse['scenes'][number];
 
 const sceneSchema = z.object({
   title: z.string().min(1, 'titleRequired'),
+  sceneType: z.string().optional(),
+  location: z.string().optional(),
   summary: z.string().optional(),
   content: z.string().optional(),
   charactersJson: z.string().optional(),
@@ -124,6 +126,7 @@ export default function SceneRoute() {
   const { t } = useTranslation(['story', 'common']);
   const [isSaving, setIsSaving] = useState(false);
   const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
+  const [editorVersion, setEditorVersion] = useState(0);
 
   // Fetch story data
   const story = useQuery({
@@ -133,6 +136,11 @@ export default function SceneRoute() {
   // Fetch characters for this project
   const characters = useQuery({
     ...listCharactersOptions({ path: { projectId } }),
+    enabled: !!projectId,
+  });
+
+  const characterImages = useQuery({
+    ...getProjectCharacterImagesOptions({ path: { projectId } }),
     enabled: !!projectId,
   });
 
@@ -194,10 +202,12 @@ export default function SceneRoute() {
     },
   });
 
-  const { register, handleSubmit, control, watch, reset, formState: { errors, isDirty } } = useForm<SceneInput>({
+  const { register, handleSubmit, control, watch, reset, setValue, formState: { errors, isDirty } } = useForm<SceneInput>({
     resolver: zodResolver(sceneSchema),
     defaultValues: {
       title: '',
+      sceneType: '',
+      location: '',
       summary: '',
       content: '',
       charactersJson: '',
@@ -211,6 +221,8 @@ export default function SceneRoute() {
     if (scene) {
       reset({
         title: scene.title ?? '',
+        sceneType: scene.sceneType ?? '',
+        location: scene.location ?? '',
         summary: scene.summary ?? '',
         content: scene.content ?? '',
         charactersJson: toCsv(scene.charactersJson) ?? '',
@@ -239,6 +251,8 @@ export default function SceneRoute() {
       path: { projectId, sceneId },
       body: {
         title: data.title,
+        sceneType: data.sceneType,
+        location: data.location,
         summary: data.summary,
         content: data.content,
         charactersJson: csv(data.charactersJson || ''),
@@ -397,10 +411,22 @@ export default function SceneRoute() {
                   </div>
 
                   <Field label={t('fields.title')}>
-                    <Input
-                      {...register('title')}
-                      className="text-lg font-semibold w-full"
-                    />
+                    <div className="grid gap-1.5">
+                      <div className="flex items-center justify-end">
+                        <StoryCompletionButton
+                          projectId={projectId}
+                          targetKind="scene"
+                          targetId={sceneId}
+                          field="title"
+                          currentValue={watch('title')}
+                          onComplete={(text) => setValue('title', text, { shouldDirty: true, shouldValidate: true })}
+                        />
+                      </div>
+                      <Input
+                        {...register('title')}
+                        className="text-lg font-semibold w-full"
+                      />
+                    </div>
                   </Field>
                   {errors.title && (
                     <span className="text-danger text-xs">{errors.title.message}</span>
@@ -425,18 +451,76 @@ export default function SceneRoute() {
 
               <div className="mt-3 flex flex-col gap-4">
                 {/* Summary */}
-                <Field label={t('fields.summary')}>
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <div className="grid gap-1.5 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{t('fields.type')}</span>
+                      <StoryCompletionButton
+                        projectId={projectId}
+                        targetKind="scene"
+                        targetId={sceneId}
+                        field="sceneType"
+                        currentValue={watch('sceneType')}
+                        instruction="Return only a concise scene type such as dialogue, action, reveal, transition, confrontation, flashback, or quiet beat."
+                        onComplete={(text) => setValue('sceneType', text, { shouldDirty: true })}
+                      />
+                    </div>
+                    <Input {...register('sceneType')} placeholder={t('scene.placeholders.type')} />
+                  </div>
+                  <div className="grid gap-1.5 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{t('fields.location')}</span>
+                      <StoryCompletionButton
+                        projectId={projectId}
+                        targetKind="scene"
+                        targetId={sceneId}
+                        field="location"
+                        currentValue={watch('location')}
+                        instruction="Return only a concise production-ready location name for this scene."
+                        onComplete={(text) => setValue('location', text, { shouldDirty: true })}
+                      />
+                    </div>
+                    <Input {...register('location')} placeholder={t('scene.placeholders.location')} />
+                  </div>
+                </div>
+
+                <div className="grid gap-1.5 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{t('fields.summary')}</span>
+                    <StoryCompletionButton
+                      projectId={projectId}
+                      targetKind="scene"
+                      targetId={sceneId}
+                      field="summary"
+                      currentValue={watch('summary')}
+                      onComplete={(text) => setValue('summary', text, { shouldDirty: true })}
+                    />
+                  </div>
                   <Textarea {...register('summary')} rows={3} placeholder={t('scene.placeholders.summary')} />
-                </Field>
+                </div>
 
                 {/* Content - Lexical Editor */}
                 <div>
-                  <label className="mb-1.5 block text-xs text-muted-foreground">{t('fields.content')}</label>
+                  <div className="mb-1.5 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                    <span>{t('fields.content')}</span>
+                    <StoryCompletionButton
+                      projectId={projectId}
+                      targetKind="scene"
+                      targetId={sceneId}
+                      field="content"
+                      currentValue={watch('content')}
+                      onComplete={(text) => {
+                        setValue('content', text, { shouldDirty: true });
+                        setEditorVersion((value) => value + 1);
+                      }}
+                    />
+                  </div>
                   <Controller
                     name="content"
                     control={control}
                     render={({ field }) => (
                       <LexicalEditor
+                        key={`${sceneId}-${editorVersion}`}
                         initialValue={field.value || ''}
                         onChange={field.onChange}
                         placeholder={t('editor.placeholder')}
@@ -448,18 +532,53 @@ export default function SceneRoute() {
 
                 {/* Characters & Tags */}
                 <div className="grid gap-4 lg:grid-cols-2">
-                  <Field label={t('fields.characters')}>
+                  <div className="grid gap-1.5 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{t('fields.characters')}</span>
+                      <StoryCompletionButton
+                        projectId={projectId}
+                        targetKind="scene"
+                        targetId={sceneId}
+                        field="charactersJson"
+                        currentValue={watch('charactersJson')}
+                        instruction="Return only a comma-separated list of relevant character names or slugs for this scene."
+                        onComplete={(text) => setValue('charactersJson', text, { shouldDirty: true })}
+                      />
+                    </div>
                     <Input {...register('charactersJson')} placeholder={t('scene.placeholders.characters')} />
-                  </Field>
-                  <Field label={t('fields.tags')}>
+                  </div>
+                  <div className="grid gap-1.5 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{t('fields.tags')}</span>
+                      <StoryCompletionButton
+                        projectId={projectId}
+                        targetKind="scene"
+                        targetId={sceneId}
+                        field="tagsJson"
+                        currentValue={watch('tagsJson')}
+                        instruction="Return only a short comma-separated list of production and narrative tags for this scene."
+                        onComplete={(text) => setValue('tagsJson', text, { shouldDirty: true })}
+                      />
+                    </div>
                     <Input {...register('tagsJson')} placeholder={t('scene.placeholders.tags')} />
-                  </Field>
+                  </div>
                 </div>
 
                 {/* Notes */}
-                <Field label={t('fields.notes')}>
+                <div className="grid gap-1.5 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{t('fields.notes')}</span>
+                    <StoryCompletionButton
+                      projectId={projectId}
+                      targetKind="scene"
+                      targetId={sceneId}
+                      field="notes"
+                      currentValue={watch('notes')}
+                      onComplete={(text) => setValue('notes', text, { shouldDirty: true })}
+                    />
+                  </div>
                   <Textarea {...register('notes')} rows={3} placeholder={t('scene.placeholders.notes')} />
-                </Field>
+                </div>
               </div>
             </Panel>
 
@@ -527,7 +646,7 @@ export default function SceneRoute() {
         projectId={projectId}
         scene={scene}
         characters={characters.data || []}
-        characterImages={{}}
+        characterImages={characterImages.data || {}}
         isOpen={isGenerationModalOpen}
         onClose={() => setIsGenerationModalOpen(false)}
       />

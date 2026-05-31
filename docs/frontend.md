@@ -8,31 +8,28 @@ Le frontend utilise React Router 7 en framework mode avec `app/routes.ts` :
 
 ```typescript
 // routes.ts
-import { index, layout, prefix, route, type RouteConfig } from "@react-router/dev/routes";
+import { index, route, type RouteConfig } from "@react-router/dev/routes";
 
 export default [
   // Page d'accueil (Project Hub)
   index("routes/home.tsx"),
 
   // Routes projet
-  ...prefix("projects/:projectId", [
-    index("routes/project.tsx"),
-    route("characters", "routes/characters.tsx"),
-    route("characters/:characterId", "routes/character.tsx"),
-    route("story", "routes/story.tsx"),
-    route("story/:tomeId", "routes/tome.tsx"),
-    route("story/:tomeId/:chapterId", "routes/chapter.tsx"),
-    route("story/:tomeId/:chapterId/:sceneId", "routes/scene.tsx"),
-    route("assets", "routes/assets.tsx"),
-    route("generation", "routes/generation.tsx"),
-    route("exports", "routes/exports.tsx"),
-    route("versions", "routes/versions.tsx"),
-    route("warnings", "routes/warnings.tsx"),
-    route("settings", "routes/settings.tsx"),
-  ]),
-
-  // Catch-all
-  route("*", "routes/$.tsx"),
+  route("projects/:projectId", "routes/project.tsx"),
+  route("projects/:projectId/characters", "routes/characters.tsx"),
+  route("projects/:projectId/characters/:characterId", "routes/character.tsx"),
+  route("projects/:projectId/story", "routes/story.tsx"),
+  route("projects/:projectId/story/:tomeId", "routes/tome.tsx"),
+  route("projects/:projectId/story/:tomeId/chapters/:chapterId", "routes/chapter.tsx"),
+  route("projects/:projectId/story/:tomeId/scenes/:sceneId", "routes/scene.tsx"),
+  route("projects/:projectId/assets", "routes/assets.tsx"),
+  route("projects/:projectId/generation", "routes/generation.tsx"),
+  route("projects/:projectId/drama-videos", "routes/drama-videos.tsx"),
+  route("projects/:projectId/tasks", "routes/tasks.tsx"),
+  route("projects/:projectId/exports", "routes/exports.tsx"),
+  route("projects/:projectId/versions", "routes/versions.tsx"),
+  route("projects/:projectId/warnings", "routes/warnings.tsx"),
+  route("projects/:projectId/settings", "routes/settings.tsx"),
 ] satisfies RouteConfig;
 ```
 
@@ -46,10 +43,12 @@ export default [
 | `/projects/:projectId/characters/:characterId` | `character.tsx` | Détail personnage |
 | `/projects/:projectId/story` | `story.tsx` | Vue d'ensemble storyline |
 | `/projects/:projectId/story/:tomeId` | `tome.tsx` | Détail tome |
-| `/projects/:projectId/story/:tomeId/:chapterId` | `chapter.tsx` | Détail chapitre |
-| `/projects/:projectId/story/:tomeId/:chapterId/:sceneId` | `scene.tsx` | Éditeur de scène |
+| `/projects/:projectId/story/:tomeId/chapters/:chapterId` | `chapter.tsx` | Détail chapitre |
+| `/projects/:projectId/story/:tomeId/scenes/:sceneId` | `scene.tsx` | Éditeur de scène |
 | `/projects/:projectId/assets` | `assets.tsx` | Bibliothèque médias |
 | `/projects/:projectId/generation` | `generation.tsx` | Studio génération IA |
+| `/projects/:projectId/drama-videos` | `drama-videos.tsx` | Bibliothèque vidéos drama |
+| `/projects/:projectId/tasks` | `tasks.tsx` | Suivi des tâches |
 | `/projects/:projectId/exports` | `exports.tsx` | Exports |
 | `/projects/:projectId/versions` | `versions.tsx` | Historique versions |
 | `/projects/:projectId/warnings` | `warnings.tsx` | Centre warnings |

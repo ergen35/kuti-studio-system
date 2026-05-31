@@ -11,6 +11,7 @@ export { deleteProjectFunction, sendDeleteProjectEvent } from "./delete-project"
 export { exportProjectFunction } from "./export-project";
 export { generateImageFunction } from "./generate-image";
 export { generateSceneMangaFunction } from "./generate-scene-manga";
+export { generateDramaVideoFunction, sendGenerateDramaVideoEvent } from "./generate-drama-video";
 export {
   cancelJobFunction,
   relaunchJobFunction,
@@ -40,10 +41,24 @@ type GenerateSceneMangaEvent = {
   data: {
     projectId: string;
     sceneId: string;
+    jobId: string;
     configId?: string;
+    modelKey?: string;
     imageCount: number;
     characterImageRefs?: Record<string, string>;
     additionalContext?: string;
+  };
+};
+
+type GenerateDramaVideoEvent = {
+  data: {
+    projectId: string;
+    sceneId: string;
+    pageId: string;
+    dramaVideoId: string;
+    jobId: string;
+    modelKey?: string;
+    prompt?: string;
   };
 };
 
@@ -146,6 +161,7 @@ import { deleteProjectFunction } from "./delete-project";
 import { exportProjectFunction } from "./export-project";
 import { generateImageFunction } from "./generate-image";
 import { generateSceneMangaFunction } from "./generate-scene-manga";
+import { generateDramaVideoFunction } from "./generate-drama-video";
 import { cancelJobFunction, relaunchJobFunction } from "./job-control";
 
 export const inngestFunctions = [
@@ -153,6 +169,7 @@ export const inngestFunctions = [
   exportProjectFunction,
   generateImageFunction,
   generateSceneMangaFunction,
+  generateDramaVideoFunction,
   cancelJobFunction,
   relaunchJobFunction,
 ];
@@ -162,6 +179,7 @@ declare module "inngest" {
   interface Events {
     "kuti/generate-image": GenerateImageEvent;
     "kuti/generate-scene-manga": GenerateSceneMangaEvent;
+    "kuti/drama-video.generate": GenerateDramaVideoEvent;
     "kuti/export-project": ExportProjectEvent;
     "kuti/delete-project": DeleteProjectEvent;
     "kuti/check-orphan-images": CheckOrphanImagesEvent;

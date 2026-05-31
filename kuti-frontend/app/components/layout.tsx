@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { clsx } from "clsx";
-import { Activity, BookOpen, Boxes, Brush, ChevronLeft, Clock3, FileArchive, FolderKanban, Menu, Moon, Settings, ShieldAlert, Sun, UsersRound, X } from "lucide-react";
+import { Activity, BookOpen, Boxes, Brush, ChevronLeft, Clapperboard, Clock3, FileArchive, FolderKanban, Menu, Moon, Settings, ShieldAlert, Sun, UsersRound, X } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useParams } from "react-router";
 import { LanguageSwitcher } from "~/components/LanguageSwitcher";
@@ -76,6 +76,7 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
     { to: "characters", label: t('sidebar.characters'), icon: UsersRound },
     { to: "story", label: t('sidebar.storyline'), icon: BookOpen },
     { to: "generation", label: t('sidebar.generation'), icon: Brush },
+    { to: "drama-videos", label: t('sidebar.dramaVideos'), icon: Clapperboard },
     { to: "tasks", label: t('sidebar.tasks'), icon: Activity },
     { to: "assets", label: t('sidebar.assets'), icon: Boxes },
     { to: "exports", label: t('sidebar.exports'), icon: FileArchive },

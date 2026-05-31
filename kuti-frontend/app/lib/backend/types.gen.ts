@@ -122,7 +122,7 @@ export type ListModelsResponses = {
      */
     200: Array<{
         key: string;
-        kind: 'image' | 'video' | 'audio';
+        kind: 'image' | 'video' | 'audio' | 'text';
         displayName: string;
         baseUrl: string | unknown;
         enabled: boolean;
@@ -871,6 +871,60 @@ export type GetStorySummaryResponses = {
 
 export type GetStorySummaryResponse = GetStorySummaryResponses[keyof GetStorySummaryResponses];
 
+export type ListStoryCompletionModelsData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/completion-models';
+};
+
+export type ListStoryCompletionModelsResponses = {
+    /**
+     * Response for status 200
+     */
+    200: Array<{
+        key: string;
+        displayName: string;
+        enabled: boolean;
+        configured: boolean;
+    }>;
+};
+
+export type ListStoryCompletionModelsResponse = ListStoryCompletionModelsResponses[keyof ListStoryCompletionModelsResponses];
+
+export type CompleteStoryFieldData = {
+    body: {
+        targetKind: 'tome' | 'chapter' | 'scene';
+        targetId: string;
+        field: 'title' | 'sceneType' | 'location' | 'synopsis' | 'summary' | 'content' | 'notes' | 'charactersJson' | 'tagsJson';
+        currentValue?: string;
+        instruction?: string;
+        modelKey?: string;
+    };
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/complete-field';
+};
+
+export type CompleteStoryFieldResponses = {
+    /**
+     * Response for status 200
+     */
+    200: {
+        targetKind: 'tome' | 'chapter' | 'scene';
+        targetId: string;
+        field: 'title' | 'sceneType' | 'location' | 'synopsis' | 'summary' | 'content' | 'notes' | 'charactersJson' | 'tagsJson';
+        modelKey: string;
+        text: string;
+    };
+};
+
+export type CompleteStoryFieldResponse = CompleteStoryFieldResponses[keyof CompleteStoryFieldResponses];
+
 export type GetReferenceSuggestionsData = {
     body?: never;
     path: {
@@ -1192,7 +1246,7 @@ export type ListGenerationJobsData = {
 
 export type CreateGenerationJobData = {
     body: {
-        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'manga_page' | 'custom';
         sourceId: string;
         sourceVersionId?: string;
         strategy: 'direct' | 'intermediate';
@@ -1219,7 +1273,7 @@ export type CreateGenerationJobResponses = {
     200: {
         id: string;
         projectId: string;
-        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'manga_page' | 'custom';
         sourceId: string;
         sourceLabel: string;
         sourceVersionId: string | unknown;
@@ -1260,7 +1314,7 @@ export type GetGenerationJobResponses = {
     200: {
         id: string;
         projectId: string;
-        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'manga_page' | 'custom';
         sourceId: string;
         sourceLabel: string;
         sourceVersionId: string | unknown;
@@ -1311,7 +1365,7 @@ export type GetGenerationBoardResponses = {
         id: string;
         projectId: string;
         jobId: string;
-        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'manga_page' | 'custom';
         strategy: 'direct' | 'intermediate';
         title: string;
         summary: string;
@@ -1366,7 +1420,7 @@ export type ValidateGenerationBoardResponses = {
         id: string;
         projectId: string;
         jobId: string;
-        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'manga_page' | 'custom';
         strategy: 'direct' | 'intermediate';
         title: string;
         summary: string;
@@ -1476,7 +1530,7 @@ export type RelaunchGenerationJobResponses = {
     200: {
         id: string;
         projectId: string;
-        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'manga_page' | 'custom';
         sourceId: string;
         sourceLabel: string;
         sourceVersionId: string | unknown;
@@ -1499,6 +1553,55 @@ export type RelaunchGenerationJobResponses = {
 };
 
 export type RelaunchGenerationJobResponse = RelaunchGenerationJobResponses[keyof RelaunchGenerationJobResponses];
+
+export type ListProjectDramaVideosData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/drama-videos/';
+};
+
+export type ListProjectDramaVideosResponses = {
+    /**
+     * Response for status 200
+     */
+    200: Array<{
+        id: string;
+        projectId: string;
+        sourceMangaPageId: string | unknown;
+        jobId: string | unknown;
+        title: string;
+        prompt: string;
+        modelKey: string;
+        stylePreset: string;
+        status: 'draft' | 'queued' | 'running' | 'ready' | 'failed' | 'archived';
+        videoUrl: string | unknown;
+        durationSeconds: number | unknown;
+        metadata: {
+            [key: string]: unknown;
+        };
+        source: {
+            sceneId: string;
+            sceneTitle: string;
+            tomeId: string;
+            tomeTitle: string;
+            chapterId: string;
+            chapterTitle: string;
+            pageNumber: number;
+            pageLabel: string;
+            pageImageUrl: string | unknown;
+        } | unknown;
+        createdAt: string;
+        updatedAt: string;
+        completedAt: string | unknown;
+        failedAt: string | unknown;
+        errorMessage: string | unknown;
+    }>;
+};
+
+export type ListProjectDramaVideosResponse = ListProjectDramaVideosResponses[keyof ListProjectDramaVideosResponses];
 
 export type ListAssetsData = {
     body?: never;
@@ -1927,6 +2030,7 @@ export type SetDefaultConfigResponse = SetDefaultConfigResponses[keyof SetDefaul
 export type GenerateSceneMangaData = {
     body: {
         configId?: string;
+        modelKey?: string;
         imageCount: number;
         characterImageRefs?: {
             [key: string]: string;
@@ -2078,6 +2182,125 @@ export type UpdateSceneMangaPageResponses = {
 };
 
 export type UpdateSceneMangaPageResponse = UpdateSceneMangaPageResponses[keyof UpdateSceneMangaPageResponses];
+
+export type ListDramaVideosData = {
+    body?: never;
+    path: {
+        projectId: string;
+        sceneId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/drama-videos';
+};
+
+export type ListDramaVideosResponses = {
+    /**
+     * Response for status 200
+     */
+    200: Array<{
+        id: string;
+        projectId: string;
+        sourceMangaPageId: string | unknown;
+        jobId: string | unknown;
+        title: string;
+        prompt: string;
+        modelKey: string;
+        stylePreset: string;
+        status: 'draft' | 'queued' | 'running' | 'ready' | 'failed' | 'archived';
+        videoUrl: string | unknown;
+        durationSeconds: number | unknown;
+        metadata: {
+            [key: string]: unknown;
+        };
+        createdAt: string;
+        updatedAt: string;
+        completedAt: string | unknown;
+        failedAt: string | unknown;
+        errorMessage: string | unknown;
+    }>;
+};
+
+export type ListDramaVideosResponse = ListDramaVideosResponses[keyof ListDramaVideosResponses];
+
+export type ListMangaPageDramaVideosData = {
+    body?: never;
+    path: {
+        projectId: string;
+        sceneId: string;
+        pageId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}/drama-videos';
+};
+
+export type ListMangaPageDramaVideosResponses = {
+    /**
+     * Response for status 200
+     */
+    200: Array<{
+        id: string;
+        projectId: string;
+        sourceMangaPageId: string | unknown;
+        jobId: string | unknown;
+        title: string;
+        prompt: string;
+        modelKey: string;
+        stylePreset: string;
+        status: 'draft' | 'queued' | 'running' | 'ready' | 'failed' | 'archived';
+        videoUrl: string | unknown;
+        durationSeconds: number | unknown;
+        metadata: {
+            [key: string]: unknown;
+        };
+        createdAt: string;
+        updatedAt: string;
+        completedAt: string | unknown;
+        failedAt: string | unknown;
+        errorMessage: string | unknown;
+    }>;
+};
+
+export type ListMangaPageDramaVideosResponse = ListMangaPageDramaVideosResponses[keyof ListMangaPageDramaVideosResponses];
+
+export type GenerateDramaVideoData = {
+    body: {
+        modelKey?: string;
+        prompt?: string;
+        title?: string;
+    };
+    path: {
+        projectId: string;
+        sceneId: string;
+        pageId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}/drama-videos';
+};
+
+export type GenerateDramaVideoResponses = {
+    /**
+     * Response for status 200
+     */
+    200: {
+        success: boolean;
+        dramaVideoId: string;
+        jobId: string;
+        message: string;
+    };
+};
+
+export type GenerateDramaVideoResponse = GenerateDramaVideoResponses[keyof GenerateDramaVideoResponses];
+
+export type GetDramaVideoFileData = {
+    body?: never;
+    path: {
+        projectId: string;
+        sceneId: string;
+        dramaVideoId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/scenes/{sceneId}/drama-videos/{dramaVideoId}/file';
+};
 
 export type ListVersionsData = {
     body?: never;

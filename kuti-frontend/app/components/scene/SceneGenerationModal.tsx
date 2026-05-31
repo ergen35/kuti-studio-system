@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, Eye, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "~/hooks/useTranslation";
 import { Button, Badge, ErrorState, LoadingState } from "~/components/ui";
@@ -23,14 +23,17 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { CharacterImageSelector } from "./CharacterImageSelector";
-import type { ListCharactersResponse, GetProjectCharacterImagesResponse, GetStorySummaryResponse } from "~/lib/backend/types.gen";
+import type { ListCharactersResponse, GetProjectCharacterImagesResponse, GetStorySummaryResponse, ListModelsResponse } from "~/lib/backend/types.gen";
 
 type Character = ListCharactersResponse[number];
-type CharacterImage = GetProjectCharacterImagesResponse[string][number];
 type Scene = GetStorySummaryResponse['scenes'][number];
 import {
   listSceneConfigsOptions,
   generateSceneMangaMutation,
+  listModelsOptions,
+  listGenerationBoardsQueryKey,
+  listGenerationJobsQueryKey,
+  listSceneMangaPagesQueryKey,
   previewPromptMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
 import { apiErrorMessage } from "~/lib/errors";
@@ -41,7 +44,7 @@ interface SceneGenerationModalProps {
   projectId: string;
   scene: Scene;
   characters: Character[];
-  characterImages: Record<string, CharacterImage>;
+  characterImages: GetProjectCharacterImagesResponse;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -55,10 +58,12 @@ export function SceneGenerationModal({
   onClose,
 }: SceneGenerationModalProps) {
   const { t } = useTranslation("scene");
+  const queryClient = useQueryClient();
 
   // State
   const [selectedConfigId, setSelectedConfigId] = useState<string>("");
-  const [imageCount, setImageCount] = useState(1);
+  const [selectedModelKey, setSelectedModelKey] = useState<string>("");
+  const [imageCount, setImageCount] = useState(6);
   const [selectedCharacterImages, setSelectedCharacterImages] = useState<Record<string, string>>({});
   const [additionalContext, setAdditionalContext] = useState("");
   const [showPreview, setShowPreview] = useState(false);
@@ -67,6 +72,12 @@ export function SceneGenerationModal({
   const configs = useQuery({
     ...listSceneConfigsOptions({ client, path: { projectId, sceneId: scene.id } }),
     enabled: isOpen,
+  });
+
+  const models = useQuery({
+    ...listModelsOptions({ client }),
+    enabled: isOpen,
+    staleTime: 60_000,
   });
 
   // Set default config when loaded
@@ -78,13 +89,20 @@ export function SceneGenerationModal({
     }
   }, [configs.data, selectedConfigId]);
 
-  const selectedConfig = configs.data?.find((c) => c.id === selectedConfigId);
+  const configItems = configs.data ?? [];
+  const hasConfigs = configItems.length > 0;
+  const selectedConfig = configItems.find((c) => c.id === selectedConfigId);
+  const imageModels = useMemo(() => {
+    const items = (models.data ?? []) as ListModelsResponse;
+    return items.filter((model) => model.kind === "image" && model.enabled && model.configured);
+  }, [models.data]);
+  const activeModelKey = selectedModelKey || imageModels.find((model) => model.key === "gpt_images_2")?.key || imageModels[0]?.key || "";
 
   // Compute preview options
   const previewOptions = useMemo(() => ({
     path: { projectId, sceneId: scene.id },
     body: {
-      configId: selectedConfigId,
+      ...(selectedConfigId ? { configId: selectedConfigId } : {}),
       characterImageRefs: selectedCharacterImages,
       panelCount: imageCount,
     },
@@ -104,12 +122,13 @@ export function SceneGenerationModal({
   const generateOptions = useMemo(() => ({
     path: { projectId, sceneId: scene.id },
     body: {
-      configId: selectedConfigId,
+      ...(selectedConfigId ? { configId: selectedConfigId } : {}),
+      ...(activeModelKey ? { modelKey: activeModelKey } : {}),
       imageCount,
       characterImageRefs: selectedCharacterImages,
       additionalContext,
     },
-  }), [projectId, scene.id, selectedConfigId, imageCount, selectedCharacterImages, additionalContext]);
+  }), [projectId, scene.id, selectedConfigId, activeModelKey, imageCount, selectedCharacterImages, additionalContext]);
 
   // Generate mutation config
   const generateMutationConfig = useMemo(() => {
@@ -121,18 +140,21 @@ export function SceneGenerationModal({
     ...generateMutationConfig,
     onSuccess: () => {
       invalidateWorkspace(projectId);
+      void queryClient.invalidateQueries({ queryKey: listGenerationJobsQueryKey({ path: { projectId } }) });
+      void queryClient.invalidateQueries({ queryKey: listGenerationBoardsQueryKey({ path: { projectId } }) });
+      void queryClient.invalidateQueries({ queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId: scene.id } }) });
       onClose();
     },
   });
 
   // Handle character image selection
-  const handleCharacterImageSelect = (characterSlug: string, imageId: string | null) => {
+  const handleCharacterImageSelect = (characterId: string, imageId: string | null) => {
     setSelectedCharacterImages((prev) => {
       const next = { ...prev };
       if (imageId) {
-        next[characterSlug] = imageId;
+        next[characterId] = imageId;
       } else {
-        delete next[characterSlug];
+        delete next[characterId];
       }
       return next;
     });
@@ -142,17 +164,15 @@ export function SceneGenerationModal({
   const handlePreviewToggle = useCallback(() => {
     const newShowPreview = !showPreview;
     setShowPreview(newShowPreview);
-    if (!showPreview && selectedConfigId) {
+    if (!showPreview) {
       preview.mutate(previewOptions);
     }
-  }, [showPreview, selectedConfigId, preview, previewOptions]);
+  }, [showPreview, preview, previewOptions]);
 
   // Handle generate
   const handleGenerate = useCallback(() => {
-    if (selectedConfigId) {
-      generate.mutate(generateOptions);
-    }
-  }, [selectedConfigId, generate, generateOptions]);
+    generate.mutate(generateOptions);
+  }, [generate, generateOptions]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -176,29 +196,35 @@ export function SceneGenerationModal({
               {/* Config Selector */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-ink">{t("generation.config")}</label>
-                <Select
-                  value={selectedConfigId}
-                  onValueChange={(value) => {
-                    const config = configs.data?.find((c) => c.id === value);
-                    setSelectedConfigId(value);
-                    if (config) {
-                      setImageCount(config.defaultImageCount);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("generation.selectConfig")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {configs.data.map((config) => (
-                        <SelectItem key={config.id} value={config.id}>
-                          {config.name} {config.isDefault ? t("generation.defaultConfig") : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                {hasConfigs ? (
+                  <Select
+                    value={selectedConfigId}
+                    onValueChange={(value) => {
+                      const config = configItems.find((c) => c.id === value);
+                      setSelectedConfigId(value);
+                      if (config) {
+                        setImageCount(config.defaultImageCount);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t("generation.selectConfig")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {configItems.map((config) => (
+                          <SelectItem key={config.id} value={config.id}>
+                            {config.name} {config.isDefault ? t("generation.defaultConfig") : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="rounded-lg border border-line bg-surface-2/30 p-3 text-sm text-muted">
+                    {t("generation.implicitConfig")}
+                  </div>
+                )}
                 {selectedConfig && (
                   <div className="flex items-center gap-2 text-xs">
                     <Badge tone={selectedConfig.colorMode === "bw" ? "default" : "info"}>
@@ -208,6 +234,26 @@ export function SceneGenerationModal({
                   </div>
                 )}
               </div>
+
+              {imageModels.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-ink">{t("generation.model")}</label>
+                  <Select value={activeModelKey} onValueChange={setSelectedModelKey}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t("generation.selectModel")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {imageModels.map((model) => (
+                          <SelectItem key={model.key} value={model.key}>
+                            {model.displayName}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Image Count */}
               <div className="flex flex-col gap-2">
@@ -225,8 +271,8 @@ export function SceneGenerationModal({
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => setImageCount(Math.min(5, imageCount + 1))}
-                    disabled={imageCount >= 5}
+                    onClick={() => setImageCount(Math.min(16, imageCount + 1))}
+                    disabled={imageCount >= 16}
                   >
                     +
                   </Button>
@@ -314,7 +360,7 @@ export function SceneGenerationModal({
           <Button
             variant="primary"
             onClick={handleGenerate}
-            disabled={!selectedConfigId || generate.isPending}
+            disabled={generate.isPending}
           >
             {generate.isPending ? (
               <>

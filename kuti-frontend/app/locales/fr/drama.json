@@ -1,0 +1,21 @@
+{
+  "title": "Vidéos drama",
+  "description": "Bibliothèque des vidéos style drama coréen générées depuis les pages manga validées.",
+  "style": "Drama coréen",
+  "library": "Bibliothèque vidéo",
+  "defaultModel": "Modèle vidéo par défaut",
+  "localFallback": "Fallback local",
+  "fallbackReason": "Fallback provider : {{reason}}",
+  "openScene": "Ouvrir la scène source",
+  "page": "Page {{number}}",
+  "stats": {
+    "total": "Vidéos",
+    "ready": "Prêtes",
+    "running": "En cours",
+    "failed": "Échecs"
+  },
+  "empty": {
+    "title": "Aucune vidéo drama",
+    "description": "Générez une vidéo depuis une page manga validée dans la galerie d'une scène."
+  }
+}

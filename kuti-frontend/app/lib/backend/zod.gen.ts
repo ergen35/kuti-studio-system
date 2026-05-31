@@ -83,7 +83,8 @@ export const zListModelsResponse = z.array(z.object({
     kind: z.enum([
         'image',
         'video',
-        'audio'
+        'audio',
+        'text'
     ]),
     displayName: z.string(),
     baseUrl: z.union([
@@ -852,6 +853,72 @@ export const zGetStorySummaryResponse = z.object({
     }))
 });
 
+export const zListStoryCompletionModelsPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zListStoryCompletionModelsResponse = z.array(z.object({
+    key: z.string(),
+    displayName: z.string(),
+    enabled: z.boolean(),
+    configured: z.boolean()
+}));
+
+export const zCompleteStoryFieldBody = z.object({
+    targetKind: z.enum([
+        'tome',
+        'chapter',
+        'scene'
+    ]),
+    targetId: z.string(),
+    field: z.enum([
+        'title',
+        'sceneType',
+        'location',
+        'synopsis',
+        'summary',
+        'content',
+        'notes',
+        'charactersJson',
+        'tagsJson'
+    ]),
+    currentValue: z.string().optional(),
+    instruction: z.string().optional(),
+    modelKey: z.string().optional()
+});
+
+export const zCompleteStoryFieldPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCompleteStoryFieldResponse = z.object({
+    targetKind: z.enum([
+        'tome',
+        'chapter',
+        'scene'
+    ]),
+    targetId: z.string(),
+    field: z.enum([
+        'title',
+        'sceneType',
+        'location',
+        'synopsis',
+        'summary',
+        'content',
+        'notes',
+        'charactersJson',
+        'tagsJson'
+    ]),
+    modelKey: z.string(),
+    text: z.string()
+});
+
 export const zGetReferenceSuggestionsPath = z.object({
     projectId: z.string(),
     type: z.string()
@@ -1149,6 +1216,7 @@ export const zCreateGenerationJobBody = z.object({
         'chapter',
         'tome',
         'panel',
+        'manga_page',
         'custom'
     ]),
     sourceId: z.string(),
@@ -1179,6 +1247,7 @@ export const zCreateGenerationJobResponse = z.object({
         'chapter',
         'tome',
         'panel',
+        'manga_page',
         'custom'
     ]),
     sourceId: z.string(),
@@ -1233,6 +1302,7 @@ export const zGetGenerationJobResponse = z.object({
         'chapter',
         'tome',
         'panel',
+        'manga_page',
         'custom'
     ]),
     sourceId: z.string(),
@@ -1292,6 +1362,7 @@ export const zGetGenerationBoardResponse = z.object({
         'chapter',
         'tome',
         'panel',
+        'manga_page',
         'custom'
     ]),
     strategy: z.enum(['direct', 'intermediate']),
@@ -1359,6 +1430,7 @@ export const zValidateGenerationBoardResponse = z.object({
         'chapter',
         'tome',
         'panel',
+        'manga_page',
         'custom'
     ]),
     strategy: z.enum(['direct', 'intermediate']),
@@ -1462,6 +1534,7 @@ export const zRelaunchGenerationJobResponse = z.object({
         'chapter',
         'tome',
         'panel',
+        'manga_page',
         'custom'
     ]),
     sourceId: z.string(),
@@ -1499,6 +1572,78 @@ export const zRelaunchGenerationJobResponse = z.object({
         z.unknown()
     ])
 });
+
+export const zListProjectDramaVideosPath = z.object({
+    projectId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zListProjectDramaVideosResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceMangaPageId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    jobId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    title: z.string(),
+    prompt: z.string(),
+    modelKey: z.string(),
+    stylePreset: z.string(),
+    status: z.enum([
+        'draft',
+        'queued',
+        'running',
+        'ready',
+        'failed',
+        'archived'
+    ]),
+    videoUrl: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    durationSeconds: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    metadata: z.record(z.unknown()),
+    source: z.union([
+        z.object({
+            sceneId: z.string(),
+            sceneTitle: z.string(),
+            tomeId: z.string(),
+            tomeTitle: z.string(),
+            chapterId: z.string(),
+            chapterTitle: z.string(),
+            pageNumber: z.number(),
+            pageLabel: z.string(),
+            pageImageUrl: z.union([
+                z.string(),
+                z.unknown()
+            ])
+        }),
+        z.unknown()
+    ]),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    completedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+}));
 
 export const zListAssetsPath = z.object({
     projectId: z.string()
@@ -1894,6 +2039,7 @@ export const zSetDefaultConfigResponse = z.object({
 
 export const zGenerateSceneMangaBody = z.object({
     configId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/).optional(),
+    modelKey: z.string().optional(),
     imageCount: z.number().int().gte(1).lte(16).default(6),
     characterImageRefs: z.record(z.string()).optional(),
     additionalContext: z.string().max(2000).optional()
@@ -1917,7 +2063,7 @@ export const zGenerateSceneMangaResponse = z.object({
 export const zPreviewPromptBody = z.object({
     configId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/).optional(),
     characterImageRefs: z.record(z.string()).optional(),
-    panelCount: z.number().int().gte(1).lte(10).default(6)
+    panelCount: z.number().int().gte(1).lte(16).default(6)
 });
 
 export const zPreviewPromptPath = z.object({
@@ -2036,6 +2182,147 @@ export const zUpdateSceneMangaPageResponse = z.object({
     ]),
     createdAt: z.string(),
     updatedAt: z.string()
+});
+
+export const zListDramaVideosPath = z.object({
+    projectId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zListDramaVideosResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceMangaPageId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    jobId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    title: z.string(),
+    prompt: z.string(),
+    modelKey: z.string(),
+    stylePreset: z.string(),
+    status: z.enum([
+        'draft',
+        'queued',
+        'running',
+        'ready',
+        'failed',
+        'archived'
+    ]),
+    videoUrl: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    durationSeconds: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    metadata: z.record(z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    completedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+}));
+
+export const zListMangaPageDramaVideosPath = z.object({
+    projectId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    pageId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zListMangaPageDramaVideosResponse = z.array(z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceMangaPageId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    jobId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    title: z.string(),
+    prompt: z.string(),
+    modelKey: z.string(),
+    stylePreset: z.string(),
+    status: z.enum([
+        'draft',
+        'queued',
+        'running',
+        'ready',
+        'failed',
+        'archived'
+    ]),
+    videoUrl: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    durationSeconds: z.union([
+        z.number(),
+        z.unknown()
+    ]),
+    metadata: z.record(z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    completedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
+}));
+
+export const zGenerateDramaVideoBody = z.object({
+    modelKey: z.string().optional(),
+    prompt: z.string().max(4000).optional(),
+    title: z.string().max(255).optional()
+});
+
+export const zGenerateDramaVideoPath = z.object({
+    projectId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    pageId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
+ * Response for status 200
+ */
+export const zGenerateDramaVideoResponse = z.object({
+    success: z.boolean(),
+    dramaVideoId: z.string(),
+    jobId: z.string(),
+    message: z.string()
+});
+
+export const zGetDramaVideoFilePath = z.object({
+    projectId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    sceneId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    dramaVideoId: z.string().uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
 });
 
 export const zListVersionsPath = z.object({

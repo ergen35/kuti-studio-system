@@ -184,7 +184,7 @@ model GenerationJob {
   sourceId        String
   sourceVersionId String?
   strategy        GenerationStrategy
-  entrypoint      String              @default("gpt-2-images")
+  entrypoint      String              @default("gpt_images_2")
   title           String
   prompt          String              @default("")
   summary         String              @default("")

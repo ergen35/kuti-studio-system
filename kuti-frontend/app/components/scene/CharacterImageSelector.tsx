@@ -16,9 +16,9 @@ type CharacterImage = GetProjectCharacterImagesResponse[string][number];
 interface CharacterImageSelectorProps {
   projectId: string;
   characters: Character[];
-  characterImages: Record<string, CharacterImage>;
+  characterImages: GetProjectCharacterImagesResponse;
   selectedImages: Record<string, string>;
-  onSelect: (characterSlug: string, imageId: string | null) => void;
+  onSelect: (characterId: string, imageId: string | null) => void;
 }
 
 // Helper to convert CharacterImage to CharacterImageWithUrl
@@ -54,8 +54,10 @@ export function CharacterImageSelector({
   return (
     <div className="space-y-2">
       {characters.map((character) => {
-        const hasImage = character.slug in characterImages;
-        const selectedImageId = selectedImages[character.slug];
+        const images = characterImages[character.id] ?? [];
+        const primaryImage = images[0];
+        const hasImage = images.length > 0;
+        const selectedImageId = selectedImages[character.id];
         const isExpanded = expandedCharacter === character.slug;
 
         return (
@@ -76,9 +78,9 @@ export function CharacterImageSelector({
                     hasImage ? "bg-accent/10" : "bg-muted/20"
                   )}
                 >
-                  {selectedImageId && characterImages[character.slug] ? (
+                  {selectedImageId && primaryImage ? (
                     <img
-                      src={getImageUrl(characterImages[character.slug], projectId, character.id)}
+                      src={getImageUrl(primaryImage, projectId, character.id)}
                       alt={character.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -114,7 +116,7 @@ export function CharacterImageSelector({
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => onSelect(character.slug, null)}
+                    onClick={() => onSelect(character.id, null)}
                     className={clsx(
                       "aspect-square rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all",
                       !selectedImageId
@@ -126,33 +128,31 @@ export function CharacterImageSelector({
                     <span className="text-[10px] text-muted">Auto</span>
                   </Button>
 
-                  {/* Image actuelle du personnage */}
-                  {characterImages[character.slug] && (
+                  {images.map((image) => (
                     <Button
+                      key={image.id}
                       type="button"
                       variant="ghost"
-                      onClick={() =>
-                        onSelect(character.slug, characterImages[character.slug].id)
-                      }
+                      onClick={() => onSelect(character.id, image.id)}
                       className={clsx(
                         "aspect-square rounded-lg border-2 overflow-hidden transition-all",
-                        selectedImageId === characterImages[character.slug].id
+                        selectedImageId === image.id
                           ? "border-accent ring-2 ring-accent/20"
                           : "border-line hover:border-accent/50"
                       )}
                     >
                       <img
-                        src={getImageUrl(characterImages[character.slug], projectId, character.id)}
+                        src={getImageUrl(image, projectId, character.id)}
                         alt={character.name}
                         className="w-full h-full object-cover"
                       />
-                      {selectedImageId === characterImages[character.slug].id && (
+                      {selectedImageId === image.id && (
                         <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center">
                           <Check size={12} className="text-accent-ink" />
                         </div>
                       )}
                     </Button>
-                  )}
+                  ))}
                 </div>
                 <p className="text-xs text-muted mt-2">
                   {t("characterSelector.help")}

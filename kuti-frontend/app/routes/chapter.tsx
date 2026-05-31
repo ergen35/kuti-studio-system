@@ -17,14 +17,16 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
 import { apiErrorMessage } from '~/lib/errors';
 import { invalidateWorkspace } from '~/lib/query';
-import { StoryBreadcrumb } from '~/components/story';
+import { StoryBreadcrumb, StoryCompletionButton } from '~/components/story';
 import { createSceneMutation, getStorySummaryOptions, updateChapterMutation } from '~/lib/backend/@tanstack/react-query.gen';
 import type { CreateSceneData, GetStorySummaryResponse, Options, UpdateChapterData } from '~/lib/backend';
 
 const editChapterSchema = z.object({
   title: z.string().min(1, 'Title is required'),
+  synopsis: z.string().optional(),
 });
 
 type EditChapterInput = z.infer<typeof editChapterSchema>;
@@ -260,15 +262,15 @@ export default function ChapterRoute() {
     },
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm<EditChapterInput>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<EditChapterInput>({
     resolver: zodResolver(editChapterSchema),
-    defaultValues: { title: chapter?.title || '' },
+    defaultValues: { title: chapter?.title || '', synopsis: chapter?.synopsis || '' },
   });
 
   const onSubmit = (data: EditChapterInput) => {
     updateChapterMut.mutate({
       path: { projectId, chapterId },
-      body: { title: data.title },
+      body: { title: data.title, synopsis: data.synopsis },
     } as unknown as Options<UpdateChapterData>);
   };
 
@@ -357,16 +359,41 @@ export default function ChapterRoute() {
 
                 {isEditing ? (
                   <form onSubmit={handleSubmit(onSubmit)} className="mt-2 flex flex-col gap-2">
-                    <Field label={t('fields.title')}>
+                    <div className="grid gap-1.5 text-xs text-muted-foreground">
+                      <div className="flex items-center justify-between gap-2">
+                        <span>{t('fields.title')}</span>
+                        <StoryCompletionButton
+                          projectId={projectId}
+                          targetKind="chapter"
+                          targetId={chapterId}
+                          field="title"
+                          currentValue={watch('title')}
+                          onComplete={(text) => setValue('title', text, { shouldDirty: true, shouldValidate: true })}
+                        />
+                      </div>
                       <Input
                         {...register('title')}
                         autoFocus
                         className="w-full text-lg font-semibold"
                       />
-                    </Field>
+                    </div>
                     {errors.title && (
                       <span className="text-danger text-xs">{errors.title.message}</span>
                     )}
+                    <div className="grid gap-1.5 text-xs text-muted-foreground">
+                      <div className="flex items-center justify-between gap-2">
+                        <span>{t('chapter.synopsis')}</span>
+                        <StoryCompletionButton
+                          projectId={projectId}
+                          targetKind="chapter"
+                          targetId={chapterId}
+                          field="synopsis"
+                          currentValue={watch('synopsis')}
+                          onComplete={(text) => setValue('synopsis', text, { shouldDirty: true })}
+                        />
+                      </div>
+                      <Textarea {...register('synopsis')} rows={4} className="w-full" />
+                    </div>
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"

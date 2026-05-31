@@ -11,6 +11,7 @@ import { z } from "zod";
 export const StylePresetSchema = z.enum(["shonen", "shojo", "seinen", "generic"]);
 export const ColorModeSchema = z.enum(["bw", "color", "spot_color"]);
 export const MangaPageStatusSchema = z.enum(["draft", "selected", "rejected"]);
+export const DramaVideoStatusSchema = z.enum(["draft", "queued", "running", "ready", "failed", "archived"]);
 
 // ============================================================================
 // Params Schemas
@@ -31,6 +32,12 @@ export const pageIdParamsSchema = z.object({
   projectId: z.string().uuid(),
   sceneId: z.string().uuid(),
   pageId: z.string().uuid(),
+});
+
+export const dramaVideoIdParamsSchema = z.object({
+  projectId: z.string().uuid(),
+  sceneId: z.string().uuid(),
+  dramaVideoId: z.string().uuid(),
 });
 
 // ============================================================================
@@ -61,6 +68,7 @@ export const setDefaultConfigBodySchema = z.object({
 
 export const generateSceneMangaBodySchema = z.object({
   configId: z.string().uuid().optional(),
+  modelKey: z.string().optional(),
   imageCount: z.number().int().min(1).max(16).default(6),
   characterImageRefs: z.record(z.string(), z.string()).optional(),
   additionalContext: z.string().max(2000).optional(),
@@ -69,7 +77,7 @@ export const generateSceneMangaBodySchema = z.object({
 export const previewPromptBodySchema = z.object({
   configId: z.string().uuid().optional(),
   characterImageRefs: z.record(z.string(), z.string()).optional(),
-  panelCount: z.number().int().min(1).max(10).default(6),
+  panelCount: z.number().int().min(1).max(16).default(6),
 });
 
 export const updateMangaPageBodySchema = z.object({
@@ -78,6 +86,12 @@ export const updateMangaPageBodySchema = z.object({
   imageUrl: z.string().optional(),
   caption: z.string().max(2000).optional(),
   prompt: z.string().max(4000).optional(),
+});
+
+export const generateDramaVideoBodySchema = z.object({
+  modelKey: z.string().optional(),
+  prompt: z.string().max(4000).optional(),
+  title: z.string().max(255).optional(),
 });
 
 // ============================================================================
@@ -122,6 +136,35 @@ export const mangaPageResponseSchema = z.object({
 
 export const mangaPageListResponseSchema = z.array(mangaPageResponseSchema);
 
+export const dramaVideoResponseSchema = z.object({
+  id: z.string(),
+  projectId: z.string(),
+  sourceMangaPageId: z.string().nullable(),
+  jobId: z.string().nullable(),
+  title: z.string(),
+  prompt: z.string(),
+  modelKey: z.string(),
+  stylePreset: z.string(),
+  status: DramaVideoStatusSchema,
+  videoUrl: z.string().nullable(),
+  durationSeconds: z.number().nullable(),
+  metadata: z.record(z.string(), z.unknown()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  completedAt: z.string().nullable(),
+  failedAt: z.string().nullable(),
+  errorMessage: z.string().nullable(),
+});
+
+export const dramaVideoListResponseSchema = z.array(dramaVideoResponseSchema);
+
+export const generateDramaVideoResponseSchema = z.object({
+  success: z.boolean(),
+  dramaVideoId: z.string(),
+  jobId: z.string(),
+  message: z.string(),
+});
+
 export const generateSceneMangaResponseSchema = z.object({
   success: z.boolean(),
   jobId: z.string(),
@@ -145,3 +188,4 @@ export type UpdateSceneConfigBody = z.infer<typeof updateSceneConfigBodySchema>;
 export type GenerateSceneMangaBody = z.infer<typeof generateSceneMangaBodySchema>;
 export type PreviewPromptBody = z.infer<typeof previewPromptBodySchema>;
 export type UpdateMangaPageBody = z.infer<typeof updateMangaPageBodySchema>;
+export type GenerateDramaVideoBody = z.infer<typeof generateDramaVideoBodySchema>;

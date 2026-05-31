@@ -55,6 +55,11 @@
     "save": "Save",
     "creating": "Creating..."
   },
+  "completion": {
+    "generate": "Generate with AI",
+    "model": "Model",
+    "error": "Generation failed"
+  },
   "fields": {
     "title": "Title",
     "type": "Type",
@@ -142,6 +147,8 @@
     "mangaBoards": "Manga boards",
     "generateBoard": "Generate board",
     "placeholders": {
+      "type": "dialogue, action, reveal...",
+      "location": "Rooftop, classroom, station...",
       "summary": "Scene summary...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romance, fight, reveal...",

@@ -8,16 +8,20 @@ import {
   sceneIdParamsSchema,
   configIdParamsSchema,
   pageIdParamsSchema,
+  dramaVideoIdParamsSchema,
   createSceneConfigBodySchema,
   updateSceneConfigBodySchema,
   setDefaultConfigBodySchema,
   generateSceneMangaBodySchema,
   previewPromptBodySchema,
   updateMangaPageBodySchema,
+  generateDramaVideoBodySchema,
   sceneConfigResponseSchema,
   sceneConfigListResponseSchema,
   mangaPageResponseSchema,
   mangaPageListResponseSchema,
+  dramaVideoListResponseSchema,
+  generateDramaVideoResponseSchema,
   generateSceneMangaResponseSchema,
   previewPromptResponseSchema,
 } from "./dto";
@@ -32,6 +36,10 @@ import {
   listSceneMangaPages,
   updateSceneMangaPage,
   deleteSceneMangaPage,
+  listDramaVideos,
+  listMangaPageDramaVideos,
+  generateDramaVideo,
+  getDramaVideoFile,
 } from "./controller";
 
 // ============================================================================
@@ -145,4 +153,42 @@ export const sceneGenerationModule = new Elysia({
   }, {
     params: pageIdParamsSchema,
     detail: { operationId: "deleteSceneMangaPage", summary: "Delete a manga page" },
+  })
+
+  // List all drama videos for the scene
+  .get("/drama-videos", ({ params: { projectId, sceneId } }) => {
+    return listDramaVideos(projectId, sceneId);
+  }, {
+    params: sceneIdParamsSchema,
+    response: dramaVideoListResponseSchema,
+    detail: { operationId: "listDramaVideos", summary: "List Korean drama videos for scene" },
+  })
+
+  // List drama videos generated from a manga page
+  .get("/manga-pages/:pageId/drama-videos", ({ params: { projectId, sceneId, pageId } }) => {
+    return listMangaPageDramaVideos(projectId, sceneId, pageId);
+  }, {
+    params: pageIdParamsSchema,
+    response: dramaVideoListResponseSchema,
+    detail: { operationId: "listMangaPageDramaVideos", summary: "List Korean drama videos for a manga page" },
+  })
+
+  // Generate a Korean drama video from a selected manga page
+  .post("/manga-pages/:pageId/drama-videos", ({ params: { projectId, sceneId, pageId }, body }) => {
+    return generateDramaVideo(projectId, sceneId, pageId, body);
+  }, {
+    params: pageIdParamsSchema,
+    body: generateDramaVideoBodySchema,
+    response: generateDramaVideoResponseSchema,
+    detail: { operationId: "generateDramaVideo", summary: "Generate Korean drama video from a manga page" },
+  })
+
+  // Stream generated drama video artifact
+  .get("/drama-videos/:dramaVideoId/file", async ({ params: { projectId, sceneId, dramaVideoId } }) => {
+    const file = await getDramaVideoFile(projectId, sceneId, dramaVideoId);
+    if (!file) throw new Error("Drama video file not found");
+    return file;
+  }, {
+    params: dramaVideoIdParamsSchema,
+    detail: { operationId: "getDramaVideoFile", summary: "Get drama video file" },
   });

@@ -147,6 +147,11 @@ export type SceneGenerationConfig = Prisma.SceneGenerationConfigModel
  */
 export type SceneMangaPage = Prisma.SceneMangaPageModel
 /**
+ * Model DramaVideo
+ * 
+ */
+export type DramaVideo = Prisma.DramaVideoModel
+/**
  * Model Version
  * 
  */

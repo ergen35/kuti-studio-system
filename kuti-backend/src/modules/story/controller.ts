@@ -5,6 +5,10 @@
 import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
 import { prisma } from "@lib/db";
+import {
+  completeStoryField as completeStoryFieldWithProvider,
+  getStoryCompletionModels,
+} from "@lib/story-completion";
 import type {
   TomeResponse,
   ChapterResponse,
@@ -15,6 +19,7 @@ import type {
   UpdateChapterBody,
   CreateSceneBody,
   UpdateSceneBody,
+  CompleteStoryFieldBody,
 } from "./dto";
 
 // ============================================================================
@@ -523,4 +528,95 @@ export async function getReferenceSuggestions(
     default:
       return [];
   }
+}
+
+// ============================================================================
+// Story Completion
+// ============================================================================
+
+export function listStoryCompletionModels() {
+  return getStoryCompletionModels();
+}
+
+async function buildCompletionContext(projectId: string, body: CompleteStoryFieldBody) {
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  if (!project) throw new Error("project_not_found");
+
+  if (body.targetKind === "tome") {
+    const tome = await prisma.tome.findFirst({ where: { id: body.targetId, projectId } });
+    if (!tome) throw new Error("tome_not_found");
+    const [chapters, scenes] = await Promise.all([
+      prisma.chapter.findMany({ where: { projectId, tomeId: tome.id }, orderBy: { orderIndex: "asc" } }),
+      prisma.scene.findMany({ where: { projectId, tomeId: tome.id }, orderBy: { orderIndex: "asc" } }),
+    ]);
+    return {
+      project: { name: project.name, slug: project.slug },
+      tome: serializeTome(tome),
+      chapters: chapters.map(serializeChapter),
+      scenes: scenes.map((scene) => ({
+        id: scene.id,
+        title: scene.title,
+        summary: scene.summary,
+        orderIndex: scene.orderIndex,
+      })),
+    };
+  }
+
+  if (body.targetKind === "chapter") {
+    const chapter = await prisma.chapter.findFirst({ where: { id: body.targetId, projectId } });
+    if (!chapter) throw new Error("chapter_not_found");
+    const [tome, scenes] = await Promise.all([
+      prisma.tome.findFirst({ where: { id: chapter.tomeId, projectId } }),
+      prisma.scene.findMany({ where: { projectId, chapterId: chapter.id }, orderBy: { orderIndex: "asc" } }),
+    ]);
+    return {
+      project: { name: project.name, slug: project.slug },
+      tome: tome ? serializeTome(tome) : null,
+      chapter: serializeChapter(chapter),
+      scenes: scenes.map(serializeScene),
+    };
+  }
+
+  const scene = await prisma.scene.findFirst({ where: { id: body.targetId, projectId } });
+  if (!scene) throw new Error("scene_not_found");
+  const [tome, chapter, characters] = await Promise.all([
+    prisma.tome.findFirst({ where: { id: scene.tomeId, projectId } }),
+    prisma.chapter.findFirst({ where: { id: scene.chapterId, projectId } }),
+    prisma.character.findMany({ where: { projectId }, orderBy: { name: "asc" } }),
+  ]);
+
+  return {
+    project: { name: project.name, slug: project.slug },
+    tome: tome ? serializeTome(tome) : null,
+    chapter: chapter ? serializeChapter(chapter) : null,
+    scene: serializeScene(scene),
+    characters: characters.map((character) => ({
+      id: character.id,
+      slug: character.slug,
+      name: character.name,
+      narrativeRole: character.narrativeRole,
+      description: character.description,
+      personality: character.personality,
+    })),
+  };
+}
+
+export async function completeStoryField(projectId: string, body: CompleteStoryFieldBody) {
+  const context = await buildCompletionContext(projectId, body);
+  const result = await completeStoryFieldWithProvider({
+    targetKind: body.targetKind,
+    field: body.field,
+    currentValue: body.currentValue,
+    instruction: body.instruction,
+    modelKey: body.modelKey,
+    context,
+  });
+
+  return {
+    targetKind: body.targetKind,
+    targetId: body.targetId,
+    field: body.field,
+    modelKey: result.modelKey,
+    text: result.text,
+  };
 }

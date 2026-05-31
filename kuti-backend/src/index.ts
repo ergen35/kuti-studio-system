@@ -13,6 +13,7 @@ import { assetsModule } from "@modules/assets";
 import { staticPlugin } from '@elysia/static';
 import { authModule } from "@modules/authentication";
 import { charactersModule } from "@modules/characters";
+import { dramaVideosModule } from "@modules/drama-videos";
 import { exportsModule } from "@modules/exports";
 import { generationModule } from "@modules/generation";
 import { healthModule } from "@modules/health";
@@ -86,6 +87,7 @@ export const app = new Elysia({
   .use(charactersModule)
   .use(storyModule)
   .use(generationModule)
+  .use(dramaVideosModule)
   .use(assetsModule)
   .use(sceneGenerationModule)
   .use(versionsModule)

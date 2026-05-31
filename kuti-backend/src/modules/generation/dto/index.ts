@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const generationSourceKindSchema = z.enum(["scene", "chapter", "tome", "panel", "custom"]);
+export const generationSourceKindSchema = z.enum(["scene", "chapter", "tome", "panel", "manga_page", "custom"]);
 export const generationStrategySchema = z.enum(["direct", "intermediate"]);
 export const generationJobStatusSchema = z.enum(["pending", "running", "ready", "validated", "failed"]);
 export const generationBoardStatusSchema = z.enum(["draft", "validated"]);

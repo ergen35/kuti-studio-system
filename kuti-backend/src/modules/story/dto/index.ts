@@ -137,6 +137,34 @@ export const referenceSuggestionSchema = z.object({
   label: z.string(),
 });
 
+// Story completion
+export const storyCompletionTargetKindSchema = z.enum(["tome", "chapter", "scene"]);
+export const storyCompletionFieldSchema = z.enum(["title", "sceneType", "location", "synopsis", "summary", "content", "notes", "charactersJson", "tagsJson"]);
+
+export const storyCompletionModelSchema = z.object({
+  key: z.string(),
+  displayName: z.string(),
+  enabled: z.boolean(),
+  configured: z.boolean(),
+});
+
+export const completeStoryFieldBodySchema = z.object({
+  targetKind: storyCompletionTargetKindSchema,
+  targetId: z.string(),
+  field: storyCompletionFieldSchema,
+  currentValue: z.string().optional(),
+  instruction: z.string().optional(),
+  modelKey: z.string().optional(),
+});
+
+export const completeStoryFieldResponseSchema = z.object({
+  targetKind: storyCompletionTargetKindSchema,
+  targetId: z.string(),
+  field: storyCompletionFieldSchema,
+  modelKey: z.string(),
+  text: z.string(),
+});
+
 // Alias pour compatibilité
 export const StorySummaryResponse = storySummaryResponseSchema;
 
@@ -150,3 +178,4 @@ export type CreateChapterBody = z.infer<typeof createChapterBodySchema>;
 export type UpdateChapterBody = z.infer<typeof updateChapterBodySchema>;
 export type CreateSceneBody = z.infer<typeof createSceneBodySchema>;
 export type UpdateSceneBody = z.infer<typeof updateSceneBodySchema>;
+export type CompleteStoryFieldBody = z.infer<typeof completeStoryFieldBodySchema>;

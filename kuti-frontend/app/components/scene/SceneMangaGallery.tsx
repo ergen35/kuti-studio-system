@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
 import {
   ImageIcon,
@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
+  Clapperboard,
+  Play,
 } from "lucide-react";
 import { Button, Badge, EmptyState, LoadingState, ErrorState } from "~/components/ui";
 import {
@@ -22,8 +24,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { useTranslation } from "~/hooks/useTranslation";
-import type { ListSceneMangaPagesResponse } from "~/lib/backend/types.gen";
+import type { ListDramaVideosResponse, ListModelsResponse, ListSceneMangaPagesResponse } from "~/lib/backend/types.gen";
 
 type SceneMangaPage = ListSceneMangaPagesResponse[number];
 
@@ -34,12 +43,31 @@ function stringValue(value: unknown) {
 function pageId(page: SceneMangaPage | undefined) {
   return typeof page?.id === "string" ? page.id : "";
 }
+
+function metadataRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function isLocalFallback(video: ListDramaVideosResponse[number]) {
+  return metadataRecord(video.metadata).localFallbackUsed === true;
+}
+
+function providerFailureMessage(video: ListDramaVideosResponse[number]) {
+  return stringValue(metadataRecord(video.metadata).providerFailureMessage);
+}
 import {
+  generateDramaVideoMutation,
+  listDramaVideosQueryKey,
+  listDramaVideosOptions,
+  listGenerationJobsQueryKey,
+  listProjectDramaVideosQueryKey,
+  listModelsOptions,
+  listSceneMangaPagesQueryKey,
   listSceneMangaPagesOptions,
   updateSceneMangaPageMutation,
   deleteSceneMangaPageMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
-import { apiErrorMessage } from "~/lib/errors";
+import { apiErrorMessage, backendUrl } from "~/lib/errors";
 import { invalidateWorkspace } from "~/lib/query";
 import { client } from "~/lib/backend-client";
 
@@ -50,8 +78,10 @@ interface SceneMangaGalleryProps {
 
 export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps) {
   const { t } = useTranslation("scene");
+  const queryClient = useQueryClient();
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedVideoModel, setSelectedVideoModel] = useState("");
 
   // Fetch pages using SDK
   const pagesQuery = useQuery({
@@ -59,6 +89,20 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
       client,
       path: { projectId, sceneId },
     }),
+    refetchInterval: 10_000,
+  });
+
+  const videosQuery = useQuery({
+    ...listDramaVideosOptions({
+      client,
+      path: { projectId, sceneId },
+    }),
+    refetchInterval: 10_000,
+  });
+
+  const modelsQuery = useQuery({
+    ...listModelsOptions({ client }),
+    staleTime: 60_000,
   });
 
   // Update page mutation using SDK
@@ -66,6 +110,7 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
     ...updateSceneMangaPageMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
+      void queryClient.invalidateQueries({ queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId } }) });
     },
   });
 
@@ -74,11 +119,33 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
     ...deleteSceneMangaPageMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
+      void queryClient.invalidateQueries({ queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId } }) });
+      void queryClient.invalidateQueries({ queryKey: listDramaVideosQueryKey({ path: { projectId, sceneId } }) });
+    },
+  });
+
+  const generateDrama = useMutation({
+    ...generateDramaVideoMutation(),
+    onSuccess: () => {
+      void videosQuery.refetch();
+      invalidateWorkspace(projectId);
+      void queryClient.invalidateQueries({ queryKey: listDramaVideosQueryKey({ path: { projectId, sceneId } }) });
+      void queryClient.invalidateQueries({ queryKey: listProjectDramaVideosQueryKey({ path: { projectId } }) });
+      void queryClient.invalidateQueries({ queryKey: listGenerationJobsQueryKey({ path: { projectId } }) });
     },
   });
 
   const pages = pagesQuery.data ?? [];
+  const videos = (videosQuery.data ?? []) as ListDramaVideosResponse;
   const selectedPage = pages.find((p) => p.id === selectedPageId);
+  const selectedPageVideos = selectedPage
+    ? videos.filter((video) => video.sourceMangaPageId === selectedPage.id)
+    : [];
+  const videoModels = useMemo(() => {
+    const items = (modelsQuery.data ?? []) as ListModelsResponse;
+    return items.filter((model) => model.kind === "video" && model.enabled && model.configured);
+  }, [modelsQuery.data]);
+  const selectedModelKey = selectedVideoModel || videoModels[0]?.key || "";
 
   // Lightbox navigation
   const currentIndex = pages.findIndex((p) => p.id === selectedPageId);
@@ -152,6 +219,7 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
             onDelete={() => deletePage.mutate({
               path: { projectId, sceneId, pageId: page.id },
             })}
+            dramaCount={videos.filter((video) => video.sourceMangaPageId === page.id).length}
             isUpdating={updatePage.isPending}
             isDeleting={deletePage.isPending && deletePage.variables?.path.pageId === page.id}
           />
@@ -181,6 +249,9 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               >
                 {selectedPage.status}
               </Badge>
+              {selectedPageVideos.length > 0 && (
+                <Badge tone="info">{selectedPageVideos.length} {t("drama.videos")}</Badge>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -188,7 +259,7 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
                 className="text-white hover:bg-white/10"
                 onClick={() => {
                   const link = document.createElement("a");
-                  link.href = stringValue(selectedPage.imageUrl);
+                  link.href = backendUrl(selectedPage.imageUrl);
                   link.download = `t${selectedPage.tomeId}-c${selectedPage.chapterId}-s${selectedPage.sceneId}-${selectedPage.pageNumber}.png`;
                   link.click();
                 }}
@@ -231,9 +302,9 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               </Button>
             )}
 
-            {stringValue(selectedPage.imageUrl) && (
+            {backendUrl(selectedPage.imageUrl) && (
               <img
-                src={stringValue(selectedPage.imageUrl)}
+                src={backendUrl(selectedPage.imageUrl)}
                 alt={t("mangaGallery.pageAlt", { number: selectedPage.pageNumber })}
                 className="max-h-full max-w-full object-contain rounded-lg"
               />
@@ -284,6 +355,79 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               )}
             </Button>
           </div>
+
+          <div className="grid gap-3 border-t border-white/10 pt-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-medium text-white">{t("drama.title")}</h3>
+                <p className="text-xs text-white/55">{t("drama.description")}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {videoModels.length > 1 && (
+                  <Select value={selectedModelKey} onValueChange={setSelectedVideoModel}>
+                    <SelectTrigger size="sm" className="h-8 border-white/20 bg-white/10 text-white">
+                      <SelectValue placeholder={t("drama.model")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {videoModels.map((model) => (
+                        <SelectItem key={model.key} value={model.key}>{model.displayName}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                  disabled={generateDrama.isPending || selectedPage.status !== "selected"}
+                  onClick={() => generateDrama.mutate({
+                    path: { projectId, sceneId, pageId: selectedPage.id },
+                    body: { modelKey: selectedModelKey || undefined },
+                  })}
+                  title={selectedPage.status !== "selected" ? t("drama.selectFirst") : t("drama.generate")}
+                >
+                  {generateDrama.isPending ? <Loader2 className="animate-spin" /> : <Clapperboard />}
+                  {generateDrama.isPending ? t("drama.queued") : t("drama.generate")}
+                </Button>
+              </div>
+            </div>
+
+            {selectedPageVideos.length > 0 ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {selectedPageVideos.map((video) => {
+                  const providerFailure = providerFailureMessage(video);
+                  return (
+                  <div key={video.id} className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="truncate text-xs font-medium text-white">{video.title}</span>
+                      <div className="flex items-center gap-1">
+                        {isLocalFallback(video) ? <Badge tone="warning">{t("drama.localFallback")}</Badge> : null}
+                        <Badge tone={video.status}>{video.status}</Badge>
+                      </div>
+                    </div>
+                    {backendUrl(video.videoUrl) && video.status === "ready" ? (
+                      <video src={backendUrl(video.videoUrl)} controls className="aspect-video w-full rounded-md bg-black" />
+                    ) : (
+                      <div className="grid aspect-video place-items-center rounded-md border border-dashed border-white/15 bg-black/25 text-white/55">
+                        {video.status === "running" || video.status === "queued" ? <Loader2 className="animate-spin" /> : <Play />}
+                      </div>
+                    )}
+                    {stringValue(video.errorMessage) ? <p className="mt-2 text-xs text-danger">{stringValue(video.errorMessage)}</p> : null}
+                    {isLocalFallback(video) && providerFailure ? (
+                      <p className="mt-2 rounded-md border border-warning/30 bg-warning/10 p-2 text-xs text-warning">
+                        {t("drama.fallbackReason", { reason: providerFailure })}
+                      </p>
+                    ) : null}
+                  </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="rounded-lg border border-dashed border-white/10 bg-white/[0.04] p-3 text-xs text-white/55">
+                {t("drama.empty")}
+              </p>
+            )}
+          </div>
           </DialogContent>
         )}
       </Dialog>
@@ -298,6 +442,7 @@ interface PageThumbnailProps {
   onSelect: () => void;
   onUpdate: (data: { status: "draft" | "selected" | "rejected" }) => void;
   onDelete: () => void;
+  dramaCount: number;
   isUpdating: boolean;
   isDeleting: boolean;
 }
@@ -308,6 +453,7 @@ function PageThumbnail({
   onSelect,
   onUpdate,
   onDelete,
+  dramaCount,
   isUpdating,
   isDeleting,
 }: PageThumbnailProps) {
@@ -321,9 +467,9 @@ function PageThumbnail({
       onMouseLeave={() => setShowActions(false)}
     >
       {/* Image */}
-      {stringValue(page.imageUrl) ? (
+      {backendUrl(page.imageUrl) ? (
         <img
-          src={stringValue(page.imageUrl)}
+          src={backendUrl(page.imageUrl)}
           alt={t("mangaGallery.pageAlt", { number: page.pageNumber })}
           className="w-full h-full object-cover"
           onClick={onSelect}
@@ -356,6 +502,14 @@ function PageThumbnail({
           P.{page.pageNumber}
         </span>
       </div>
+
+      {dramaCount > 0 && (
+        <div className="absolute bottom-2 left-2">
+          <span className="inline-flex items-center gap-1 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+            <Clapperboard size={11} /> {dramaCount}
+          </span>
+        </div>
+      )}
 
       {/* Hover Actions */}
       {showActions && (

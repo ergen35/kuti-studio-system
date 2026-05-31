@@ -405,6 +405,7 @@ export const ModelName = {
   GenerationBoardPanel: 'GenerationBoardPanel',
   SceneGenerationConfig: 'SceneGenerationConfig',
   SceneMangaPage: 'SceneMangaPage',
+  DramaVideo: 'DramaVideo',
   Version: 'Version',
   Warning: 'Warning',
   ExportRecord: 'ExportRecord'
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "project" | "character" | "characterRelation" | "voiceSample" | "characterImage" | "tome" | "chapter" | "scene" | "storyReference" | "asset" | "assetLink" | "generationJob" | "generationJobStep" | "generationBoard" | "generationBoardPanel" | "sceneGenerationConfig" | "sceneMangaPage" | "version" | "warning" | "exportRecord"
+    modelProps: "user" | "session" | "account" | "verification" | "project" | "character" | "characterRelation" | "voiceSample" | "characterImage" | "tome" | "chapter" | "scene" | "storyReference" | "asset" | "assetLink" | "generationJob" | "generationJobStep" | "generationBoard" | "generationBoardPanel" | "sceneGenerationConfig" | "sceneMangaPage" | "dramaVideo" | "version" | "warning" | "exportRecord"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1981,6 +1982,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DramaVideo: {
+      payload: Prisma.$DramaVideoPayload<ExtArgs>
+      fields: Prisma.DramaVideoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DramaVideoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DramaVideoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
+        }
+        findFirst: {
+          args: Prisma.DramaVideoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DramaVideoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
+        }
+        findMany: {
+          args: Prisma.DramaVideoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>[]
+        }
+        create: {
+          args: Prisma.DramaVideoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
+        }
+        createMany: {
+          args: Prisma.DramaVideoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DramaVideoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>[]
+        }
+        delete: {
+          args: Prisma.DramaVideoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
+        }
+        update: {
+          args: Prisma.DramaVideoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
+        }
+        deleteMany: {
+          args: Prisma.DramaVideoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DramaVideoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DramaVideoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>[]
+        }
+        upsert: {
+          args: Prisma.DramaVideoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
+        }
+        aggregate: {
+          args: Prisma.DramaVideoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDramaVideo>
+        }
+        groupBy: {
+          args: Prisma.DramaVideoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DramaVideoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DramaVideoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DramaVideoCountAggregateOutputType> | number
+        }
+      }
+    }
     Version: {
       payload: Prisma.$VersionPayload<ExtArgs>
       fields: Prisma.VersionFieldRefs
@@ -2620,6 +2695,30 @@ export const SceneMangaPageScalarFieldEnum = {
 export type SceneMangaPageScalarFieldEnum = (typeof SceneMangaPageScalarFieldEnum)[keyof typeof SceneMangaPageScalarFieldEnum]
 
 
+export const DramaVideoScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  sourceMangaPageId: 'sourceMangaPageId',
+  jobId: 'jobId',
+  title: 'title',
+  prompt: 'prompt',
+  modelKey: 'modelKey',
+  stylePreset: 'stylePreset',
+  status: 'status',
+  videoPath: 'videoPath',
+  videoUrl: 'videoUrl',
+  durationSeconds: 'durationSeconds',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  completedAt: 'completedAt',
+  failedAt: 'failedAt',
+  errorMessage: 'errorMessage'
+} as const
+
+export type DramaVideoScalarFieldEnum = (typeof DramaVideoScalarFieldEnum)[keyof typeof DramaVideoScalarFieldEnum]
+
+
 export const VersionScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -2967,6 +3066,20 @@ export type ListEnumMangaPageStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'DramaVideoStatus'
+ */
+export type EnumDramaVideoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DramaVideoStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DramaVideoStatus[]'
+ */
+export type ListEnumDramaVideoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DramaVideoStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'WarningSeverity'
  */
 export type EnumWarningSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WarningSeverity'>
@@ -3180,6 +3293,7 @@ export type GlobalOmitConfig = {
   generationBoardPanel?: Prisma.GenerationBoardPanelOmit
   sceneGenerationConfig?: Prisma.SceneGenerationConfigOmit
   sceneMangaPage?: Prisma.SceneMangaPageOmit
+  dramaVideo?: Prisma.DramaVideoOmit
   version?: Prisma.VersionOmit
   warning?: Prisma.WarningOmit
   exportRecord?: Prisma.ExportRecordOmit

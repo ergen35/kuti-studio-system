@@ -72,6 +72,7 @@ export const ModelName = {
   GenerationBoardPanel: 'GenerationBoardPanel',
   SceneGenerationConfig: 'SceneGenerationConfig',
   SceneMangaPage: 'SceneMangaPage',
+  DramaVideo: 'DramaVideo',
   Version: 'Version',
   Warning: 'Warning',
   ExportRecord: 'ExportRecord'
@@ -469,6 +470,30 @@ export const SceneMangaPageScalarFieldEnum = {
 } as const
 
 export type SceneMangaPageScalarFieldEnum = (typeof SceneMangaPageScalarFieldEnum)[keyof typeof SceneMangaPageScalarFieldEnum]
+
+
+export const DramaVideoScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  sourceMangaPageId: 'sourceMangaPageId',
+  jobId: 'jobId',
+  title: 'title',
+  prompt: 'prompt',
+  modelKey: 'modelKey',
+  stylePreset: 'stylePreset',
+  status: 'status',
+  videoPath: 'videoPath',
+  videoUrl: 'videoUrl',
+  durationSeconds: 'durationSeconds',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  completedAt: 'completedAt',
+  failedAt: 'failedAt',
+  errorMessage: 'errorMessage'
+} as const
+
+export type DramaVideoScalarFieldEnum = (typeof DramaVideoScalarFieldEnum)[keyof typeof DramaVideoScalarFieldEnum]
 
 
 export const VersionScalarFieldEnum = {

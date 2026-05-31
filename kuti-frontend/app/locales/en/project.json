@@ -23,6 +23,10 @@
       "title": "Generation",
       "description": "Launch image or video generation jobs from story sources."
     },
+    "dramaVideos": {
+      "title": "Drama videos",
+      "description": "Review Korean-drama-style videos generated from approved manga pages."
+    },
     "assets": {
       "title": "Assets",
       "description": "Import local files and link them to project entities."

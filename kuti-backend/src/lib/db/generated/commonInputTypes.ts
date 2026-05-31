@@ -487,6 +487,23 @@ export type EnumMangaPageStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumMangaPageStatusFilter<$PrismaModel>
 }
 
+export type EnumDramaVideoStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DramaVideoStatus | Prisma.EnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDramaVideoStatusFilter<$PrismaModel> | $Enums.DramaVideoStatus
+}
+
+export type EnumDramaVideoStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DramaVideoStatus | Prisma.EnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDramaVideoStatusWithAggregatesFilter<$PrismaModel> | $Enums.DramaVideoStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDramaVideoStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDramaVideoStatusFilter<$PrismaModel>
+}
+
 export type EnumWarningSeverityFilter<$PrismaModel = never> = {
   equals?: $Enums.WarningSeverity | Prisma.EnumWarningSeverityFieldRefInput<$PrismaModel>
   in?: $Enums.WarningSeverity[] | Prisma.ListEnumWarningSeverityFieldRefInput<$PrismaModel>
@@ -1029,6 +1046,23 @@ export type NestedEnumMangaPageStatusWithAggregatesFilter<$PrismaModel = never> 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMangaPageStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMangaPageStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumDramaVideoStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.DramaVideoStatus | Prisma.EnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDramaVideoStatusFilter<$PrismaModel> | $Enums.DramaVideoStatus
+}
+
+export type NestedEnumDramaVideoStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DramaVideoStatus | Prisma.EnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DramaVideoStatus[] | Prisma.ListEnumDramaVideoStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDramaVideoStatusWithAggregatesFilter<$PrismaModel> | $Enums.DramaVideoStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDramaVideoStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDramaVideoStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumWarningSeverityFilter<$PrismaModel = never> = {

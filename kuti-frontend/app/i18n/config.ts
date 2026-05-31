@@ -16,6 +16,7 @@ import enVersions from '~/locales/en/versions.json';
 import enExports from '~/locales/en/exports.json';
 import enSettings from '~/locales/en/settings.json';
 import enTasks from '~/locales/en/tasks.json';
+import enDrama from '~/locales/en/drama.json';
 
 // Import namespaces FR
 import frCommon from '~/locales/fr/common.json';
@@ -31,6 +32,7 @@ import frVersions from '~/locales/fr/versions.json';
 import frExports from '~/locales/fr/exports.json';
 import frSettings from '~/locales/fr/settings.json';
 import frTasks from '~/locales/fr/tasks.json';
+import frDrama from '~/locales/fr/drama.json';
 
 export const resources = {
   en: {
@@ -47,6 +49,7 @@ export const resources = {
     exports: enExports,
     settings: enSettings,
     tasks: enTasks,
+    drama: enDrama,
   },
   fr: {
     common: frCommon,
@@ -62,6 +65,7 @@ export const resources = {
     exports: frExports,
     settings: frSettings,
     tasks: frTasks,
+    drama: frDrama,
   },
 } as const;
 
@@ -91,6 +95,7 @@ export function initI18n() {
         'exports',
         'settings',
         'tasks',
+        'drama',
       ],
       interpolation: {
         escapeValue: false,

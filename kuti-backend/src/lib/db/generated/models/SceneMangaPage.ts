@@ -305,6 +305,7 @@ export type SceneMangaPageWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  dramaVideos?: Prisma.DramaVideoListRelationFilter
 }
 
 export type SceneMangaPageOrderByWithRelationInput = {
@@ -325,6 +326,7 @@ export type SceneMangaPageOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
+  dramaVideos?: Prisma.DramaVideoOrderByRelationAggregateInput
 }
 
 export type SceneMangaPageWhereUniqueInput = Prisma.AtLeast<{
@@ -348,6 +350,7 @@ export type SceneMangaPageWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  dramaVideos?: Prisma.DramaVideoListRelationFilter
 }, "id">
 
 export type SceneMangaPageOrderByWithAggregationInput = {
@@ -413,6 +416,7 @@ export type SceneMangaPageCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutSceneMangaPagesInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutSourceMangaPageInput
 }
 
 export type SceneMangaPageUncheckedCreateInput = {
@@ -432,6 +436,7 @@ export type SceneMangaPageUncheckedCreateInput = {
   prompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutSourceMangaPageInput
 }
 
 export type SceneMangaPageUpdateInput = {
@@ -451,6 +456,7 @@ export type SceneMangaPageUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutSceneMangaPagesNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutSourceMangaPageNestedInput
 }
 
 export type SceneMangaPageUncheckedUpdateInput = {
@@ -470,6 +476,7 @@ export type SceneMangaPageUncheckedUpdateInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutSourceMangaPageNestedInput
 }
 
 export type SceneMangaPageCreateManyInput = {
@@ -603,6 +610,11 @@ export type SceneMangaPageSumOrderByAggregateInput = {
   pageNumber?: Prisma.SortOrder
 }
 
+export type SceneMangaPageNullableScalarRelationFilter = {
+  is?: Prisma.SceneMangaPageWhereInput | null
+  isNot?: Prisma.SceneMangaPageWhereInput | null
+}
+
 export type SceneMangaPageCreateNestedManyWithoutProjectInput = {
   create?: Prisma.XOR<Prisma.SceneMangaPageCreateWithoutProjectInput, Prisma.SceneMangaPageUncheckedCreateWithoutProjectInput> | Prisma.SceneMangaPageCreateWithoutProjectInput[] | Prisma.SceneMangaPageUncheckedCreateWithoutProjectInput[]
   connectOrCreate?: Prisma.SceneMangaPageCreateOrConnectWithoutProjectInput | Prisma.SceneMangaPageCreateOrConnectWithoutProjectInput[]
@@ -649,6 +661,22 @@ export type EnumMangaPageStatusFieldUpdateOperationsInput = {
   set?: $Enums.MangaPageStatus
 }
 
+export type SceneMangaPageCreateNestedOneWithoutDramaVideosInput = {
+  create?: Prisma.XOR<Prisma.SceneMangaPageCreateWithoutDramaVideosInput, Prisma.SceneMangaPageUncheckedCreateWithoutDramaVideosInput>
+  connectOrCreate?: Prisma.SceneMangaPageCreateOrConnectWithoutDramaVideosInput
+  connect?: Prisma.SceneMangaPageWhereUniqueInput
+}
+
+export type SceneMangaPageUpdateOneWithoutDramaVideosNestedInput = {
+  create?: Prisma.XOR<Prisma.SceneMangaPageCreateWithoutDramaVideosInput, Prisma.SceneMangaPageUncheckedCreateWithoutDramaVideosInput>
+  connectOrCreate?: Prisma.SceneMangaPageCreateOrConnectWithoutDramaVideosInput
+  upsert?: Prisma.SceneMangaPageUpsertWithoutDramaVideosInput
+  disconnect?: Prisma.SceneMangaPageWhereInput | boolean
+  delete?: Prisma.SceneMangaPageWhereInput | boolean
+  connect?: Prisma.SceneMangaPageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SceneMangaPageUpdateToOneWithWhereWithoutDramaVideosInput, Prisma.SceneMangaPageUpdateWithoutDramaVideosInput>, Prisma.SceneMangaPageUncheckedUpdateWithoutDramaVideosInput>
+}
+
 export type SceneMangaPageCreateWithoutProjectInput = {
   id?: string
   sceneId: string
@@ -665,6 +693,7 @@ export type SceneMangaPageCreateWithoutProjectInput = {
   prompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutSourceMangaPageInput
 }
 
 export type SceneMangaPageUncheckedCreateWithoutProjectInput = {
@@ -683,6 +712,7 @@ export type SceneMangaPageUncheckedCreateWithoutProjectInput = {
   prompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutSourceMangaPageInput
 }
 
 export type SceneMangaPageCreateOrConnectWithoutProjectInput = {
@@ -733,6 +763,98 @@ export type SceneMangaPageScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
 }
 
+export type SceneMangaPageCreateWithoutDramaVideosInput = {
+  id?: string
+  sceneId: string
+  tomeId: string
+  chapterId: string
+  jobId: string
+  boardId: string
+  panelId: string
+  pageNumber: number
+  label: string
+  status?: $Enums.MangaPageStatus
+  imageUrl?: string | null
+  caption?: string | null
+  prompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutSceneMangaPagesInput
+}
+
+export type SceneMangaPageUncheckedCreateWithoutDramaVideosInput = {
+  id?: string
+  projectId: string
+  sceneId: string
+  tomeId: string
+  chapterId: string
+  jobId: string
+  boardId: string
+  panelId: string
+  pageNumber: number
+  label: string
+  status?: $Enums.MangaPageStatus
+  imageUrl?: string | null
+  caption?: string | null
+  prompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SceneMangaPageCreateOrConnectWithoutDramaVideosInput = {
+  where: Prisma.SceneMangaPageWhereUniqueInput
+  create: Prisma.XOR<Prisma.SceneMangaPageCreateWithoutDramaVideosInput, Prisma.SceneMangaPageUncheckedCreateWithoutDramaVideosInput>
+}
+
+export type SceneMangaPageUpsertWithoutDramaVideosInput = {
+  update: Prisma.XOR<Prisma.SceneMangaPageUpdateWithoutDramaVideosInput, Prisma.SceneMangaPageUncheckedUpdateWithoutDramaVideosInput>
+  create: Prisma.XOR<Prisma.SceneMangaPageCreateWithoutDramaVideosInput, Prisma.SceneMangaPageUncheckedCreateWithoutDramaVideosInput>
+  where?: Prisma.SceneMangaPageWhereInput
+}
+
+export type SceneMangaPageUpdateToOneWithWhereWithoutDramaVideosInput = {
+  where?: Prisma.SceneMangaPageWhereInput
+  data: Prisma.XOR<Prisma.SceneMangaPageUpdateWithoutDramaVideosInput, Prisma.SceneMangaPageUncheckedUpdateWithoutDramaVideosInput>
+}
+
+export type SceneMangaPageUpdateWithoutDramaVideosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sceneId?: Prisma.StringFieldUpdateOperationsInput | string
+  tomeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chapterId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  boardId?: Prisma.StringFieldUpdateOperationsInput | string
+  panelId?: Prisma.StringFieldUpdateOperationsInput | string
+  pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumMangaPageStatusFieldUpdateOperationsInput | $Enums.MangaPageStatus
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutSceneMangaPagesNestedInput
+}
+
+export type SceneMangaPageUncheckedUpdateWithoutDramaVideosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  sceneId?: Prisma.StringFieldUpdateOperationsInput | string
+  tomeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chapterId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  boardId?: Prisma.StringFieldUpdateOperationsInput | string
+  panelId?: Prisma.StringFieldUpdateOperationsInput | string
+  pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumMangaPageStatusFieldUpdateOperationsInput | $Enums.MangaPageStatus
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type SceneMangaPageCreateManyProjectInput = {
   id?: string
   sceneId: string
@@ -767,6 +889,7 @@ export type SceneMangaPageUpdateWithoutProjectInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutSourceMangaPageNestedInput
 }
 
 export type SceneMangaPageUncheckedUpdateWithoutProjectInput = {
@@ -785,6 +908,7 @@ export type SceneMangaPageUncheckedUpdateWithoutProjectInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutSourceMangaPageNestedInput
 }
 
 export type SceneMangaPageUncheckedUpdateManyWithoutProjectInput = {
@@ -806,6 +930,35 @@ export type SceneMangaPageUncheckedUpdateManyWithoutProjectInput = {
 }
 
 
+/**
+ * Count Type SceneMangaPageCountOutputType
+ */
+
+export type SceneMangaPageCountOutputType = {
+  dramaVideos: number
+}
+
+export type SceneMangaPageCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  dramaVideos?: boolean | SceneMangaPageCountOutputTypeCountDramaVideosArgs
+}
+
+/**
+ * SceneMangaPageCountOutputType without action
+ */
+export type SceneMangaPageCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SceneMangaPageCountOutputType
+   */
+  select?: Prisma.SceneMangaPageCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * SceneMangaPageCountOutputType without action
+ */
+export type SceneMangaPageCountOutputTypeCountDramaVideosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DramaVideoWhereInput
+}
+
 
 export type SceneMangaPageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -825,6 +978,8 @@ export type SceneMangaPageSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  dramaVideos?: boolean | Prisma.SceneMangaPage$dramaVideosArgs<ExtArgs>
+  _count?: boolean | Prisma.SceneMangaPageCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["sceneMangaPage"]>
 
 export type SceneMangaPageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -889,6 +1044,8 @@ export type SceneMangaPageSelectScalar = {
 export type SceneMangaPageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sceneId" | "tomeId" | "chapterId" | "jobId" | "boardId" | "panelId" | "pageNumber" | "label" | "status" | "imageUrl" | "caption" | "prompt" | "createdAt" | "updatedAt", ExtArgs["result"]["sceneMangaPage"]>
 export type SceneMangaPageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  dramaVideos?: boolean | Prisma.SceneMangaPage$dramaVideosArgs<ExtArgs>
+  _count?: boolean | Prisma.SceneMangaPageCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SceneMangaPageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -901,6 +1058,7 @@ export type $SceneMangaPagePayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "SceneMangaPage"
   objects: {
     project: Prisma.$ProjectPayload<ExtArgs>
+    dramaVideos: Prisma.$DramaVideoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1314,6 +1472,7 @@ readonly fields: SceneMangaPageFieldRefs;
 export interface Prisma__SceneMangaPageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  dramaVideos<T extends Prisma.SceneMangaPage$dramaVideosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SceneMangaPage$dramaVideosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DramaVideoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1757,6 +1916,30 @@ export type SceneMangaPageDeleteManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many SceneMangaPages to delete.
    */
   limit?: number
+}
+
+/**
+ * SceneMangaPage.dramaVideos
+ */
+export type SceneMangaPage$dramaVideosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DramaVideo
+   */
+  select?: Prisma.DramaVideoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DramaVideo
+   */
+  omit?: Prisma.DramaVideoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DramaVideoInclude<ExtArgs> | null
+  where?: Prisma.DramaVideoWhereInput
+  orderBy?: Prisma.DramaVideoOrderByWithRelationInput | Prisma.DramaVideoOrderByWithRelationInput[]
+  cursor?: Prisma.DramaVideoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DramaVideoScalarFieldEnum | Prisma.DramaVideoScalarFieldEnum[]
 }
 
 /**

@@ -121,7 +121,7 @@ export async function createGenerationJob(
       sourceLabel: sourceInfo.label,
       sourceVersionId: data.sourceVersionId ?? null,
       strategy: data.strategy,
-      entrypoint: "gpt-2-images",
+      entrypoint: data.modelKey || "gpt_images_2",
       title: data.title || `${sourceInfo.label} · ${data.strategy} generation`,
       prompt: "", // Sera rempli par le worker
       summary: data.summary ?? "",
@@ -302,7 +302,11 @@ export async function getGenerationPanelImage(
 
   // Essayer de détecter le mime type depuis les metadata
   const metadata = panel.metadataJson as Record<string, unknown>;
-  const mimeType = (metadata?.["mime_type"] as string) || "image/png";
+  const mimeType = typeof metadata.mimeType === "string"
+    ? metadata.mimeType
+    : typeof metadata["mime_type"] === "string"
+      ? metadata["mime_type"]
+      : "image/png";
 
   return { buffer, mimeType };
 }

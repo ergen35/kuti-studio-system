@@ -4,12 +4,27 @@
  */
 
 import { randomUUIDv7 } from "bun";
-import { resolveModelProvider } from "../config";
 import { db } from "../db";
 import type { GenerationJobStatus, GenerationSourceKind, GenerationStepStatus } from "../db/generated/enums";
 import { getFileStats, writeFile } from "../filesystem";
+import { generateImage } from "../model-providers";
 import { getProjectDir } from "../paths";
 import { inngest } from "./client";
+
+type CharacterForPrompt = {
+  id: string;
+  name: string;
+  description: string;
+  images?: Array<{ filePath: string; publicUrl: string; fileName: string }>;
+};
+
+type SelectedImageForPrompt = {
+  id: string;
+  characterId: string;
+  filePath: string;
+  publicUrl: string;
+  fileName: string;
+};
 
 // ============================================================================
 // Fonction Inngest
@@ -23,7 +38,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
     triggers: [{ event: "kuti/generate-scene-manga" }],
   },
   async ({ event, step }) => {
-    const { projectId, sceneId, configId, imageCount, characterImageRefs, additionalContext } = event.data;
+    const { projectId, sceneId, jobId, configId, modelKey, imageCount, characterImageRefs, additionalContext } = event.data;
 
     // ============================================================================
     // Step 1: Récupérer le contexte (scène, projet, config)
@@ -48,50 +63,65 @@ export const generateSceneMangaFunction = inngest.createFunction(
       if (!scene) throw new Error(`Scene ${sceneId} not found`);
       if (!project) throw new Error(`Project ${projectId} not found`);
 
-      // Récupérer les personnages de la scène
-      const characters = scene.charactersJson as string[];
-      const characterDetails =
-        characters.length > 0
-          ? await db.character.findMany({
-              where: {
-                id: { in: characters },
-                projectId,
-              },
-              include: {
-                images: {
-                  take: 1,
-                  orderBy: { createdAt: "desc" },
-                },
-              },
-            })
-          : [];
+      const sceneCharacterRefs = jsonStringArray(scene.charactersJson);
+      const selectedCharacterIds = Object.keys(characterImageRefs ?? {});
+      const selectedImageIds = Object.values(characterImageRefs ?? {}).filter(
+        (value): value is string => typeof value === "string" && value.trim().length > 0,
+      );
+      const characterLookupValues = Array.from(new Set([...sceneCharacterRefs, ...selectedCharacterIds]));
 
-      return { scene, project, sceneConfig, characterDetails };
+      const characterDetails: CharacterForPrompt[] = characterLookupValues.length > 0
+        ? await db.character.findMany({
+            where: {
+              projectId,
+              OR: [
+                { id: { in: characterLookupValues } },
+                { slug: { in: characterLookupValues } },
+                { name: { in: characterLookupValues } },
+              ],
+            },
+            include: {
+              images: {
+                take: 1,
+                orderBy: { createdAt: "desc" },
+              },
+            },
+          })
+        : [];
+
+      const selectedImages: SelectedImageForPrompt[] = selectedImageIds.length > 0
+        ? await db.characterImage.findMany({ where: { projectId, id: { in: selectedImageIds } } })
+        : [];
+
+      return { scene, project, sceneConfig, characterDetails, selectedImages };
     });
 
-    const { scene, project, sceneConfig, characterDetails } = context;
+    const { scene, project, sceneConfig, characterDetails, selectedImages } = context;
 
     // ============================================================================
-    // Step 2: Créer un job de génération
+    // Step 2: Utiliser le job créé par l'API
     // ============================================================================
-    const job = await step.run("create-generation-job", async () => {
-      return await db.generationJob.create({
+    const job = await step.run("mark-generation-job-running", async () => {
+      const existing = await db.generationJob.findFirst({ where: { id: jobId, projectId, sourceId: sceneId } });
+      if (!existing) throw new Error(`Generation job ${jobId} not found`);
+
+      return await db.generationJob.update({
+        where: { id: existing.id },
         data: {
-          projectId,
           sourceKind: "scene" as GenerationSourceKind,
-          sourceId: sceneId,
           sourceLabel: `${scene.tome?.title || "Tome"} > ${scene.chapter?.title || "Chapter"} > ${scene.title}`,
-          sourceVersionId: null,
           strategy: "intermediate",
-          entrypoint: "gpt-2-images",
+          entrypoint: modelKey || "gpt_images_2",
           title: `Manga: ${scene.title}`,
           prompt: buildScenePrompt(scene, characterDetails, additionalContext),
           summary: "",
           status: "running" as GenerationJobStatus,
           progress: 5,
           metadataJson: {
+            ...(existing.metadataJson as Record<string, unknown>),
             sceneId,
             configId: sceneConfig?.id,
+            modelKey,
             characterCount: characterDetails.length,
           },
         },
@@ -104,7 +134,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
     const storyboard = await step.run("generate-storyboard", async () => {
       // Simuler un storyboard basé sur le contenu de la scène
       // Dans une vraie implémentation, on pourrait appeler une API LLM
-      const panels = generatePanelsFromContent(scene.content, imageCount || 6);
+      const panels = generatePanelsFromContent(scene.content || scene.summary, imageCount || 6, scene.title);
 
       await db.generationJob.update({
         where: { id: job.id },
@@ -174,7 +204,6 @@ export const generateSceneMangaFunction = inngest.createFunction(
     // ============================================================================
     // Step 5: Générer chaque image de panel
     // ============================================================================
-    const provider = resolveModelProvider(undefined, "image");
     const panels = await db.generationBoardPanel.findMany({
       where: { boardId: board.id },
       orderBy: { orderIndex: "asc" },
@@ -198,17 +227,19 @@ export const generateSceneMangaFunction = inngest.createFunction(
 
         try {
           // Construire le prompt amélioré avec les refs de personnages
-          const prompt = buildPanelPrompt(panel.prompt, characterDetails, characterImageRefs, sceneConfig);
+          const prompt = buildPanelPrompt(panel.prompt, characterDetails, characterImageRefs, selectedImages, sceneConfig);
 
-          // Appeler l'API de génération
-          const imageData = await callImageGenerationAPI(provider, prompt);
+          const generatedImage = await generateImage(prompt, {
+            modelKey,
+            size: "1024x1536",
+            timeoutSeconds: 180,
+          });
 
           // Sauvegarder l'image
-          const ext = ".png";
-          const fileName = `panel-${panel.orderIndex}_${randomUUIDv7("base64url")}${ext}`;
+          const fileName = `panel-${panel.orderIndex}_${randomUUIDv7("base64url")}${generatedImage.fileExtension}`;
           const filePath = `${getProjectDir(project.slug)}/generation/${job.id}/${fileName}`;
 
-          await writeFile(filePath, imageData);
+          await writeFile(filePath, generatedImage.content);
 
           const stats = await getFileStats(filePath);
 
@@ -218,6 +249,11 @@ export const generateSceneMangaFunction = inngest.createFunction(
             data: {
               imagePath: filePath,
               imageName: fileName,
+              metadataJson: {
+                ...(panel.metadataJson as Record<string, unknown>),
+                mimeType: generatedImage.mimeType,
+                sizeBytes: stats.size,
+              },
             },
           });
 
@@ -229,6 +265,11 @@ export const generateSceneMangaFunction = inngest.createFunction(
                 status: "ready" as GenerationStepStatus,
                 artifactPath: filePath,
                 artifactName: fileName,
+                metadataJson: {
+                  ...(stepRecord.metadataJson as Record<string, unknown>),
+                  mimeType: generatedImage.mimeType,
+                  sizeBytes: stats.size,
+                },
                 completedAt: new Date(),
               },
             });
@@ -379,10 +420,21 @@ function buildScenePrompt(
   return parts.join("\n\n");
 }
 
+function jsonStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+}
+
 function buildPanelPrompt(
   basePrompt: string,
-  characters: Array<{ id: string; name: string; description: string; }>,
+  characters: Array<{
+    id: string;
+    name: string;
+    description: string;
+    images?: Array<{ filePath: string; publicUrl: string; fileName: string }>;
+  }>,
   characterImageRefs?: Record<string, string>,
+  selectedImages?: Array<{ id: string; characterId: string; filePath: string; publicUrl: string; fileName: string }>,
   config?: {
     systemPrompt?: string;
     stylePreset?: string;
@@ -424,13 +476,15 @@ function buildPanelPrompt(
   }
 
   // Références des personnages (si disponibles)
-  if (characterImageRefs && Object.keys(characterImageRefs).length > 0) {
+  const selectedImageById = new Map((selectedImages ?? []).map((image) => [image.id, image]));
+  if (characters.length > 0) {
     parts.push("Character references:");
-    for (const [charId, imageRef] of Object.entries(characterImageRefs)) {
-      const char = characters.find((c) => c.id === charId);
-      if (char) {
-        parts.push(`- ${char.name}: ${imageRef}`);
-      }
+    for (const char of characters) {
+      const selectedImageId = characterImageRefs?.[char.id];
+      const selectedImage = selectedImageId ? selectedImageById.get(selectedImageId) : null;
+      const fallbackImage = char.images?.[0] ?? null;
+      const imageRef = selectedImage?.publicUrl || selectedImage?.filePath || fallbackImage?.publicUrl || fallbackImage?.filePath || "no visual reference selected";
+      parts.push(`- ${char.name}${char.description ? ` (${char.description})` : ""}: ${imageRef}`);
     }
   }
 
@@ -447,79 +501,74 @@ interface PanelDefinition {
   description: string;
 }
 
-function generatePanelsFromContent(content: string, targetCount: number): PanelDefinition[] {
-  // Découper le contenu en segments
-  const sentences = content
-    .split(/[.!?]+/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 10);
+function generatePanelsFromContent(content: string, targetCount: number, sceneTitle = "Scene"): PanelDefinition[] {
+  const beats = extractVisualBeats(content, sceneTitle);
 
   const panels: PanelDefinition[] = [];
-  const count = Math.min(targetCount, Math.max(3, sentences.length));
+  const count = Math.max(1, targetCount);
 
   for (let i = 0; i < count; i++) {
-    const sentence = sentences[i] || `Scene part ${i + 1}`;
+    const beat = beats[i] || beats[i % beats.length] || `${sceneTitle} - visual beat ${i + 1}`;
     panels.push({
       title: `Panel ${i + 1}`,
-      caption: sentence.substring(0, 100),
-      prompt: `Illustrate this moment: ${sentence}`,
-      description: sentence,
+      caption: beat.substring(0, 140),
+      prompt: `Illustrate this manga story beat: ${beat}`,
+      description: beat,
     });
   }
 
   return panels;
 }
 
-async function callImageGenerationAPI(
-  provider: {
-    baseUrl: string | null;
-    apiKey: string | null;
-    apiModel: string | null;
-  },
-  prompt: string,
-): Promise<Buffer> {
-  if (!provider.baseUrl || !provider.apiKey) {
-    throw new Error("Provider not configured");
+function extractVisualBeats(content: string, fallbackTitle: string): string[] {
+  const source = content.replace(/\r/g, "").trim();
+  if (!source) return [`${fallbackTitle} - visual beat 1`];
+
+  const lineBeats = source
+    .split(/\n+/)
+    .map(cleanVisualBeat)
+    .filter((line) => line.length >= 18 && !isDialogueOnly(line) && !isSoundOnly(line));
+
+  if (lineBeats.length >= 2) return uniqueBeats(lineBeats);
+
+  const paragraphBeats = source
+    .split(/\n\s*\n+/)
+    .flatMap((paragraph) => paragraph.split(/(?<=[.!?。！？])\s+/))
+    .map(cleanVisualBeat)
+    .filter((beat) => beat.length >= 18 && !isDialogueOnly(beat) && !isSoundOnly(beat));
+
+  const beats = uniqueBeats([...lineBeats, ...paragraphBeats]);
+  return beats.length > 0 ? beats : [`${fallbackTitle} - visual beat 1`];
+}
+
+function cleanVisualBeat(value: string): string {
+  return value
+    .replace(/^[-*•]\s+/, "")
+    .replace(/^\[(.+?)\]\s*[-—:]?\s*/u, "$1. ")
+    .replace(/[\[\]]/g, "")
+    .replace(/\.\s*([.!?])/g, "$1")
+    .replace(/([.!?])\1+/g, "$1")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.!?;:])/g, "$1")
+    .trim();
+}
+
+function isDialogueOnly(value: string): boolean {
+  return /^[A-ZÀ-ÖØ-Þ0-9 _'’.-]{2,}\s*[:：]/.test(value) && value.length < 160;
+}
+
+function isSoundOnly(value: string): boolean {
+  return /^Son\s*[—:-]/i.test(value) || /^SFX\s*[—:-]/i.test(value);
+}
+
+function uniqueBeats(beats: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const beat of beats) {
+    const key = beat.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(beat);
   }
-
-  const baseUrl = provider.baseUrl.replace(/\/$/, "");
-  const response = await fetch(`${baseUrl}/images/generations`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${provider.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: provider.apiModel || "gpt-image-2",
-      prompt,
-      n: 1,
-      size: "1024x1024",
-      quality: "high",
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Image generation failed: ${error}`);
-  }
-
-  const result = (await response.json()) as {
-    data: Array<{ b64_json?: string; url?: string }>;
-  };
-
-  const imageData = result.data[0];
-
-  if (imageData.b64_json) {
-    return Buffer.from(imageData.b64_json, "base64");
-  }
-
-  if (imageData.url) {
-    const imageResponse = await fetch(imageData.url);
-    if (!imageResponse.ok) {
-      throw new Error("Failed to download generated image");
-    }
-    return Buffer.from(await imageResponse.arrayBuffer());
-  }
-
-  throw new Error("No image data received from API");
+  return result;
 }

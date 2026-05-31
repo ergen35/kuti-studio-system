@@ -17,12 +17,13 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
 import type { GetStorySummaryResponse, UpdateTomeData } from '~/lib/backend/types.gen';
 import type { Options } from '~/lib/backend';
 import { getStorySummaryOptions, updateTomeMutation, createChapterMutation } from '~/lib/backend/@tanstack/react-query.gen';
 import { apiErrorMessage } from '~/lib/errors';
 import { invalidateWorkspace } from '~/lib/query';
-import { StoryBreadcrumb } from '~/components/story';
+import { StoryBreadcrumb, StoryCompletionButton } from '~/components/story';
 
 // Derive types from GetStorySummaryResponse
 type StoryData = GetStorySummaryResponse;
@@ -222,6 +223,7 @@ function TomeNavigationPanel({
 // Schema for editing tome
 const editTomeSchema = z.object({
   title: z.string().min(1, 'Title is required'),
+  synopsis: z.string().optional(),
 });
 
 type EditTomeInput = z.infer<typeof editTomeSchema>;
@@ -253,15 +255,15 @@ function TomeHeader({
     },
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm<EditTomeInput>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<EditTomeInput>({
     resolver: zodResolver(editTomeSchema),
-    defaultValues: { title: tome.title },
+    defaultValues: { title: tome.title, synopsis: tome.synopsis },
   });
 
   const onSubmit = (data: EditTomeInput) => {
     updateTome.mutate({
       path: { projectId, tomeId },
-      body: { title: data.title }
+      body: { title: data.title, synopsis: data.synopsis }
     } as unknown as Options<UpdateTomeData>);
   };
 
@@ -278,16 +280,41 @@ function TomeHeader({
 
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="mt-2 flex flex-col gap-2">
-              <Field label={t('fields.title')}>
+              <div className="grid gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center justify-between gap-2">
+                  <span>{t('fields.title')}</span>
+                  <StoryCompletionButton
+                    projectId={projectId}
+                    targetKind="tome"
+                    targetId={tomeId}
+                    field="title"
+                    currentValue={watch('title')}
+                    onComplete={(text) => setValue('title', text, { shouldDirty: true, shouldValidate: true })}
+                  />
+                </div>
                 <Input
                   {...register('title')}
                   autoFocus
                   className="w-full text-lg font-semibold"
                 />
-              </Field>
+              </div>
               {errors.title && (
                 <span className="text-danger text-xs">{errors.title.message}</span>
               )}
+              <div className="grid gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center justify-between gap-2">
+                  <span>{t('tome.synopsis')}</span>
+                  <StoryCompletionButton
+                    projectId={projectId}
+                    targetKind="tome"
+                    targetId={tomeId}
+                    field="synopsis"
+                    currentValue={watch('synopsis')}
+                    onComplete={(text) => setValue('synopsis', text, { shouldDirty: true })}
+                  />
+                </div>
+                <Textarea {...register('synopsis')} rows={4} className="w-full" />
+              </div>
               <div className="flex justify-end gap-2">
                 <Button
                   variant="ghost"
