@@ -2,10 +2,26 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { clsx } from "clsx";
-import { X, Sparkles, Eye, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Eye, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "~/hooks/useTranslation";
 import { Button, Badge, ErrorState, LoadingState } from "~/components/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 import { CharacterImageSelector } from "./CharacterImageSelector";
 import type { ListCharactersResponse, GetProjectCharacterImagesResponse, GetStorySummaryResponse } from "~/lib/backend/types.gen";
 
@@ -138,25 +154,19 @@ export function SceneGenerationModal({
     }
   }, [selectedConfigId, generate, generateOptions]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-surface shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/30 shrink-0">
-          <div className="flex items-center gap-3">
-            <Sparkles size={20} className="text-accent" />
-            <h2 className="text-lg font-semibold text-ink">{t("generation.title") || "Générer Planche Manga"}</h2>
-          </div>
-          <Button variant="ghost" className="p-1 h-auto" onClick={onClose}>
-            <X size={20} />
-          </Button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden sm:max-w-2xl">
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="flex items-center gap-2">
+            <Sparkles className="text-accent" />
+            {t("generation.title")}
+          </DialogTitle>
+          <DialogDescription>{t("generation.description")}</DialogDescription>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {configs.isLoading && <LoadingState label="Chargement des configurations..." />}
+        <div className="flex-1 overflow-y-auto py-1 flex flex-col gap-4">
+          {configs.isLoading && <LoadingState label={t("generation.loadingConfigs")} />}
           {configs.error && (
             <ErrorState message={apiErrorMessage(configs.error)} />
           )}
@@ -164,29 +174,35 @@ export function SceneGenerationModal({
           {configs.data && (
             <>
               {/* Config Selector */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-ink">Configuration</label>
-                <select
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-ink">{t("generation.config")}</label>
+                <Select
                   value={selectedConfigId}
-                  onChange={(e) => {
-                    const config = configs.data?.find((c) => c.id === e.target.value);
-                    setSelectedConfigId(e.target.value);
+                  onValueChange={(value) => {
+                    const config = configs.data?.find((c) => c.id === value);
+                    setSelectedConfigId(value);
                     if (config) {
                       setImageCount(config.defaultImageCount);
                     }
                   }}
-                  className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
                 >
-                  {configs.data.map((config) => (
-                    <option key={config.id} value={config.id}>
-                      {config.name} {config.isDefault ? "(Défaut)" : ""}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t("generation.selectConfig")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {configs.data.map((config) => (
+                        <SelectItem key={config.id} value={config.id}>
+                          {config.name} {config.isDefault ? t("generation.defaultConfig") : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
                 {selectedConfig && (
                   <div className="flex items-center gap-2 text-xs">
                     <Badge tone={selectedConfig.colorMode === "bw" ? "default" : "info"}>
-                      {selectedConfig.colorMode === "bw" ? "Noir & Blanc" : "Couleur"}
+                      {selectedConfig.colorMode === "bw" ? t("generation.colorMode.bw") : t("generation.colorMode.color")}
                     </Badge>
                     <Badge tone="default">{selectedConfig.stylePreset}</Badge>
                   </div>
@@ -194,31 +210,33 @@ export function SceneGenerationModal({
               </div>
 
               {/* Image Count */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-ink">Nombre de planches</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-ink">{t("generation.pageCount")}</label>
                 <div className="flex items-center gap-3">
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
                     onClick={() => setImageCount(Math.max(1, imageCount - 1))}
-                    className="w-8 h-8 rounded-lg border border-line hover:bg-surface-2 flex items-center justify-center"
                     disabled={imageCount <= 1}
                   >
                     -
-                  </button>
+                  </Button>
                   <span className="w-8 text-center font-medium">{imageCount}</span>
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
                     onClick={() => setImageCount(Math.min(5, imageCount + 1))}
-                    className="w-8 h-8 rounded-lg border border-line hover:bg-surface-2 flex items-center justify-center"
                     disabled={imageCount >= 5}
                   >
                     +
-                  </button>
+                  </Button>
                 </div>
               </div>
 
               {/* Character References */}
               {characters.length > 0 && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-ink">Références Personnages</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-ink">{t("generation.characterRefs")}</label>
                   <CharacterImageSelector
                     projectId={projectId}
                     characters={characters}
@@ -230,39 +248,41 @@ export function SceneGenerationModal({
               )}
 
               {/* Additional Context */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-ink">Contexte additionnel (optionnel)</label>
-                <textarea
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-ink">{t("generation.additionalContext")}</label>
+                <Textarea
                   value={additionalContext}
                   onChange={(e) => setAdditionalContext(e.target.value)}
-                  placeholder="Ajoutez des précisions sur le style, les angles de caméra, l'ambiance..."
-                  className="w-full min-h-[80px] rounded-lg border border-line bg-surface px-3 py-2 text-sm resize-y"
+                  placeholder={t("generation.additionalContextPlaceholder")}
+                  className="min-h-20 resize-y"
                 />
               </div>
 
               {/* Preview Section */}
               <div className="border border-line rounded-lg overflow-hidden">
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={handlePreviewToggle}
-                  className="w-full flex items-center justify-between p-3 hover:bg-surface-2/30 transition-colors"
+                  className="w-full justify-between p-3"
                 >
                   <div className="flex items-center gap-2">
                     <Eye size={16} className="text-muted" />
-                    <span className="text-sm font-medium">Aperçu du prompt</span>
+                    <span className="text-sm font-medium">{t("generation.promptPreview")}</span>
                   </div>
                   {showPreview ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
+                </Button>
 
                 {showPreview && (
                   <div className="p-3 border-t border-line bg-surface-2/20">
-                    {preview.isPending && <LoadingState label="Génération de l'aperçu..." />}
+                    {preview.isPending && <LoadingState label={t("generation.loadingPreview")} />}
                     {preview.error && (
                       <ErrorState message={apiErrorMessage(preview.error)} />
                     )}
                     {preview.data && (
                       <div className="space-y-3">
                         <div className="text-xs text-muted mb-2">
-                          Style: {preview.data.styleDescription}
+                          {t("generation.styleLabel")}: {preview.data.styleDescription}
                         </div>
                         {preview.data.prompts.map((promptItem, i) => (
                           <div key={i} className="border border-line rounded p-2">
@@ -272,7 +292,7 @@ export function SceneGenerationModal({
                         ))}
                         <details className="text-xs">
                           <summary className="cursor-pointer text-muted hover:text-ink">
-                            Voir le system prompt ({preview.data.systemPrompt.length} caractères)
+                            {t("generation.viewSystemPrompt", { count: preview.data.systemPrompt.length })}
                           </summary>
                           <pre className="mt-2 p-2 bg-ink/5 rounded text-[10px] whitespace-pre-wrap max-h-40 overflow-y-auto">
                             {preview.data.systemPrompt}
@@ -287,10 +307,9 @@ export function SceneGenerationModal({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-2 p-4 border-t border-line bg-surface-2/30 shrink-0">
+        <DialogFooter className="shrink-0">
           <Button variant="ghost" onClick={onClose} disabled={generate.isPending}>
-            Annuler
+            {t("actions.cancel")}
           </Button>
           <Button
             variant="primary"
@@ -299,18 +318,18 @@ export function SceneGenerationModal({
           >
             {generate.isPending ? (
               <>
-                <Loader2 size={16} className="animate-spin mr-2" />
-                Génération...
+                <Loader2 className="animate-spin" />
+                {t("generation.generating")}
               </>
             ) : (
               <>
-                <Sparkles size={16} className="mr-2" />
-                Générer {imageCount > 1 ? `${imageCount} planches` : "la planche"}
+                <Sparkles />
+                {t(imageCount > 1 ? "generation.generateMany" : "generation.generateOne", { count: imageCount })}
               </>
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,6 +3,9 @@ import { clsx } from 'clsx';
 import { Image, Trash2 } from 'lucide-react';
 import { characterImageUrlFromData, type CharacterImageWithUrl } from '~/lib/image-urls';
 import type { ListCharacterImagesResponse } from '~/lib/backend';
+import { Button } from '~/components/ui';
+import { Badge } from '~/components/ui/badge';
+import { useTranslation } from '~/hooks/useTranslation';
 
 type CharacterImage = ListCharacterImagesResponse[number];
 
@@ -15,6 +18,7 @@ interface CharacterImageGalleryProps {
 }
 
 export function CharacterImageGallery({ images = [], projectId, characterId, onImageClick, onDelete }: CharacterImageGalleryProps) {
+  const { t } = useTranslation('characters');
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Build image URL from API response using publicUrl or fallback
@@ -24,9 +28,9 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
   const getStrategyLabel = (strategy: string | null) => {
     if (!strategy) return '';
     const labels: Record<string, string> = {
-      portrait: 'Portrait',
-      full_body: 'Corps',
-      concept: 'Concept',
+      portrait: t('generation.strategy.portrait'),
+      full_body: t('generation.strategy.full_body'),
+      concept: t('generation.strategy.concept'),
     };
     return labels[strategy] || strategy;
   };
@@ -35,10 +39,10 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
   const getStyleLabel = (style: string | null) => {
     if (!style) return '';
     const labels: Record<string, string> = {
-      realistic: 'Réaliste',
-      anime: 'Anime',
-      illustration: 'Illustration',
-      watercolor: 'Aquarelle',
+      realistic: t('generation.style.realistic'),
+      anime: t('generation.style.anime'),
+      illustration: t('generation.style.illustration'),
+      watercolor: t('generation.style.watercolor'),
     };
     return labels[style] || style;
   };
@@ -47,7 +51,7 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
     return (
       <div className="text-center py-6">
         <Image size={32} className="mx-auto text-muted/50 mb-2" />
-        <p className="text-sm text-muted">Aucune image générée</p>
+        <p className="text-sm text-muted">{t('images.empty')}</p>
       </div>
     );
   }
@@ -78,27 +82,29 @@ export function CharacterImageGallery({ images = [], projectId, characterId, onI
             <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm flex flex-col justify-end p-2">
               <div className="flex items-center gap-1 flex-wrap">
                 {typeof image.strategy === 'string' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
+                  <Badge variant="secondary" className="bg-white/10 text-white">
                     {getStrategyLabel(image.strategy)}
-                  </span>
+                  </Badge>
                 )}
                 {typeof image.style === 'string' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/30 text-white">
+                  <Badge variant="secondary" className="bg-white/10 text-white">
                     {getStyleLabel(image.style)}
-                  </span>
+                  </Badge>
                 )}
               </div>
               {onDelete && (
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete(image);
                   }}
-                  className="absolute top-2 right-2 p-1.5 rounded bg-surface/90 text-danger hover:bg-danger hover:text-white transition-colors"
-                  aria-label="Supprimer"
+                  className="absolute top-2 right-2 bg-surface/90 text-danger hover:bg-danger hover:text-white"
+                  aria-label={t('actions.delete')}
                 >
                   <Trash2 size={12} />
-                </button>
+                </Button>
               )}
             </div>
           )}

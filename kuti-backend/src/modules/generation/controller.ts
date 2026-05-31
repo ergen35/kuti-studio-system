@@ -1,6 +1,8 @@
 import { randomUUIDv7 } from "bun";
 import { writeFile, mkdir } from "node:fs/promises";
 import { prisma } from "@lib/db";
+import type { Prisma } from "@lib/db/generated/client";
+import type { GenerationPanelStatus } from "@lib/db/generated/enums";
 import { throwIfNotExists } from "@lib/db/utils";
 import { sendCancelJobEvent, sendRelaunchJobEvent } from "@lib/inngest";
 import type {
@@ -132,7 +134,7 @@ export async function createGenerationJob(
         gridCols: data.gridCols,
         imageCount: data.imageCount,
         modelKey: data.modelKey,
-      },
+      } as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
     },
@@ -224,7 +226,7 @@ export async function validateGenerationBoard(
       metadataJson: {
         ...(board.metadataJson as Record<string, unknown>),
         validationNote: note,
-      },
+      } as Prisma.InputJsonValue,
     },
   });
 
@@ -268,7 +270,7 @@ export async function updateGenerationPanel(
   const updated = await prisma.generationBoardPanel.update({
     where: { id: panelId },
     data: {
-      status: data.status ?? panel.status,
+      status: (data.status ?? panel.status) as GenerationPanelStatus,
       caption: data.caption ?? panel.caption,
       title: data.title ?? panel.title,
       updatedAt: new Date(),
@@ -398,7 +400,7 @@ export async function relaunchGenerationJob(
       summary: originalJob.summary,
       status: "pending",
       progress: 0,
-      metadataJson: originalJob.metadataJson,
+      metadataJson: originalJob.metadataJson as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
     },

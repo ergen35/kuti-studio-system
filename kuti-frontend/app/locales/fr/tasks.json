@@ -1,0 +1,57 @@
+{
+  "title": "Gestionnaire de tâches",
+  "description": "Suivi des jobs de génération en cours",
+  "lastUpdated": "Dernière mise à jour : {{time}}",
+  "loading": "Chargement des tâches...",
+  "empty": "Aucune tâche trouvée",
+  "emptySearch": "Aucun résultat pour votre recherche",
+  "emptyDescription": "Les tâches apparaîtront ici lorsqu'elles seront créées",
+  "activeEmpty": "Aucune tâche active",
+  "sideTitle": "Tâches",
+  "runningCount": "{{count}} en cours",
+  "viewAll": "Voir toutes les tâches",
+  "actions": {
+    "cancelTask": "Annuler",
+    "relaunch": "Relancer"
+  },
+  "search": {
+    "label": "Recherche",
+    "placeholder": "Rechercher par titre, type...",
+    "shortPlaceholder": "Rechercher..."
+  },
+  "statusLabel": "Statuts",
+  "typesLabel": "Types",
+  "status": {
+    "pending": "En attente",
+    "running": "En cours",
+    "ready": "Prêt",
+    "validated": "Validé",
+    "failed": "Échoué"
+  },
+  "sourceKinds": {
+    "tome": "Tome",
+    "chapter": "Chapitre",
+    "scene": "Scène",
+    "panel": "Panel",
+    "custom": "Personnalisé",
+    "character": "Personnage"
+  },
+  "filters": {
+    "title": "Filtres",
+    "all": "Tous",
+    "none": "Aucun",
+    "reset": "Réinitialiser les filtres"
+  },
+  "detail": {
+    "status": "Statut",
+    "type": "Type",
+    "elapsed": "Temps",
+    "progress": "Progrès",
+    "details": "Détails",
+    "jobId": "ID job",
+    "sourceId": "ID source",
+    "source": "Source",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour"
+  }
+}

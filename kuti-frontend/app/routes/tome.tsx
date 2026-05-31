@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
@@ -9,7 +9,16 @@ import { z } from 'zod';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field } from '~/components/ui';
-import type { GetStorySummaryResponse } from '~/lib/backend/types.gen';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import type { GetStorySummaryResponse, UpdateTomeData } from '~/lib/backend/types.gen';
+import type { Options } from '~/lib/backend';
 import { getStorySummaryOptions, updateTomeMutation, createChapterMutation } from '~/lib/backend/@tanstack/react-query.gen';
 import { apiErrorMessage } from '~/lib/errors';
 import { invalidateWorkspace } from '~/lib/query';
@@ -41,22 +50,6 @@ function CreateChapterModal({
     defaultValues: { title: '' },
   });
 
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
-
   useEffect(() => {
     if (isOpen) {
       reset({ title: `${t('sources.chapter')} ${tomeNumber}` });
@@ -67,27 +60,15 @@ function CreateChapterModal({
     onSubmit(data);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm"
-      onClick={(e) => e.target === overlayRef.current && onClose()}
-    >
-      <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-surface shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/30">
-          <h2 className="text-lg font-semibold text-ink">
-            {t('createChapter.title') || 'Nouveau chapitre'}
-          </h2>
-          <Button variant="ghost" onClick={onClose} className="p-1 h-auto">
-            <X size={20} />
-          </Button>
-        </div>
-
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 space-y-4">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('createChapter.title')}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
           <Field label={t('fields.title')}>
-            <input
+            <Input
               {...register('title')}
               autoFocus
               className="w-full"
@@ -97,7 +78,7 @@ function CreateChapterModal({
             <span className="text-danger text-xs">{errors.title.message}</span>
           )}
 
-          <div className="flex justify-end gap-3 pt-2">
+          <DialogFooter>
             <Button
               variant="ghost"
               onClick={onClose}
@@ -119,10 +100,10 @@ function CreateChapterModal({
                 t('actions.save')
               )}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -146,26 +127,30 @@ function ChapterRow({
   const chapterScenes = scenes.filter((s: Scene) => s.chapterId === chapter.id);
 
   return (
-    <button
+    <Button
+      type="button"
+      variant="ghost"
       onClick={() => navigate(`/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`)}
-      className="w-full flex items-center justify-between p-4 rounded-lg border border-line bg-surface hover:border-accent hover:bg-surface-2/30 transition-all text-left"
+      className="flex h-auto min-h-16 w-full items-center justify-between rounded-lg border border-border bg-card p-4 text-left transition-colors hover:border-primary/35 hover:bg-primary/8 hover:text-foreground"
     >
       <div className="flex items-center gap-3">
-        <BookOpen size={18} className="text-accent" />
+        <div className="grid size-9 place-items-center rounded-md bg-primary/10 text-primary">
+          <BookOpen size={18} />
+        </div>
         <div>
-          <span className="text-xs font-bold text-accent/70 block">
+          <span className="block text-xs font-semibold text-primary">
             {t('chapter.number', { number: chapterNumber })}
           </span>
-          <span className="font-medium text-ink">{chapter.title}</span>
+          <span className="font-medium text-foreground">{chapter.title}</span>
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <Badge>
+        <Badge tone="info">
           {chapterScenes.length} {t('tome.scenesCount', { count: chapterScenes.length })}
         </Badge>
-        <ChevronRight size={16} className="text-muted" />
+        <ChevronRight size={16} className="text-muted-foreground" />
       </div>
-    </button>
+    </Button>
   );
 }
 
@@ -187,44 +172,46 @@ function TomeNavigationPanel({
   return (
     <Panel className="!p-3">
       <SectionTitle
-        title={t('tome.navigation.title') || 'Tomes'}
+        title={t('tome.navigation.title')}
         meta={String(sortedTomes.length)}
       />
 
-      <div className="space-y-2 mt-3">
+      <div className="mt-3 flex flex-col gap-2">
         {sortedTomes.map((tome: Tome, index: number) => {
           const isCurrent = tome.id === currentTomeId;
           return (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               key={tome.id}
               onClick={() => navigate(`/projects/${projectId}/story/${tome.id}`)}
               className={clsx(
-                "w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-all",
+                "flex h-auto w-full items-center gap-3 rounded-lg border p-2.5 text-left transition-colors hover:text-foreground",
                 isCurrent
-                  ? "border-accent bg-accent/10 shadow-[inset_3px_0_0_var(--accent)]"
-                  : "border-line bg-surface-2/30 hover:border-accent hover:bg-surface-2/60"
+                  ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_3px_0_0_var(--primary)]"
+                  : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-primary/8"
               )}
             >
               <span className={clsx(
-                "text-xs font-bold",
-                isCurrent ? "text-accent" : "text-accent/70"
+                "text-xs font-semibold",
+                isCurrent ? "text-primary" : "text-muted-foreground"
               )}>
                 {t('tome.shortNumber', { number: index + 1 })}
               </span>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium truncate">{tome.title}</p>
               </div>
               {isCurrent && (
-                <span className="w-2 h-2 rounded-full bg-accent" />
+                <span className="size-2 rounded-full bg-primary" />
               )}
-              {!isCurrent && <ChevronRight size={14} className="text-muted" />}
-            </button>
+              {!isCurrent && <ChevronRight size={14} className="text-muted-foreground" />}
+            </Button>
           );
         })}
 
         {sortedTomes.length === 0 && (
-          <p className="text-sm text-muted text-center py-4">
-            {t('tome.navigation.empty') || 'Aucun tome'}
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            {t('tome.navigation.empty')}
           </p>
         )}
       </div>
@@ -273,27 +260,26 @@ function TomeHeader({
 
   const onSubmit = (data: EditTomeInput) => {
     updateTome.mutate({
-      // @ts-expect-error - SDK types have path as never but the API requires projectId and tomeId
       path: { projectId, tomeId },
       body: { title: data.title }
-    });
+    } as unknown as Options<UpdateTomeData>);
   };
 
   return (
     <Panel className="overflow-hidden">
-      <div className="flex items-start gap-4 p-4 -m-3.5 mb-4 bg-surface-2/20 border-b border-line">
-        <div className="p-3 rounded-lg bg-accent/10 text-accent">
+      <div className="-m-4 mb-4 flex items-start gap-4 border-b border-border bg-secondary/20 p-5 compact:-m-3 compact:mb-4 compact:p-4">
+        <div className="grid size-12 place-items-center rounded-lg bg-primary/10 text-primary">
           <BookOpen size={24} />
         </div>
-        <div className="flex-1">
-          <span className="text-xs font-bold tracking-widest uppercase text-accent/70">
+        <div className="min-w-0 flex-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-primary">
             {t('tome.number', { number: tomeNumber })}
           </span>
 
           {isEditing ? (
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-2 space-y-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-2 flex flex-col gap-2">
               <Field label={t('fields.title')}>
-                <input
+                <Input
                   {...register('title')}
                   autoFocus
                   className="w-full text-lg font-semibold"
@@ -322,26 +308,27 @@ function TomeHeader({
           ) : (
             <>
               <div className="flex items-start justify-between gap-2">
-                <h1 className="text-xl font-semibold text-ink mt-1">{tome.title}</h1>
+                <h1 className="mt-1 text-xl font-semibold text-foreground">{tome.title}</h1>
                 <Button
                   variant="ghost"
-                  className="p-1 h-auto"
+                  className="size-8 p-0 hover:bg-primary/8 hover:text-primary"
                   onClick={() => setIsEditing(true)}
+                  title={t('actions.edit')}
                 >
-                  <Pencil size={16} className="text-muted" />
+                  <Pencil size={16} />
                 </Button>
               </div>
-              <p className="text-sm text-muted font-mono mt-0.5">{tome.slug}</p>
+              <p className="mt-0.5 font-mono text-sm text-muted-foreground">{tome.slug}</p>
             </>
           )}
 
           <div className="flex flex-wrap items-center gap-4 mt-3">
-            <div className="flex items-center gap-2 text-sm text-muted">
-              <BookOpen size={14} className="text-accent/60" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <BookOpen size={14} className="text-primary" />
               <span>{chapters.length} {t('tome.stats.chapters', { count: chapters.length })}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted">
-              <Film size={14} className="text-accent/60" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Film size={14} className="text-primary" />
               <span>{scenes.length} {t('tome.stats.scenes', { count: scenes.length })}</span>
             </div>
             <Badge tone={tome.status}>{tome.status}</Badge>
@@ -351,8 +338,8 @@ function TomeHeader({
 
       {tome.synopsis && (
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-ink mb-2">{t('tome.synopsis') || 'Synopsis'}</h3>
-          <p className="text-sm text-muted">{tome.synopsis}</p>
+          <h3 className="mb-2 text-sm font-medium text-foreground">{t('tome.synopsis')}</h3>
+          <p className="text-sm leading-6 text-muted-foreground">{tome.synopsis}</p>
         </div>
       )}
     </Panel>
@@ -437,7 +424,7 @@ export default function TomeRoute() {
   if (!tomeData) {
     return (
       <AppShell>
-        <EmptyState title={t('tome.notFound') || 'Tome non trouvé'} />
+        <EmptyState title={t('tome.notFound')} />
       </AppShell>
     );
   }
@@ -459,15 +446,15 @@ export default function TomeRoute() {
       <div className="mb-4 lg:hidden">
         <Link
           to={`/projects/${projectId}/story`}
-          className="inline-flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
         >
-          <ArrowLeft size={16} /> {t('tome.backToStory') || 'Retour aux tomes'}
+          <ArrowLeft size={16} /> {t('tome.backToStory')}
         </Link>
       </div>
 
       <div className="grid items-start gap-4 lg:grid-cols-[1fr_280px]">
         {/* Main content */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {/* Tome header with edit mode */}
           <TomeHeader
             tome={currentTome}
@@ -480,9 +467,9 @@ export default function TomeRoute() {
 
           {/* Chapters list */}
           <Panel>
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between gap-3">
               <SectionTitle
-                title={t('tome.chapters') || 'Chapitres'}
+                title={t('tome.chapters')}
                 meta={`${chapters.length}`}
               />
               <Button
@@ -494,7 +481,7 @@ export default function TomeRoute() {
               </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               {chapters.map((chapter: Chapter, index: number) => (
                 <ChapterRow
                   key={chapter.id}
@@ -508,8 +495,8 @@ export default function TomeRoute() {
 
               {chapters.length === 0 && (
                 <EmptyState
-                  title={t('empty.noChapter.title') || 'Aucun chapitre'}
-                  description={t('empty.noChapter.description') || 'Ajoutez des chapitres à ce tome.'}
+                  title={t('empty.noChapter.title')}
+                  description={t('empty.noChapter.description')}
                 />
               )}
             </div>
@@ -517,7 +504,7 @@ export default function TomeRoute() {
         </div>
 
         {/* Side panel */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {story.data && (
             <TomeNavigationPanel
               tomes={story.data.tomes}

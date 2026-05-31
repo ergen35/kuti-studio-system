@@ -24,7 +24,7 @@ export type ProjectStatus = z.infer<typeof projectStatusSchema>;
 
 export const projectBaseSchema = z.object({
   name: z.string().min(1).max(255),
-  settingsJson: z.record(z.unknown()).default({}),
+  settingsJson: z.record(z.string(), z.unknown()).default({}),
 });
 
 // ============================================================================
@@ -34,7 +34,7 @@ export const projectBaseSchema = z.object({
 export const createProjectBodySchema = z.object({
   name: z.string().min(1).max(255),
   status: projectStatusSchema.default("draft"),
-  settingsJson: z.record(z.unknown()).optional(),
+  settingsJson: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type CreateProjectBody = z.infer<typeof createProjectBodySchema>;
@@ -46,7 +46,7 @@ export type CreateProjectBody = z.infer<typeof createProjectBodySchema>;
 export const updateProjectBodySchema = z.object({
   name: z.string().min(1).max(255).optional(),
   status: projectStatusSchema.optional(),
-  settingsJson: z.record(z.unknown()).optional(),
+  settingsJson: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type UpdateProjectBody = z.infer<typeof updateProjectBodySchema>;
@@ -98,7 +98,7 @@ export const projectResponseSchema = z.object({
   slug: z.string(),
   status: projectStatusSchema,
   rootPath: z.string(),
-  settingsJson: z.record(z.unknown()),
+  settingsJson: z.record(z.string(), z.unknown()),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   lastOpenedAt: z.iso.datetime().nullable(),

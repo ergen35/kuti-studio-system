@@ -10,7 +10,7 @@ Ce document présente l'architecture globale de Kuti Studio, une plateforme de p
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────┐         ┌─────────────────────────────┐   │
-│  │      kuti-frontend          │         │      kuti-backend-v2        │   │
+│  │      kuti-frontend          │         │      kuti-backend           │   │
 │  │    (React Router 7)         │◄───────►│      (ElysiaJS)             │   │
 │  │                             │   HTTP  │                             │   │
 │  │  • React Router v7          │         │  • ElysiaJS                 │   │

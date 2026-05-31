@@ -1,5 +1,5 @@
-import { Plus, Sparkles, X } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
@@ -7,11 +7,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
-import { Button, ErrorState, LoadingState } from '~/components/ui';
+import { Button, ErrorState, LoadingState, PageHeader } from '~/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
 import { FormField } from '~/components/FormField';
 import { CharacterCardGrid } from '~/components/characters';
 import { apiErrorMessage } from '~/lib/errors';
-import { listCharactersOptions, createCharacterMutation } from '~/lib/backend/@tanstack/react-query.gen';
+import { listCharactersOptions, createCharacterMutation, getProjectCharacterImagesOptions, deleteCharacterImageMutation } from '~/lib/backend/@tanstack/react-query.gen';
 import { queryClient } from '~/lib/query';
 
 
@@ -41,23 +49,6 @@ function CreateCharacterModal({
     defaultValues: { name: '', narrativeRole: '' },
   });
   
-  const overlayRef = useRef<HTMLDivElement>(null);
-  
-  // Close on escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
-  
   // Reset form when opened
   useEffect(() => {
     if (isOpen) {
@@ -69,36 +60,22 @@ function CreateCharacterModal({
     onSubmit(data);
   };
   
-  if (!isOpen) return null;
-  
   return (
-    <div 
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm"
-      onClick={(e) => e.target === overlayRef.current && onClose()}
-    >
-      <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-surface shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/30">
-          <h2 className="text-lg font-semibold text-ink">
-            {t('createModal.title') || 'Nouveau personnage'}
-          </h2>
-          <Button variant="ghost" onClick={onClose} className="p-1 h-auto">
-            <X size={20} />
-          </Button>
-        </div>
-        
-        {/* Form */}
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 space-y-4">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('createModal.title')}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
           <FormField 
             label={t('fields.name')} 
             error={errors.name}
           >
-            <input
+            <Input
               {...register('name')}
               autoFocus
               className="w-full"
-              placeholder={t('createModal.namePlaceholder') || 'Ex: Jean Valjean'}
+              placeholder={t('createModal.namePlaceholder')}
             />
           </FormField>
           
@@ -106,22 +83,21 @@ function CreateCharacterModal({
             label={t('fields.narrativeRole')}
             error={errors.narrativeRole}
           >
-            <input
+            <Input
               {...register('narrativeRole')}
               className="w-full"
-              placeholder={t('createModal.rolePlaceholder') || 'Ex: Protagoniste'}
+              placeholder={t('createModal.rolePlaceholder')}
             />
           </FormField>
           
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
+          <DialogFooter>
             <Button 
               variant="ghost" 
               onClick={onClose}
               disabled={isLoading}
               type="button"
             >
-              {t('actions.cancel') || 'Annuler'}
+              {t('actions.cancel')}
             </Button>
             <Button 
               variant="primary"
@@ -130,16 +106,16 @@ function CreateCharacterModal({
               {isLoading ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
-                  {t('actions.creating') || 'Création...'}
+                  {t('actions.creating')}
                 </>
               ) : (
-                t('actions.save') || 'Enregistrer'
+                t('actions.save')
               )}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -156,14 +132,7 @@ export default function CharactersRoute() {
   
   // Fetch character images for all characters
   const characterImages = useQuery({
-    queryKey: ['characterImages', projectId, 'all'],
-    queryFn: async () => {
-      const { getProjectCharacterImages } = await import('~/lib/backend/sdk.gen');
-      const { data } = await getProjectCharacterImages({
-        path: { projectId }
-      });
-      return data ?? {};
-    },
+    ...getProjectCharacterImagesOptions({ path: { projectId } }),
     enabled: !!projectId,
   });
   
@@ -172,12 +141,7 @@ export default function CharactersRoute() {
   
   // Delete character image mutation (for grid updates)
   const deleteImageMutation = useMutation({
-    mutationFn: async ({ characterId, imageId }: { characterId: string; imageId: string }) => {
-      const { deleteCharacterImage } = await import('~/lib/backend/sdk.gen');
-      await deleteCharacterImage({
-        path: { projectId, characterId, imageId }
-      });
-    },
+    ...deleteCharacterImageMutation(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['characterImages', projectId, 'all'] });
     },
@@ -193,7 +157,7 @@ export default function CharactersRoute() {
         path: { projectId },
         body: {
           name: data.name,
-          narrativeRole: data.narrativeRole || null,
+          narrativeRole: data.narrativeRole || undefined,
           description: '',
         }
       },
@@ -214,25 +178,15 @@ export default function CharactersRoute() {
 
   return (
     <AppShell>
-      {/* Header with decorative element */}
-      <div className="flex items-start justify-between gap-4 mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-accent/10 text-accent">
-              <Sparkles size={20} />
-            </div>
-            <h1 className="text-2xl font-semibold text-ink">{t('title')}</h1>
-          </div>
-          <p className="text-muted max-w-xl">{t('description')}</p>
-        </div>
-        <Button 
-          variant="primary" 
-          onClick={handleCreateClick}
-          className="shrink-0"
-        >
-          <Plus size={16} /> {t('actions.addCharacter')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={(
+          <Button variant="primary" onClick={handleCreateClick} className="shrink-0">
+            <Plus size={16} /> {t('actions.addCharacter')}
+          </Button>
+        )}
+      />
       
       {/* Error states */}
       {create.error && (

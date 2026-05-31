@@ -1,7 +1,16 @@
 import { useEffect, useCallback } from 'react';
-import { clsx } from 'clsx';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import type { ListCharacterImagesResponse } from '~/lib/backend';
+import { Button } from '~/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog';
+import { Badge } from '~/components/ui/badge';
+import { useTranslation } from '~/hooks/useTranslation';
 import { characterImageUrlFromData, type CharacterImageWithUrl } from '~/lib/image-urls';
 
 interface ImageLightboxProps {
@@ -25,6 +34,7 @@ export function ImageLightbox({
   projectId,
   characterId,
 }: ImageLightboxProps) {
+  const { t } = useTranslation('characters');
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
@@ -83,55 +93,61 @@ export function ImageLightbox({
     }
   };
 
-  if (!isOpen || !image) return null;
-
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < images.length - 1;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/90 backdrop-blur-md"
-      onClick={onClose}
-    >
-      {/* Close button */}
-      <button
+    <Dialog open={isOpen && Boolean(image)} onOpenChange={(open) => !open && onClose()}>
+      {image && (
+        <DialogContent className="max-h-[92vh] max-w-[min(96vw,1200px)] overflow-hidden bg-ink text-white" showCloseButton={false}>
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t('generation.lightbox.title')}</DialogTitle>
+            <DialogDescription>{t('generation.lightbox.description')}</DialogDescription>
+          </DialogHeader>
+
+      <Button
+        type="button"
+        variant="ghost"
         onClick={onClose}
-        className="absolute top-4 right-4 p-2 rounded-full bg-surface/10 text-white/80 hover:bg-surface/20 hover:text-white transition-colors"
+        className="absolute top-4 right-4 text-white hover:bg-white/10"
+        title={t('generation.lightbox.close')}
       >
-        <X size={24} />
-      </button>
+        <X />
+      </Button>
 
       {/* Navigation - Previous */}
       {hasPrev && onNavigate && (
-        <button
+        <Button
+          type="button"
+          variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
             onNavigate(currentIndex - 1);
           }}
-          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-surface/10 text-white/80 hover:bg-surface/20 hover:text-white transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/10"
+          title={t('generation.lightbox.previous')}
         >
-          <ChevronLeft size={32} />
-        </button>
+          <ChevronLeft />
+        </Button>
       )}
 
       {/* Navigation - Next */}
       {hasNext && onNavigate && (
-        <button
+        <Button
+          type="button"
+          variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
             onNavigate(currentIndex + 1);
           }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-surface/10 text-white/80 hover:bg-surface/20 hover:text-white transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/10"
+          title={t('generation.lightbox.next')}
         >
-          <ChevronRight size={32} />
-        </button>
+          <ChevronRight />
+        </Button>
       )}
 
-      {/* Main image */}
-      <div 
-        className="max-w-[90vw] max-h-[85vh] flex flex-col items-center"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex max-h-[86vh] flex-col items-center">
         <img
           src={getImageUrl(image)}
           alt={image.fileName}
@@ -147,14 +163,14 @@ export function ImageLightbox({
           {(!!image.strategy || !!image.style) && (
             <div className="flex items-center justify-center gap-2 mb-3">
               {!!image.strategy && (
-                <span className="px-2 py-1 rounded-full text-xs bg-accent/30 text-white">
+                <Badge variant="secondary" className="bg-white/10 text-white">
                   {String(image.strategy)}
-                </span>
+                </Badge>
               )}
               {!!image.style && (
-                <span className="px-2 py-1 rounded-full text-xs bg-accent/30 text-white">
+                <Badge variant="secondary" className="bg-white/10 text-white">
                   {String(image.style)}
-                </span>
+                </Badge>
               )}
             </div>
           )}
@@ -167,13 +183,15 @@ export function ImageLightbox({
           
           {/* Actions */}
           <div className="flex items-center justify-center gap-3 mt-4">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={handleDownload}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface/20 text-white/80 hover:bg-surface/30 hover:text-white transition-colors text-sm"
+              className="text-white hover:bg-white/10"
             >
-              <Download size={16} />
-              Télécharger
-            </button>
+              <Download />
+              {t('generation.download')}
+            </Button>
             
             {images.length > 1 && (
               <span className="text-sm text-white/60">
@@ -183,6 +201,8 @@ export function ImageLightbox({
           </div>
         </div>
       </div>
-    </div>
+        </DialogContent>
+      )}
+    </Dialog>
   );
 }

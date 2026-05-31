@@ -1,5 +1,7 @@
 import { clsx } from "clsx";
 import { BookOpen, Book, FileText, ChevronDown, ChevronRight } from "lucide-react";
+import { useTranslation } from "~/hooks/useTranslation";
+import { Button } from "~/components/ui";
 import { useOrchestraStore } from "~/stores/orchestra";
 import type { GetStorySummaryResponse } from '~/lib/backend';
 
@@ -41,18 +43,19 @@ function SceneNode({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
+      type="button"
+      variant="ghost"
       onClick={onClick}
       className={clsx(
-        "w-full flex items-center gap-2 px-2 py-1.5 text-left text-sm transition-colors rounded-md",
-        "hover:bg-surface-2",
-        isActive && "bg-accent/10 text-accent ring-1 ring-accent/50"
+        "flex h-auto w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-primary/8 hover:text-primary",
+        isActive && "bg-primary/10 text-primary ring-1 ring-primary/35"
       )}
       style={{ paddingLeft: `${12 + level * 16}px` }}
     >
-      <FileText size={14} className={clsx(isActive ? "text-accent" : "text-muted")} />
-      <span className="truncate flex-1">{scene.title}</span>
-    </button>
+      <FileText size={14} className={clsx(isActive ? "text-primary" : "text-muted-foreground")} />
+      <span className="flex-1 truncate">{scene.title}</span>
+    </Button>
   );
 }
 
@@ -63,7 +66,7 @@ function ChapterNode({
   level,
   onSelectScene,
 }: ChapterNodeProps) {
-  const { expandedChapterIds, toggleChapter, expandChapter, selectChapter, selectedChapterId } = useOrchestraStore();
+  const { expandedChapterIds, toggleChapter, selectChapter, selectedChapterId } = useOrchestraStore();
   const isExpanded = expandedChapterIds.has(chapter.id);
   const chapterScenes = scenes
     .filter((s) => s.chapterId === chapter.id)
@@ -73,37 +76,38 @@ function ChapterNode({
 
   return (
     <div>
-      <button
+      <Button
+        type="button"
+        variant="ghost"
         onClick={() => {
           toggleChapter(chapter.id);
           selectChapter(chapter.id);
         }}
         className={clsx(
-          "w-full flex items-center gap-2 px-2 py-1.5 text-left text-sm transition-colors rounded-md",
-          "hover:bg-surface-2",
-          isSelected && !currentSceneId && "bg-surface-2 text-ink ring-1 ring-line"
+          "flex h-auto w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-primary/8 hover:text-primary",
+          isSelected && !currentSceneId && "bg-primary/10 text-primary ring-1 ring-primary/35"
         )}
         style={{ paddingLeft: `${12 + level * 16}px` }}
       >
-        <span className="w-4 h-4 flex items-center justify-center">
+        <span className="flex size-4 items-center justify-center">
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown size={14} className="text-muted" />
+              <ChevronDown size={14} className="text-muted-foreground" />
             ) : (
-              <ChevronRight size={14} className="text-muted" />
+              <ChevronRight size={14} className="text-muted-foreground" />
             )
           ) : (
-            <span className="w-1 h-1 rounded-full bg-muted" />
+            <span className="size-1 rounded-full bg-muted-foreground" />
           )}
         </span>
-        <Book size={14} className={clsx(isSelected ? "text-accent" : "text-muted")} />
-        <span className="truncate flex-1 font-medium">{chapter.title}</span>
+        <Book size={14} className={clsx(isSelected ? "text-primary" : "text-muted-foreground")} />
+        <span className="flex-1 truncate font-medium">{chapter.title}</span>
         {hasChildren && (
-          <span className="text-xs text-muted bg-surface-2 px-1.5 py-0.5 rounded">
+          <span className="rounded bg-secondary px-1.5 py-0.5 text-xs text-muted-foreground">
             {chapterScenes.length}
           </span>
         )}
-      </button>
+      </Button>
 
       {isExpanded && chapterScenes.map((scene) => (
         <SceneNode
@@ -128,7 +132,7 @@ function TomeNode({
   level,
   onSelectScene,
 }: TomeNodeProps) {
-  const { expandedTomeIds, toggleTome, expandTome, selectTome, selectedTomeId } = useOrchestraStore();
+  const { expandedTomeIds, toggleTome, selectTome, selectedTomeId } = useOrchestraStore();
   const isExpanded = expandedTomeIds.has(tome.id);
   const tomeChapters = chapters
     .filter((c) => c.tomeId === tome.id)
@@ -138,37 +142,38 @@ function TomeNode({
 
   return (
     <div className="mb-1">
-      <button
+      <Button
+        type="button"
+        variant="ghost"
         onClick={() => {
           toggleTome(tome.id);
           selectTome(tome.id);
         }}
         className={clsx(
-          "w-full flex items-center gap-2 px-2 py-2 text-left text-sm transition-colors rounded-md",
-          "hover:bg-surface-2",
-          isSelected && !currentSceneId && "bg-surface-2 text-ink ring-1 ring-line"
+          "flex h-auto w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm transition-colors hover:bg-primary/8 hover:text-primary",
+          isSelected && !currentSceneId && "bg-primary/10 text-primary ring-1 ring-primary/35"
         )}
         style={{ paddingLeft: `${12 + level * 16}px` }}
       >
-        <span className="w-4 h-4 flex items-center justify-center">
+        <span className="flex size-4 items-center justify-center">
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown size={14} className="text-muted" />
+              <ChevronDown size={14} className="text-muted-foreground" />
             ) : (
-              <ChevronRight size={14} className="text-muted" />
+              <ChevronRight size={14} className="text-muted-foreground" />
             )
           ) : (
-            <span className="w-1 h-1 rounded-full bg-muted" />
+            <span className="size-1 rounded-full bg-muted-foreground" />
           )}
         </span>
-        <BookOpen size={16} className={clsx(isSelected ? "text-accent" : "text-muted")} />
-        <span className="truncate flex-1 font-medium">{tome.title}</span>
+        <BookOpen size={16} className={clsx(isSelected ? "text-primary" : "text-muted-foreground")} />
+        <span className="flex-1 truncate font-medium">{tome.title}</span>
         {hasChildren && (
-          <span className="text-xs text-muted bg-surface-2 px-1.5 py-0.5 rounded">
+          <span className="rounded bg-secondary px-1.5 py-0.5 text-xs text-muted-foreground">
             {tomeChapters.length}
           </span>
         )}
-      </button>
+      </Button>
 
       {isExpanded && tomeChapters.map((chapter) => (
         <ChapterNode
@@ -192,24 +197,25 @@ export function StoryTreeNavigator({
   currentSceneId,
   onSelectScene,
 }: StoryTreeNavigatorProps) {
+  const { t } = useTranslation('story');
   const sortedTomes = [...tomes].sort((a, b) => a.orderIndex - b.orderIndex);
 
   return (
-    <div className="h-full flex flex-col bg-surface border-l border-line">
-      <div className="px-4 py-3 border-b border-line">
-        <h3 className="text-sm font-medium text-ink">Structure narrative</h3>
-        <p className="text-xs text-muted mt-0.5">
-          {tomes.length} tome{tomes.length > 1 ? 's' : ''} · {chapters.length} chapitre{chapters.length > 1 ? 's' : ''} · {scenes.length} scène{scenes.length > 1 ? 's' : ''}
+    <div className="flex h-full flex-col border-l border-border bg-card">
+      <div className="border-b border-border px-4 py-3">
+        <h3 className="text-sm font-medium text-foreground">{t('tree.title')}</h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {t('tree.stats', { tomes: tomes.length, chapters: chapters.length, scenes: scenes.length })}
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-2 px-2 custom-scrollbar">
+      <div className="custom-scrollbar flex-1 overflow-y-auto px-2 py-2">
         {sortedTomes.length === 0 ? (
-          <div className="text-center py-8 px-4">
-            <BookOpen size={32} className="mx-auto text-muted/50 mb-2" />
-            <p className="text-sm text-muted">Aucun tome</p>
-            <p className="text-xs text-muted/70 mt-1">
-              Commencez par créer un tome dans la section Storyline
+          <div className="px-4 py-8 text-center">
+            <BookOpen size={32} className="mx-auto mb-2 text-muted-foreground/60" />
+            <p className="text-sm text-muted-foreground">{t('tree.empty.title')}</p>
+            <p className="mt-1 text-xs text-muted-foreground/70">
+              {t('tree.empty.description')}
             </p>
           </div>
         ) : (
@@ -227,9 +233,9 @@ export function StoryTreeNavigator({
         )}
       </div>
 
-      <div className="px-3 py-2 border-t border-line text-center">
-        <p className="text-xs text-muted">
-          Double-cliquez un nœud pour centrer
+      <div className="border-t border-border px-3 py-2 text-center">
+        <p className="text-xs text-muted-foreground">
+          {t('tree.hint')}
         </p>
       </div>
     </div>

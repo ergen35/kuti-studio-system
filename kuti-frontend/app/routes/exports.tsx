@@ -7,6 +7,8 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, dateLabel, EmptyState, ErrorState, LinkButton, LoadingState, PageHeader, Panel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
+import { Input } from "~/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
 import {
   listExportsOptions,
@@ -20,9 +22,9 @@ export default function ExportsRoute() {
   const queryClient = useQueryClient();
   const exports = useQuery({ ...listExportsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ExportCreateInput>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = useForm<ExportCreateInput>({
     resolver: zodResolver(exportCreateSchema),
-    defaultValues: { kind: 'work', format: 'json', label: 'Work export' },
+    defaultValues: { kind: 'work', format: 'json', label: 'Work export', summary: '' },
   });
   
   const create = useMutation({
@@ -33,7 +35,7 @@ export default function ExportsRoute() {
   });
   const onSubmit = (data: ExportCreateInput) => create.mutate({
     path: { projectId: projectId },
-    body: { kind: data.kind as "work" | "publication", format: data.format as "json" | "tree" | "zip", label: data.label }
+    body: { kind: data.kind as "work" | "publication", format: data.format as "json" | "tree" | "zip", label: data.label, summary: data.summary }
   }, { onSuccess: () => reset() });
 
   const kindOptions = [
@@ -46,6 +48,8 @@ export default function ExportsRoute() {
     { value: "tree", label: t('panels.create.formats.tree') },
     { value: "zip", label: t('panels.create.formats.zip') },
   ];
+  const kindValue = watch('kind');
+  const formatValue = watch('format');
 
   return (
     <AppShell>
@@ -54,17 +58,19 @@ export default function ExportsRoute() {
         <Panel>
           <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
             <FormField label={t('panels.create.kind')} error={errors.kind}>
-              <select {...register('kind')}>
-                {kindOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-              </select>
+              <Select value={kindValue} onValueChange={(value) => setValue('kind', value as ExportCreateInput['kind'], { shouldDirty: true, shouldValidate: true })}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectGroup>{kindOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectGroup></SelectContent>
+              </Select>
             </FormField>
             <FormField label={t('panels.create.format')} error={errors.format}>
-              <select {...register('format')}>
-                {formatOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-              </select>
+              <Select value={formatValue} onValueChange={(value) => setValue('format', value as ExportCreateInput['format'], { shouldDirty: true, shouldValidate: true })}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectGroup>{formatOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectGroup></SelectContent>
+              </Select>
             </FormField>
             <FormField label={t('panels.create.label')} error={errors.label}>
-              <input {...register('label')} />
+              <Input {...register('label')} />
             </FormField>
             <Button variant="primary" disabled={isSubmitting || create.isPending}><PackagePlus size={16} /> {t('panels.create.button')}</Button>
             {create.error ? <ErrorState message={apiErrorMessage(create.error)} /> : null}

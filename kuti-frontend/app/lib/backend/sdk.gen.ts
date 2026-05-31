@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ArchiveAssetData, ArchiveAssetResponses, ArchiveCharacterData, ArchiveCharacterResponses, ArchiveProjectData, ArchiveProjectResponses, CloneProjectData, CloneProjectResponses, CompareVersionsData, CompareVersionsResponses, CreateAssetLinkData, CreateAssetLinkResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVersionData, CreateVersionResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponses, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponses, GetCharacterData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetData, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, GetVersionData, GetVersionResponses, ImportAssetData, ImportAssetResponses, ListAssetsData, ListAssetsResponses, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RestoreVersionData, RestoreVersionResponses, ScanWarningsData, ScanWarningsResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateAssetData, UpdateAssetResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
+import type { ArchiveAssetData, ArchiveAssetResponses, ArchiveCharacterData, ArchiveCharacterResponses, ArchiveProjectData, ArchiveProjectResponses, CancelGenerationJobData, CancelGenerationJobResponses, CloneProjectData, CloneProjectResponses, CompareVersionsData, CompareVersionsResponses, CreateAssetLinkData, CreateAssetLinkResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVersionData, CreateVersionResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponses, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponses, GetCharacterData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetData, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, GetVersionData, GetVersionResponses, ImportAssetData, ImportAssetResponses, ListAssetsData, ListAssetsResponses, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RelaunchGenerationJobData, RelaunchGenerationJobResponses, RestoreVersionData, RestoreVersionResponses, ScanWarningsData, ScanWarningsResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateAssetData, UpdateAssetResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -213,7 +213,7 @@ export const getStorySummary = <ThrowOnError extends boolean = false>(options: O
 /**
  * Get reference suggestions
  */
-export const getReferenceSuggestions = <ThrowOnError extends boolean = false>(options?: Options<GetReferenceSuggestionsData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/references/{type}', ...options });
+export const getReferenceSuggestions = <ThrowOnError extends boolean = false>(options: Options<GetReferenceSuggestionsData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/references/{type}', ...options });
 
 /**
  * List tomes
@@ -235,7 +235,7 @@ export const createTome = <ThrowOnError extends boolean = false>(options: Option
 /**
  * Delete a tome
  */
-export const deleteTome = <ThrowOnError extends boolean = false>(options?: Options<DeleteTomeData, ThrowOnError>) => (options?.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/tomes/{tomeId}', ...options });
+export const deleteTome = <ThrowOnError extends boolean = false>(options: Options<DeleteTomeData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/tomes/{tomeId}', ...options });
 
 /**
  * Update a tome
@@ -252,7 +252,7 @@ export const updateTome = <ThrowOnError extends boolean = false>(options: Option
 /**
  * List chapters
  */
-export const listChapters = <ThrowOnError extends boolean = false>(options?: Options<ListChaptersData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/chapters', ...options });
+export const listChapters = <ThrowOnError extends boolean = false>(options: Options<ListChaptersData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/chapters', ...options });
 
 /**
  * Create a chapter
@@ -269,7 +269,7 @@ export const createChapter = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * Delete a chapter
  */
-export const deleteChapter = <ThrowOnError extends boolean = false>(options?: Options<DeleteChapterData, ThrowOnError>) => (options?.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/chapters/{chapterId}', ...options });
+export const deleteChapter = <ThrowOnError extends boolean = false>(options: Options<DeleteChapterData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/chapters/{chapterId}', ...options });
 
 /**
  * Update a chapter
@@ -286,7 +286,7 @@ export const updateChapter = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * List scenes
  */
-export const listScenes = <ThrowOnError extends boolean = false>(options?: Options<ListScenesData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes', ...options });
+export const listScenes = <ThrowOnError extends boolean = false>(options: Options<ListScenesData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes', ...options });
 
 /**
  * Create a scene
@@ -303,7 +303,7 @@ export const createScene = <ThrowOnError extends boolean = false>(options: Optio
 /**
  * Delete a scene
  */
-export const deleteScene = <ThrowOnError extends boolean = false>(options?: Options<DeleteSceneData, ThrowOnError>) => (options?.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}', ...options });
+export const deleteScene = <ThrowOnError extends boolean = false>(options: Options<DeleteSceneData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}', ...options });
 
 /**
  * Update a scene
@@ -337,7 +337,7 @@ export const createGenerationJob = <ThrowOnError extends boolean = false>(option
 /**
  * Get a generation job
  */
-export const getGenerationJob = <ThrowOnError extends boolean = false>(options?: Options<GetGenerationJobData, ThrowOnError>) => (options?.client ?? client).get<GetGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}', ...options });
+export const getGenerationJob = <ThrowOnError extends boolean = false>(options: Options<GetGenerationJobData, ThrowOnError>) => (options.client ?? client).get<GetGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}', ...options });
 
 /**
  * List generation boards
@@ -347,7 +347,7 @@ export const listGenerationBoards = <ThrowOnError extends boolean = false>(optio
 /**
  * Get a generation board
  */
-export const getGenerationBoard = <ThrowOnError extends boolean = false>(options?: Options<GetGenerationBoardData, ThrowOnError>) => (options?.client ?? client).get<GetGenerationBoardResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}', ...options });
+export const getGenerationBoard = <ThrowOnError extends boolean = false>(options: Options<GetGenerationBoardData, ThrowOnError>) => (options.client ?? client).get<GetGenerationBoardResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}', ...options });
 
 /**
  * Validate a board
@@ -376,12 +376,22 @@ export const updateGenerationPanel = <ThrowOnError extends boolean = false>(opti
 /**
  * Get panel image
  */
-export const getGenerationPanelImage = <ThrowOnError extends boolean = false>(options?: Options<GetGenerationPanelImageData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}/panels/{panelId}/image', ...options });
+export const getGenerationPanelImage = <ThrowOnError extends boolean = false>(options: Options<GetGenerationPanelImageData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}/panels/{panelId}/image', ...options });
 
 /**
  * Download board artifact
  */
-export const downloadBoardArtifact = <ThrowOnError extends boolean = false>(options?: Options<DownloadBoardArtifactData, ThrowOnError>) => (options?.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}/download', ...options });
+export const downloadBoardArtifact = <ThrowOnError extends boolean = false>(options: Options<DownloadBoardArtifactData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/boards/{boardId}/download', ...options });
+
+/**
+ * Cancel a running generation job
+ */
+export const cancelGenerationJob = <ThrowOnError extends boolean = false>(options: Options<CancelGenerationJobData, ThrowOnError>) => (options.client ?? client).post<CancelGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}/cancel', ...options });
+
+/**
+ * Relaunch a completed or failed generation job
+ */
+export const relaunchGenerationJob = <ThrowOnError extends boolean = false>(options: Options<RelaunchGenerationJobData, ThrowOnError>) => (options.client ?? client).post<RelaunchGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}/relaunch', ...options });
 
 /**
  * List all assets

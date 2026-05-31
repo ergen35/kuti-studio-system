@@ -1,25 +1,21 @@
 import { clsx } from "clsx";
 import { Search, X, RotateCcw } from "lucide-react";
+import { Button } from "~/components/ui";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Input } from "~/components/ui/input";
+import { useTranslation } from "~/hooks/useTranslation";
 import { useTasksStore, type TaskStatus, type SourceKind } from "~/stores/tasks";
-import { getStatusColor, getStatusLabel } from "~/lib/tasks/types";
+import { getStatusColor } from "~/lib/tasks/types";
 
 const ALL_STATUSES: TaskStatus[] = ["pending", "running", "ready", "validated", "failed"];
 const ALL_SOURCE_KINDS: SourceKind[] = ["tome", "chapter", "scene", "panel", "custom", "character"];
-
-const SOURCE_KIND_LABELS: Record<SourceKind, string> = {
-  tome: "Tome",
-  chapter: "Chapitre",
-  scene: "Scène",
-  panel: "Panel",
-  custom: "Personnalisé",
-  character: "Personnage",
-};
 
 interface TaskFiltersProps {
   compact?: boolean;
 }
 
 export function TaskFilters({ compact = false }: TaskFiltersProps) {
+  const { t } = useTranslation("tasks");
   const {
     searchQuery,
     setSearchQuery,
@@ -46,45 +42,49 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
 
   if (compact) {
     return (
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {/* Search */}
         <div className="relative">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
-          <input
+          <Input
             type="text"
-            placeholder="Rechercher..."
+            placeholder={t("search.shortPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 text-sm bg-surface border border-line rounded-lg focus:outline-none focus:border-accent"
+            className="pl-9 pr-8"
           />
           {searchQuery && (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-surface-2"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
             >
-              <X size={12} className="text-muted" />
-            </button>
+              <X className="text-muted-foreground" />
+            </Button>
           )}
         </div>
 
         {/* Status pills */}
         <div className="flex flex-wrap gap-1">
           {ALL_STATUSES.map((status) => (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               key={status}
               onClick={() => toggleStatus(status)}
               className={clsx(
-                "px-2 py-1 text-[10px] font-medium rounded-full border transition-colors",
+                "h-7 px-2 text-[10px]",
                 selectedStatuses.includes(status)
                   ? getStatusColor(status)
-                  : "text-muted bg-surface-2 border-transparent opacity-50"
+                  : "border-border bg-secondary/50 text-muted-foreground opacity-70"
               )}
             >
-              {getStatusLabel(status)}
-            </button>
+              {t(`status.${status}`)}
+            </Button>
           ))}
         </div>
       </div>
@@ -92,104 +92,114 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-5">
       {/* Search */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-ink">Recherche</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-foreground">{t("search.label")}</label>
         <div className="relative">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
-          <input
+          <Input
             type="text"
-            placeholder="Rechercher par titre, type..."
+            placeholder={t("search.placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 text-sm bg-surface border border-line rounded-lg focus:outline-none focus:border-accent"
+            className="pl-9 pr-8"
           />
           {searchQuery && (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-surface-2"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
             >
-              <X size={14} className="text-muted" />
-            </button>
+              <X className="text-muted-foreground" />
+            </Button>
           )}
         </div>
       </div>
 
       {/* Status filters */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-ink">Statuts</label>
+          <label className="text-sm font-medium text-foreground">{t("statusLabel")}</label>
           <div className="flex items-center gap-1">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={selectAllStatuses}
-              className="text-[10px] text-accent hover:underline"
+              className="h-6 px-1 text-[10px] text-primary"
             >
-              Tous
-            </button>
-            <span className="text-muted">·</span>
-            <button
+              {t("filters.all")}
+            </Button>
+            <span className="text-muted-foreground">·</span>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={clearStatuses}
-              className="text-[10px] text-muted hover:underline"
+              className="h-6 px-1 text-[10px] text-muted-foreground"
             >
-              Aucun
-            </button>
+              {t("filters.none")}
+            </Button>
           </div>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {ALL_STATUSES.map((status) => (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               key={status}
               onClick={() => toggleStatus(status)}
               className={clsx(
-                "px-2.5 py-1 text-xs font-medium rounded-full border transition-colors",
+                "h-7 px-2.5 text-xs",
                 selectedStatuses.includes(status)
                   ? getStatusColor(status)
-                  : "text-muted bg-surface-2 border-line/50 hover:border-line"
+                  : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/25"
               )}
             >
-              {getStatusLabel(status)}
-            </button>
+              {t(`status.${status}`)}
+            </Button>
           ))}
         </div>
       </div>
 
       {/* SourceKind filters */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-ink">Types</label>
+          <label className="text-sm font-medium text-foreground">{t("typesLabel")}</label>
           <div className="flex items-center gap-1">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={selectAllSourceKinds}
-              className="text-[10px] text-accent hover:underline"
+              className="h-6 px-1 text-[10px] text-primary"
             >
-              Tous
-            </button>
-            <span className="text-muted">·</span>
-            <button
+              {t("filters.all")}
+            </Button>
+            <span className="text-muted-foreground">·</span>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={clearSourceKinds}
-              className="text-[10px] text-muted hover:underline"
+              className="h-6 px-1 text-[10px] text-muted-foreground"
             >
-              Aucun
-            </button>
+              {t("filters.none")}
+            </Button>
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="flex flex-col gap-1.5">
           {ALL_SOURCE_KINDS.map((kind) => (
             <label
               key={kind}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-2 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-primary/8"
             >
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selectedSourceKinds.includes(kind)}
-                onChange={() => toggleSourceKind(kind)}
-                className="rounded border-line text-accent focus:ring-accent"
+                onCheckedChange={() => toggleSourceKind(kind)}
               />
-              <span className="text-sm text-ink">{SOURCE_KIND_LABELS[kind]}</span>
+              <span className="text-sm text-foreground">{t(`sourceKinds.${kind}`)}</span>
             </label>
           ))}
         </div>
@@ -197,13 +207,15 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
 
       {/* Clear all */}
       {hasFilters && (
-        <button
+        <Button
+          type="button"
+          variant="ghost"
           onClick={clearAll}
-          className="flex items-center gap-2 text-sm text-muted hover:text-ink transition-colors"
+          className="justify-start text-muted-foreground"
         >
           <RotateCcw size={14} />
-          Réinitialiser les filtres
-        </button>
+          {t("filters.reset")}
+        </Button>
       )}
     </div>
   );

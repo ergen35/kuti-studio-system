@@ -1,16 +1,18 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { clsx } from 'clsx';
-import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles, Layout, Monitor } from 'lucide-react';
+import { ArrowLeft, FileText, Save, Clock, Trash2, Sparkles, Layout, Monitor, ChevronRight } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from '~/hooks/useTranslation';
 import { AppShell } from '~/components/layout';
 import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field, toCsv } from '~/components/ui';
+import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
 import { LexicalEditor } from '~/components/editor';
 import '~/components/editor/styles.css';
-import type { GetStorySummaryResponse } from '~/lib/backend';
+import type { DeleteSceneData, GetStorySummaryResponse, Options, UpdateSceneData } from '~/lib/backend';
 import { apiErrorMessage } from '~/lib/errors';
 import { csv } from '~/lib/utils';
 
@@ -32,22 +34,22 @@ const sceneSchema = z.object({
   title: z.string().min(1, 'titleRequired'),
   summary: z.string().optional(),
   content: z.string().optional(),
-  characters_json: z.string().optional(),
-  tags_json: z.string().optional(),
+  charactersJson: z.string().optional(),
+  tagsJson: z.string().optional(),
   notes: z.string().optional(),
 });
 
 type SceneInput = z.infer<typeof sceneSchema>;
 
 // Sidepanel with scenes in this chapter
-function SceneNavigationPanel({ 
-  scenes, 
+function SceneNavigationPanel({
+  scenes,
   currentSceneId,
   projectId,
   tomeId,
   chapterId,
-}: { 
-  scenes: Scene[]; 
+}: {
+  scenes: Scene[];
   currentSceneId: string;
   projectId: string;
   tomeId: string;
@@ -55,59 +57,59 @@ function SceneNavigationPanel({
 }) {
   const { t } = useTranslation('story');
   const navigate = useNavigate();
-  
+
   const sortedScenes = [...scenes].sort((a, b) => a.orderIndex - b.orderIndex);
-  
+
   return (
     <Panel className="!p-3">
-      <SectionTitle 
-        title={t('scene.navigation.title') || 'Scènes du chapitre'} 
+      <SectionTitle
+        title={t('scene.navigation.title')}
         meta={String(sortedScenes.length)}
       />
-      
-      <div className="space-y-2 mt-3">
+
+      <div className="mt-3 flex flex-col gap-2">
         {sortedScenes.map((scene, index) => {
           const isCurrent = scene.id === currentSceneId;
           return (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               key={scene.id}
               onClick={() => navigate(`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`)}
               className={clsx(
-                "w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-all",
-                isCurrent 
-                  ? "border-accent bg-accent/10 shadow-[inset_3px_0_0_var(--accent)]"
-                  : "border-line bg-surface-2/30 hover:border-accent hover:bg-surface-2/60"
+                "flex h-auto w-full items-center gap-3 rounded-lg border p-2.5 text-left transition-colors hover:text-foreground",
+                isCurrent
+                  ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_3px_0_0_var(--primary)]"
+                  : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-primary/8"
               )}
             >
               <span className={clsx(
-                "text-xs font-bold",
-                isCurrent ? "text-accent" : "text-accent/70"
+                "text-xs font-semibold",
+                isCurrent ? "text-primary" : "text-muted-foreground"
               )}>
                 {t('scene.shortNumber', { number: index + 1 })}
               </span>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className={clsx(
-                  "text-sm truncate",
-                  isCurrent ? "font-medium text-ink" : "text-ink"
+                  "truncate text-sm",
+                  isCurrent ? "font-medium text-primary" : "text-foreground"
                 )}>
                   {scene.title}
                 </p>
               </div>
               {isCurrent && (
-                <span className="w-2 h-2 rounded-full bg-accent" />
+                <span className="size-2 rounded-full bg-primary" />
               )}
               {!isCurrent && (
-                <svg className="text-muted w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
+                <ChevronRight size={14} className="text-muted-foreground" />
               )}
-            </button>
+            </Button>
           );
         })}
-        
+
         {sortedScenes.length === 0 && (
-          <p className="text-sm text-muted text-center py-4">
-            {t('scene.navigation.empty') || 'Aucune scène'}
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            {t('scene.navigation.empty')}
           </p>
         )}
       </div>
@@ -191,15 +193,15 @@ export default function SceneRoute() {
       navigate(`/projects/${projectId}/story/${tomeId}/chapters/${scene?.chapterId}`);
     },
   });
-  
+
   const { register, handleSubmit, control, watch, reset, formState: { errors, isDirty } } = useForm<SceneInput>({
     resolver: zodResolver(sceneSchema),
     defaultValues: {
       title: '',
       summary: '',
       content: '',
-      characters_json: '',
-      tags_json: '',
+      charactersJson: '',
+      tagsJson: '',
       notes: '',
     },
   });
@@ -211,8 +213,8 @@ export default function SceneRoute() {
         title: scene.title ?? '',
         summary: scene.summary ?? '',
         content: scene.content ?? '',
-        characters_json: toCsv(scene.charactersJson) ?? '',
-        tags_json: toCsv(scene.tagsJson) ?? '',
+        charactersJson: toCsv(scene.charactersJson) ?? '',
+        tagsJson: toCsv(scene.tagsJson) ?? '',
         notes: scene.notes ?? '',
       });
     }
@@ -234,19 +236,18 @@ export default function SceneRoute() {
   const onSubmit = useCallback((data: SceneInput) => {
     setIsSaving(true);
     updateScene.mutate({
-      // @ts-expect-error - SDK types missing path params
       path: { projectId, sceneId },
       body: {
         title: data.title,
         summary: data.summary,
         content: data.content,
-        charactersJson: csv(data.characters_json || ''),
-        tagsJson: csv(data.tags_json || ''),
+        charactersJson: csv(data.charactersJson || ''),
+        tagsJson: csv(data.tagsJson || ''),
         notes: data.notes,
       },
-    });
+    } as unknown as Options<UpdateSceneData>);
   }, [updateScene, projectId, sceneId]);
-  
+
   if (story.isLoading) {
     return (
       <AppShell>
@@ -254,7 +255,7 @@ export default function SceneRoute() {
       </AppShell>
     );
   }
-  
+
   if (story.error) {
     return (
       <AppShell>
@@ -262,18 +263,18 @@ export default function SceneRoute() {
       </AppShell>
     );
   }
-  
+
   if (!scene || !context || !context.chapter || !context.tome) {
     return (
       <AppShell>
-        <EmptyState title={t('scene.notFound') || 'Scène non trouvée'} />
+        <EmptyState title={t('scene.notFound')} />
       </AppShell>
     );
   }
-  
+
   const { chapter, tome, chapterScenes } = context;
   if (!chapter || !tome) return null;
-  const formattedDate = new Date(scene.updatedAt).toLocaleDateString(t('locale') || 'fr-FR', {
+  const formattedDate = new Date(scene.updatedAt).toLocaleDateString(t('locale'), {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -303,19 +304,21 @@ export default function SceneRoute() {
               />
 
               {/* Overlay: Button to switch back to classic mode */}
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={toggleOrchestra}
-                className="absolute top-4 left-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-surface/90 backdrop-blur border border-line text-sm text-ink hover:bg-surface transition-colors shadow-lg"
-                title="Retour au mode classique"
+                className="absolute left-4 top-4 flex items-center gap-2 rounded-lg border border-border bg-card/90 px-3 py-2 text-sm text-foreground shadow-lg backdrop-blur transition-colors hover:bg-primary/8 hover:text-primary"
+                title={t('scene.orchestra.backToClassic')}
               >
                 <Layout size={16} />
-                <span>Mode Classique</span>
-              </button>
+                <span>{t('scene.orchestra.classicMode')}</span>
+              </Button>
 
               {/* Overlay: Title */}
               <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none">
-                <div className="bg-surface/90 backdrop-blur border border-line rounded-lg px-4 py-2 shadow-lg">
-                  <p className="text-xs text-muted uppercase tracking-wide">Mode Orchestra</p>
+                <div className="rounded-lg border border-border bg-card/90 px-4 py-2 shadow-lg backdrop-blur">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{t('scene.orchestra.mode')}</p>
                 </div>
               </div>
             </div>
@@ -342,18 +345,6 @@ export default function SceneRoute() {
   // Classic Mode View
   return (
     <AppShell>
-      {/* Mode switch button */}
-      <div className="fixed top-20 right-4 z-40">
-        <button
-          onClick={toggleOrchestra}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 border border-accent/50 text-accent text-sm hover:bg-accent/20 transition-all shadow-lg"
-          title="Basculer vers le mode Orchestra"
-        >
-          <Monitor size={16} />
-          <span>Mode Orchestra</span>
-        </button>
-      </div>
-
       {/* Breadcrumb */}
       <StoryBreadcrumb
         projectId={projectId}
@@ -367,34 +358,46 @@ export default function SceneRoute() {
         chapterNumber={chapterNumber}
         sceneNumber={sceneNumber}
       />
-      
+
       {/* Back link - mobile only */}
       <div className="mb-4 lg:hidden">
-        <Link 
+        <Link
           to={`/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`}
-          className="inline-flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
         >
-          <ArrowLeft size={16} /> {t('scene.backToChapter') || 'Retour au chapitre'}
+          <ArrowLeft size={16} /> {t('scene.backToChapter')}
         </Link>
       </div>
-      
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid items-start gap-4 lg:grid-cols-[1fr_280px]">
           {/* Main content */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {/* Scene header */}
             <Panel className="overflow-hidden">
-              <div className="flex items-start gap-4 p-4 -m-3.5 mb-4 bg-surface-2/20 border-b border-line">
-                <div className="p-3 rounded-lg bg-accent/10 text-accent">
+              <div className="-m-4 mb-0 flex items-start gap-4 border-b border-border bg-secondary/20 p-5 compact:-m-3 compact:p-4">
+                <div className="grid size-12 place-items-center rounded-lg bg-primary/10 text-primary">
                   <FileText size={24} />
                 </div>
-                <div className="flex-1">
-                  <span className="text-xs font-bold tracking-widest uppercase text-accent/70">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-primary">
                     {t('scene.number', { number: sceneNumber })}
-                  </span>
-                  
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={toggleOrchestra}
+                      className="h-8 gap-2 border border-primary/25 bg-primary/10 px-2.5 text-primary hover:bg-primary/15"
+                      title={t('scene.orchestra.switchToOrchestra')}
+                    >
+                      <Monitor size={16} />
+                      <span>{t('scene.orchestra.mode')}</span>
+                    </Button>
+                  </div>
+
                   <Field label={t('fields.title')}>
-                    <input
+                    <Input
                       {...register('title')}
                       className="text-lg font-semibold w-full"
                     />
@@ -402,11 +405,11 @@ export default function SceneRoute() {
                   {errors.title && (
                     <span className="text-danger text-xs">{errors.title.message}</span>
                   )}
-                  
-                  <p className="text-sm text-muted font-mono mt-1">{scene.slug}</p>
-                  
+
+                  <p className="mt-1 font-mono text-sm text-muted-foreground">{scene.slug}</p>
+
                   <div className="flex flex-wrap items-center gap-3 mt-3">
-                    <div className="flex items-center gap-1.5 text-xs text-muted">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Clock size={12} />
                       <span>{t('scene.lastModified')}: {formattedDate}</span>
                     </div>
@@ -415,20 +418,20 @@ export default function SceneRoute() {
                 </div>
               </div>
             </Panel>
-            
+
             {/* Scene editor */}
             <Panel>
               <SectionTitle title={t('panels.sceneEditor.title')} />
-              
-              <div className="space-y-4 mt-3">
+
+              <div className="mt-3 flex flex-col gap-4">
                 {/* Summary */}
                 <Field label={t('fields.summary')}>
-                  <textarea {...register('summary')} rows={3} placeholder="Résumé de la scène..." />
+                  <Textarea {...register('summary')} rows={3} placeholder={t('scene.placeholders.summary')} />
                 </Field>
-                
+
                 {/* Content - Lexical Editor */}
                 <div>
-                  <label className="text-xs text-muted block mb-1.5">{t('fields.content')}</label>
+                  <label className="mb-1.5 block text-xs text-muted-foreground">{t('fields.content')}</label>
                   <Controller
                     name="content"
                     control={control}
@@ -442,66 +445,65 @@ export default function SceneRoute() {
                     )}
                   />
                 </div>
-                
+
                 {/* Characters & Tags */}
                 <div className="grid gap-4 lg:grid-cols-2">
                   <Field label={t('fields.characters')}>
-                    <input {...register('characters_json')} placeholder="@character:jean, @character:marie..." />
+                    <Input {...register('charactersJson')} placeholder={t('scene.placeholders.characters')} />
                   </Field>
                   <Field label={t('fields.tags')}>
-                    <input {...register('tags_json')} placeholder="romantique, combat, révélation..." />
+                    <Input {...register('tagsJson')} placeholder={t('scene.placeholders.tags')} />
                   </Field>
                 </div>
-                
+
                 {/* Notes */}
                 <Field label={t('fields.notes')}>
-                  <textarea {...register('notes')} rows={3} placeholder="Notes internes..." />
+                  <Textarea {...register('notes')} rows={3} placeholder={t('scene.placeholders.notes')} />
                 </Field>
               </div>
             </Panel>
-            
+
             {/* Actions */}
             <div className="flex justify-between items-center">
               <Button
                 variant="danger"
                 type="button"
-                // @ts-expect-error - SDK types missing path params
-                onClick={() => deleteScene.mutate({ path: { projectId, sceneId } })}
+                onClick={() => deleteScene.mutate({ path: { projectId, sceneId } } as unknown as Options<DeleteSceneData>)}
                 disabled={deleteScene.isPending}
               >
                 <Trash2 size={16} />
                 {t('actions.deleteScene')}
               </Button>
-              
+
               <div className="flex items-center gap-4">
                 {isDirty && (
-                  <span className="text-xs text-warning">{t('scene.unsavedChanges') || 'Modifications non enregistrées'}</span>
+                  <span className="text-xs text-warning">{t('scene.unsavedChanges')}</span>
                 )}
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   type="submit"
                   disabled={updateScene.isPending || isSaving}
                 >
                   <Save size={16} />
-                  {updateScene.isPending || isSaving ? t('actions.saving') || 'Enregistrement...' : t('actions.saveScene')}
+                  {updateScene.isPending || isSaving ? t('actions.saving') : t('actions.saveScene')}
                 </Button>
               </div>
             </div>
           </div>
-          
+
           {/* Side panel */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {/* Manga Generation Section */}
             <Panel>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-ink">Planches Manga</h3>
-                <Button 
-                  variant="ghost" 
-                  className="p-1.5 h-auto"
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-sm font-medium text-foreground">{t('scene.mangaBoards')}</h3>
+                <Button
+                  variant="ghost"
+                  className="size-8 border border-primary/25 bg-primary/10 p-0 text-primary hover:bg-primary/15"
                   onClick={() => setIsGenerationModalOpen(true)}
-                  title="Générer une planche"
+                  title={t('scene.generateBoard')}
                 >
-                  <Sparkles size={18} className="text-accent" />
+                  <Sparkles size={18} />
                 </Button>
               </div>
               <SceneMangaGallery projectId={projectId} sceneId={sceneId} />

@@ -1,5 +1,5 @@
 import { Save, Trash2, X, AlertTriangle } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Button, ErrorState, LoadingState, PageHeader, Panel } from "~/components/ui";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { FormField } from "~/components/FormField";
 import { apiErrorMessage } from "~/lib/errors";
 import { csv } from "~/lib/utils";
@@ -37,39 +55,14 @@ function DeleteProjectModal({
 }: DeleteProjectModalProps) {
   const { t } = useTranslation('settings');
   const [inputValue, setInputValue] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
 
   const isConfirmEnabled = inputValue === projectName;
 
-  // Reset input when opened
   useEffect(() => {
     if (isOpen) {
       setInputValue("");
-      setTimeout(() => inputRef.current?.focus(), 100);
-      document.body.style.overflow = "hidden";
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
-
-  // Close on escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !isLoading) onClose();
-    };
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-    }
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, isLoading, onClose]);
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === overlayRef.current && !isLoading) {
-      onClose();
-    }
-  };
 
   const handleSubmit = () => {
     if (isConfirmEnabled) {
@@ -77,56 +70,36 @@ function DeleteProjectModal({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      ref={overlayRef}
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
-      style={{ animation: "fadeIn 0.15s ease-out" }}
-    >
-      <div
-        className="w-full max-w-md rounded-[7px] border border-line bg-surface p-5 shadow-lg"
-        style={{ animation: "scaleIn 0.15s ease-out" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="mb-4 flex items-center gap-3">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !isLoading && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader className="flex-row items-start gap-3 text-left">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-danger/10">
-            <AlertTriangle size={20} className="text-danger" />
+            <AlertTriangle className="text-danger" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-ink">
-              {t('delete.dialogTitle')}
-            </h2>
+            <DialogTitle>{t('delete.dialogTitle')}</DialogTitle>
+            <DialogDescription>{t('delete.dialogDescription')}</DialogDescription>
           </div>
-        </div>
+        </DialogHeader>
 
-        {/* Description */}
-        <p className="mb-4 text-sm text-muted">
-          {t('delete.dialogDescription')}
-        </p>
-
-        {/* Project name to confirm */}
         <div className="mb-4 rounded-[7px] bg-surface-2 p-3">
           <span className="text-xs text-muted">{t('fields.name')}:</span>
           <p className="font-medium text-ink">{projectName}</p>
         </div>
 
-        {/* Input */}
         <div className="mb-4">
-          <label className="mb-1.5 block text-xs text-muted">
+          <label className="mb-1.5 block text-xs text-muted" htmlFor="delete-project-name">
             {t('delete.inputLabel')}
           </label>
-          <input
-            ref={inputRef}
+          <Input
+            id="delete-project-name"
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={t('delete.inputPlaceholder')}
             disabled={isLoading}
-            className="min-h-9 w-full rounded-[7px] border border-line bg-surface px-2.5 py-2 text-ink outline-none transition-colors focus:border-danger disabled:opacity-50"
+            autoFocus
           />
           {inputValue && inputValue !== projectName && (
             <p className="mt-1.5 text-xs text-danger">
@@ -135,15 +108,13 @@ function DeleteProjectModal({
           )}
         </div>
 
-        {/* Error */}
         {error && (
-          <div className="mb-4 rounded-[7px] border border-danger/45 bg-danger/10 p-3">
-            <p className="text-sm text-danger">{apiErrorMessage(error)}</p>
-          </div>
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{apiErrorMessage(error)}</AlertDescription>
+          </Alert>
         )}
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2">
+        <DialogFooter>
           <Button
             variant="ghost"
             onClick={onClose}
@@ -168,9 +139,9 @@ function DeleteProjectModal({
               </>
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -190,7 +161,7 @@ export default function SettingsRoute() {
     enabled: !!projectId,
   });
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ProjectSettingsInput>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch, setValue } = useForm<ProjectSettingsInput>({
     resolver: zodResolver(projectSettingsSchema),
     defaultValues: { name: '', status: 'draft', locations: '' },
   });
@@ -245,6 +216,7 @@ export default function SettingsRoute() {
     { value: "archived", label: t('common:status.archived') },
     { value: "maintenance", label: t('common:status.maintenance') },
   ];
+  const statusValue = watch('status');
 
   return (
     <AppShell>
@@ -257,15 +229,22 @@ export default function SettingsRoute() {
           <Panel>
             <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
               <FormField label={t('fields.name')} error={errors.name}>
-                <input {...register('name')} />
+                <Input {...register('name')} />
               </FormField>
               <FormField label={t('fields.status')} error={errors.status}>
-                <select {...register('status')}>
-                  {statusOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                </select>
+                <Select value={statusValue} onValueChange={(value) => setValue('status', value as Project['status'], { shouldDirty: true, shouldValidate: true })}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {statusOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormField>
               <FormField label={t('fields.allowedLocations')} error={errors.locations}>
-                <input {...register('locations')} placeholder={t('fields.locationsPlaceholder')} />
+                <Input {...register('locations')} placeholder={t('fields.locationsPlaceholder')} />
               </FormField>
               <Button variant="primary" disabled={isSubmitting || update.isPending}>
                 <Save size={16} /> {t('actions.save')}

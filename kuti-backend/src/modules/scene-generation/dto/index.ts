@@ -62,13 +62,13 @@ export const setDefaultConfigBodySchema = z.object({
 export const generateSceneMangaBodySchema = z.object({
   configId: z.string().uuid().optional(),
   imageCount: z.number().int().min(1).max(16).default(6),
-  characterImageRefs: z.record(z.string()).optional(),
+  characterImageRefs: z.record(z.string(), z.string()).optional(),
   additionalContext: z.string().max(2000).optional(),
 });
 
 export const previewPromptBodySchema = z.object({
   configId: z.string().uuid().optional(),
-  characterImageRefs: z.record(z.string()).optional(),
+  characterImageRefs: z.record(z.string(), z.string()).optional(),
   panelCount: z.number().int().min(1).max(10).default(6),
 });
 
@@ -94,7 +94,7 @@ export const sceneConfigResponseSchema = z.object({
   colorMode: ColorModeSchema,
   defaultImageCount: z.number(),
   allowMultiPage: z.boolean(),
-  metadata: z.record(z.unknown()),
+  metadata: z.record(z.string(), z.unknown()),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -139,3 +139,9 @@ export const previewPromptResponseSchema = z.object({
   systemPrompt: z.string(),
   styleDescription: z.string(),
 });
+
+export type CreateSceneConfigBody = z.infer<typeof createSceneConfigBodySchema>;
+export type UpdateSceneConfigBody = z.infer<typeof updateSceneConfigBodySchema>;
+export type GenerateSceneMangaBody = z.infer<typeof generateSceneMangaBodySchema>;
+export type PreviewPromptBody = z.infer<typeof previewPromptBodySchema>;
+export type UpdateMangaPageBody = z.infer<typeof updateMangaPageBodySchema>;

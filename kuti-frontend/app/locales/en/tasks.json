@@ -1,0 +1,57 @@
+{
+  "title": "Task Manager",
+  "description": "Track generation jobs in progress",
+  "lastUpdated": "Last updated: {{time}}",
+  "loading": "Loading tasks...",
+  "empty": "No tasks found",
+  "emptySearch": "No result for your search",
+  "emptyDescription": "Tasks will appear here when they are created",
+  "activeEmpty": "No active tasks",
+  "sideTitle": "Tasks",
+  "runningCount": "{{count}} running",
+  "viewAll": "View all tasks",
+  "actions": {
+    "cancelTask": "Cancel",
+    "relaunch": "Relaunch"
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Search by title, type...",
+    "shortPlaceholder": "Search..."
+  },
+  "statusLabel": "Statuses",
+  "typesLabel": "Types",
+  "status": {
+    "pending": "Pending",
+    "running": "Running",
+    "ready": "Ready",
+    "validated": "Validated",
+    "failed": "Failed"
+  },
+  "sourceKinds": {
+    "tome": "Tome",
+    "chapter": "Chapter",
+    "scene": "Scene",
+    "panel": "Panel",
+    "custom": "Custom",
+    "character": "Character"
+  },
+  "filters": {
+    "title": "Filters",
+    "all": "All",
+    "none": "None",
+    "reset": "Reset filters"
+  },
+  "detail": {
+    "status": "Status",
+    "type": "Type",
+    "elapsed": "Time",
+    "progress": "Progress",
+    "details": "Details",
+    "jobId": "Job ID",
+    "sourceId": "Source ID",
+    "source": "Source",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
+  }
+}

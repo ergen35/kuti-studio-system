@@ -3,6 +3,7 @@
  */
 
 import type { Project } from "@lib/db/generated/client";
+import type { ProjectStatus } from "./dto";
 
 /**
  * Sérialise un projet pour l'export JSON
@@ -13,7 +14,7 @@ export function serializeProject(
   id: string;
   name: string;
   slug: string;
-  status: string;
+  status: ProjectStatus;
   rootPath: string;
   settingsJson: Record<string, unknown>;
   createdAt: string;
@@ -25,7 +26,7 @@ export function serializeProject(
     id: project.id,
     name: project.name,
     slug: project.slug,
-    status: project.status,
+    status: project.status as ProjectStatus,
     rootPath: project.rootPath,
     settingsJson: project.settingsJson as Record<string, unknown>,
     createdAt: project.createdAt.toISOString(),
@@ -34,5 +35,4 @@ export function serializeProject(
     archivedAt: project.archivedAt?.toISOString() ?? null,
   };
 }
-
 

@@ -21,7 +21,7 @@ Kuti Studio est une plateforme de production narrative local-first pour créer d
 
 ```
 /home/ergen35/Sources/repos/creative-work/kuti-studio-system/
-├── kuti-backend-v2/          # Backend ElysiaJS (stack principale)
+├── kuti-backend/             # Backend ElysiaJS (stack principale)
 │   ├── src/
 │   │   ├── index.ts          # Entry point
 │   │   ├── lib/              # Librairies partagées
@@ -39,7 +39,7 @@ Kuti Studio est une plateforme de production narrative local-first pour créer d
 └── docs/                     # Documentation détaillée
 ```
 
-> **Note** : Le dossier `kuti-backend/` (Python) est obsolète. La stack principale est dans `kuti-backend-v2/`.
+> **Note** : La stack backend principale est dans `kuti-backend/`.
 
 ---
 
@@ -61,7 +61,7 @@ Kuti Studio est une plateforme de production narrative local-first pour créer d
 ### Backend
 
 ```bash
-cd kuti-backend-v2
+cd kuti-backend
 
 # Installer les dépendances
 bun install
@@ -100,11 +100,14 @@ yarn dev
 
 ## Principes de développement
 
-1. **OpenAPI primauté** : Le backend expose le contrat via Swagger, le frontend l'utilise via le client API généré
-2. **Type safety** : Types Prisma générés partagés entre backend et frontend
-3. **Durable execution** : Les jobs longs passent par Inngest (pas de threading local)
-4. **Modularité** : Chaque domaine métier est un module Elysia autonome
-5. **Local-first** : Les projets sont stockés localement dans `kuti-data/`
+1. **OpenAPI primauté** : Le backend expose le contrat via Swagger, le frontend l'utilise via le SDK Hey API généré
+2. **Contrats camelCase-only** : `body`, `query`, `params`, `response`, SDK, formulaires et docs exposent du `camelCase` uniquement. Les colonnes SQL peuvent rester en `snake_case` via Prisma `@map(...)`.
+3. **SDK centralisé** : Les composants utilisent `~/lib/backend/@tanstack/react-query.gen` par défaut, les types viennent de `~/lib/backend/types.gen` ou `~/lib/backend`, et le client fetch centralisé est `~/lib/backend-client`.
+4. **UI shadcn** : Les primitives officielles vivent dans `app/components/ui/`; les écrans doivent composer ces primitives. Le thème utilise la classe `.dark` sur `document.documentElement`.
+5. **i18n systématique** : Toute chaîne UI visible passe par les namespaces `common`, `home`, `project`, `characters`, `story`, `generation`, `tasks`, etc.
+6. **Durable execution** : Les jobs longs passent par Inngest (pas de threading local)
+7. **Modularité** : Chaque domaine métier est un module Elysia autonome
+8. **Local-first** : Les projets sont stockés localement dans `kuti-data/`
 
 ---
 
@@ -112,26 +115,26 @@ yarn dev
 
 | Module               | Description                                    | Endpoint                                       |
 | -------------------- | ---------------------------------------------- | ---------------------------------------------- |
-| **health**           | Santé et configuration                         | `/api/v1/health`                               |
-| **authentication**   | Better Auth (users, sessions, accounts)        | `/api/v1/auth/*`                               |
-| **projects**         | Gestion des projets                            | `/api/v1/projects`                             |
-| **characters**       | Fiches personnages et relations                | `/api/v1/projects/:projectId/characters`       |
-| **story**            | Structure narrative (tomes, chapitres, scènes) | `/api/v1/projects/:projectId/story/*`          |
-| **generation**       | Jobs de génération IA                          | `/api/v1/projects/:projectId/generation`       |
-| **scene-generation** | Configuration et génération de planches manga  | `/api/v1/projects/:projectId/scene-generation` |
-| **assets**           | Bibliothèque de médias                         | `/api/v1/projects/:projectId/assets`           |
-| **versions**         | Historique et branches                         | `/api/v1/projects/:projectId/versions`         |
-| **warnings**         | Vérification de cohérence                      | `/api/v1/projects/:projectId/warnings`         |
-| **exports**          | Export travail et publication                  | `/api/v1/projects/:projectId/exports`          |
+| **health**           | Santé et configuration                         | `/api/health`                                  |
+| **authentication**   | Better Auth (users, sessions, accounts)        | `/api/auth/*`                                  |
+| **projects**         | Gestion des projets                            | `/api/projects`                                |
+| **characters**       | Fiches personnages et relations                | `/api/projects/:projectId/characters`          |
+| **story**            | Structure narrative (tomes, chapitres, scènes) | `/api/projects/:projectId/story/*`             |
+| **generation**       | Jobs de génération IA                          | `/api/projects/:projectId/generation`          |
+| **scene-generation** | Configuration et génération de planches manga  | `/api/projects/:projectId/story/scenes/:sceneId` |
+| **assets**           | Bibliothèque de médias                         | `/api/projects/:projectId/assets`              |
+| **versions**         | Historique et branches                         | `/api/projects/:projectId/versions`            |
+| **warnings**         | Vérification de cohérence                      | `/api/projects/:projectId/warnings`            |
+| **exports**          | Export travail et publication                  | `/api/projects/:projectId/exports`             |
 | **inngest**          | Webhooks Inngest                               | `/api/inngest`                                 |
-| **upload**           | Upload de fichiers                             | `/api/v1/upload`                               |
+| **upload**           | Upload de fichiers                             | `/api/v1/files`                                |
 | **users**            | Gestion des utilisateurs                       | `/api/v1/users`                                |
 
 ---
 
 ## Structure détaillée
 
-### Backend (`kuti-backend-v2/`)```
+### Backend (`kuti-backend/`)```
 
 src/
 ├── index.ts # Entry point Elysia
@@ -188,7 +191,8 @@ app/
 │   ├── home/              # Composants page d'accueil
 │   ├── scene/             # Composants scènes
 │   ├── story/             # Composants storyline
-│   └── ui.tsx             # Composants shadcn/ui
+│   ├── ui.tsx             # Façade compatibilité UI
+│   └── ui/                # Primitives shadcn/ui générées
 ├── lib/
 │   ├── backend/           # SDK API généré (Hey API)
 │   ├── api.ts
@@ -218,7 +222,7 @@ Configuration dans `src/lib/inngest-client.ts` et `src/modules/inngest/`.
 
 ### Backend```bash
 
-cd kuti-backend-v2
+cd kuti-backend
 
 # Développement
 
@@ -248,7 +252,7 @@ yarn build                 # Build de production
 yarn preview               # Prévisualiser le build
 
 # Génération
-yarn openapi-ts            # Regénérer le SDK depuis OpenAPI
+yarn api:generate          # Regénérer le SDK Hey API depuis OpenAPI
 
 # Validation
 yarn typecheck             # Vérifier les types
@@ -283,7 +287,7 @@ bun run db:studio
 
 # Regénérer SDK frontend
 
-yarn openapi-ts
+yarn api:generate
 
 ```
 

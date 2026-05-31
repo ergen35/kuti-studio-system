@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { archiveAsset, archiveCharacter, archiveProject, cloneProject, compareVersions, createAssetLink, createChapter, createCharacter, createExport, createGenerationJob, createProject, createRelation, createScene, createSceneConfig, createTome, createVersion, createVoiceSample, deleteAsset, deleteAssetLink, deleteChapter, deleteCharacter, deleteCharacterImage, deleteProject, deleteScene, deleteSceneConfig, deleteSceneMangaPage, deleteTome, downloadBoardArtifact, downloadExport, exportProject, generateCharacterImage, generateSceneManga, get_, getApiInngest, getAsset, getAssetFile, getCharacter, getConfig, getExport, getGenerationBoard, getGenerationJob, getGenerationPanelImage, getHealth, getHealthz, getIndex, getProject, getProjectCharacterImages, getReferenceSuggestions, getStorySummary, getVersion, importAsset, listAssets, listBranches, listChapters, listCharacterImages, listCharacters, listExports, listGenerationBoards, listGenerationJobs, listModels, listProjects, listSceneConfigs, listSceneMangaPages, listScenes, listTomes, listVersions, listWarnings, openProject, type Options, postApiInngest, previewPrompt, putApiInngest, restoreVersion, scanWarnings, setDefaultConfig, updateAsset, updateChapter, updateCharacter, updateGenerationPanel, updateProject, updateScene, updateSceneConfig, updateSceneMangaPage, updateTome, updateWarning, validateGenerationBoard } from '../sdk.gen';
-import type { ArchiveAssetData, ArchiveAssetResponse, ArchiveCharacterData, ArchiveCharacterResponse, ArchiveProjectData, ArchiveProjectResponse, CloneProjectData, CloneProjectResponse, CompareVersionsData, CompareVersionsResponse, CreateAssetLinkData, CreateAssetLinkResponse, CreateChapterData, CreateChapterResponse, CreateCharacterData, CreateCharacterResponse, CreateExportData, CreateExportResponse, CreateGenerationJobData, CreateGenerationJobResponse, CreateProjectData, CreateProjectResponse, CreateRelationData, CreateRelationResponse, CreateSceneConfigData, CreateSceneConfigResponse, CreateSceneData, CreateSceneResponse, CreateTomeData, CreateTomeResponse, CreateVersionData, CreateVersionResponse, CreateVoiceSampleData, CreateVoiceSampleResponse, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponse, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponse, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponse, GetCharacterData, GetCharacterResponse, GetConfigData, GetConfigResponse, GetData, GetExportData, GetExportResponse, GetGenerationBoardData, GetGenerationBoardResponse, GetGenerationJobData, GetGenerationJobResponse, GetGenerationPanelImageData, GetHealthData, GetHealthResponse, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponse, GetProjectData, GetProjectResponse, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponse, GetVersionData, GetVersionResponse, ImportAssetData, ImportAssetResponse, ListAssetsData, ListAssetsResponse, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponse, ListCharactersData, ListCharactersResponse, ListExportsData, ListExportsResponse, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponse, ListProjectsData, ListProjectsResponse, ListSceneConfigsData, ListSceneConfigsResponse, ListSceneMangaPagesData, ListSceneMangaPagesResponse, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponse, OpenProjectData, OpenProjectResponse, PostApiInngestData, PreviewPromptData, PreviewPromptResponse, PutApiInngestData, RestoreVersionData, RestoreVersionResponse, ScanWarningsData, ScanWarningsResponse, SetDefaultConfigData, SetDefaultConfigResponse, UpdateAssetData, UpdateAssetResponse, UpdateChapterData, UpdateChapterResponse, UpdateCharacterData, UpdateCharacterResponse, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponse, UpdateSceneConfigData, UpdateSceneConfigResponse, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponse, UpdateSceneResponse, UpdateTomeData, UpdateTomeResponse, UpdateWarningData, UpdateWarningResponse, ValidateGenerationBoardData, ValidateGenerationBoardResponse } from '../types.gen';
+import { archiveAsset, archiveCharacter, archiveProject, cancelGenerationJob, cloneProject, compareVersions, createAssetLink, createChapter, createCharacter, createExport, createGenerationJob, createProject, createRelation, createScene, createSceneConfig, createTome, createVersion, createVoiceSample, deleteAsset, deleteAssetLink, deleteChapter, deleteCharacter, deleteCharacterImage, deleteProject, deleteScene, deleteSceneConfig, deleteSceneMangaPage, deleteTome, downloadBoardArtifact, downloadExport, exportProject, generateCharacterImage, generateSceneManga, get_, getApiInngest, getAsset, getAssetFile, getCharacter, getConfig, getExport, getGenerationBoard, getGenerationJob, getGenerationPanelImage, getHealth, getHealthz, getIndex, getProject, getProjectCharacterImages, getReferenceSuggestions, getStorySummary, getVersion, importAsset, listAssets, listBranches, listChapters, listCharacterImages, listCharacters, listExports, listGenerationBoards, listGenerationJobs, listModels, listProjects, listSceneConfigs, listSceneMangaPages, listScenes, listTomes, listVersions, listWarnings, openProject, type Options, postApiInngest, previewPrompt, putApiInngest, relaunchGenerationJob, restoreVersion, scanWarnings, setDefaultConfig, updateAsset, updateChapter, updateCharacter, updateGenerationPanel, updateProject, updateScene, updateSceneConfig, updateSceneMangaPage, updateTome, updateWarning, validateGenerationBoard } from '../sdk.gen';
+import type { ArchiveAssetData, ArchiveAssetResponse, ArchiveCharacterData, ArchiveCharacterResponse, ArchiveProjectData, ArchiveProjectResponse, CancelGenerationJobData, CancelGenerationJobResponse, CloneProjectData, CloneProjectResponse, CompareVersionsData, CompareVersionsResponse, CreateAssetLinkData, CreateAssetLinkResponse, CreateChapterData, CreateChapterResponse, CreateCharacterData, CreateCharacterResponse, CreateExportData, CreateExportResponse, CreateGenerationJobData, CreateGenerationJobResponse, CreateProjectData, CreateProjectResponse, CreateRelationData, CreateRelationResponse, CreateSceneConfigData, CreateSceneConfigResponse, CreateSceneData, CreateSceneResponse, CreateTomeData, CreateTomeResponse, CreateVersionData, CreateVersionResponse, CreateVoiceSampleData, CreateVoiceSampleResponse, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponse, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateSceneMangaData, GenerateSceneMangaResponse, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponse, GetCharacterData, GetCharacterResponse, GetConfigData, GetConfigResponse, GetData, GetExportData, GetExportResponse, GetGenerationBoardData, GetGenerationBoardResponse, GetGenerationJobData, GetGenerationJobResponse, GetGenerationPanelImageData, GetHealthData, GetHealthResponse, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponse, GetProjectData, GetProjectResponse, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponse, GetVersionData, GetVersionResponse, ImportAssetData, ImportAssetResponse, ListAssetsData, ListAssetsResponse, ListBranchesData, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponse, ListCharactersData, ListCharactersResponse, ListExportsData, ListExportsResponse, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponse, ListProjectsData, ListProjectsResponse, ListSceneConfigsData, ListSceneConfigsResponse, ListSceneMangaPagesData, ListSceneMangaPagesResponse, ListScenesData, ListTomesData, ListVersionsData, ListWarningsData, ListWarningsResponse, OpenProjectData, OpenProjectResponse, PostApiInngestData, PreviewPromptData, PreviewPromptResponse, PutApiInngestData, RelaunchGenerationJobData, RelaunchGenerationJobResponse, RestoreVersionData, RestoreVersionResponse, ScanWarningsData, ScanWarningsResponse, SetDefaultConfigData, SetDefaultConfigResponse, UpdateAssetData, UpdateAssetResponse, UpdateChapterData, UpdateChapterResponse, UpdateCharacterData, UpdateCharacterResponse, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponse, UpdateSceneConfigData, UpdateSceneConfigResponse, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponse, UpdateSceneResponse, UpdateTomeData, UpdateTomeResponse, UpdateWarningData, UpdateWarningResponse, ValidateGenerationBoardData, ValidateGenerationBoardResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -536,12 +536,12 @@ export const getStorySummaryOptions = (options: Options<GetStorySummaryData>) =>
     queryKey: getStorySummaryQueryKey(options)
 });
 
-export const getReferenceSuggestionsQueryKey = (options?: Options<GetReferenceSuggestionsData>) => createQueryKey('getReferenceSuggestions', options);
+export const getReferenceSuggestionsQueryKey = (options: Options<GetReferenceSuggestionsData>) => createQueryKey('getReferenceSuggestions', options);
 
 /**
  * Get reference suggestions
  */
-export const getReferenceSuggestionsOptions = (options?: Options<GetReferenceSuggestionsData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getReferenceSuggestionsQueryKey>>({
+export const getReferenceSuggestionsOptions = (options: Options<GetReferenceSuggestionsData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getReferenceSuggestionsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getReferenceSuggestions({
             ...options,
@@ -623,12 +623,12 @@ export const updateTomeMutation = (options?: Partial<Options<UpdateTomeData>>): 
     return mutationOptions;
 };
 
-export const listChaptersQueryKey = (options?: Options<ListChaptersData>) => createQueryKey('listChapters', options);
+export const listChaptersQueryKey = (options: Options<ListChaptersData>) => createQueryKey('listChapters', options);
 
 /**
  * List chapters
  */
-export const listChaptersOptions = (options?: Options<ListChaptersData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listChaptersQueryKey>>({
+export const listChaptersOptions = (options: Options<ListChaptersData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listChaptersQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await listChapters({
             ...options,
@@ -692,12 +692,12 @@ export const updateChapterMutation = (options?: Partial<Options<UpdateChapterDat
     return mutationOptions;
 };
 
-export const listScenesQueryKey = (options?: Options<ListScenesData>) => createQueryKey('listScenes', options);
+export const listScenesQueryKey = (options: Options<ListScenesData>) => createQueryKey('listScenes', options);
 
 /**
  * List scenes
  */
-export const listScenesOptions = (options?: Options<ListScenesData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listScenesQueryKey>>({
+export const listScenesOptions = (options: Options<ListScenesData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listScenesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await listScenes({
             ...options,
@@ -796,12 +796,12 @@ export const createGenerationJobMutation = (options?: Partial<Options<CreateGene
     return mutationOptions;
 };
 
-export const getGenerationJobQueryKey = (options?: Options<GetGenerationJobData>) => createQueryKey('getGenerationJob', options);
+export const getGenerationJobQueryKey = (options: Options<GetGenerationJobData>) => createQueryKey('getGenerationJob', options);
 
 /**
  * Get a generation job
  */
-export const getGenerationJobOptions = (options?: Options<GetGenerationJobData>) => queryOptions<GetGenerationJobResponse, DefaultError, GetGenerationJobResponse, ReturnType<typeof getGenerationJobQueryKey>>({
+export const getGenerationJobOptions = (options: Options<GetGenerationJobData>) => queryOptions<GetGenerationJobResponse, DefaultError, GetGenerationJobResponse, ReturnType<typeof getGenerationJobQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getGenerationJob({
             ...options,
@@ -832,12 +832,12 @@ export const listGenerationBoardsOptions = (options: Options<ListGenerationBoard
     queryKey: listGenerationBoardsQueryKey(options)
 });
 
-export const getGenerationBoardQueryKey = (options?: Options<GetGenerationBoardData>) => createQueryKey('getGenerationBoard', options);
+export const getGenerationBoardQueryKey = (options: Options<GetGenerationBoardData>) => createQueryKey('getGenerationBoard', options);
 
 /**
  * Get a generation board
  */
-export const getGenerationBoardOptions = (options?: Options<GetGenerationBoardData>) => queryOptions<GetGenerationBoardResponse, DefaultError, GetGenerationBoardResponse, ReturnType<typeof getGenerationBoardQueryKey>>({
+export const getGenerationBoardOptions = (options: Options<GetGenerationBoardData>) => queryOptions<GetGenerationBoardResponse, DefaultError, GetGenerationBoardResponse, ReturnType<typeof getGenerationBoardQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getGenerationBoard({
             ...options,
@@ -884,12 +884,12 @@ export const updateGenerationPanelMutation = (options?: Partial<Options<UpdateGe
     return mutationOptions;
 };
 
-export const getGenerationPanelImageQueryKey = (options?: Options<GetGenerationPanelImageData>) => createQueryKey('getGenerationPanelImage', options);
+export const getGenerationPanelImageQueryKey = (options: Options<GetGenerationPanelImageData>) => createQueryKey('getGenerationPanelImage', options);
 
 /**
  * Get panel image
  */
-export const getGenerationPanelImageOptions = (options?: Options<GetGenerationPanelImageData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getGenerationPanelImageQueryKey>>({
+export const getGenerationPanelImageOptions = (options: Options<GetGenerationPanelImageData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getGenerationPanelImageQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getGenerationPanelImage({
             ...options,
@@ -902,12 +902,12 @@ export const getGenerationPanelImageOptions = (options?: Options<GetGenerationPa
     queryKey: getGenerationPanelImageQueryKey(options)
 });
 
-export const downloadBoardArtifactQueryKey = (options?: Options<DownloadBoardArtifactData>) => createQueryKey('downloadBoardArtifact', options);
+export const downloadBoardArtifactQueryKey = (options: Options<DownloadBoardArtifactData>) => createQueryKey('downloadBoardArtifact', options);
 
 /**
  * Download board artifact
  */
-export const downloadBoardArtifactOptions = (options?: Options<DownloadBoardArtifactData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof downloadBoardArtifactQueryKey>>({
+export const downloadBoardArtifactOptions = (options: Options<DownloadBoardArtifactData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof downloadBoardArtifactQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await downloadBoardArtifact({
             ...options,
@@ -919,6 +919,40 @@ export const downloadBoardArtifactOptions = (options?: Options<DownloadBoardArti
     },
     queryKey: downloadBoardArtifactQueryKey(options)
 });
+
+/**
+ * Cancel a running generation job
+ */
+export const cancelGenerationJobMutation = (options?: Partial<Options<CancelGenerationJobData>>): UseMutationOptions<CancelGenerationJobResponse, DefaultError, Options<CancelGenerationJobData>> => {
+    const mutationOptions: UseMutationOptions<CancelGenerationJobResponse, DefaultError, Options<CancelGenerationJobData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await cancelGenerationJob({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Relaunch a completed or failed generation job
+ */
+export const relaunchGenerationJobMutation = (options?: Partial<Options<RelaunchGenerationJobData>>): UseMutationOptions<RelaunchGenerationJobResponse, DefaultError, Options<RelaunchGenerationJobData>> => {
+    const mutationOptions: UseMutationOptions<RelaunchGenerationJobResponse, DefaultError, Options<RelaunchGenerationJobData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await relaunchGenerationJob({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const listAssetsQueryKey = (options: Options<ListAssetsData>) => createQueryKey('listAssets', options);
 

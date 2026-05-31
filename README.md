@@ -40,7 +40,7 @@ Kuti Studio centralise l'écriture, la conception des personnages, l'organisatio
 
 ```bash
 # Backend
-cd kuti-backend-v2
+cd kuti-backend
 bun install
 cp .env.example .env
 # Éditer .env avec DATABASE_URL
@@ -60,14 +60,14 @@ yarn dev
 
 ```
 .
-├── kuti-backend-v2/          # Backend ElysiaJS
+├── kuti-backend/             # Backend ElysiaJS
 │   ├── src/
 │   │   ├── modules/          # Modules métier (14 modules)
 │   │   ├── lib/              # Librairies partagées
 │   │   └── index.ts          # Entry point
 │   └── prisma/
 │       └── schema.prisma     # Schéma de données
-├── kuti-frontend/            # Frontend React Router 7
+├── kuti-frontend/            # Frontend React Router 7 + shadcn/ui
 │   ├── app/
 │   │   ├── routes/           # Pages et layouts
 │   │   ├── components/       # Composants React
@@ -93,16 +93,16 @@ yarn dev
 
 | Module         | Endpoint                          | Description            |
 | -------------- | --------------------------------- | ---------------------- |
-| health         | `/api/v1/health`                  | Santé et configuration |
-| authentication | `/api/v1/auth/*`                  | Auth Better Auth       |
-| projects       | `/api/v1/projects`                | Projets                |
-| characters     | `/api/v1/projects/:id/characters` | Personnages            |
-| story          | `/api/v1/projects/:id/story/*`    | Tomes/Chapitres/Scènes |
-| generation     | `/api/v1/projects/:id/generation` | Génération IA          |
-| assets         | `/api/v1/projects/:id/assets`     | Médias                 |
-| exports        | `/api/v1/projects/:id/exports`    | Exports                |
-| versions       | `/api/v1/projects/:id/versions`   | Historique             |
-| warnings       | `/api/v1/projects/:id/warnings`   | Cohérence              |
+| health         | `/api/health`                         | Santé et configuration |
+| authentication | `/api/auth/*`                         | Auth Better Auth       |
+| projects       | `/api/projects`                       | Projets                |
+| characters     | `/api/projects/:id/characters`        | Personnages            |
+| story          | `/api/projects/:id/story/*`           | Tomes/Chapitres/Scènes |
+| generation     | `/api/projects/:id/generation`        | Génération IA          |
+| assets         | `/api/projects/:id/assets`            | Médias                 |
+| exports        | `/api/projects/:id/exports`           | Exports                |
+| versions       | `/api/projects/:id/versions`          | Historique             |
+| warnings       | `/api/projects/:id/warnings`          | Cohérence              |
 | inngest        | `/api/inngest`                    | Workflows              |
 
 ## Commandes utiles
@@ -110,7 +110,7 @@ yarn dev
 ### Backend
 
 ```bash
-cd kuti-backend-v2
+cd kuti-backend
 bun run dev              # Démarrer
 bun run db:migrate       # Migrations
 bun run db:studio        # Prisma Studio
@@ -123,7 +123,7 @@ bun run typecheck        # TypeScript
 cd kuti-frontend
 yarn dev                 # Démarrer
 yarn build               # Build production
-yarn openapi-ts          # Générer SDK API
+yarn api:generate        # Générer SDK API Hey API depuis OpenAPI
 yarn typecheck           # TypeScript
 ```
 
@@ -149,11 +149,13 @@ VITE_KUTI_API_URL=http://localhost:8000
 
 ## Principes
 
-1. **OpenAPI primauté** - Le backend expose Swagger UI, le frontend consomme le SDK généré
-2. **Type safety** - Types Prisma partagés, Zod pour validation
-3. **Durable execution** - Jobs longs via Inngest (survient aux redémarrages)
-4. **Modularité** - Un module Elysia par domaine métier
-5. **Local-first** - Stockage local dans `kuti-data/`
+1. **OpenAPI primauté** - Le backend expose Swagger UI, le frontend consomme le SDK Hey API généré
+2. **Contrats camelCase-only** - DTO, OpenAPI, SDK et formulaires frontend exposent des clés `camelCase`; les colonnes SQL restent mappées via Prisma `@map(...)`
+3. **Type safety** - Types Prisma partagés, Zod pour validation
+4. **UI standardisée** - Primitives shadcn/ui dans `app/components/ui`, thème via classe `.dark` sur `document.documentElement`
+5. **Durable execution** - Jobs longs via Inngest (survivent aux redémarrages)
+6. **Modularité** - Un module Elysia par domaine métier
+7. **Local-first** - Stockage local dans `kuti-data/`
 
 ## Contribution
 

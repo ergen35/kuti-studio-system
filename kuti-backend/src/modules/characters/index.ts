@@ -26,6 +26,7 @@ import {
   characterResponseSchema,
   createCharacterBodySchema,
   createRelationBodySchema,
+  createVoiceSampleBodySchema,
   generateCharacterImageQuerySchema,
   imageIdParamsSchema,
   projectCharacterImagesResponseSchema,
@@ -105,6 +106,7 @@ export const charactersModule = new Elysia({
   // Create relation
   .post("/:characterId/relations", async ({ params, body }) => {
     const relation = await createRelation(params.projectId, params.characterId, body);
+    if (!relation) throw new Error("Character not found");
     return relation;
   }, {
     params: characterIdParamsSchema,
@@ -120,7 +122,7 @@ export const charactersModule = new Elysia({
     return sample;
   }, {
     params: characterIdParamsSchema,
-    body: createRelationBodySchema,
+    body: createVoiceSampleBodySchema,
     response: voiceSampleResponseSchema,
     detail: { operationId: "createVoiceSample", summary: "Create a voice sample" },
   })

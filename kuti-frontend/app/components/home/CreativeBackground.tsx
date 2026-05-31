@@ -23,28 +23,23 @@ export function CreativeBackground({ images, className }: CreativeBackgroundProp
 
   if (images.length === 0) {
     return (
-      <div className={clsx("fixed inset-0 -z-10 bg-gradient-to-br from-surface via-surface-2 to-surface", className)}>
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(var(--accent-rgb),0.03),transparent_50%)]" />
-        </div>
+      <div className={clsx("fixed inset-0 -z-10 bg-bg", className)}>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,var(--surface)_0%,transparent_28%),radial-gradient(circle_at_18%_8%,color-mix(in_oklab,var(--accent),transparent_90%),transparent_28rem)]" />
       </div>
     );
   }
 
   return (
     <div className={clsx("fixed inset-0 -z-10 overflow-hidden", className)}>
-      <div className="absolute inset-0 bg-surface" />
-      <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 auto-rows-fr gap-1 p-1 opacity-[0.25] dark:opacity-[0.10]">
+      <div className="absolute inset-0 bg-bg" />
+      <div className="absolute inset-x-0 top-0 grid h-[44vh] grid-cols-4 gap-px opacity-[0.16] grayscale dark:opacity-[0.10] md:grid-cols-6">
         {gridItems.map((item) => (
           <div key={item.id} className={clsx("relative overflow-hidden", item.colSpan === 2 && "col-span-2", item.rowSpan === 2 && "row-span-2")}>
             <img src={item.src} alt="" className="absolute inset-0 w-full h-full object-cover grayscale" />
           </div>
         ))}
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-surface/25 via-surface/15 to-surface/40" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--surface)_100%)] opacity-15" />
-      {/* Warm overlay for light theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50/20 via-transparent to-amber-50/10 dark:hidden pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--bg),transparent_10%)_0%,var(--bg)_54%),radial-gradient(circle_at_18%_5%,color-mix(in_oklab,var(--accent),transparent_88%),transparent_30rem)]" />
     </div>
   );
 }

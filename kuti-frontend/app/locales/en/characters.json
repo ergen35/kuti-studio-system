@@ -38,6 +38,10 @@
     "narrativeArc": "Narrative arc",
     "tags": "Tags"
   },
+  "placeholders": {
+    "traits": "brave, loyal, cunning...",
+    "palette": "#2f6f73, #61a5a0..."
+  },
   "relations": {
     "title": "Relations",
     "empty": "No relations",
@@ -53,8 +57,14 @@
   },
   "voiceSamples": {
     "title": "Voice samples",
+    "empty": "No voice samples",
     "count": "{{count}} sample",
     "count_plural": "{{count}} samples"
+  },
+  "images": {
+    "title": "Generated images",
+    "empty": "No generated image",
+    "confirmDelete": "Delete this image?"
   },
   "status": {
     "active": "Active",
@@ -96,6 +106,8 @@
     "generating": "Generating...",
     "regenerate": "Regenerate",
     "modalTitle": "Generate character image",
+    "modalDescription": "Choose framing, style and the number of variations to generate.",
+    "defaultPromptSubject": "A character",
     "results": "Results",
     "preview": "Prompt preview",
     "download": "Download",
@@ -121,6 +133,13 @@
       "illustrationDesc": "book illustration, stylized, professional art, high quality",
       "watercolorDesc": "watercolor painting, soft colors, artistic, traditional media style"
     },
-    "imageCount": "Number of variations"
+    "imageCount": "Number of variations",
+    "lightbox": {
+      "title": "Generated image",
+      "description": "Preview of the generated character image.",
+      "close": "Close",
+      "previous": "Previous image",
+      "next": "Next image"
+    }
   }
 }

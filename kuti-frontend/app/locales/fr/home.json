@@ -1,6 +1,24 @@
 {
   "title": "Kuti Studio",
   "subtitle": "Production narrative locale",
+  "hero": {
+    "subtitle": "Studio narratif pour œuvres multimédias",
+    "placeholder": "Nom du nouveau projet...",
+    "create": "Créer",
+    "creating": "Création..."
+  },
+  "theme": {
+    "darkTitle": "Passer en mode sombre",
+    "lightTitle": "Passer en mode clair",
+    "dark": "Sombre",
+    "light": "Clair"
+  },
+  "view": {
+    "gridTitle": "Vue grille",
+    "listTitle": "Vue liste",
+    "grid": "Grille",
+    "list": "Liste"
+  },
   "createProject": {
     "title": "Créer un projet",
     "meta": "Stocké dans kuti-data/projects",
@@ -19,6 +37,12 @@
     "title": "Projets",
     "count": "{{count}} projet",
     "count_plural": "{{count}} projets",
+    "statusCount": {
+      "active": "{{count}} actif",
+      "active_plural": "{{count}} actifs",
+      "draft": "{{count}} brouillon",
+      "draft_plural": "{{count}} brouillons"
+    },
     "empty": {
       "title": "Aucun projet",
       "description": "Créez-en un depuis le formulaire ci-dessus pour initialiser le stockage via le backend."
@@ -27,7 +51,8 @@
       "open": "Ouvrir",
       "clone": "Cloner",
       "archive": "Archiver",
-      "dashboard": "Tableau de bord"
+      "dashboard": "Tableau de bord",
+      "more": "Plus d'actions"
     },
     "meta": {
       "path": "Chemin",

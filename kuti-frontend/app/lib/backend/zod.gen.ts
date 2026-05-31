@@ -393,8 +393,14 @@ export const zListCharactersResponse = z.array(z.object({
 
 export const zCreateCharacterBody = z.object({
     name: z.string().min(1).max(255),
-    alias: z.string().max(255).optional(),
-    narrativeRole: z.string().max(255).optional(),
+    alias: z.union([
+        z.string().max(255),
+        z.unknown()
+    ]).optional(),
+    narrativeRole: z.union([
+        z.string().max(255),
+        z.unknown()
+    ]).optional(),
     description: z.string().optional(),
     physicalDescription: z.string().optional(),
     colorPaletteJson: z.array(z.string()).optional(),
@@ -690,12 +696,9 @@ export const zCreateRelationResponse = z.object({
 });
 
 export const zCreateVoiceSampleBody = z.object({
-    sourceCharacterId: z.string(),
-    targetCharacterId: z.string(),
-    relationType: z.string().min(1),
-    strength: z.number().gte(0).lte(100).default(50),
-    narrativeDependency: z.string().optional(),
-    notes: z.string().optional()
+    label: z.string().min(1).max(255),
+    assetPath: z.string().optional(),
+    voiceNotes: z.string().optional()
 });
 
 export const zCreateVoiceSamplePath = z.object({
@@ -849,6 +852,15 @@ export const zGetStorySummaryResponse = z.object({
     }))
 });
 
+export const zGetReferenceSuggestionsPath = z.object({
+    projectId: z.string(),
+    type: z.string()
+});
+
+export const zGetReferenceSuggestionsQuery = z.object({
+    q: z.string().optional()
+});
+
 export const zListTomesPath = z.object({
     projectId: z.string()
 });
@@ -887,6 +899,11 @@ export const zCreateTomeResponse = z.object({
     updatedAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
 });
 
+export const zDeleteTomePath = z.object({
+    projectId: z.string(),
+    tomeId: z.string()
+});
+
 export const zUpdateTomeBody = z.object({
     title: z.string().min(1).optional(),
     synopsis: z.string().optional(),
@@ -896,6 +913,11 @@ export const zUpdateTomeBody = z.object({
         'archived'
     ]).optional(),
     orderIndex: z.number().optional()
+});
+
+export const zUpdateTomePath = z.object({
+    projectId: z.string(),
+    tomeId: z.string()
 });
 
 /**
@@ -915,6 +937,14 @@ export const zUpdateTomeResponse = z.object({
     orderIndex: z.number(),
     createdAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
     updatedAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zListChaptersPath = z.object({
+    projectId: z.string()
+});
+
+export const zListChaptersQuery = z.object({
+    tomeId: z.string().optional()
 });
 
 export const zCreateChapterBody = z.object({
@@ -953,6 +983,11 @@ export const zCreateChapterResponse = z.object({
     updatedAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
 });
 
+export const zDeleteChapterPath = z.object({
+    projectId: z.string(),
+    chapterId: z.string()
+});
+
 export const zUpdateChapterBody = z.object({
     tomeId: z.string().optional(),
     title: z.string().min(1).optional(),
@@ -963,6 +998,11 @@ export const zUpdateChapterBody = z.object({
         'archived'
     ]).optional(),
     orderIndex: z.number().optional()
+});
+
+export const zUpdateChapterPath = z.object({
+    projectId: z.string(),
+    chapterId: z.string()
 });
 
 /**
@@ -983,6 +1023,14 @@ export const zUpdateChapterResponse = z.object({
     orderIndex: z.number(),
     createdAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
     updatedAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
+});
+
+export const zListScenesPath = z.object({
+    projectId: z.string()
+});
+
+export const zListScenesQuery = z.object({
+    chapterId: z.string().optional()
 });
 
 export const zCreateSceneBody = z.object({
@@ -1035,6 +1083,11 @@ export const zCreateSceneResponse = z.object({
     updatedAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)
 });
 
+export const zDeleteScenePath = z.object({
+    projectId: z.string(),
+    sceneId: z.string()
+});
+
 export const zUpdateSceneBody = z.object({
     tomeId: z.string().optional(),
     chapterId: z.string().optional(),
@@ -1052,6 +1105,11 @@ export const zUpdateSceneBody = z.object({
         'archived'
     ]).optional(),
     orderIndex: z.number().optional()
+});
+
+export const zUpdateScenePath = z.object({
+    projectId: z.string(),
+    sceneId: z.string()
 });
 
 /**
@@ -1106,6 +1164,10 @@ export const zCreateGenerationJobBody = z.object({
     summary: z.string().optional()
 });
 
+export const zCreateGenerationJobPath = z.object({
+    projectId: z.string()
+});
+
 /**
  * Response for status 200
  */
@@ -1153,6 +1215,11 @@ export const zCreateGenerationJobResponse = z.object({
         z.string(),
         z.unknown()
     ])
+});
+
+export const zGetGenerationJobPath = z.object({
+    projectId: z.string(),
+    jobId: z.string()
 });
 
 /**
@@ -1206,6 +1273,11 @@ export const zGetGenerationJobResponse = z.object({
 
 export const zListGenerationBoardsPath = z.object({
     projectId: z.string()
+});
+
+export const zGetGenerationBoardPath = z.object({
+    projectId: z.string(),
+    boardId: z.string()
 });
 
 /**
@@ -1268,6 +1340,11 @@ export const zGetGenerationBoardResponse = z.object({
 
 export const zValidateGenerationBoardBody = z.object({
     note: z.string().optional()
+});
+
+export const zValidateGenerationBoardPath = z.object({
+    projectId: z.string(),
+    boardId: z.string()
 });
 
 /**
@@ -1337,6 +1414,90 @@ export const zUpdateGenerationPanelBody = z.object({
     ]).optional(),
     caption: z.string().optional(),
     title: z.string().optional()
+});
+
+export const zUpdateGenerationPanelPath = z.object({
+    projectId: z.string(),
+    boardId: z.string(),
+    panelId: z.string()
+});
+
+export const zGetGenerationPanelImagePath = z.object({
+    projectId: z.string(),
+    boardId: z.string(),
+    panelId: z.string()
+});
+
+export const zDownloadBoardArtifactPath = z.object({
+    projectId: z.string(),
+    boardId: z.string()
+});
+
+export const zCancelGenerationJobPath = z.object({
+    projectId: z.string(),
+    jobId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zCancelGenerationJobResponse = z.object({
+    success: z.boolean(),
+    message: z.string()
+});
+
+export const zRelaunchGenerationJobPath = z.object({
+    projectId: z.string(),
+    jobId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zRelaunchGenerationJobResponse = z.object({
+    id: z.string(),
+    projectId: z.string(),
+    sourceKind: z.enum([
+        'scene',
+        'chapter',
+        'tome',
+        'panel',
+        'custom'
+    ]),
+    sourceId: z.string(),
+    sourceLabel: z.string(),
+    sourceVersionId: z.union([
+        z.string(),
+        z.unknown()
+    ]),
+    strategy: z.enum(['direct', 'intermediate']),
+    entrypoint: z.string(),
+    title: z.string(),
+    prompt: z.string(),
+    summary: z.string(),
+    status: z.enum([
+        'pending',
+        'running',
+        'ready',
+        'validated',
+        'failed'
+    ]),
+    progress: z.number(),
+    metadataJson: z.record(z.unknown()),
+    createdAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    updatedAt: z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+    completedAt: z.union([
+        z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    failedAt: z.union([
+        z.string().datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/),
+        z.unknown()
+    ]),
+    errorMessage: z.union([
+        z.string(),
+        z.unknown()
+    ])
 });
 
 export const zListAssetsPath = z.object({
@@ -2041,6 +2202,9 @@ export const zScanWarningsPath = z.object({
  * Response for status 200
  */
 export const zScanWarningsResponse = z.object({
+    scanned: z.number().int().gte(0).lte(9007199254740991),
+    added: z.number().int().gte(0).lte(9007199254740991),
+    resolved: z.number().int().gte(0).lte(9007199254740991),
     items: z.array(z.object({
         id: z.string(),
         projectId: z.string(),

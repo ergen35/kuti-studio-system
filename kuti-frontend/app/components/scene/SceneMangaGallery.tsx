@@ -15,9 +15,25 @@ import {
   Maximize2,
 } from "lucide-react";
 import { Button, Badge, EmptyState, LoadingState, ErrorState } from "~/components/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { useTranslation } from "~/hooks/useTranslation";
 import type { ListSceneMangaPagesResponse } from "~/lib/backend/types.gen";
 
 type SceneMangaPage = ListSceneMangaPagesResponse[number];
+
+function stringValue(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
+
+function pageId(page: SceneMangaPage | undefined) {
+  return typeof page?.id === "string" ? page.id : "";
+}
 import {
   listSceneMangaPagesOptions,
   updateSceneMangaPageMutation,
@@ -33,6 +49,7 @@ interface SceneMangaGalleryProps {
 }
 
 export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps) {
+  const { t } = useTranslation("scene");
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -70,20 +87,20 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
 
   const goToPrevious = () => {
     if (canGoPrevious) {
-      setSelectedPageId(pages[currentIndex - 1].id);
+      setSelectedPageId(pageId(pages[currentIndex - 1]));
     }
   };
 
   const goToNext = () => {
     if (canGoNext) {
-      setSelectedPageId(pages[currentIndex + 1].id);
+      setSelectedPageId(pageId(pages[currentIndex + 1]));
     }
   };
 
   if (pagesQuery.isLoading) {
     return (
       <div className="rounded-lg border border-line bg-surface p-6">
-        <LoadingState label="Chargement des planches..." />
+        <LoadingState label={t("mangaGallery.loading")} />
       </div>
     );
   }
@@ -100,8 +117,8 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
     return (
       <div className="rounded-lg border border-line bg-surface p-6">
         <EmptyState
-          title="Aucune planche générée"
-          description="Générez des planches de manga pour cette scène en cliquant sur le bouton ci-dessus."
+          title={t("mangaGallery.empty.title")}
+          description={t("mangaGallery.empty.description")}
         />
       </div>
     );
@@ -112,7 +129,7 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
       {/* Header with count */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-ink">
-          Planches générées
+          {t("mangaGallery.generated")}
           <span className="ml-2 text-xs text-muted">({pages.length})</span>
         </h3>
       </div>
@@ -141,14 +158,17 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
         ))}
       </div>
 
-      {/* Lightbox */}
-      {lightboxOpen && selectedPage && (
-        <div className="fixed inset-0 z-50 bg-ink/90 flex flex-col">
-          {/* Toolbar */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <Dialog open={lightboxOpen && Boolean(selectedPage)} onOpenChange={setLightboxOpen}>
+        {selectedPage && (
+          <DialogContent className="h-[92vh] max-w-[min(96vw,1200px)] overflow-hidden bg-ink text-white" showCloseButton={false}>
+            <DialogHeader className="sr-only">
+              <DialogTitle>{t("mangaGallery.lightboxTitle")}</DialogTitle>
+              <DialogDescription>{t("mangaGallery.lightboxDescription")}</DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-3">
               <span className="text-white text-sm font-medium">
-                Page {currentIndex + 1} / {pages.length}
+                {t("mangaGallery.pageCounter", { current: currentIndex + 1, total: pages.length })}
               </span>
               <Badge
                 tone={
@@ -168,55 +188,59 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
                 className="text-white hover:bg-white/10"
                 onClick={() => {
                   const link = document.createElement("a");
-                  link.href = selectedPage.imageUrl || "";
+                  link.href = stringValue(selectedPage.imageUrl);
                   link.download = `t${selectedPage.tomeId}-c${selectedPage.chapterId}-s${selectedPage.sceneId}-${selectedPage.pageNumber}.png`;
                   link.click();
                 }}
+                title={t("mangaGallery.download")}
               >
-                <Download size={18} />
+                <Download />
               </Button>
               <Button
                 variant="ghost"
                 className="text-white hover:bg-white/10"
                 onClick={() => setLightboxOpen(false)}
+                title={t("actions.close")}
               >
-                <X size={20} />
+                <X />
               </Button>
             </div>
           </div>
 
-          {/* Image Container */}
-          <div className="flex-1 flex items-center justify-center p-4 relative">
-            {/* Navigation */}
+          <div className="relative flex min-h-0 flex-1 items-center justify-center p-4">
             {canGoPrevious && (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={goToPrevious}
-                className="absolute left-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="absolute left-4 text-white hover:bg-white/10"
+                title={t("mangaGallery.previous")}
               >
-                <ChevronLeft size={24} />
-              </button>
+                <ChevronLeft />
+              </Button>
             )}
             {canGoNext && (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={goToNext}
-                className="absolute right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="absolute right-4 text-white hover:bg-white/10"
+                title={t("mangaGallery.next")}
               >
-                <ChevronRight size={24} />
-              </button>
+                <ChevronRight />
+              </Button>
             )}
 
-            {/* Image */}
-            {selectedPage.imageUrl && (
+            {stringValue(selectedPage.imageUrl) && (
               <img
-                src={selectedPage.imageUrl}
-                alt={`Planche ${selectedPage.pageNumber}`}
+                src={stringValue(selectedPage.imageUrl)}
+                alt={t("mangaGallery.pageAlt", { number: selectedPage.pageNumber })}
                 className="max-h-full max-w-full object-contain rounded-lg"
               />
             )}
           </div>
 
-          {/* Bottom Actions */}
-          <div className="p-4 border-t border-white/10 flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 border-t border-white/10 pt-3">
             <Button
               variant={selectedPage.status === "selected" ? "primary" : "ghost"}
               className={selectedPage.status === "selected" ? "" : "text-white hover:bg-white/10"}
@@ -228,8 +252,8 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               }
               disabled={updatePage.isPending}
             >
-              <Check size={16} className="mr-1" />
-              Valider
+              <Check />
+              {t("mangaGallery.approve")}
             </Button>
             <Button
               variant={selectedPage.status === "rejected" ? "primary" : "ghost"}
@@ -242,8 +266,8 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               }
               disabled={updatePage.isPending}
             >
-              <X size={16} className="mr-1" />
-              Rejeter
+              <X />
+              {t("mangaGallery.reject")}
             </Button>
             <Button
               variant="ghost"
@@ -254,14 +278,15 @@ export function SceneMangaGallery({ projectId, sceneId }: SceneMangaGalleryProps
               disabled={deletePage.isPending}
             >
               {deletePage.isPending ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2 className="animate-spin" />
               ) : (
-                <Trash2 size={16} />
+                <Trash2 />
               )}
             </Button>
           </div>
-        </div>
-      )}
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 }
@@ -286,6 +311,7 @@ function PageThumbnail({
   isUpdating,
   isDeleting,
 }: PageThumbnailProps) {
+  const { t } = useTranslation("scene");
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -295,10 +321,10 @@ function PageThumbnail({
       onMouseLeave={() => setShowActions(false)}
     >
       {/* Image */}
-      {page.imageUrl ? (
+      {stringValue(page.imageUrl) ? (
         <img
-          src={page.imageUrl}
-          alt={`Planche ${page.pageNumber}`}
+          src={stringValue(page.imageUrl)}
+          alt={t("mangaGallery.pageAlt", { number: page.pageNumber })}
           className="w-full h-full object-cover"
           onClick={onSelect}
         />
@@ -336,40 +362,46 @@ function PageThumbnail({
         <div className="absolute inset-0 bg-ink/60 flex flex-col items-center justify-center gap-2">
           <Button variant="ghost" className="text-white" onClick={onSelect}>
             <Maximize2 size={16} className="mr-1" />
-            Voir
+            {t("mangaGallery.view")}
           </Button>
           <div className="flex items-center gap-1">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => onUpdate({ status: "selected" })}
               disabled={isUpdating}
               className={clsx(
-                "p-2 rounded-full transition-colors",
+                "text-white",
                 page.status === "selected"
                   ? "bg-success text-success-ink"
                   : "bg-white/20 text-white hover:bg-success/80"
               )}
             >
               <Check size={14} />
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => onUpdate({ status: "rejected" })}
               disabled={isUpdating}
               className={clsx(
-                "p-2 rounded-full transition-colors",
+                "text-white",
                 page.status === "rejected"
                   ? "bg-danger text-danger-ink"
                   : "bg-white/20 text-white hover:bg-danger/80"
               )}
             >
               <X size={14} />
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               onClick={onDelete}
               disabled={isDeleting}
-              className="p-2 rounded-full bg-white/20 text-white hover:bg-danger/80 transition-colors"
+              className="bg-white/20 text-white hover:bg-danger/80"
             >
               {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-            </button>
+            </Button>
           </div>
         </div>
       )}

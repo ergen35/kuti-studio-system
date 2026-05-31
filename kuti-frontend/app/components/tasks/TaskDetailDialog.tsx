@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { clsx } from "clsx";
 import {
-  X,
   BookOpen,
   Book,
   FileText,
@@ -17,7 +16,18 @@ import {
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Badge } from "~/components/ui";
-import { client } from "~/lib/backend/client.gen";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { useTranslation } from "~/hooks/useTranslation";
+import {
+  cancelGenerationJobMutation,
+  relaunchGenerationJobMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
 import type {
   TaskItem,
   TaskStatus,
@@ -46,19 +56,27 @@ const STATUS_ICONS: Record<TaskStatus, React.ComponentType<{ size?: number; clas
 };
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
-  pending: "text-yellow-500",
-  running: "text-blue-500",
-  ready: "text-emerald-500",
-  validated: "text-teal-500",
-  failed: "text-red-500",
+  pending: "text-warning",
+  running: "text-primary",
+  ready: "text-success",
+  validated: "text-success",
+  failed: "text-destructive",
 };
 
 const STATUS_BG_COLORS: Record<TaskStatus, string> = {
-  pending: "bg-yellow-500/10",
-  running: "bg-blue-500/10",
-  ready: "bg-emerald-500/10",
-  validated: "bg-teal-500/10",
-  failed: "bg-red-500/10",
+  pending: "bg-warning/10",
+  running: "bg-primary/10",
+  ready: "bg-success/10",
+  validated: "bg-success/10",
+  failed: "bg-destructive/10",
+};
+
+const STATUS_BAR_COLORS: Record<TaskStatus, string> = {
+  pending: "bg-warning",
+  running: "bg-primary",
+  ready: "bg-success",
+  validated: "bg-success",
+  failed: "bg-destructive",
 };
 
 interface TaskDetailDialogProps {
@@ -75,6 +93,7 @@ export function TaskDetailDialog({
   onClose,
 }: TaskDetailDialogProps) {
   const queryClient = useQueryClient();
+  const { t, i18n } = useTranslation(["tasks", "common"]);
 
   // Conditions d'affichage des boutons
   const canCancel = task.status === "running" || task.status === "pending";
@@ -82,18 +101,7 @@ export function TaskDetailDialog({
 
   // Mutation Cancel
   const cancelMutation = useMutation({
-    mutationFn: async () => {
-      const result = await client.post<{
-        success: boolean;
-        message: string;
-      }>({
-        url: `/api/projects/${projectId}/generation/jobs/${task.id}/cancel`,
-      });
-      if (!result.response || !result.response.ok) {
-        throw new Error("Failed to cancel job");
-      }
-      return result.data!;
-    },
+    ...cancelGenerationJobMutation(),
     onSuccess: () => {
       // Fermer la boîte de dialogue
       onClose();
@@ -104,19 +112,7 @@ export function TaskDetailDialog({
 
   // Mutation Relaunch
   const relaunchMutation = useMutation({
-    mutationFn: async () => {
-      const result = await client.post<{
-        id: string;
-        title: string;
-        status: string;
-      }>({
-        url: `/api/projects/${projectId}/generation/jobs/${task.id}/relaunch`,
-      });
-      if (!result.response || !result.response.ok) {
-        throw new Error("Failed to relaunch job");
-      }
-      return result.data!;
-    },
+    ...relaunchGenerationJobMutation(),
     onSuccess: () => {
       // Fermer la boîte de dialogue
       onClose();
@@ -134,23 +130,14 @@ export function TaskDetailDialog({
     return formatElapsedTime(task.createdAt);
   }, [task.createdAt, task.updatedAt, task.status]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-ink/50 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Dialog */}
-      <div className="relative z-50 w-full max-w-lg max-h-[90vh] bg-surface border border-line rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 mx-4">
-        {/* Header */}
-        <div className="flex items-start gap-3 p-4 border-b border-line">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="border-b border-border p-4">
+          <div className="flex items-start gap-3 pr-8">
           <div
             className={clsx(
-              "p-2 rounded-lg shrink-0",
+              "shrink-0 rounded-lg p-2",
               STATUS_BG_COLORS[task.status]
             )}
           >
@@ -160,35 +147,29 @@ export function TaskDetailDialog({
             />
           </div>
 
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-ink truncate">
+          <div className="min-w-0 flex-1">
+            <DialogTitle className="truncate text-lg font-semibold text-foreground">
               {task.title}
-            </h2>
-            <div className="flex items-center gap-2 mt-1">
+            </DialogTitle>
+            <div className="mt-1 flex items-center gap-2">
               <Badge tone={task.status}>{getStatusLabel(task.status)}</Badge>
-              <span className="text-xs text-muted">
+              <span className="text-xs text-muted-foreground">
                 {task.sourceLabel || task.sourceKind}
               </span>
             </div>
           </div>
-
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg text-muted hover:text-ink hover:bg-surface-2 transition-colors shrink-0"
-          >
-            <X size={18} />
-          </button>
-        </div>
+          </div>
+        </DialogHeader>
 
         {/* Content */}
-        <div className="p-4 space-y-5 overflow-y-auto max-h-[60vh]">
+        <div className="flex max-h-[60vh] flex-col gap-5 overflow-y-auto p-4">
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-3">
             {/* Status */}
-            <div className="rounded-lg border border-line bg-surface-2/30 p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted mb-1.5">
+            <div className="rounded-lg border border-border bg-secondary/30 p-3">
+              <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <StatusIcon size={12} className={STATUS_COLORS[task.status]} />
-                <span>Statut</span>
+                <span>{t('detail.status')}</span>
               </div>
               <p className={clsx("font-medium text-sm", STATUS_COLORS[task.status])}>
                 {getStatusLabel(task.status)}
@@ -196,83 +177,80 @@ export function TaskDetailDialog({
             </div>
 
             {/* Type */}
-            <div className="rounded-lg border border-line bg-surface-2/30 p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted mb-1.5">
+            <div className="rounded-lg border border-border bg-secondary/30 p-3">
+              <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <SourceIcon size={12} />
-                <span>Type</span>
+                <span>{t('detail.type')}</span>
               </div>
-              <p className="font-medium text-sm text-ink capitalize">
+              <p className="text-sm font-medium capitalize text-foreground">
                 {task.sourceKind}
               </p>
             </div>
 
             {/* Elapsed Time */}
-            <div className="rounded-lg border border-line bg-surface-2/30 p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted mb-1.5">
+            <div className="rounded-lg border border-border bg-secondary/30 p-3">
+              <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Clock size={12} />
-                <span>Temps</span>
+                <span>{t('detail.elapsed')}</span>
               </div>
-              <p className="font-medium text-sm text-ink">
+              <p className="text-sm font-medium text-foreground">
                 {elapsedTime}
               </p>
             </div>
           </div>
 
           {/* Progress Section */}
-          <div className="rounded-lg border border-line bg-surface-2/30 p-4 space-y-3">
+          <div className="flex flex-col gap-3 rounded-lg border border-border bg-secondary/30 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-ink">Progrès</span>
-              <span className="text-sm font-semibold text-accent">
+              <span className="text-sm font-medium text-foreground">{t('detail.progress')}</span>
+              <span className="text-sm font-semibold text-primary">
                 {Math.round(task.progress)}%
               </span>
             </div>
 
             {/* Progress Bar */}
-            <div className="h-2 rounded-full bg-surface overflow-hidden">
+            <div className="h-2 overflow-hidden rounded-full bg-card">
               <div
                 className={clsx(
                   "h-full rounded-full transition-all duration-300",
-                  task.status === "running" && "bg-accent animate-pulse",
-                  task.status === "ready" && "bg-emerald-500",
-                  task.status === "validated" && "bg-teal-500",
-                  task.status === "failed" && "bg-red-500",
-                  task.status === "pending" && "bg-yellow-500"
+                  STATUS_BAR_COLORS[task.status],
+                  task.status === "running" && "animate-pulse"
                 )}
                 style={{ width: `${task.progress}%` }}
               />
             </div>
 
             {task.hierarchyProgress && (
-              <p className="text-xs text-muted">
+              <p className="text-xs text-muted-foreground">
                 {task.hierarchyProgress.label}
               </p>
             )}
 
             {task.errorMessage && (
-              <div className="flex items-start gap-2 p-2 rounded bg-red-500/10 text-red-500 text-xs">
-                <AlertCircle size={14} className="shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 rounded bg-destructive/10 p-2 text-xs text-destructive">
+                <AlertCircle size={14} className="mt-0.5 shrink-0" />
                 <span>{task.errorMessage}</span>
               </div>
             )}
           </div>
 
           {/* Details Section */}
-          <div className="rounded-lg border border-line bg-surface-2/30 p-4 space-y-3">
-            <h3 className="text-sm font-medium text-ink">Détails</h3>
+          <div className="flex flex-col gap-3 rounded-lg border border-border bg-secondary/30 p-4">
+            <h3 className="text-sm font-medium text-foreground">{t('detail.details')}</h3>
 
             <dl className="grid grid-cols-[100px_1fr] gap-y-2 text-sm">
-              <dt className="text-muted">ID Job</dt>
-              <dd className="font-mono text-ink truncate">{task.id}</dd>
+              <dt className="text-muted-foreground">{t('detail.jobId')}</dt>
+              <dd className="truncate font-mono text-foreground">{task.id}</dd>
 
-              <dt className="text-muted">Source ID</dt>
-              <dd className="font-mono text-ink truncate">{task.sourceId || '-'}</dd>
+              <dt className="text-muted-foreground">{t('detail.sourceId')}</dt>
+              <dd className="truncate font-mono text-foreground">{task.sourceId || '-'}</dd>
 
-              <dt className="text-muted">Source</dt>
-              <dd className="text-ink">{task.sourceLabel || '-'}</dd>
+              <dt className="text-muted-foreground">{t('detail.source')}</dt>
+              <dd className="text-foreground">{task.sourceLabel || '-'}</dd>
 
-              <dt className="text-muted">Créé le</dt>
-              <dd className="text-ink">
-                {new Date(task.createdAt).toLocaleString('fr-FR', {
+              <dt className="text-muted-foreground">{t('detail.createdAt')}</dt>
+              <dd className="text-foreground">
+                {new Date(task.createdAt).toLocaleString(i18n.language, {
                   dateStyle: 'medium',
                   timeStyle: 'short',
                 })}
@@ -280,9 +258,9 @@ export function TaskDetailDialog({
 
               {task.updatedAt && (
                 <>
-                  <dt className="text-muted">Mis à jour</dt>
-                  <dd className="text-ink">
-                    {new Date(task.updatedAt).toLocaleString('fr-FR', {
+                  <dt className="text-muted-foreground">{t('detail.updatedAt')}</dt>
+                  <dd className="text-foreground">
+                    {new Date(task.updatedAt).toLocaleString(i18n.language, {
                       dateStyle: 'medium',
                       timeStyle: 'short',
                     })}
@@ -293,12 +271,11 @@ export function TaskDetailDialog({
           </div>
         </div>
 
-        {/* Footer avec Actions */}
-        <div className="flex items-center justify-end gap-2 p-4 border-t border-line bg-surface-2/30">
+        <DialogFooter className="flex-row items-center justify-end gap-2">
           {canCancel && (
             <Button
               variant="danger"
-              onClick={() => cancelMutation.mutate()}
+              onClick={() => cancelMutation.mutate({ path: { projectId, jobId: task.id } })}
               disabled={cancelMutation.isPending}
               className="flex items-center gap-2"
             >
@@ -307,14 +284,14 @@ export function TaskDetailDialog({
               ) : (
                 <Square size={16} />
               )}
-              Annuler
+              {t('actions.cancelTask')}
             </Button>
           )}
 
           {canRelaunch && (
             <Button
               variant="primary"
-              onClick={() => relaunchMutation.mutate()}
+              onClick={() => relaunchMutation.mutate({ path: { projectId, jobId: task.id } })}
               disabled={relaunchMutation.isPending}
               className="flex items-center gap-2"
             >
@@ -323,15 +300,15 @@ export function TaskDetailDialog({
               ) : (
                 <RefreshCw size={16} />
               )}
-              Relancer
+              {t('actions.relaunch')}
             </Button>
           )}
 
           <Button variant="ghost" onClick={onClose}>
-            Fermer
+            {t('common:actions.close')}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

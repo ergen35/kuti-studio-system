@@ -1,0 +1,55 @@
+{
+  "actions": {
+    "cancel": "Annuler",
+    "close": "Fermer"
+  },
+  "generation": {
+    "title": "Générer une planche manga",
+    "description": "Configurez les références et le contexte avant de lancer la génération.",
+    "loadingConfigs": "Chargement des configurations...",
+    "config": "Configuration",
+    "selectConfig": "Sélectionner une configuration",
+    "defaultConfig": "(défaut)",
+    "colorMode": {
+      "bw": "Noir et blanc",
+      "color": "Couleur"
+    },
+    "pageCount": "Nombre de planches",
+    "characterRefs": "Références personnages",
+    "additionalContext": "Contexte additionnel (optionnel)",
+    "additionalContextPlaceholder": "Précisez le style, les angles de caméra ou l'ambiance.",
+    "promptPreview": "Aperçu du prompt",
+    "loadingPreview": "Génération de l'aperçu...",
+    "styleLabel": "Style",
+    "viewSystemPrompt": "Voir le system prompt ({{count}} caractères)",
+    "generating": "Génération...",
+    "generateOne": "Générer la planche",
+    "generateMany": "Générer {{count}} planches"
+  },
+  "mangaGallery": {
+    "loading": "Chargement des planches...",
+    "empty": {
+      "title": "Aucune planche générée",
+      "description": "Générez des planches de manga pour cette scène avec le bouton de génération."
+    },
+    "generated": "Planches générées",
+    "lightboxTitle": "Planche manga",
+    "lightboxDescription": "Aperçu de la planche générée avec actions de validation.",
+    "pageCounter": "Page {{current}} / {{total}}",
+    "download": "Télécharger",
+    "previous": "Planche précédente",
+    "next": "Planche suivante",
+    "pageAlt": "Planche {{number}}",
+    "approve": "Valider",
+    "reject": "Rejeter",
+    "view": "Voir"
+  },
+  "characterSelector": {
+    "empty": "Aucun personnage dans cette scène.",
+    "referenceSelected": "Image de référence sélectionnée",
+    "imageAvailable": "Image disponible",
+    "noImage": "Pas d'image générée",
+    "selected": "Sélectionné",
+    "help": "Sélectionnez l'image à utiliser comme référence visuelle pour ce personnage."
+  }
+}

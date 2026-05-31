@@ -5,7 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
-import { Badge, Button, EmptyState, ErrorState, LoadingState, PageHeader, Panel, dateLabel } from "~/components/ui";
+import { Badge, Button, EmptyState, ErrorState, LoadingState, PageHeader, Panel, SectionTitle, dateLabel } from "~/components/ui";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { Input } from "~/components/ui/input";
 import { FormField } from "~/components/FormField";
 import { apiErrorMessage } from "~/lib/errors";
 import {
@@ -50,38 +52,44 @@ export default function VersionsRoute() {
   }, { onSuccess: () => reset() });
   
   const restore = useMutation(restoreVersionMutation());
+  const versionItems = (versions.data as Array<Version> | undefined) ?? [];
+  const branchItems = (branches.data as Array<Branch> | undefined) ?? [];
 
   return (
     <AppShell>
       <PageHeader title={t('title')} description={t('description')} />
       <div className="grid gap-3 lg:grid-cols-2">
         <Panel>
+          <SectionTitle title={t('panels.create.title')} />
           <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
             <FormField label={t('panels.create.branch')} error={errors.branch}>
-              <input {...register('branch')} />
+              <Input {...register('branch')} />
             </FormField>
             <FormField label={t('panels.create.label')} error={errors.label}>
-              <input {...register('label')} />
+              <Input {...register('label')} />
             </FormField>
             <Button variant="primary" disabled={isSubmitting || create.isPending}><Save size={16} /> {t('panels.create.button')}</Button>
             {create.error ? <ErrorState message={apiErrorMessage(create.error)} /> : null}
           </form>
         </Panel>
         <Panel>
-          <h2 className="mb-3 text-[15px] font-semibold text-ink">{t('panels.branches.title')}</h2>
-          <div className="grid gap-2">{(branches.data as Array<Branch> || []).map((item) => <div className="grid gap-1 rounded-[7px] border border-line bg-surface-2/55 p-2.5" key={item.branchName}><strong className="text-sm text-ink">{item.branchName}</strong><small className="text-xs text-muted">{item.versionCount} {t('panels.branches.count', { count: item.versionCount })} · {t('panels.branches.latest')} {dateLabel(item.latestCreatedAt)}</small></div>)}</div>
+          <SectionTitle title={t('panels.branches.title')} />
+          {branchItems.length === 0 ? <EmptyState title={t('empty.title')} description={t('empty.description')} /> : null}
+          <div className="grid gap-2">{branchItems.map((item) => <div className="grid gap-1 rounded-lg border border-border bg-secondary/35 p-3" key={item.branchName}><strong className="text-sm text-foreground">{item.branchName}</strong><small className="text-xs text-muted-foreground">{t('panels.branches.count', { count: item.versionCount })} · {t('panels.branches.latest')} {dateLabel(item.latestCreatedAt)}</small></div>)}</div>
         </Panel>
       </div>
       <div className="mt-3">
         {versions.isLoading ? <LoadingState /> : null}
         {versions.error ? <ErrorState message={apiErrorMessage(versions.error)} /> : null}
-        {versions.data?.length === 0 ? <EmptyState title={t('empty.title')} description={t('empty.description')} /> : null}
-        <div className="overflow-x-auto rounded-[7px] border border-line bg-surface shadow-card">
-          <table className="w-full border-collapse text-left text-sm">
-            <thead><tr className="border-b border-line text-xs text-muted"><th className="p-2.5 font-semibold">{t('table.version')}</th><th className="p-2.5 font-semibold">{t('table.branch')}</th><th className="p-2.5 font-semibold">{t('table.created')}</th><th className="p-2.5" /></tr></thead>
-            <tbody>{(versions.data as Array<Version> || []).map((version) => <tr className="border-b border-line last:border-0" key={version.id}><td className="p-2.5 align-top"><strong className="text-ink">{version.label}</strong><div className="text-xs text-muted">{version.summary || `#${version.versionIndex}`}</div></td><td className="p-2.5 align-top"><Badge>{version.branchName}</Badge></td><td className="p-2.5 align-top text-muted">{dateLabel(version.createdAt)}</td><td className="p-2.5 align-top"><Button onClick={() => restore.mutate({ path: { projectId: projectId, versionId: version.id }, body: {} })}><RotateCcw size={15} /> {t('actions.restore')}</Button></td></tr>)}</tbody>
-          </table>
-        </div>
+        {versionItems.length === 0 ? <EmptyState title={t('empty.title')} description={t('empty.description')} /> : null}
+        {versionItems.length > 0 ? (
+          <Panel>
+            <Table>
+              <TableHeader><TableRow><TableHead>{t('table.version')}</TableHead><TableHead>{t('table.branch')}</TableHead><TableHead>{t('table.created')}</TableHead><TableHead /></TableRow></TableHeader>
+              <TableBody>{versionItems.map((version) => <TableRow key={version.id}><TableCell className="align-top"><strong className="text-foreground">{version.label}</strong><div className="text-xs text-muted-foreground">{version.summary || `#${version.versionIndex}`}</div></TableCell><TableCell className="align-top"><Badge>{version.branchName}</Badge></TableCell><TableCell className="align-top text-muted-foreground">{dateLabel(version.createdAt)}</TableCell><TableCell className="align-top"><Button onClick={() => restore.mutate({ path: { projectId: projectId, versionId: version.id }, body: {} })}><RotateCcw size={15} /> {t('actions.restore')}</Button></TableCell></TableRow>)}</TableBody>
+            </Table>
+          </Panel>
+        ) : null}
       </div>
     </AppShell>
   );

@@ -4,6 +4,9 @@ import { useState } from "react";
 import { clsx } from "clsx";
 import { Check, ImageIcon, X } from "lucide-react";
 import { Button } from "~/components/ui";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
+import { useTranslation } from "~/hooks/useTranslation";
 import type { ListCharactersResponse, GetProjectCharacterImagesResponse } from "~/lib/backend";
 import { characterImageUrlFromData, type CharacterImageWithUrl } from "~/lib/image-urls";
 
@@ -37,13 +40,14 @@ export function CharacterImageSelector({
   selectedImages,
   onSelect,
 }: CharacterImageSelectorProps) {
+  const { t } = useTranslation("scene");
   const [expandedCharacter, setExpandedCharacter] = useState<string | null>(null);
 
   if (characters.length === 0) {
     return (
-      <div className="text-sm text-muted p-3 bg-surface-2/30 rounded-lg">
-        Aucun personnage dans cette scène.
-      </div>
+      <Alert>
+        <AlertDescription>{t("characterSelector.empty")}</AlertDescription>
+      </Alert>
     );
   }
 
@@ -59,9 +63,11 @@ export function CharacterImageSelector({
             key={character.slug}
             className="border border-line rounded-lg bg-surface overflow-hidden"
           >
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setExpandedCharacter(isExpanded ? null : character.slug)}
-              className="w-full flex items-center justify-between p-3 hover:bg-surface-2/30 transition-colors"
+              className="w-full justify-between p-3"
             >
               <div className="flex items-center gap-3">
                 <div
@@ -86,28 +92,28 @@ export function CharacterImageSelector({
                   <p className="text-sm font-medium text-ink">{character.name}</p>
                   <p className="text-xs text-muted">
                     {selectedImageId
-                      ? "Image de référence sélectionnée"
+                      ? t("characterSelector.referenceSelected")
                       : hasImage
-                      ? "Image disponible"
-                      : "Pas d'image générée"}
+                      ? t("characterSelector.imageAvailable")
+                      : t("characterSelector.noImage")}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {selectedImageId && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-success/20 text-success">
-                    Sélectionné
-                  </span>
+                  <Badge variant="secondary">{t("characterSelector.selected")}</Badge>
                 )}
                 <span className="text-xs text-muted">{isExpanded ? "▲" : "▼"}</span>
               </div>
-            </button>
+            </Button>
 
             {isExpanded && hasImage && (
               <div className="p-3 border-t border-line bg-surface-2/20">
                 <div className="grid grid-cols-4 gap-2">
                   {/* Option: aucune image */}
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
                     onClick={() => onSelect(character.slug, null)}
                     className={clsx(
                       "aspect-square rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all",
@@ -118,11 +124,13 @@ export function CharacterImageSelector({
                   >
                     <X size={20} className="text-muted" />
                     <span className="text-[10px] text-muted">Auto</span>
-                  </button>
+                  </Button>
 
                   {/* Image actuelle du personnage */}
                   {characterImages[character.slug] && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
                       onClick={() =>
                         onSelect(character.slug, characterImages[character.slug].id)
                       }
@@ -143,11 +151,11 @@ export function CharacterImageSelector({
                           <Check size={12} className="text-accent-ink" />
                         </div>
                       )}
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <p className="text-xs text-muted mt-2">
-                  Sélectionnez l'image à utiliser comme référence visuelle pour ce personnage.
+                  {t("characterSelector.help")}
                 </p>
               </div>
             )}

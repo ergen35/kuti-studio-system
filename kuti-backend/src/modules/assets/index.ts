@@ -31,6 +31,10 @@ import {
   deleteAssetLink,
 } from "./controller";
 
+function responseBody(buffer: Buffer): ArrayBuffer {
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer;
+}
+
 // ============================================================================
 // Module
 // ============================================================================
@@ -106,7 +110,7 @@ export const assetsModule = new Elysia({
   .get("/:assetId/file", async ({ params: { projectId, assetId } }) => {
     const file = await getAssetFile(projectId, assetId);
     if (!file) throw new Error("Asset file not found");
-    return new Response(file.buffer, {
+    return new Response(responseBody(file.buffer), {
       headers: { 
         "Content-Type": file.mimeType,
         "Content-Disposition": `inline; filename="${file.fileName}"`,

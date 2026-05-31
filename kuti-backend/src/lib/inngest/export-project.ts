@@ -12,6 +12,107 @@ import { saveExportFile, writeFile } from "../filesystem";
 import { inngest } from "./client";
 import { getProjectDir } from "../paths";
 
+type ZipWriterLike = {
+  add(path: string, data: Buffer): void;
+  end(): Promise<Buffer>;
+};
+
+const CRC_TABLE = new Uint32Array(256).map((_, index) => {
+  let value = index;
+  for (let bit = 0; bit < 8; bit++) {
+    value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+  }
+  return value >>> 0;
+});
+
+function crc32(data: Buffer): number {
+  let crc = 0xffffffff;
+  for (const byte of data) {
+    crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function dosDateTime(date = new Date()) {
+  const year = Math.max(1980, date.getFullYear());
+  return {
+    time: (date.getSeconds() >> 1) | (date.getMinutes() << 5) | (date.getHours() << 11),
+    date: date.getDate() | ((date.getMonth() + 1) << 5) | ((year - 1980) << 9),
+  };
+}
+
+class StoreZipWriter implements ZipWriterLike {
+  private files: Array<{ path: string; data: Buffer }> = [];
+
+  add(path: string, data: Buffer): void {
+    this.files.push({ path: path.replace(/^\/+/, ""), data });
+  }
+
+  async end(): Promise<Buffer> {
+    const localChunks: Buffer[] = [];
+    const centralChunks: Buffer[] = [];
+    const { time, date } = dosDateTime();
+    let offset = 0;
+
+    for (const file of this.files) {
+      const name = Buffer.from(file.path, "utf8");
+      const checksum = crc32(file.data);
+      const local = Buffer.alloc(30);
+      local.writeUInt32LE(0x04034b50, 0);
+      local.writeUInt16LE(20, 4);
+      local.writeUInt16LE(0x0800, 6);
+      local.writeUInt16LE(0, 8);
+      local.writeUInt16LE(time, 10);
+      local.writeUInt16LE(date, 12);
+      local.writeUInt32LE(checksum, 14);
+      local.writeUInt32LE(file.data.length, 18);
+      local.writeUInt32LE(file.data.length, 22);
+      local.writeUInt16LE(name.length, 26);
+      local.writeUInt16LE(0, 28);
+      localChunks.push(local, name, file.data);
+
+      const central = Buffer.alloc(46);
+      central.writeUInt32LE(0x02014b50, 0);
+      central.writeUInt16LE(20, 4);
+      central.writeUInt16LE(20, 6);
+      central.writeUInt16LE(0x0800, 8);
+      central.writeUInt16LE(0, 10);
+      central.writeUInt16LE(time, 12);
+      central.writeUInt16LE(date, 14);
+      central.writeUInt32LE(checksum, 16);
+      central.writeUInt32LE(file.data.length, 20);
+      central.writeUInt32LE(file.data.length, 24);
+      central.writeUInt16LE(name.length, 28);
+      central.writeUInt16LE(0, 30);
+      central.writeUInt16LE(0, 32);
+      central.writeUInt16LE(0, 34);
+      central.writeUInt16LE(0, 36);
+      central.writeUInt32LE(0, 38);
+      central.writeUInt32LE(offset, 42);
+      centralChunks.push(central, name);
+
+      offset += local.length + name.length + file.data.length;
+    }
+
+    const centralSize = centralChunks.reduce((total, chunk) => total + chunk.length, 0);
+    const end = Buffer.alloc(22);
+    end.writeUInt32LE(0x06054b50, 0);
+    end.writeUInt16LE(0, 4);
+    end.writeUInt16LE(0, 6);
+    end.writeUInt16LE(this.files.length, 8);
+    end.writeUInt16LE(this.files.length, 10);
+    end.writeUInt32LE(centralSize, 12);
+    end.writeUInt32LE(offset, 16);
+    end.writeUInt16LE(0, 20);
+
+    return Buffer.concat([...localChunks, ...centralChunks, end]);
+  }
+}
+
+function objectRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
 // ============================================================================
 // Fonction Inngest
 // ============================================================================
@@ -147,7 +248,7 @@ export const exportProjectFunction = inngest.createFunction(
           completedAt: new Date(),
           summary: `${kind} export completed: ${format} format`,
           metadataJson: {
-            ...exportRecord.metadataJson,
+            ...objectRecord(exportRecord.metadataJson),
             exportedAt: new Date().toISOString(),
             entityCounts: {
               characters: project.characters.length,
@@ -320,7 +421,7 @@ async function exportAsTree(project: Record<string, unknown>, label: string, kin
   const zipFileName = `export_tree_${label.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}.zip`;
   const zipFilePath = `${getProjectDir(project.slug as string)}/exports/${zipFileName}`;
 
-  const zip = new Bun.ZipWriter();
+  const zip = new StoreZipWriter();
   await addDirectoryToZip(zip, exportDir, "");
   const zipBuffer = await zip.end();
   await writeFile(zipFilePath, zipBuffer);
@@ -376,7 +477,7 @@ async function exportAsZip(project: Record<string, unknown>, label: string, kind
       },
     };
 
-    const zip = new Bun.ZipWriter();
+    const zip = new StoreZipWriter();
 
     // Ajouter le manifest et les données
     zip.add("manifest.json", Buffer.from(JSON.stringify(exportData.manifest, null, 2)));
@@ -419,7 +520,7 @@ async function exportAsZip(project: Record<string, unknown>, label: string, kind
     await writeFile(zipFilePath, zipBuffer);
   } else {
     // Export publication: uniquement les pages manga en format lisible
-    const zip = new Bun.ZipWriter();
+    const zip = new StoreZipWriter();
 
     // Manifest
     const manifest = {
@@ -501,7 +602,7 @@ function generateSceneMarkdown(scene: Record<string, unknown>): string {
   return lines.join("\n");
 }
 
-async function addDirectoryToZip(zip: Bun.ZipWriter, dirPath: string, zipPath: string): Promise<void> {
+async function addDirectoryToZip(zip: ZipWriterLike, dirPath: string, zipPath: string): Promise<void> {
   const entries = await readdir(dirPath, { withFileTypes: true });
 
   for (const entry of entries) {

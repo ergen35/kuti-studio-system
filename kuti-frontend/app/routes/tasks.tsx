@@ -10,7 +10,7 @@ import {
 } from "~/components/ui";
 import { useTranslation } from "~/hooks/useTranslation";
 import { listGenerationJobsOptions } from "~/lib/backend/@tanstack/react-query.gen";
-import type { TaskItem } from "~/lib/tasks/types";
+import type { GenerationJob, TaskItem } from "~/lib/tasks/types";
 import { jobToTaskItem } from "~/lib/tasks/types";
 import { useTasksStore } from "~/stores/tasks";
 
@@ -33,8 +33,10 @@ export default function TasksRoute() {
   });
 
   // Convert API jobs to TaskItems
+  const jobItems = (jobs as GenerationJob[] | undefined) ?? [];
+
   const tasks: TaskItem[] =
-    jobs?.map((job) => {
+    jobItems.map((job) => {
       const item = jobToTaskItem(job);
       // Extract hierarchy info from metadata if available
       const metadata = job.metadataJson as {
@@ -57,7 +59,7 @@ export default function TasksRoute() {
       }
 
       return item;
-    }) || [];
+    });
 
   const lastUpdated = dataUpdatedAt
     ? new Date(dataUpdatedAt).toLocaleTimeString()
@@ -68,14 +70,14 @@ export default function TasksRoute() {
       <PageHeader
         title={
           <div className="flex items-center gap-3">
-            <Activity size={24} className="text-accent" />
-            <span>Gestionnaire de Tâches</span>
+            <Activity size={24} className="text-primary" />
+            <span>{t('tasks:title')}</span>
           </div>
         }
         description={
           lastUpdated
-            ? `Dernière mise à jour: ${lastUpdated}`
-            : "Suivi des jobs de génération en cours"
+            ? t('tasks:lastUpdated', { time: lastUpdated })
+            : t('tasks:description')
         }
         actions={
           <Button onClick={() => refetch()} variant="secondary">
@@ -88,7 +90,7 @@ export default function TasksRoute() {
       <div className="grid gap-5 lg:grid-cols-[280px_1fr] items-start">
         {/* Filters panel */}
         <Panel className="lg:sticky lg:top-4">
-          <h3 className="font-medium text-ink mb-4">Filtres</h3>
+          <h3 className="mb-4 font-medium text-foreground">{t('tasks:filters.title')}</h3>
           <TaskFilters />
         </Panel>
 
@@ -100,7 +102,7 @@ export default function TasksRoute() {
             onOpenDetail={(task) => setSelectedTask(task.id)}
             showProgressBar={true}
             compact={false}
-            emptyMessage="Aucune tâche trouvée"
+            emptyMessage={t('tasks:empty')}
           />
         </Panel>
       </div>

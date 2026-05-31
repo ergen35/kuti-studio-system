@@ -20,11 +20,11 @@ export function CharacterCardGrid({ characters, imagesByCharacter = {}, onSelect
   
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
           <div 
             key={i} 
-            className="aspect-[3/4] rounded-xl bg-surface-2/50 border border-line animate-pulse"
+            className="aspect-[4/3] animate-pulse rounded-lg border border-border bg-secondary"
             aria-hidden="true"
           />
         ))}
@@ -49,7 +49,7 @@ export function CharacterCardGrid({ characters, imagesByCharacter = {}, onSelect
   }
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {characters.map((character) => {
         // Get the most recent image for this character (first in the sorted array)
         const characterImages = imagesByCharacter[character.id];

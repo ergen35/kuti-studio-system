@@ -296,7 +296,7 @@ Les champs de type tableau ou objet complexe sont stockés en JSON :
 ### Créer une migration
 
 ```bash
-cd kuti-backend-v2
+cd kuti-backend
 
 # Générer automatiquement depuis le schéma
 bun run db:migrate -- --name add_character_field

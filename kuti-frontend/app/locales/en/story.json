@@ -1,5 +1,6 @@
 {
   "title": "Storyline",
+  "locale": "en-US",
   "createChapter": {
     "title": "New chapter"
   },
@@ -30,6 +31,18 @@
       "title": "Metadata"
     }
   },
+  "tree": {
+    "title": "Story structure",
+    "stats": "{{tomes}} tome · {{chapters}} chapter · {{scenes}} scene",
+    "hint": "Double-click a node to center it",
+    "empty": {
+      "title": "No tome",
+      "description": "Start by creating a tome in the Storyline section"
+    }
+  },
+  "orchestra": {
+    "resetView": "Reset view"
+  },
   "actions": {
     "addTome": "Add tome",
     "addChapter": "Add chapter",
@@ -38,6 +51,7 @@
     "saveScene": "Save scene",
     "saving": "Saving...",
     "cancel": "Cancel",
+    "edit": "Edit",
     "save": "Save",
     "creating": "Creating..."
   },
@@ -71,10 +85,26 @@
         "tome": "Tome",
         "asset": "Asset"
       }
+    },
+    "toolbar": {
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "strikethrough": "Strikethrough",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet list",
+      "numberedList": "Numbered list",
+      "quote": "Quote",
+      "code": "Code",
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)"
     }
   },
   "chapter": {
     "select": "Select a chapter",
+    "fallbackTitle": "Chapter",
     "number": "Chapter {{number}}",
     "shortNumber": "C.{{number}}",
     "stats": {
@@ -98,6 +128,7 @@
   },
   "scene": {
     "select": "Select a scene",
+    "fallbackTitle": "Scene",
     "number": "Scene {{number}}",
     "shortNumber": "S.{{number}}",
     "navigation": {
@@ -107,10 +138,28 @@
     "notFound": "Scene not found",
     "backToChapter": "Back to chapter",
     "lastModified": "Last modified",
-    "unsavedChanges": "Unsaved changes"
+    "unsavedChanges": "Unsaved changes",
+    "mangaBoards": "Manga boards",
+    "generateBoard": "Generate board",
+    "placeholders": {
+      "summary": "Scene summary...",
+      "characters": "@character:jean, @character:marie...",
+      "tags": "romance, fight, reveal...",
+      "notes": "Internal notes..."
+    },
+    "orchestra": {
+      "mode": "Orchestra Mode",
+      "classicMode": "Classic Mode",
+      "backToClassic": "Back to classic mode",
+      "switchToOrchestra": "Switch to Orchestra mode"
+    }
+  },
+  "scenes": {
+    "add": "Add scene"
   },
   "tome": {
     "select": "Select a tome",
+    "fallbackTitle": "Tome",
     "number": "Tome {{number}}",
     "shortNumber": "T.{{number}}",
     "stats": {

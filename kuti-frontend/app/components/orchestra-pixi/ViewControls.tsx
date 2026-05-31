@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
 import { ZoomIn, ZoomOut, Maximize, RotateCcw, Focus } from 'lucide-react';
+import { Button } from '~/components/ui';
+import { useTranslation } from '~/hooks/useTranslation';
 import { useOrchestraStore } from '~/stores/orchestra';
 import { getLayoutBounds } from '~/lib/orchestra/layout-engine';
 
@@ -16,6 +18,7 @@ export function ViewControls({
   getNodePosition,
   selectedNodeId,
 }: ViewControlsProps) {
+  const { t } = useTranslation('story');
   const {
     zoomViewport,
     resetViewport,
@@ -131,7 +134,7 @@ export function ViewControls({
         {/* Reset */}
         <ControlButton
           onClick={handleReset}
-          title="Reset view"
+          title={t('orchestra.resetView')}
           icon={<RotateCcw size={16} />}
         />
       </div>
@@ -152,11 +155,12 @@ interface ControlButtonProps {
 
 function ControlButton({ onClick, icon, title, disabled, accent }: ControlButtonProps) {
   return (
-    <button
+    <Button
       onClick={onClick}
       disabled={disabled}
       title={title}
       type="button"
+      variant="ghost"
       className={`
         flex items-center justify-center w-7 h-7 rounded transition-colors
         ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#343941]'}
@@ -174,6 +178,6 @@ function ControlButton({ onClick, icon, title, disabled, accent }: ControlButton
       }}
     >
       {icon}
-    </button>
+    </Button>
   );
 }

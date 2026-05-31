@@ -22,6 +22,10 @@ import {
   getBoardArtifact,
 } from "./controller";
 
+function responseBody(buffer: Buffer): ArrayBuffer {
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer;
+}
+
 export const generationModule = new Elysia({
   prefix: "/api/projects/:projectId/generation",
   name: "generationModule",
@@ -86,7 +90,7 @@ export const generationModule = new Elysia({
   .get("/boards/:boardId/panels/:panelId/image", async ({ params: { projectId, boardId, panelId } }) => {
     const file = await getGenerationPanelImage(projectId, boardId, panelId);
     if (!file) throw new Error("Panel image not found");
-    return new Response(file.buffer, {
+    return new Response(responseBody(file.buffer), {
       headers: { "Content-Type": file.mimeType },
     });
   }, {
@@ -98,7 +102,7 @@ export const generationModule = new Elysia({
   .get("/boards/:boardId/download", async ({ params: { projectId, boardId } }) => {
     const artifact = await getBoardArtifact(projectId, boardId);
     if (!artifact) throw new Error("Board artifact not found");
-    return new Response(artifact.buffer, {
+    return new Response(responseBody(artifact.buffer), {
       headers: {
         "Content-Type": "application/json",
         "Content-Disposition": `attachment; filename="${artifact.fileName}"`,

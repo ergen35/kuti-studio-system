@@ -1,11 +1,29 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from '~/hooks/useTranslation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X, Save, Archive, Trash2, UserRoundPlus } from 'lucide-react';
+import { Save, Archive, Trash2, UserRoundPlus } from 'lucide-react';
 import { CharacterAvatar } from './CharacterAvatar';
 import { FormField } from '~/components/FormField';
 import { Button, Panel, SectionTitle, Badge, toCsv } from '~/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
+import { Skeleton } from '~/components/ui/skeleton';
+import { Textarea } from '~/components/ui/textarea';
 import { characterSchema, relationSchema, type CharacterInput, type RelationInput } from '~/lib/schemas';
 import { csv } from '~/lib/utils';
 import type { ListCharactersResponse, GetCharacterResponse } from '~/lib/backend';
@@ -41,22 +59,21 @@ export function CharacterDetailModal({
   saving,
 }: CharacterDetailModalProps) {
   const { t } = useTranslation('characters');
-  const overlayRef = useRef<HTMLDivElement>(null);
-  
+
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<CharacterInput>({
     resolver: zodResolver(characterSchema),
     defaultValues: {
       name: character.name,
       alias: (character.alias as string | undefined) || '',
-      narrative_role: (character.narrativeRole as string | undefined) || '',
+      narrativeRole: (character.narrativeRole as string | undefined) || '',
       description: character.description,
-      physical_description: character.physicalDescription,
-      key_traits_json: toCsv(character.keyTraitsJson),
-      color_palette_json: toCsv(character.colorPaletteJson),
-      costume_elements_json: toCsv(character.costumeElementsJson),
+      physicalDescription: character.physicalDescription,
+      keyTraitsJson: toCsv(character.keyTraitsJson),
+      colorPaletteJson: toCsv(character.colorPaletteJson),
+      costumeElementsJson: toCsv(character.costumeElementsJson),
       personality: character.personality,
-      narrative_arc: character.narrativeArc,
-      tags_json: toCsv(character.tagsJson),
+      narrativeArc: character.narrativeArc,
+      tagsJson: toCsv(character.tagsJson),
     },
   });
 
@@ -65,125 +82,99 @@ export function CharacterDetailModal({
     reset({
       name: character.name,
       alias: (character.alias as string | undefined) || '',
-      narrative_role: (character.narrativeRole as string | undefined) || '',
+      narrativeRole: (character.narrativeRole as string | undefined) || '',
       description: character.description,
-      physical_description: character.physicalDescription,
-      key_traits_json: toCsv(character.keyTraitsJson),
-      color_palette_json: toCsv(character.colorPaletteJson),
-      costume_elements_json: toCsv(character.costumeElementsJson),
+      physicalDescription: character.physicalDescription,
+      keyTraitsJson: toCsv(character.keyTraitsJson),
+      colorPaletteJson: toCsv(character.colorPaletteJson),
+      costumeElementsJson: toCsv(character.costumeElementsJson),
       personality: character.personality,
-      narrative_arc: character.narrativeArc,
-      tags_json: toCsv(character.tagsJson),
+      narrativeArc: character.narrativeArc,
+      tagsJson: toCsv(character.tagsJson),
     });
   }, [character, reset]);
-  
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
-  
+
   const onSubmit = (data: CharacterInput) => {
     onSave({
       name: data.name,
       alias: data.alias,
-      narrativeRole: data.narrative_role,
+      narrativeRole: data.narrativeRole,
       description: data.description,
-      physicalDescription: data.physical_description,
-      keyTraitsJson: csv(data.key_traits_json),
-      colorPaletteJson: csv(data.color_palette_json),
-      costumeElementsJson: csv(data.costume_elements_json),
+      physicalDescription: data.physicalDescription,
+      keyTraitsJson: csv(data.keyTraitsJson),
+      colorPaletteJson: csv(data.colorPaletteJson),
+      costumeElementsJson: csv(data.costumeElementsJson),
       personality: data.personality,
-      narrativeArc: data.narrative_arc,
-      tagsJson: csv(data.tags_json),
+      narrativeArc: data.narrativeArc,
+      tagsJson: csv(data.tagsJson),
     });
   };
-  
-  if (!isOpen) return null;
-  
+
   return (
-    <div 
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm"
-      onClick={(e) => e.target === overlayRef.current && onClose()}
-    >
-      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl bg-surface shadow-2xl">
-        {/* Header with avatar and close */}
-        <div className="relative flex items-center gap-4 p-6 border-b border-line bg-surface-2/30">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-5xl">
+        <DialogHeader className="flex-row items-center gap-4 text-left">
           <CharacterAvatar
             name={character.name}
             colorPalette={character.colorPaletteJson}
             size="md"
           />
           <div className="flex-1">
-            <h2 className="text-xl font-semibold text-ink">{character.name}</h2>
-            <p className="text-sm text-muted">{character.slug}</p>
+            <DialogTitle className="text-xl">{character.name}</DialogTitle>
+            <DialogDescription>{character.slug}</DialogDescription>
           </div>
-          <Button variant="ghost" onClick={onClose} className="shrink-0">
-            <X size={20} />
-          </Button>
-        </div>
-        
-        {/* Scrollable content */}
+        </DialogHeader>
+
         <div className="overflow-y-auto max-h-[calc(90vh-140px)] p-6">
           <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
             {/* Main form */}
             <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-4 lg:grid-cols-2">
                 <FormField label={t('fields.name')} error={errors.name}>
-                  <input {...register('name')} className="w-full" />
+                  <Input {...register('name')} />
                 </FormField>
                 <FormField label={t('fields.alias')} error={errors.alias}>
-                  <input {...register('alias')} className="w-full" />
+                  <Input {...register('alias')} />
                 </FormField>
               </div>
-              
-              <FormField label={t('fields.narrativeRole')} error={errors.narrative_role}>
-                <input {...register('narrative_role')} className="w-full" />
+
+              <FormField label={t('fields.narrativeRole')} error={errors.narrativeRole}>
+                <Input {...register('narrativeRole')} />
               </FormField>
 
               <FormField label={t('fields.description')} error={errors.description}>
-                <textarea {...register('description')} rows={3} className="w-full" />
+                <Textarea {...register('description')} rows={3} />
               </FormField>
 
-              <FormField label={t('fields.physicalDescription')} error={errors.physical_description}>
-                <textarea {...register('physical_description')} rows={3} className="w-full" />
+              <FormField label={t('fields.physicalDescription')} error={errors.physicalDescription}>
+                <Textarea {...register('physicalDescription')} rows={3} />
               </FormField>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <FormField label={t('fields.traits')} error={errors.key_traits_json}>
-                  <input {...register('key_traits_json')} className="w-full" placeholder="brave, loyal, cunning..." />
+                <FormField label={t('fields.traits')} error={errors.keyTraitsJson}>
+                  <Input {...register('keyTraitsJson')} placeholder={t('placeholders.traits')} />
                 </FormField>
-                <FormField label={t('fields.palette')} error={errors.color_palette_json}>
-                  <input {...register('color_palette_json')} className="w-full" placeholder="#2f6f73, #61a5a0..." />
+                <FormField label={t('fields.palette')} error={errors.colorPaletteJson}>
+                  <Input {...register('colorPaletteJson')} placeholder={t('placeholders.palette')} />
                 </FormField>
               </div>
 
-              <FormField label={t('fields.costumeElements')} error={errors.costume_elements_json}>
-                <input {...register('costume_elements_json')} className="w-full" />
+              <FormField label={t('fields.costumeElements')} error={errors.costumeElementsJson}>
+                <Input {...register('costumeElementsJson')} />
               </FormField>
 
               <FormField label={t('fields.personality')} error={errors.personality}>
-                <textarea {...register('personality')} rows={3} className="w-full" />
+                <Textarea {...register('personality')} rows={3} />
               </FormField>
 
-              <FormField label={t('fields.narrativeArc')} error={errors.narrative_arc}>
-                <textarea {...register('narrative_arc')} rows={3} className="w-full" />
+              <FormField label={t('fields.narrativeArc')} error={errors.narrativeArc}>
+                <Textarea {...register('narrativeArc')} rows={3} />
               </FormField>
 
-              <FormField label={t('fields.tags')} error={errors.tags_json}>
-                <input {...register('tags_json')} className="w-full" />
+              <FormField label={t('fields.tags')} error={errors.tagsJson}>
+                <Input {...register('tagsJson')} />
               </FormField>
-              
+
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="primary" disabled={saving || isSubmitting}>
                   <Save size={16} /> {t('actions.saveProfile')}
@@ -196,19 +187,19 @@ export function CharacterDetailModal({
                 </Button>
               </div>
             </form>
-            
+
             {/* Sidebar: Relations & Voice samples */}
             <div className="space-y-4">
               <Panel className="!p-4">
-                <SectionTitle 
-                  title={t('relations.title')} 
+                <SectionTitle
+                  title={t('relations.title')}
                   meta={detail ? `${detail.relations.length} ${t('relations.count', { count: detail.relations.length })}` : ''}
                 />
-                
+
                 {detailLoading ? (
-                  <div className="animate-pulse space-y-2">
-                    <div className="h-16 bg-surface-2 rounded" />
-                    <div className="h-16 bg-surface-2 rounded" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-16" />
+                    <Skeleton className="h-16" />
                   </div>
                 ) : detail && detail.relations.length > 0 ? (
                   <div className="space-y-2 mt-3">
@@ -223,9 +214,9 @@ export function CharacterDetailModal({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted py-4 text-center">{t('relations.empty') || 'No relations yet'}</p>
+                  <p className="text-sm text-muted py-4 text-center">{t('relations.empty')}</p>
                 )}
-                
+
                 {/* Quick add relation */}
                 {detail && (
                   <RelationQuickAdd
@@ -234,10 +225,10 @@ export function CharacterDetailModal({
                   />
                 )}
               </Panel>
-              
+
               <Panel className="!p-4">
-                <SectionTitle 
-                  title={t('voiceSamples.title')} 
+                <SectionTitle
+                  title={t('voiceSamples.title')}
                   meta={detail ? `${detail.voiceSamples.length} ${t('voiceSamples.count', { count: detail.voiceSamples.length })}` : ''}
                 />
                 {detail && detail.voiceSamples.length > 0 ? (
@@ -245,47 +236,53 @@ export function CharacterDetailModal({
                     {detail.voiceSamples.map((sample) => (
                       <div key={sample.id} className="p-3 rounded-lg bg-surface-2/50 border border-line/50">
                         <p className="text-sm font-medium text-ink">{sample.label}</p>
-                        <p className="text-xs text-muted">{sample.voiceNotes || sample.assetPath}</p>
+                        <p className="text-xs text-muted">{String(sample.voiceNotes || sample.assetPath || '')}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted py-4 text-center">{t('voiceSamples.empty') || 'No voice samples'}</p>
+                  <p className="text-sm text-muted py-4 text-center">{t('voiceSamples.empty')}</p>
                 )}
               </Panel>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 // Quick relation add form
 function RelationQuickAdd({ characters, onSubmit }: { characters: Character[]; onSubmit: (body: RelationInput) => void }) {
   const { t } = useTranslation('characters');
-  const { register, handleSubmit, formState: { isSubmitting }, watch } = useForm<RelationInput>({
+  const { register, handleSubmit, formState: { isSubmitting }, watch, setValue } = useForm<RelationInput>({
     resolver: zodResolver(relationSchema),
-    defaultValues: { target_character_id: '', relation_type: 'ally', strength: 50 },
+    defaultValues: { targetCharacterId: '', relationType: 'ally', strength: 50 },
   });
-  
-  const target = watch('target_character_id');
-  
+
+  const target = watch('targetCharacterId');
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-4 pt-4 border-t border-line/50 space-y-3">
       <p className="text-sm font-medium text-ink">{t('relations.add.title')}</p>
-      <select {...register('target_character_id')} className="w-full text-sm">
-        <option value="">{t('relations.add.selectTarget')}</option>
-        {characters.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-      </select>
+      <Select value={target} onValueChange={(value) => setValue('targetCharacterId', value, { shouldDirty: true, shouldValidate: true })}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={t('relations.add.selectTarget')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {characters.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
       <div className="grid grid-cols-2 gap-2">
-        <input {...register('relation_type')} className="text-sm" placeholder="Type" />
-        <input 
-          type="number" 
-          min={0} 
-          max={100} 
-          {...register('strength', { valueAsNumber: true })} 
-          className="text-sm" 
+        <Input {...register('relationType')} className="text-sm" placeholder={t('relations.add.type')} />
+        <Input
+          type="number"
+          min={0}
+          max={100}
+          {...register('strength', { valueAsNumber: true })}
+          className="text-sm"
         />
       </div>
       <Button disabled={!target || isSubmitting} className="w-full text-sm">

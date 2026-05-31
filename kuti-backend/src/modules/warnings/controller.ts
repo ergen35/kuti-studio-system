@@ -3,7 +3,38 @@
  */
 
 import { db } from "@lib/db";
+import type { Prisma, Warning } from "@lib/db/generated/client";
 import type { UpdateWarningBody } from "./dto";
+
+type WarningCandidate = {
+  projectId: string;
+  fingerprint: string;
+  kind: string;
+  severity: "info" | "warning" | "critical";
+  status: "open" | "ignored" | "resolved";
+  title: string;
+  message: string;
+  entityKind: string;
+  entityId: string;
+  metadataJson: Record<string, unknown>;
+};
+
+function serializeWarning(warning: Warning) {
+  return {
+    ...warning,
+    metadataJson: warning.metadataJson as Record<string, unknown>,
+    createdAt: warning.createdAt.toISOString(),
+    updatedAt: warning.updatedAt.toISOString(),
+    resolvedAt: warning.resolvedAt?.toISOString() || null,
+  };
+}
+
+function warningCreateData(warning: WarningCandidate) {
+  return {
+    ...warning,
+    metadataJson: warning.metadataJson as Prisma.InputJsonValue,
+  };
+}
 
 // ============================================================================
 // CRUD Warnings
@@ -35,13 +66,7 @@ export async function listWarnings(projectId: string, filters?: {
     ],
   });
 
-  return warnings.map((warning) => ({
-    ...warning,
-    metadata: warning.metadataJson as Record<string, unknown>,
-    createdAt: warning.createdAt.toISOString(),
-    updatedAt: warning.updatedAt.toISOString(),
-    resolvedAt: warning.resolvedAt?.toISOString() || null,
-  }));
+  return warnings.map(serializeWarning);
 }
 
 export async function getWarning(projectId: string, warningId: string) {
@@ -51,13 +76,7 @@ export async function getWarning(projectId: string, warningId: string) {
 
   if (!warning) return null;
 
-  return {
-    ...warning,
-    metadata: warning.metadataJson as Record<string, unknown>,
-    createdAt: warning.createdAt.toISOString(),
-    updatedAt: warning.updatedAt.toISOString(),
-    resolvedAt: warning.resolvedAt?.toISOString() || null,
-  };
+  return serializeWarning(warning);
 }
 
 export async function updateWarning(
@@ -82,8 +101,11 @@ export async function updateWarning(
     }
   }
 
-  if (data.message) {
-    updateData.message = data.message;
+  if (data.note) {
+    updateData.metadataJson = {
+      ...(warning.metadataJson as Record<string, unknown>),
+      note: data.note,
+    } as Prisma.InputJsonValue;
   }
 
   const updated = await db.warning.update({
@@ -91,13 +113,7 @@ export async function updateWarning(
     data: updateData,
   });
 
-  return {
-    ...updated,
-    metadata: updated.metadataJson as Record<string, unknown>,
-    createdAt: updated.createdAt.toISOString(),
-    updatedAt: updated.updatedAt.toISOString(),
-    resolvedAt: updated.resolvedAt?.toISOString() || null,
-  };
+  return serializeWarning(updated);
 }
 
 // ============================================================================
@@ -105,8 +121,8 @@ export async function updateWarning(
 // ============================================================================
 
 export async function scanWarnings(projectId: string) {
-  const added: typeof warnings = [];
-  const resolved: typeof warnings = [];
+  const added: Warning[] = [];
+  const resolved: Warning[] = [];
   let scanned = 0;
 
   // Récupérer tous les warnings existants
@@ -120,7 +136,7 @@ export async function scanWarnings(projectId: string) {
   scanned += characterWarnings.scanned;
   for (const warning of characterWarnings.warnings) {
     if (!openFingerprints.has(warning.fingerprint)) {
-      const created = await db.warning.create({ data: warning });
+      const created = await db.warning.create({ data: warningCreateData(warning) });
       added.push(created);
       openFingerprints.add(warning.fingerprint);
     }
@@ -131,7 +147,7 @@ export async function scanWarnings(projectId: string) {
   scanned += referenceWarnings.scanned;
   for (const warning of referenceWarnings.warnings) {
     if (!openFingerprints.has(warning.fingerprint)) {
-      const created = await db.warning.create({ data: warning });
+      const created = await db.warning.create({ data: warningCreateData(warning) });
       added.push(created);
       openFingerprints.add(warning.fingerprint);
     }
@@ -142,7 +158,7 @@ export async function scanWarnings(projectId: string) {
   scanned += statusWarnings.scanned;
   for (const warning of statusWarnings.warnings) {
     if (!openFingerprints.has(warning.fingerprint)) {
-      const created = await db.warning.create({ data: warning });
+      const created = await db.warning.create({ data: warningCreateData(warning) });
       added.push(created);
       openFingerprints.add(warning.fingerprint);
     }
@@ -173,13 +189,7 @@ export async function scanWarnings(projectId: string) {
     scanned,
     added: added.length,
     resolved: resolved.length,
-    warnings: allOpenWarnings.map((w) => ({
-      ...w,
-      metadata: w.metadataJson as Record<string, unknown>,
-      createdAt: w.createdAt.toISOString(),
-      updatedAt: w.updatedAt.toISOString(),
-      resolvedAt: w.resolvedAt?.toISOString() || null,
-    })),
+    items: allOpenWarnings.map(serializeWarning),
   };
 }
 
@@ -188,18 +198,7 @@ export async function scanWarnings(projectId: string) {
 // ============================================================================
 
 async function scanCharacterWarnings(projectId: string) {
-  const warnings: Array<{
-    projectId: string;
-    fingerprint: string;
-    kind: string;
-    severity: "info" | "warning" | "critical";
-    status: "open" | "ignored" | "resolved";
-    title: string;
-    message: string;
-    entityKind: string;
-    entityId: string;
-    metadataJson: Record<string, unknown>;
-  }> = [];
+  const warnings: WarningCandidate[] = [];
 
   // Personnages sans scènes
   const characters = await db.character.findMany({
@@ -243,18 +242,7 @@ async function scanCharacterWarnings(projectId: string) {
 }
 
 async function scanReferenceWarnings(projectId: string) {
-  const warnings: Array<{
-    projectId: string;
-    fingerprint: string;
-    kind: string;
-    severity: "info" | "warning" | "critical";
-    status: "open" | "ignored" | "resolved";
-    title: string;
-    message: string;
-    entityKind: string;
-    entityId: string;
-    metadataJson: Record<string, unknown>;
-  }> = [];
+  const warnings: WarningCandidate[] = [];
 
   // Récupérer toutes les références
   const references = await db.storyReference.findMany({
@@ -299,18 +287,7 @@ async function scanReferenceWarnings(projectId: string) {
 }
 
 async function scanStatusWarnings(projectId: string) {
-  const warnings: Array<{
-    projectId: string;
-    fingerprint: string;
-    kind: string;
-    severity: "info" | "warning" | "critical";
-    status: "open" | "ignored" | "resolved";
-    title: string;
-    message: string;
-    entityKind: string;
-    entityId: string;
-    metadataJson: Record<string, unknown>;
-  }> = [];
+  const warnings: WarningCandidate[] = [];
 
   // Scènes vides
   const scenes = await db.scene.findMany({

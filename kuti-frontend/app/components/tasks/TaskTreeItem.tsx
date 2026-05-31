@@ -11,6 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { TaskProgressBadge, TaskProgressBadgeMini } from "./TaskProgressBadge";
+import { Button } from "~/components/ui";
 import type {
   TaskItem,
   TaskStatus,
@@ -26,6 +27,22 @@ const SOURCE_ICONS: Record<SourceKind, React.ComponentType<{ size?: number; clas
   panel: PanelTop,
   custom: Sparkles,
   character: User,
+};
+
+const STATUS_ICON_CLASS: Record<TaskStatus, string> = {
+  pending: "text-warning",
+  running: "text-primary",
+  ready: "text-success",
+  validated: "text-success",
+  failed: "text-destructive",
+};
+
+const STATUS_ICON_BG_CLASS: Record<TaskStatus, string> = {
+  pending: "bg-warning/10",
+  running: "bg-primary/10",
+  ready: "bg-success/10",
+  validated: "bg-success/10",
+  failed: "bg-destructive/10",
 };
 
 interface TaskTreeItemProps {
@@ -64,12 +81,14 @@ export function TaskTreeItem({
 
   if (compact) {
     return (
-      <div className="rounded-lg border border-line bg-surface hover:border-accent/50 transition-colors">
-        <button
+      <div className="rounded-lg border border-border bg-card transition-colors hover:border-primary/45">
+        <Button
+          type="button"
+          variant="ghost"
           onClick={() => onOpenDetail ? onOpenDetail(task) : handleClick()}
-          className="w-full flex items-center gap-2 p-2 text-left"
+          className="h-auto w-full justify-start gap-2 p-2 text-left"
         >
-          <Icon size={16} className="text-muted shrink-0" />
+          <Icon size={16} className="shrink-0 text-muted-foreground" />
           <span className="flex-1 text-sm truncate">{task.title}</span>
           <TaskProgressBadgeMini
             status={task.status}
@@ -77,27 +96,29 @@ export function TaskTreeItem({
             label={task.hierarchyProgress?.label}
           />
           {hasChildren && (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={(e) => {
                 e.stopPropagation();
                 toggleExpanded(task.id);
               }}
-              className="p-0.5 rounded hover:bg-surface-2"
+              className="p-0.5"
             >
               <ChevronRight
                 size={14}
                 className={clsx(
-                  "text-muted transition-transform",
+                  "text-muted-foreground transition-transform",
                   isExpanded && "rotate-90"
                 )}
               />
-            </button>
+            </Button>
           )}
-        </button>
+        </Button>
 
         {/* Children */}
         {hasChildren && isExpanded && (
-          <div className="border-t border-line/50">
+          <div className="border-t border-border">
             {task.children!.map((child) => (
               <TaskTreeItemChild
                 key={child.id}
@@ -112,12 +133,13 @@ export function TaskTreeItem({
   }
 
   return (
-    <div className="rounded-lg border border-line bg-surface overflow-hidden">
-      <button
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <Button
+        type="button"
+        variant="ghost"
         onClick={handleClick}
         className={clsx(
-          "w-full flex items-center gap-3 p-3 text-left transition-colors",
-          "hover:bg-surface-2/50",
+          "flex h-auto w-full items-center gap-3 p-3 text-left transition-colors",
           level > 0 && "pl-6"
         )}
       >
@@ -125,7 +147,7 @@ export function TaskTreeItem({
           <ChevronDown
             size={16}
             className={clsx(
-              "text-muted shrink-0 transition-transform duration-200",
+              "shrink-0 text-muted-foreground transition-transform duration-200",
               !isExpanded && "-rotate-90"
             )}
           />
@@ -135,34 +157,24 @@ export function TaskTreeItem({
 
         <div
           className={clsx(
-            "p-1.5 rounded-md shrink-0",
-            task.status === "running" && "bg-blue-500/10",
-            task.status === "ready" && "bg-emerald-500/10",
-            task.status === "validated" && "bg-teal-500/10",
-            task.status === "failed" && "bg-red-500/10",
-            task.status === "pending" && "bg-yellow-500/10"
+            "shrink-0 rounded-md p-1.5",
+            STATUS_ICON_BG_CLASS[task.status]
           )}
         >
           <Icon
             size={18}
-            className={clsx(
-              task.status === "running" && "text-blue-500",
-              task.status === "ready" && "text-emerald-500",
-              task.status === "validated" && "text-teal-500",
-              task.status === "failed" && "text-red-500",
-              task.status === "pending" && "text-yellow-500"
-            )}
+            className={STATUS_ICON_CLASS[task.status]}
           />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-sm truncate">{task.title}</span>
+            <span className="truncate text-sm font-medium text-foreground">{task.title}</span>
             {isFailed && (
-              <AlertCircle size={14} className="text-red-500 shrink-0" />
+              <AlertCircle size={14} className="shrink-0 text-destructive" />
             )}
           </div>
-          <div className="text-xs text-muted">
+          <div className="text-xs text-muted-foreground">
             {task.sourceLabel}
           </div>
         </div>
@@ -176,11 +188,11 @@ export function TaskTreeItem({
             size="sm"
           />
         </div>
-      </button>
+      </Button>
 
       {/* Children */}
       {hasChildren && isExpanded && (
-        <div className="border-t border-line/50">
+        <div className="border-t border-border">
           {task.children!.map((child) => (
             <TaskTreeItemChild
               key={child.id}
@@ -207,33 +219,28 @@ function TaskTreeItemChild({ child, onNavigate, onOpenDetail }: TaskTreeItemChil
   const isFailed = child.status === "failed";
 
   return (
-    <button
+    <Button
+      type="button"
+      variant="ghost"
       onClick={() => onOpenDetail ? onOpenDetail(child) : onNavigate?.(child.id)}
-      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-2/50 transition-colors border-l-2 border-transparent hover:border-accent"
+      className="flex h-auto w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-left transition-colors hover:border-primary"
     >
       <span className="w-4" />
 
       <Icon
         size={14}
-        className={clsx(
-          "shrink-0",
-          child.status === "running" && "text-blue-500",
-          child.status === "ready" && "text-emerald-500",
-          child.status === "validated" && "text-teal-500",
-          child.status === "failed" && "text-red-500",
-          child.status === "pending" && "text-yellow-500"
-        )}
+        className={clsx("shrink-0", STATUS_ICON_CLASS[child.status])}
       />
 
-      <span className="flex-1 text-sm truncate">{child.title}</span>
+      <span className="flex-1 truncate text-sm text-foreground">{child.title}</span>
 
       <div className="flex items-center gap-2">
-        {isFailed && <AlertCircle size={12} className="text-red-500" />}
+        {isFailed && <AlertCircle size={12} className="text-destructive" />}
         <TaskProgressBadgeMini
           status={child.status}
           progress={child.progress}
         />
       </div>
-    </button>
+    </Button>
   );
 }

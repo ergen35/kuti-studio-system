@@ -14,7 +14,7 @@ import { sendCheckOrphanImagesEvent } from "./inngest";
 export const orphanCheckerCron = cron({
   name: "orphan-checker",
   pattern: "0 * * * *", // Toutes les heures
-  protected: true, // Ne pas exécuter si le précédent n'est pas terminé
+  protect: true, // Ne pas exécuter si le précédent n'est pas terminé
   async run() {
     console.log("[OrphanChecker] Starting scheduled check...");
     
@@ -36,7 +36,7 @@ export const orphanCheckerCron = cron({
 export const cleanupCron = cron({
   name: "cleanup-temp-files",
   pattern: "0 3 * * *", // Tous les jours à 3h du matin
-  protected: true,
+  protect: true,
   async run() {
     console.log("[Cleanup] Starting daily cleanup...");
     

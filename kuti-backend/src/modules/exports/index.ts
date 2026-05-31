@@ -18,6 +18,10 @@ import {
   getExportDownload,
 } from "./controller";
 
+function responseBody(buffer: Buffer): ArrayBuffer {
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer;
+}
+
 // ============================================================================
 // Module
 // ============================================================================
@@ -62,7 +66,7 @@ export const exportsModule = new Elysia({
   .get("/:exportId/download", async ({ params: { projectId, exportId } }) => {
     const result = await getExportDownload(projectId, exportId);
     if (!result) throw new Error("Export artifact not found");
-    return new Response(result.buffer, {
+    return new Response(responseBody(result.buffer), {
       headers: {
         "Content-Type": result.mimeType,
         "Content-Disposition": `attachment; filename="${result.fileName}"`,

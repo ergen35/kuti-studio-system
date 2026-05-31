@@ -3,6 +3,7 @@
  */
 
 import { Elysia } from "elysia";
+import { z } from "zod";
 import {
   createTomeBodySchema,
   updateTomeBodySchema,
@@ -36,7 +37,14 @@ import {
   getReferenceSuggestions,
 } from "./controller";
 
-const projectIdParamsSchema = { projectId: "string" };
+const projectIdParamsSchema = z.object({ projectId: z.string() });
+const referenceParamsSchema = z.object({ projectId: z.string(), type: z.string() });
+const referenceQuerySchema = z.object({ q: z.string().optional() });
+const tomeIdParamsSchema = z.object({ projectId: z.string(), tomeId: z.string() });
+const chapterIdParamsSchema = z.object({ projectId: z.string(), chapterId: z.string() });
+const sceneIdParamsSchema = z.object({ projectId: z.string(), sceneId: z.string() });
+const listChaptersQuerySchema = z.object({ tomeId: z.string().optional() });
+const listScenesQuerySchema = z.object({ chapterId: z.string().optional() });
 
 export const storyModule = new Elysia({
   prefix: "/api/projects/:projectId",
@@ -53,8 +61,8 @@ export const storyModule = new Elysia({
   .get("/references/:type", async ({ params: { projectId, type }, query: { q } }) => {
     return getReferenceSuggestions(projectId, type, q ?? "");
   }, {
-    params: { projectId: "string", type: "string" },
-    query: { q: "string" },
+    params: referenceParamsSchema,
+    query: referenceQuerySchema,
     response: [referenceSuggestionSchema],
     detail: { operationId: "getReferenceSuggestions", summary: "Get reference suggestions" },
   })
@@ -74,7 +82,7 @@ export const storyModule = new Elysia({
     if (!tome) throw new Error("Tome not found");
     return tome;
   }, {
-    params: { projectId: "string", tomeId: "string" },
+    params: tomeIdParamsSchema,
     body: updateTomeBodySchema,
     response: tomeResponseSchema,
     detail: { operationId: "updateTome", summary: "Update a tome" },
@@ -84,7 +92,7 @@ export const storyModule = new Elysia({
     if (!deleted) throw new Error("Tome not found");
     return;
   }, {
-    params: { projectId: "string", tomeId: "string" },
+    params: tomeIdParamsSchema,
     detail: { operationId: "deleteTome", summary: "Delete a tome" },
   })
 
@@ -92,8 +100,8 @@ export const storyModule = new Elysia({
   .get("/story/chapters", ({ params: { projectId }, query: { tomeId } }) =>
     listChapters(projectId, tomeId),
   {
-    params: { projectId: "string" },
-    query: { tomeId: "string" },
+    params: projectIdParamsSchema,
+    query: listChaptersQuerySchema,
     response: [chapterResponseSchema],
     detail: { operationId: "listChapters", summary: "List chapters" },
   })
@@ -111,7 +119,7 @@ export const storyModule = new Elysia({
     if (!chapter) throw new Error("Chapter not found");
     return chapter;
   }, {
-    params: { projectId: "string", chapterId: "string" },
+    params: chapterIdParamsSchema,
     body: updateChapterBodySchema,
     response: chapterResponseSchema,
     detail: { operationId: "updateChapter", summary: "Update a chapter" },
@@ -121,7 +129,7 @@ export const storyModule = new Elysia({
     if (!deleted) throw new Error("Chapter not found");
     return;
   }, {
-    params: { projectId: "string", chapterId: "string" },
+    params: chapterIdParamsSchema,
     detail: { operationId: "deleteChapter", summary: "Delete a chapter" },
   })
 
@@ -129,8 +137,8 @@ export const storyModule = new Elysia({
   .get("/story/scenes", ({ params: { projectId }, query: { chapterId } }) =>
     listScenes(projectId, chapterId),
   {
-    params: { projectId: "string" },
-    query: { chapterId: "string" },
+    params: projectIdParamsSchema,
+    query: listScenesQuerySchema,
     response: [sceneResponseSchema],
     detail: { operationId: "listScenes", summary: "List scenes" },
   })
@@ -148,7 +156,7 @@ export const storyModule = new Elysia({
     if (!scene) throw new Error("Scene not found");
     return scene;
   }, {
-    params: { projectId: "string", sceneId: "string" },
+    params: sceneIdParamsSchema,
     body: updateSceneBodySchema,
     response: sceneResponseSchema,
     detail: { operationId: "updateScene", summary: "Update a scene" },
@@ -158,6 +166,6 @@ export const storyModule = new Elysia({
     if (!deleted) throw new Error("Scene not found");
     return;
   }, {
-    params: { projectId: "string", sceneId: "string" },
+    params: sceneIdParamsSchema,
     detail: { operationId: "deleteScene", summary: "Delete a scene" },
   });

@@ -107,7 +107,7 @@ export async function createVersion(
 
   const versionIndex = (latestVersion?.versionIndex || 0) + 1;
 
-  // Créer la version avec un snapshot simplifié du projet
+  // Créer la version. Le modèle Prisma actuel ne persiste pas encore de snapshot.
   const version = await prisma.version.create({
     data: {
       id: randomUUIDv7(),
@@ -116,15 +116,6 @@ export async function createVersion(
       versionIndex,
       label: data.label,
       summary: data.summary,
-      snapshotJson: {
-        project: {
-          name: project.name,
-          slug: project.slug,
-          status: project.status,
-          settingsJson: project.settingsJson,
-        },
-        createdAt: new Date().toISOString(),
-      },
     },
   });
 
@@ -171,22 +162,8 @@ export async function compareVersions(
     return null;
   }
 
-  const leftSnapshot = left.snapshotJson as Record<string, unknown>;
-  const rightSnapshot = right.snapshotJson as Record<string, unknown>;
-
   const projectChanges: string[] = [];
   const countsDelta: Record<string, number> = {};
-
-  // Comparer les propriétés du projet
-  const leftProject = leftSnapshot.project as Record<string, unknown>;
-  const rightProject = rightSnapshot.project as Record<string, unknown>;
-
-  if (leftProject?.name !== rightProject?.name) {
-    projectChanges.push("project.name");
-  }
-  if (leftProject?.status !== rightProject?.status) {
-    projectChanges.push("project.status");
-  }
 
   return {
     left: serializeVersion(left),

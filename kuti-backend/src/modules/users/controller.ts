@@ -1,4 +1,14 @@
 import { db } from "@lib/db";
+import type { UserResponse } from "./dto";
+
+function serializeUser(user: { id: string; email: string; name: string | null; role: string | null }): UserResponse {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role === "admin" || user.role === "viewer" ? user.role : "member",
+  };
+}
 
 export async function listUsers(query: { page: number; limit: number; search?: string }) {
   const { page, limit, search } = query;
@@ -27,7 +37,7 @@ export async function listUsers(query: { page: number; limit: number; search?: s
   });
   
   return {
-    users,
+    users: users.map(serializeUser),
     total,
     page,
     totalPages: Math.ceil(total / limit),
@@ -40,5 +50,5 @@ export async function updateUser(id: string, body: { name?: string; role?: strin
     data: body,
   });
   
-  return user;
+  return serializeUser(user);
 }

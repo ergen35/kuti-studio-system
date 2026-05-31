@@ -1,5 +1,6 @@
 {
   "title": "Histoire",
+  "locale": "fr-FR",
   "createChapter": {
     "title": "Nouveau chapitre"
   },
@@ -30,6 +31,18 @@
       "title": "Métadonnées"
     }
   },
+  "tree": {
+    "title": "Structure narrative",
+    "stats": "{{tomes}} tome · {{chapters}} chapitre · {{scenes}} scène",
+    "hint": "Double-cliquez un nœud pour centrer",
+    "empty": {
+      "title": "Aucun tome",
+      "description": "Commencez par créer un tome dans la section Histoire"
+    }
+  },
+  "orchestra": {
+    "resetView": "Réinitialiser la vue"
+  },
   "actions": {
     "addTome": "Ajouter tome",
     "addChapter": "Ajouter chapitre",
@@ -38,6 +51,7 @@
     "saveScene": "Enregistrer la scène",
     "saving": "Enregistrement...",
     "cancel": "Annuler",
+    "edit": "Modifier",
     "save": "Enregistrer",
     "creating": "Création..."
   },
@@ -71,10 +85,26 @@
         "tome": "Tome",
         "asset": "Asset"
       }
+    },
+    "toolbar": {
+      "bold": "Gras (Ctrl+B)",
+      "italic": "Italique (Ctrl+I)",
+      "underline": "Souligné (Ctrl+U)",
+      "strikethrough": "Barré",
+      "heading1": "Titre 1",
+      "heading2": "Titre 2",
+      "heading3": "Titre 3",
+      "bulletList": "Liste à puces",
+      "numberedList": "Liste numérotée",
+      "quote": "Citation",
+      "code": "Code",
+      "undo": "Annuler (Ctrl+Z)",
+      "redo": "Refaire (Ctrl+Y)"
     }
   },
   "chapter": {
     "select": "Sélectionner un chapitre",
+    "fallbackTitle": "Chapitre",
     "number": "Chapitre {{number}}",
     "shortNumber": "C.{{number}}",
     "stats": {
@@ -98,6 +128,7 @@
   },
   "scene": {
     "select": "Sélectionner une scène",
+    "fallbackTitle": "Scène",
     "number": "Scène {{number}}",
     "shortNumber": "S.{{number}}",
     "navigation": {
@@ -107,10 +138,28 @@
     "notFound": "Scène non trouvée",
     "backToChapter": "Retour au chapitre",
     "lastModified": "Dernière modification",
-    "unsavedChanges": "Modifications non enregistrées"
+    "unsavedChanges": "Modifications non enregistrées",
+    "mangaBoards": "Planches manga",
+    "generateBoard": "Générer une planche",
+    "placeholders": {
+      "summary": "Résumé de la scène...",
+      "characters": "@character:jean, @character:marie...",
+      "tags": "romantique, combat, révélation...",
+      "notes": "Notes internes..."
+    },
+    "orchestra": {
+      "mode": "Mode Orchestra",
+      "classicMode": "Mode Classique",
+      "backToClassic": "Retour au mode classique",
+      "switchToOrchestra": "Basculer vers le mode Orchestra"
+    }
+  },
+  "scenes": {
+    "add": "Ajouter une scène"
   },
   "tome": {
     "select": "Sélectionner un tome",
+    "fallbackTitle": "Tome",
     "number": "Tome {{number}}",
     "shortNumber": "T.{{number}}",
     "stats": {

@@ -120,17 +120,17 @@ export const SOURCE_KIND_ICONS: Record<SourceKind, string> = {
 export function getStatusColor(status: TaskStatus): string {
   switch (status) {
     case 'pending':
-      return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+      return 'border-warning/25 bg-warning/10 text-warning';
     case 'running':
-      return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+      return 'border-primary/25 bg-primary/10 text-primary';
     case 'ready':
-      return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+      return 'border-success/25 bg-success/10 text-success';
     case 'validated':
-      return 'text-teal-500 bg-teal-500/10 border-teal-500/20';
+      return 'border-success/25 bg-success/10 text-success';
     case 'failed':
-      return 'text-red-500 bg-red-500/10 border-red-500/20';
+      return 'border-destructive/25 bg-destructive/10 text-destructive';
     default:
-      return 'text-gray-500 bg-gray-500/10 border-gray-500/20';
+      return 'border-border bg-secondary text-muted-foreground';
   }
 }
 

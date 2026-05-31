@@ -76,7 +76,7 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
     { to: "characters", label: t('sidebar.characters'), icon: UsersRound },
     { to: "story", label: t('sidebar.storyline'), icon: BookOpen },
     { to: "generation", label: t('sidebar.generation'), icon: Brush },
-    { to: "tasks", label: "Tâches", icon: Activity },
+    { to: "tasks", label: t('sidebar.tasks'), icon: Activity },
     { to: "assets", label: t('sidebar.assets'), icon: Boxes },
     { to: "exports", label: t('sidebar.exports'), icon: FileArchive },
     { to: "warnings", label: t('sidebar.warnings'), icon: ShieldAlert },
@@ -86,8 +86,8 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     clsx(
-      "flex min-h-9 items-center gap-2.5 rounded-[7px] border px-2.5 py-2 text-sm transition-colors",
-      isActive ? "border-line bg-surface-2 text-ink" : "border-transparent text-muted hover:border-line hover:bg-surface-2 hover:text-ink",
+      "flex min-h-9 items-center gap-2.5 rounded-md border px-2.5 py-2 text-sm font-medium transition-colors",
+      isActive ? "border-primary/30 bg-primary/10 text-primary" : "border-transparent text-muted-foreground hover:border-primary/25 hover:bg-primary/8 hover:text-foreground",
     );
 
   // Handle click outside to close sidebar
@@ -96,7 +96,7 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen bg-bg text-foreground">
       {/* Mobile overlay */}
       {isOpen && (
         <div 
@@ -110,35 +110,37 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
       <aside
         ref={sidebarRef}
         className={clsx(
-          "fixed lg:sticky top-0 z-50 flex h-screen flex-col gap-5 border-r border-line bg-surface p-3.5 transition-all duration-300 ease-out lg:translate-x-0",
+          "fixed top-0 z-50 flex h-screen flex-col gap-5 border-r border-border bg-card/95 p-3.5 backdrop-blur transition-all duration-300 ease-out lg:sticky lg:translate-x-0",
           reducedSidebar ? "lg:w-[56px] !p-2" : "lg:w-[248px]",
           "w-[280px]",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Close button - mobile only */}
-        <button
+        <Button
+          type="button"
+          variant="ghost"
           onClick={() => setIsOpen(false)}
-          className="absolute top-3 right-3 p-2 rounded-lg text-muted hover:text-ink hover:bg-surface-2 lg:hidden"
-          aria-label={t('actions.close') || 'Fermer'}
+          className="absolute top-3 right-3 text-muted hover:text-ink lg:hidden"
+          aria-label={t('actions.close')}
         >
           <X size={20} />
-        </button>
+        </Button>
 
         <div className={clsx(
-          "grid gap-1 border-b border-line pb-3.5 pt-2",
+          "grid gap-1 border-b border-border pb-3.5 pt-2",
           reducedSidebar ? "px-1.5 items-center" : "px-2.5"
         )}>
           <b className={clsx(
-            "text-[17px] text-ink",
+            "text-[17px] font-semibold text-foreground",
             reducedSidebar && "hidden"
           )}>{t('appName')}</b>
           <span className={clsx(
-            "text-xs text-muted",
+            "text-xs text-muted-foreground",
             reducedSidebar && "hidden"
           )}>{t('tagline')}</span>
           {reducedSidebar && (
-            <b className="text-accent text-lg text-center">K</b>
+            <b className="text-primary text-lg text-center">K</b>
           )}
         </div>
         
@@ -172,7 +174,7 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
         </nav>
         
         <div className={clsx(
-          "grid gap-2 border-t border-line pt-3",
+          "grid gap-2 border-t border-border pt-3",
           reducedSidebar && "justify-items-center"
         )}>
           <div className={clsx(reducedSidebar && "hidden")}>
@@ -182,7 +184,7 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
             variant="ghost"
             onClick={toggleTheme}
             className={clsx(
-              "justify-start",
+              "justify-start text-muted-foreground hover:text-foreground",
               reducedSidebar && "!px-2 !min-w-0 w-10 h-10 justify-center"
             )}
             title={reducedSidebar ? (theme === "dark" ? t('actions.light') : t('actions.dark')) : undefined}
@@ -208,21 +210,23 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
       {/* Main content */}
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Top bar with hamburger menu */}
-        <div className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-3 border-b border-line bg-bg/90 px-4 py-2.5 backdrop-blur">
+        <div className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-3 border-b border-border bg-bg/92 px-4 py-2.5 backdrop-blur">
           <div className="flex items-center gap-3 min-w-0">
             {/* Hamburger menu - mobile only */}
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={toggle}
-              className="p-2 rounded-lg text-ink hover:bg-surface-2 lg:hidden"
-              aria-label={t('actions.openMenu') || 'Ouvrir le menu'}
+              className="text-foreground lg:hidden"
+              aria-label={t('actions.openMenu')}
               aria-expanded={isOpen}
             >
               <Menu size={22} />
-            </button>
+            </Button>
 
             <div className="min-w-0">
-              <b className="block truncate text-sm text-ink">{project.data?.name || t('sidebar.projectHub')}</b>
-              <span className="block truncate text-xs text-muted">{project.data ? `${project.data.status} · ${project.data.rootPath}` : "Backend-driven workspace"}</span>
+              <b className="block truncate text-sm font-semibold text-foreground">{project.data?.name || t('sidebar.projectHub')}</b>
+              <span className="block truncate text-xs text-muted-foreground">{project.data ? `${project.data.status} · ${project.data.rootPath}` : t('workspace.backendDriven')}</span>
             </div>
           </div>
 
@@ -230,29 +234,31 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
           <div className="flex items-center gap-2">
             {/* Task toggle - only in project context */}
             {projectId && (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={toggleSideSheet}
-                className="relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-ink hover:bg-surface-2 transition-colors"
-                title="Ouvrir le gestionnaire de tâches"
+                className="relative"
+                title={t('tasks.openManager')}
               >
                 <Activity size={18} />
                 {runningTaskCount > 0 && (
                   <>
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                    <span className="hidden sm:inline text-xs font-medium bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded-full">
+                    <span className="absolute top-1 right-1 size-2 animate-pulse rounded-full bg-primary" />
+                    <span className="hidden rounded-md bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary sm:inline">
                       {runningTaskCount}
                     </span>
                   </>
                 )}
-                <span className="hidden sm:inline text-sm">Tâches</span>
-              </button>
+                <span className="hidden sm:inline text-sm">{t('sidebar.tasks')}</span>
+              </Button>
             )}
-            <span className="hidden sm:block font-mono text-xs text-muted">API {import.meta.env.VITE_KUTI_API_URL || "http://127.0.0.1:8000"}</span>
+            <span className="hidden rounded-md border border-border bg-card px-2 py-1 font-mono text-xs text-muted-foreground sm:block">API {import.meta.env.VITE_KUTI_API_URL || "http://127.0.0.1:8000"}</span>
           </div>
         </div>
 
         {/* Page content */}
-        <div className="flex-1 mx-auto w-full max-w-[1500px] p-4 sm:p-5 compact:p-3">
+        <div className="mx-auto w-full max-w-[1500px] flex-1 p-4 sm:p-5 compact:p-3">
           {children ?? <Outlet />}
         </div>
       </main>

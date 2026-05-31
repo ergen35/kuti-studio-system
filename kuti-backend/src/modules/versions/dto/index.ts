@@ -71,7 +71,7 @@ export const versionCompareResponseSchema = z.object({
   left: versionResponseSchema,
   right: versionResponseSchema,
   projectChanges: z.array(z.string()),
-  countsDelta: z.record(z.number()),
+  countsDelta: z.record(z.string(), z.number()),
 });
 
 export type VersionCompareResponse = z.infer<typeof versionCompareResponseSchema>;

@@ -1,8 +1,18 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { clsx } from 'clsx';
-import { ImageIcon, Loader2, Sparkles, Wand2, X } from 'lucide-react';
+import { ImageIcon, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Button, ErrorState } from '~/components/ui';
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog';
+import { Progress } from '~/components/ui/progress';
+import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 import { useTranslation } from '~/hooks/useTranslation';
 import type { ListCharactersResponse } from '~/lib/backend';
 import { generateCharacterImageMutation, getGenerationJobOptions } from '~/lib/backend/@tanstack/react-query.gen';
@@ -111,7 +121,7 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
     
     const base = strategyPrefix[strategy] || strategyPrefix.portrait;
     const artistic = styleSuffix[style] || styleSuffix.realistic;
-    const description = parts.join(', ') || 'A character';
+    const description = parts.join(', ') || t('generation.defaultPromptSubject');
     
     return `${base}, ${description}, ${artistic}`;
   }, [character, strategy, style, t]);
@@ -135,25 +145,20 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
   );
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Active generation progress */}
       {isGenerating && activeJob.data && (
-        <div className="p-4 rounded-lg border border-accent/30 bg-accent/5">
-          <div className="flex items-center gap-3 mb-3">
-            <Loader2 size={18} className="animate-spin text-accent" />
-            <span className="text-sm font-medium text-ink">
-              {t('generation.generating') || 'Génération en cours...'}
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+          <div className="mb-3 flex items-center gap-3">
+            <Loader2 size={18} className="animate-spin text-primary" />
+            <span className="text-sm font-medium text-foreground">
+              {t('generation.generating')}
             </span>
-            <span className="text-sm text-muted ml-auto">
+            <span className="ml-auto text-sm text-muted-foreground">
               {activeJob.data.progress}%
             </span>
           </div>
-          <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-accent transition-all duration-300"
-              style={{ width: `${activeJob.data.progress}%` }}
-            />
-          </div>
+          <Progress value={activeJob.data.progress} className="h-2" />
         </div>
       )}
 
@@ -179,34 +184,24 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
           <Sparkles size={16} />
         )}
         {isGenerating 
-          ? t('generation.generating') || 'Génération...'
+          ? t('generation.generating')
           : activeJob.data?.board?.panels?.length 
-            ? t('generation.regenerate') || 'Regénérer'
-            : t('generation.generatePortrait') || 'Générer un portrait'
+            ? t('generation.regenerate')
+            : t('generation.generatePortrait')
         }
       </Button>
 
-      {/* Generation config modal */}
-      {isModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm"
-          onClick={(e) => e.target === e.currentTarget && setIsModalOpen(false)}
-        >
-          <div className="w-full max-w-md rounded-xl bg-surface shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/30">
-              <div className="flex items-center gap-2">
-                <Wand2 size={20} className="text-accent" />
-                <h2 className="text-lg font-semibold text-ink">
-                  {t('generation.modalTitle') || 'Générer une image'}
-                </h2>
-              </div>
-              <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="p-1 h-auto">
-                <X size={20} />
-              </Button>
-            </div>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wand2 className="text-primary" />
+              {t('generation.modalTitle')}
+            </DialogTitle>
+            <DialogDescription>{t('generation.modalDescription')}</DialogDescription>
+          </DialogHeader>
 
-            <div className="p-4 space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Error */}
               {generateMutation.error && (
                 <ErrorState message={apiErrorMessage(generateMutation.error as unknown)} />
@@ -214,93 +209,92 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
 
               {/* Strategy */}
               <div>
-                <label className="text-sm text-muted mb-2 block">
-                  {t('generation.strategy.label') || 'Cadre'}
+                <label className="mb-2 block text-sm text-muted-foreground">
+                  {t('generation.strategy.label')}
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <ToggleGroup
+                  type="single"
+                  value={strategy}
+                  onValueChange={(value) => value && setStrategy(value as Strategy)}
+                  className="grid w-full grid-cols-3"
+                >
                   {STRATEGIES.map((s) => (
-                    <button
+                    <ToggleGroupItem
                       key={s}
-                      onClick={() => setStrategy(s)}
-                      className={clsx(
-                        "p-2 rounded-lg border text-sm transition-colors text-center",
-                        strategy === s
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-line hover:border-accent/50 text-ink"
-                      )}
+                      value={s}
+                      className="w-full"
                     >
-                      {t(`generation.strategy.${s}`) || s}
-                    </button>
+                      {t(`generation.strategy.${s}`)}
+                    </ToggleGroupItem>
                   ))}
-                </div>
+                </ToggleGroup>
               </div>
 
               {/* Style */}
               <div>
-                <label className="text-sm text-muted mb-2 block">
-                  {t('generation.style.label') || 'Style'}
+                <label className="mb-2 block text-sm text-muted-foreground">
+                  {t('generation.style.label')}
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <ToggleGroup
+                  type="single"
+                  value={style}
+                  onValueChange={(value) => value && setStyle(value as Style)}
+                  className="grid w-full grid-cols-2"
+                >
                   {STYLES.map((s) => (
-                    <button
+                    <ToggleGroupItem
                       key={s}
-                      onClick={() => setStyle(s)}
-                      className={clsx(
-                        "p-2 rounded-lg border text-sm transition-colors text-center",
-                        style === s
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-line hover:border-accent/50 text-ink"
-                      )}
+                      value={s}
+                      className="w-full"
                     >
-                      {t(`generation.style.${s}`) || s}
-                    </button>
+                      {t(`generation.style.${s}`)}
+                    </ToggleGroupItem>
                   ))}
-                </div>
+                </ToggleGroup>
               </div>
 
               {/* Image count */}
               <div>
-                <label className="text-sm text-muted mb-2 block">
-                  {t('generation.imageCount') || 'Nombre de variations'}
+                <label className="mb-2 block text-sm text-muted-foreground">
+                  {t('generation.imageCount')}
                 </label>
-                <div className="flex gap-2">
+                <ToggleGroup
+                  type="single"
+                  value={String(imageCount)}
+                  onValueChange={(value) => value && setImageCount(Number(value))}
+                  className="grid w-full grid-cols-3"
+                >
                   {[1, 2, 4].map((count) => (
-                    <button
+                    <ToggleGroupItem
                       key={count}
-                      onClick={() => setImageCount(count)}
-                      className={clsx(
-                        "flex-1 p-2 rounded-lg border text-sm transition-colors",
-                        imageCount === count
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-line hover:border-accent/50 text-ink"
-                      )}
+                      value={String(count)}
+                      className="w-full"
                     >
-                      <ImageIcon size={14} className="inline mr-1" />
+                      <ImageIcon />
                       {count}
-                    </button>
+                    </ToggleGroupItem>
                   ))}
-                </div>
+                </ToggleGroup>
               </div>
 
               {/* Prompt preview */}
               <div>
-                <label className="text-sm text-muted mb-2 block">
-                  {t('generation.preview') || 'Aperçu du prompt'}
+                <label className="mb-2 block text-sm text-muted-foreground">
+                  {t('generation.preview')}
                 </label>
-                <div className="max-h-32 overflow-y-auto p-3 rounded-lg bg-surface-2/30 border border-line text-xs text-muted">
+                <div className="max-h-32 overflow-y-auto rounded-lg border border-border bg-secondary/35 p-3 text-xs text-muted-foreground">
                   {previewPrompt}
                 </div>
               </div>
 
               {/* Insufficient data warning */}
               {(!character.description && !character.physicalDescription) && (
-                <div className="p-3 rounded-lg bg-warning/10 border border-warning/30 text-sm text-warning">
-                  {t('generation.insufficientData') || 'Données insuffisantes. Enrichissez la fiche avec description et traits physiques.'}
-                </div>
+                <Alert>
+                  <AlertDescription>{t('generation.insufficientData')}</AlertDescription>
+                </Alert>
               )}
 
-              {/* Actions */}
-              <div className="flex justify-end gap-3 pt-2 border-t border-line">
+              <DialogFooter>
                 <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
                   {t('actions.cancel')}
                 </Button>
@@ -314,13 +308,12 @@ export function CharacterImageGenerator({ character, projectId }: CharacterImage
                   ) : (
                     <Wand2 size={16} />
                   )}
-                  {t('generation.generate') || 'Générer'}
+                  {t('generation.generate')}
                 </Button>
-              </div>
+              </DialogFooter>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

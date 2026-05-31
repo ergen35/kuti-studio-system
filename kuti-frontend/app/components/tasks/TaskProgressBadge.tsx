@@ -2,6 +2,14 @@ import { clsx } from "clsx";
 import type { TaskStatus } from "~/lib/tasks/types";
 import { getStatusColor, getStatusLabel } from "~/lib/tasks/types";
 
+const progressBarClass: Record<TaskStatus, string> = {
+  pending: "bg-warning",
+  running: "bg-primary",
+  ready: "bg-success",
+  validated: "bg-success",
+  failed: "bg-destructive",
+};
+
 interface TaskProgressBadgeProps {
   status: TaskStatus;
   progress: number;
@@ -41,26 +49,22 @@ export function TaskProgressBadge({
         </span>
 
         {label && (
-          <span className="text-xs text-muted">{label}</span>
+          <span className="text-xs text-muted-foreground">{label}</span>
         )}
       </div>
 
       {showProgressBar && (
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
             <div
               className={clsx(
                 "h-full rounded-full transition-all duration-300",
-                status === "failed" && "bg-red-500",
-                status === "running" && "bg-blue-500",
-                status === "ready" && "bg-emerald-500",
-                status === "validated" && "bg-teal-500",
-                status === "pending" && "bg-yellow-500"
+                progressBarClass[status]
               )}
               style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
             />
           </div>
-          <span className="text-[10px] text-muted tabular-nums">
+          <span className="text-[10px] tabular-nums text-muted-foreground">
             {Math.round(progress)}%
           </span>
         </div>
@@ -94,7 +98,7 @@ export function TaskProgressBadgeMini({
       </span>
 
       {label && (
-        <span className="text-[10px] text-muted">{label}</span>
+        <span className="text-[10px] text-muted-foreground">{label}</span>
       )}
     </div>
   );

@@ -1,6 +1,24 @@
 {
   "title": "Kuti Studio",
   "subtitle": "Local narrative production",
+  "hero": {
+    "subtitle": "Narrative studio for multimedia works",
+    "placeholder": "New project name...",
+    "create": "Create",
+    "creating": "Creating..."
+  },
+  "theme": {
+    "darkTitle": "Switch to dark mode",
+    "lightTitle": "Switch to light mode",
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "view": {
+    "gridTitle": "Grid view",
+    "listTitle": "List view",
+    "grid": "Grid",
+    "list": "List"
+  },
   "createProject": {
     "title": "Create project",
     "meta": "Stored in kuti-data/projects",
@@ -19,6 +37,10 @@
     "title": "Projects",
     "count": "{{count}} project",
     "count_plural": "{{count}} projects",
+    "statusCount": {
+      "active": "{{count}} active",
+      "draft": "{{count}} draft"
+    },
     "empty": {
       "title": "No project yet",
       "description": "Create one from the form above to initialize storage through the backend."
@@ -27,7 +49,8 @@
       "open": "Open",
       "clone": "Clone",
       "archive": "Archive",
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "more": "More actions"
     },
     "meta": {
       "path": "Path",

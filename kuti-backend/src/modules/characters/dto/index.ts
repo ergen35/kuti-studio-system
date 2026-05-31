@@ -157,8 +157,11 @@ export const characterRelationListResponseSchema = z.array(characterRelationResp
 export const characterImageListResponseSchema = z.array(characterImageResponseSchema);
 
 export const projectCharacterImagesResponseSchema = z.record(
+  z.string(),
   z.array(characterImageResponseSchema)
 );
+
+export type CreateVoiceSampleBody = z.infer<typeof createVoiceSampleBodySchema>;
 
 // Generate image
 export const generateCharacterImageQuerySchema = z.object({

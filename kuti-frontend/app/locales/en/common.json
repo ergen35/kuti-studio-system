@@ -1,5 +1,6 @@
 {
   "appName": "Kuti Studio",
+  "locale": "en-US",
   "tagline": "Local narrative production",
   "nav": {
     "back": "Back",
@@ -65,11 +66,15 @@
     "characters": "Characters",
     "storyline": "Storyline",
     "generation": "Generation",
+    "tasks": "Tasks",
     "assets": "Assets",
     "exports": "Exports",
     "warnings": "Warnings",
     "versions": "Versions",
     "settings": "Settings"
+  },
+  "tasks": {
+    "openManager": "Open task manager"
   },
   "backend": {
     "title": "Backend",
@@ -85,7 +90,8 @@
     "open": "Open {{name}}",
     "description": "Description",
     "actions": "Actions",
-    "details": "Details"
+    "details": "Details",
+    "backendDriven": "Backend-driven workspace"
   },
   "fields": {
     "name": "Name",

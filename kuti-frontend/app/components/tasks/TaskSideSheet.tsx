@@ -1,8 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { Activity, X } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { Activity } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { listGenerationJobsOptions } from "~/lib/backend/@tanstack/react-query.gen";
+import { Button, Badge } from "~/components/ui";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "~/components/ui/sheet";
+import { useTranslation } from "~/hooks/useTranslation";
 import type { TaskItem } from "~/lib/tasks/types";
 import { jobToTaskItem } from "~/lib/tasks/types";
 import { useTasksStore } from "~/stores/tasks";
@@ -18,6 +26,7 @@ export function TaskSideSheet({ projectId: propProjectId }: TaskSideSheetProps) 
   const { projectId: routeProjectId } = useParams();
   const projectId = propProjectId || routeProjectId || "";
   const navigate = useNavigate();
+  const { t } = useTranslation(["tasks", "common"]);
   const { isSideSheetOpen, closeSideSheet, selectedTaskId, setSelectedTask, searchQuery, selectedStatuses, selectedSourceKinds } =
     useTasksStore();
 
@@ -92,65 +101,19 @@ export function TaskSideSheet({ projectId: propProjectId }: TaskSideSheetProps) 
   // Count running tasks
   const runningCount = tasks.filter((t) => t.status === "running").length;
 
-  const handleNavigate = useCallback(
-    (taskId: string) => {
-      closeSideSheet();
-      navigate(`/projects/${projectId}/generation?job=${taskId}`);
-    },
-    [closeSideSheet, navigate, projectId]
-  );
-
-  // Close on escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isSideSheetOpen) {
-        closeSideSheet();
-      }
-    };
-    if (isSideSheetOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isSideSheetOpen, closeSideSheet]);
-
-  if (!isSideSheetOpen) return null;
-
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-ink/50 backdrop-blur-sm transition-opacity"
-        onClick={closeSideSheet}
-        aria-hidden="true"
-      />
-
-      {/* Sheet */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[400px] bg-surface border-l border-line shadow-2xl animate-in slide-in-from-right duration-200">
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-line">
+      <Sheet open={isSideSheetOpen} onOpenChange={(open) => !open && closeSideSheet()}>
+        <SheetContent className="w-full sm:w-[400px]" side="right">
+          <SheetHeader className="border-b border-line">
             <div className="flex items-center gap-2">
               <Activity size={20} className="text-accent" />
-              <h2 className="font-semibold text-ink">Tâches</h2>
+              <SheetTitle>{t('tasks:sideTitle')}</SheetTitle>
               {runningCount > 0 && (
-                <span className="px-1.5 py-0.5 text-[10px] font-medium bg-blue-500/10 text-blue-600 rounded-full animate-pulse">
-                  {runningCount} en cours
-                </span>
+                <Badge tone="running">{t('tasks:runningCount', { count: runningCount })}</Badge>
               )}
             </div>
-            <button
-              onClick={closeSideSheet}
-              className="p-2 rounded-lg text-muted hover:text-ink hover:bg-surface-2 transition-colors"
-            >
-              <X size={18} />
-            </button>
-          </div>
+          </SheetHeader>
 
           {/* Filters */}
           <div className="px-4 py-3 border-b border-line bg-surface-2/30">
@@ -165,24 +128,24 @@ export function TaskSideSheet({ projectId: propProjectId }: TaskSideSheetProps) 
               onOpenDetail={(task) => setSelectedTask(task.id)}
               showProgressBar={false}
               compact
-              emptyMessage="Aucune tâche active"
+              emptyMessage={t('tasks:activeEmpty')}
             />
           </div>
 
-          {/* Footer */}
-          <div className="px-4 py-3 border-t border-line bg-surface-2/30">
-            <button
+          <SheetFooter className="border-t border-line bg-surface-2/30">
+            <Button
+              variant="ghost"
               onClick={() => {
                 closeSideSheet();
                 navigate(`/projects/${projectId}/tasks`);
               }}
-              className="w-full py-2 text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+              className="w-full"
             >
-              Voir toutes les tâches →
-            </button>
-          </div>
-        </div>
-      </div>
+              {t('tasks:viewAll')}
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       {/* Task Detail Dialog */}
       {selectedTaskId && (

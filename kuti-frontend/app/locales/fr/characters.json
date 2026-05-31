@@ -38,6 +38,10 @@
     "narrativeArc": "Arc narratif",
     "tags": "Tags"
   },
+  "placeholders": {
+    "traits": "brave, loyal, rusé...",
+    "palette": "#2f6f73, #61a5a0..."
+  },
   "relations": {
     "title": "Relations",
     "empty": "Aucune relation",
@@ -53,8 +57,14 @@
   },
   "voiceSamples": {
     "title": "Échantillons vocaux",
+    "empty": "Aucun échantillon vocal",
     "count": "{{count}} échantillon",
     "count_plural": "{{count}} échantillons"
+  },
+  "images": {
+    "title": "Images générées",
+    "empty": "Aucune image générée",
+    "confirmDelete": "Supprimer cette image ?"
   },
   "status": {
     "active": "Actif",
@@ -96,6 +106,8 @@
     "generating": "Génération...",
     "regenerate": "Regénérer",
     "modalTitle": "Générer une image",
+    "modalDescription": "Choisissez le cadrage, le style et le nombre de variantes à produire.",
+    "defaultPromptSubject": "Un personnage",
     "results": "Résultats",
     "preview": "Aperçu du prompt",
     "download": "Télécharger",
@@ -121,6 +133,13 @@
       "illustrationDesc": "illustration de livre, stylisé, art professionnel, haute qualité",
       "watercolorDesc": "peinture à l'aquarelle, couleurs douces, artistique, style média traditionnel"
     },
-    "imageCount": "Nombre de variations"
+    "imageCount": "Nombre de variations",
+    "lightbox": {
+      "title": "Image générée",
+      "description": "Aperçu de l'image de personnage générée.",
+      "close": "Fermer",
+      "previous": "Image précédente",
+      "next": "Image suivante"
+    }
   }
 }

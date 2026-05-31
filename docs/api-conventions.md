@@ -4,32 +4,38 @@ Standards et conventions pour l'API REST de Kuti Studio.
 
 ## Structure des endpoints
 
-### Versionning
+### Versioning
 
-Toutes les routes publiques utilisent le préfixe `/api/v1/`.
+Les routes métier principales utilisent le préfixe `/api/`. Quelques modules legacy isolés conservent encore `/api/v1/*` quand le code le montre explicitement, par exemple `users` et `files`.
 
 ```
-/api/v1/projects
-/api/v1/projects/:id
-/api/v1/projects/:id/characters
+/api/projects
+/api/projects/:id
+/api/projects/:id/characters
 ```
 
 ### Organisation
 
 | Domaine | Base URL |
 |---------|----------|
-| Santé | `/api/v1/health` |
-| Authentification | `/api/v1/auth/*` |
-| Projets | `/api/v1/projects` |
-| Personnages | `/api/v1/projects/:projectId/characters` |
-| Storyline | `/api/v1/projects/:projectId/story/*` |
-| Génération | `/api/v1/projects/:projectId/generation` |
-| Assets | `/api/v1/projects/:projectId/assets` |
-| Versions | `/api/v1/projects/:projectId/versions` |
-| Warnings | `/api/v1/projects/:projectId/warnings` |
-| Exports | `/api/v1/projects/:projectId/exports` |
-| Upload | `/api/v1/upload` |
+| Santé | `/api/health` |
+| Authentification | `/api/auth/*` |
+| Projets | `/api/projects` |
+| Personnages | `/api/projects/:projectId/characters` |
+| Storyline | `/api/projects/:projectId/story/*` |
+| Génération | `/api/projects/:projectId/generation` |
+| Assets | `/api/projects/:projectId/assets` |
+| Versions | `/api/projects/:projectId/versions` |
+| Warnings | `/api/projects/:projectId/warnings` |
+| Exports | `/api/projects/:projectId/exports` |
+| Upload | `/api/v1/files` |
 | Users | `/api/v1/users` |
+
+## Contrats camelCase
+
+Tous les contrats publics exposés par DTO, OpenAPI, SDK Hey API et frontend utilisent des clés `camelCase` uniquement. Les anciens alias `snake_case` ne sont pas supportés côté contrat public.
+
+Les colonnes PostgreSQL peuvent rester en `snake_case` via Prisma `@map(...)`; cette convention ne fuit pas dans les payloads API. Exemples attendus : `sourcePath`, `modelKey`, `narrativeRole`, `charactersJson`, `updatedAt`.
 
 ## Méthodes HTTP
 
@@ -250,7 +256,7 @@ Utilisé par Inngest pour invoquer les workflows.
 ### Accès
 
 - **Swagger UI** : `http://localhost:8000/openapi`
-- **JSON Spec** : `http://localhost:8000/openapi/doc.json`
+- **JSON Spec** : `http://localhost:8000/openapi/api-doc.json`
 
 ### Conventions
 

@@ -10,10 +10,12 @@ import enCharacters from '~/locales/en/characters.json';
 import enStory from '~/locales/en/story.json';
 import enAssets from '~/locales/en/assets.json';
 import enGeneration from '~/locales/en/generation.json';
+import enScene from '~/locales/en/scene.json';
 import enWarnings from '~/locales/en/warnings.json';
 import enVersions from '~/locales/en/versions.json';
 import enExports from '~/locales/en/exports.json';
 import enSettings from '~/locales/en/settings.json';
+import enTasks from '~/locales/en/tasks.json';
 
 // Import namespaces FR
 import frCommon from '~/locales/fr/common.json';
@@ -23,10 +25,12 @@ import frCharacters from '~/locales/fr/characters.json';
 import frStory from '~/locales/fr/story.json';
 import frAssets from '~/locales/fr/assets.json';
 import frGeneration from '~/locales/fr/generation.json';
+import frScene from '~/locales/fr/scene.json';
 import frWarnings from '~/locales/fr/warnings.json';
 import frVersions from '~/locales/fr/versions.json';
 import frExports from '~/locales/fr/exports.json';
 import frSettings from '~/locales/fr/settings.json';
+import frTasks from '~/locales/fr/tasks.json';
 
 export const resources = {
   en: {
@@ -37,10 +41,12 @@ export const resources = {
     story: enStory,
     assets: enAssets,
     generation: enGeneration,
+    scene: enScene,
     warnings: enWarnings,
     versions: enVersions,
     exports: enExports,
     settings: enSettings,
+    tasks: enTasks,
   },
   fr: {
     common: frCommon,
@@ -50,10 +56,12 @@ export const resources = {
     story: frStory,
     assets: frAssets,
     generation: frGeneration,
+    scene: frScene,
     warnings: frWarnings,
     versions: frVersions,
     exports: frExports,
     settings: frSettings,
+    tasks: frTasks,
   },
 } as const;
 
@@ -77,10 +85,12 @@ export function initI18n() {
         'story',
         'assets',
         'generation',
+        'scene',
         'warnings',
         'versions',
         'exports',
         'settings',
+        'tasks',
       ],
       interpolation: {
         escapeValue: false,

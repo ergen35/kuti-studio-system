@@ -64,7 +64,7 @@ export const warningResponseSchema = z.object({
   message: z.string(),
   entityKind: z.string(),
   entityId: z.string(),
-  metadataJson: z.record(z.unknown()),
+  metadataJson: z.record(z.string(), z.unknown()),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   resolvedAt: z.iso.datetime().nullable(),
@@ -77,6 +77,9 @@ export const warningListResponseSchema = z.array(warningResponseSchema);
 export type WarningListResponse = z.infer<typeof warningListResponseSchema>;
 
 export const warningScanResponseSchema = z.object({
+  scanned: z.number().int().min(0),
+  added: z.number().int().min(0),
+  resolved: z.number().int().min(0),
   items: warningListResponseSchema,
 });
 

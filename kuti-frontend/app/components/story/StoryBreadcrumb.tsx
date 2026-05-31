@@ -1,8 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ChevronRight, Check, ChevronDown } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTranslation } from '~/hooks/useTranslation';
+import { Button } from '~/components/ui';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 import type { GetStorySummaryResponse } from '~/lib/backend';
 
 type Tome = GetStorySummaryResponse['tomes'][number];
@@ -34,76 +42,60 @@ function BreadcrumbDropdown({
   label,
   items,
   isOpen,
-  onToggle,
+  onOpenChange,
   onClose,
 }: {
   label: string;
   items: DropdownItem[];
   isOpen: boolean;
-  onToggle: () => void;
+  onOpenChange: (open: boolean) => void;
   onClose: () => void;
 }) {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Close on click outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
-  
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={onToggle}
-        className={clsx(
-          "hidden lg:flex items-center gap-1 px-2 py-1 rounded-md text-sm transition-colors",
-          isOpen 
-            ? "bg-accent/10 text-accent" 
-            : "hover:bg-surface-2/50 text-ink"
-        )}
-      >
-        <span className="font-medium">{label}</span>
-        <ChevronDown 
-          size={14} 
-          className={clsx("transition-transform", isOpen && "rotate-180")} 
-        />
-      </button>
-      
-      {/* Mobile: just show text */}
-      <span className="lg:hidden text-sm text-ink font-medium">{label}</span>
-      
-      {/* Dropdown */}
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-56 max-h-64 overflow-y-auto rounded-lg border border-line bg-surface shadow-lg z-50">
+    <DropdownMenu open={isOpen} onOpenChange={onOpenChange}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          className={clsx(
+            "hidden h-8 max-w-[280px] items-center gap-1.5 rounded-md px-2.5 text-sm lg:flex",
+            isOpen
+              ? "bg-primary/10 text-primary"
+              : "text-foreground hover:bg-primary/8 hover:text-primary"
+          )}
+        >
+          <span className="truncate font-medium">{label}</span>
+          <ChevronDown
+            size={14}
+            className={clsx("shrink-0 transition-transform", isOpen && "rotate-180")}
+          />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <span className="max-w-[260px] truncate text-sm font-medium text-foreground lg:hidden">{label}</span>
+
+      <DropdownMenuContent className="max-h-72 w-64 overflow-y-auto" align="start">
+        <DropdownMenuGroup>
           {items.map((item) => (
-            <button
+            <DropdownMenuItem
               key={item.id}
               onClick={() => {
                 item.onClick();
                 onClose();
               }}
               className={clsx(
-                "w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors",
-                item.isActive 
-                  ? "bg-accent/10 text-accent" 
-                  : "hover:bg-surface-2/50 text-ink"
+                "gap-2 py-1.5",
+                item.isActive && "bg-primary/10 text-primary focus:bg-primary/10 focus:text-primary"
               )}
             >
-              <span className="text-xs text-muted w-8">#{item.number}</span>
+              <span className="w-8 shrink-0 text-xs text-muted-foreground">#{item.number}</span>
               <span className="flex-1 truncate">{item.label}</span>
               {item.isActive && <Check size={14} />}
-            </button>
+            </DropdownMenuItem>
           ))}
-        </div>
-      )}
-    </div>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -169,53 +161,55 @@ export function StoryBreadcrumb({
   }));
   
   const getCurrentTomeLabel = () => {
-    if (!currentTomeId || !tomeNumber) return t('tome.select') || 'Sélectionner un tome';
+    if (!currentTomeId || !tomeNumber) return t('tome.select');
     const tome = sortedTomes.find(t => t.id === currentTomeId);
-    return `${t('tome.shortNumber', { number: tomeNumber })}: ${tome?.title || 'Tome'}`;
+    return `${t('tome.shortNumber', { number: tomeNumber })}: ${tome?.title || t('tome.fallbackTitle')}`;
   };
   
   const getCurrentChapterLabel = () => {
-    if (!currentChapterId || !chapterNumber) return t('chapter.select') || 'Sélectionner un chapitre';
+    if (!currentChapterId || !chapterNumber) return t('chapter.select');
     const chapter = tomeChapters.find(c => c.id === currentChapterId);
-    return `${t('chapter.shortNumber', { number: chapterNumber })}: ${chapter?.title || 'Chapitre'}`;
+    return `${t('chapter.shortNumber', { number: chapterNumber })}: ${chapter?.title || t('chapter.fallbackTitle')}`;
   };
   
   const getCurrentSceneLabel = () => {
-    if (!currentSceneId || !sceneNumber) return t('scene.select') || 'Sélectionner une scène';
+    if (!currentSceneId || !sceneNumber) return t('scene.select');
     const scene = chapterScenes.find(s => s.id === currentSceneId);
-    return `${t('scene.shortNumber', { number: sceneNumber })}: ${scene?.title || 'Scène'}`;
+    return `${t('scene.shortNumber', { number: sceneNumber })}: ${scene?.title || t('scene.fallbackTitle')}`;
   };
   
   return (
-    <nav className="flex items-center gap-1 text-sm mb-4 flex-wrap">
+    <nav className="mb-4 flex flex-wrap items-center gap-1 text-sm">
       {/* Story root */}
-      <button 
+      <Button
+        type="button"
+        variant="ghost"
         onClick={() => navigate(`/projects/${projectId}/story`)}
-        className="px-2 py-1 rounded-md hover:bg-surface-2/50 text-muted hover:text-ink transition-colors"
+        className="h-8 rounded-md px-2.5 text-muted-foreground hover:bg-primary/8 hover:text-primary"
       >
         {t('title')}
-      </button>
+      </Button>
       
-      <ChevronRight size={14} className="text-muted" />
+      <ChevronRight size={14} className="text-muted-foreground" />
       
       {/* Tome dropdown */}
       <BreadcrumbDropdown
         label={getCurrentTomeLabel()}
         items={tomeItems}
         isOpen={openDropdown === 'tome'}
-        onToggle={() => setOpenDropdown(openDropdown === 'tome' ? null : 'tome')}
+        onOpenChange={(open) => setOpenDropdown(open ? 'tome' : null)}
         onClose={() => setOpenDropdown(null)}
       />
       
       {/* Chapter dropdown (if chapter or scene) */}
       {(currentChapterId || currentSceneId) && (
         <>
-          <ChevronRight size={14} className="text-muted hidden lg:block" />
+          <ChevronRight size={14} className="hidden text-muted-foreground lg:block" />
           <BreadcrumbDropdown
             label={getCurrentChapterLabel()}
             items={chapterItems}
             isOpen={openDropdown === 'chapter'}
-            onToggle={() => setOpenDropdown(openDropdown === 'chapter' ? null : 'chapter')}
+            onOpenChange={(open) => setOpenDropdown(open ? 'chapter' : null)}
             onClose={() => setOpenDropdown(null)}
           />
         </>
@@ -224,12 +218,12 @@ export function StoryBreadcrumb({
       {/* Scene dropdown (if scene) */}
       {currentSceneId && (
         <>
-          <ChevronRight size={14} className="text-muted hidden lg:block" />
+          <ChevronRight size={14} className="hidden text-muted-foreground lg:block" />
           <BreadcrumbDropdown
             label={getCurrentSceneLabel()}
             items={sceneItems}
             isOpen={openDropdown === 'scene'}
-            onToggle={() => setOpenDropdown(openDropdown === 'scene' ? null : 'scene')}
+            onOpenChange={(open) => setOpenDropdown(open ? 'scene' : null)}
             onClose={() => setOpenDropdown(null)}
           />
         </>

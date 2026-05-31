@@ -168,28 +168,30 @@ function Sidebar() {
 
 ### shadcn/ui
 
-Les composants UI de base proviennent de shadcn/ui et se trouvent dans `app/components/ui.tsx` :
+Les composants UI de base proviennent de shadcn/ui. Les primitives générées vivent dans `app/components/ui/`; `app/components/ui.tsx` sert de façade de compatibilité temporaire pour les anciens imports métier.
 
 ```typescript
 // Exemple d'utilisation
-import { Button, Card, Dialog, Input, Tabs } from "~/components/ui";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 function Dashboard() {
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>Mon Projet</Card.Title>
-      </Card.Header>
-      <Card.Content>
+      <CardHeader>
+        <CardTitle>Mon Projet</CardTitle>
+      </CardHeader>
+      <CardContent>
         <Tabs>
-          <Tabs.List>
-            <Tabs.Trigger value="scenes">Scènes</Tabs.Trigger>
-            <Tabs.Trigger value="characters">Personnages</Tabs.Trigger>
-          </Tabs.List>
-          <Tabs.Content value="scenes">...</Tabs.Content>
-          <Tabs.Content value="characters">...</Tabs.Content>
+          <TabsList>
+            <TabsTrigger value="scenes">Scènes</TabsTrigger>
+            <TabsTrigger value="characters">Personnages</TabsTrigger>
+          </TabsList>
+          <TabsContent value="scenes">...</TabsContent>
+          <TabsContent value="characters">...</TabsContent>
         </Tabs>
-      </Card.Content>
+      </CardContent>
     </Card>
   );
 }
@@ -221,7 +223,8 @@ app/components/
 │   ├── StoryBreadcrumb.tsx
 │   ├── TomeCard.tsx
 │   └── TomeCardGrid.tsx
-└── ui.tsx               # shadcn/ui
+├── ui.tsx               # façade compatibilité UI
+└── ui/                  # primitives shadcn/ui générées
 ```
 
 ## Internationalisation (i18n)
@@ -243,7 +246,8 @@ locales/
 │   ├── exports.json
 │   ├── versions.json
 │   ├── warnings.json
-│   └── settings.json
+│   ├── settings.json
+│   └── tasks.json
 └── fr/
     └── ... (mêmes fichiers)
 ```
@@ -300,7 +304,7 @@ Le client API est généré automatiquement depuis l'OpenAPI du backend.
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-  input: "http://localhost:8000/openapi/doc.json",
+  input: "http://localhost:8000/openapi/api-doc.json",
   output: {
     path: "app/lib/backend",
     clean: true,
@@ -319,17 +323,19 @@ export default defineConfig({
 ### Commande
 
 ```bash
-yarn openapi-ts
+yarn api:generate
 ```
 
 ### Fichiers générés
 
 | Fichier | Description |
 |---------|-------------|
-| `sdk.gen.ts` | Fonctions API brutes |
-| `@tanstack/react-query.gen.ts` | Options queries/mutations |
+| `@tanstack/react-query.gen.ts` | Options queries/mutations à utiliser par défaut |
+| `sdk.gen.ts` | Fonctions API brutes réservées aux wrappers dédiés |
 | `types.gen.ts` | Types TypeScript |
 | `zod.gen.ts` | Schémas Zod pour formulaires |
+
+Les composants ne doivent pas importer directement `client.gen`. Le client fetch est centralisé dans `~/lib/backend-client`.
 
 > **Important** : Ne jamais modifier les fichiers `*.gen.ts`. Les régénérer après chaque changement backend.
 
@@ -398,7 +404,7 @@ yarn build                 # Build de production
 yarn preview               # Prévisualiser le build
 
 # Génération
-yarn openapi-ts            # Regénérer le SDK API
+yarn api:generate            # Regénérer le SDK API
 
 # Validation
 yarn typecheck             # Vérifier les types

@@ -1,6 +1,7 @@
 import { useTranslation } from '~/hooks/useTranslation';
 import { TomeCard } from './TomeCard';
 import { EmptyState, Button } from '~/components/ui';
+import { Skeleton } from '~/components/ui/skeleton';
 import { Plus } from 'lucide-react';
 import type { GetStorySummaryResponse } from '~/lib/backend';
 
@@ -22,13 +23,9 @@ export function TomeCardGrid({ tomes, onSelect, onCreate, isLoading }: TomeCardG
   
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div 
-            key={i} 
-            className="aspect-[16/10] rounded-lg bg-surface-2/50 border border-line animate-pulse"
-            aria-hidden="true"
-          />
+          <Skeleton key={i} className="h-40 rounded-lg" />
         ))}
       </div>
     );
@@ -51,7 +48,7 @@ export function TomeCardGrid({ tomes, onSelect, onCreate, isLoading }: TomeCardG
   }
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {tomes.map((tome, index) => (
         <TomeCard
           key={tome.id}

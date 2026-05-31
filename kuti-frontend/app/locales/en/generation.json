@@ -30,6 +30,11 @@
     "chapter": "Chapter",
     "scene": "Scene"
   },
+  "modelKinds": {
+    "image": "Images",
+    "video": "Videos",
+    "audio": "Audio"
+  },
   "empty": {
     "noJob": "No generation job",
     "noBoard": "No board generated yet"

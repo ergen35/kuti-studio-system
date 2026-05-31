@@ -7,6 +7,7 @@ import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import { Badge, Button, Card, EmptyState, ErrorState, LinkButton, LoadingState, PageHeader, Panel, SectionTitle, dateLabel } from "~/components/ui";
 import { FormField } from "~/components/FormField";
+import { Input } from "~/components/ui/input";
 import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
 import { csv } from "~/lib/utils";
 import {
@@ -15,7 +16,16 @@ import {
   archiveAssetMutation,
   deleteAssetMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
+import type { ListAssetsResponse } from "~/lib/backend/types.gen";
 import { assetImportSchema, type AssetImportInput } from "~/lib/schemas";
+
+function slugify(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "asset";
+}
 
 export default function AssetsRoute() {
   const { projectId = "" } = useParams();
@@ -24,8 +34,9 @@ export default function AssetsRoute() {
   const assets = useQuery({ ...listAssetsOptions({ path: { projectId: projectId } }), enabled: !!projectId });
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<AssetImportInput>({
     resolver: zodResolver(assetImportSchema),
-    defaultValues: { source_path: '', name: '', tags: '' },
+    defaultValues: { sourcePath: '', name: '', tags: '' },
   });
+  const assetItems = (assets.data ?? []) as ListAssetsResponse;
   
   const importAsset = useMutation({
     ...importAssetMutation(),
@@ -35,7 +46,12 @@ export default function AssetsRoute() {
   });
   const onSubmit = (data: AssetImportInput) => importAsset.mutate({
     path: { projectId: projectId },
-    body: { sourcePath: data.source_path, name: data.name || undefined, tags: data.tags ? csv(data.tags) : undefined }
+    body: {
+      sourcePath: data.sourcePath,
+      name: data.name || data.sourcePath.split(/[\\/]/).pop() || "Asset",
+      slug: slugify(data.name || data.sourcePath.split(/[\\/]/).pop() || "asset"),
+      tags: data.tags ? csv(data.tags) : undefined,
+    }
   }, { onSuccess: () => reset() });
   
   const archive = useMutation({
@@ -58,29 +74,26 @@ export default function AssetsRoute() {
         <Panel>
           <SectionTitle title={t('panels.import.title')} />
           <form className="grid gap-3" onSubmit={handleSubmit(onSubmit)}>
-            <FormField label={t('panels.import.sourcePath')} error={errors.source_path}>
-              <input {...register('source_path')} placeholder={t('panels.import.placeholder')} />
+            <FormField label={t('panels.import.sourcePath')} error={errors.sourcePath}>
+              <Input {...register('sourcePath')} placeholder={t('panels.import.placeholder')} />
             </FormField>
             <FormField label={t('panels.import.name')} error={errors.name}>
-              <input {...register('name')} />
+              <Input {...register('name')} />
             </FormField>
             <FormField label={t('panels.import.tags')} error={errors.tags}>
-              <input {...register('tags')} />
+              <Input {...register('tags')} />
             </FormField>
             <Button variant="primary" disabled={isSubmitting || importAsset.isPending}><Plus size={16} /> {t('panels.import.button')}</Button>
             {importAsset.error ? <ErrorState message={apiErrorMessage(importAsset.error)} /> : null}
           </form>
         </Panel>
         <Panel>
-          {/* @ts-expect-error - SDK types differ from use-api wrapper */}
-          <SectionTitle title={t('panels.assets.title')} meta={`${assets.data?.items?.length ?? 0} ${t('panels.assets.count', { count: assets.data?.items?.length ?? 0 })}`} />
+          <SectionTitle title={t('panels.assets.title')} meta={t('panels.assets.count', { count: assetItems.length })} />
           {assets.isLoading ? <LoadingState /> : null}
           {assets.error ? <ErrorState message={apiErrorMessage(assets.error)} /> : null}
-          {/* @ts-expect-error - SDK types differ from use-api wrapper */}
-          {assets.data?.items?.length === 0 ? <EmptyState title={t('empty.title')} description={t('empty.description')} /> : null}
+          {assetItems.length === 0 ? <EmptyState title={t('empty.title')} description={t('empty.description')} /> : null}
           <div className="grid gap-3 lg:grid-cols-2">
-            {/* @ts-expect-error - SDK types differ from use-api wrapper */}
-            {(assets.data?.items || []).map((asset) => (
+            {assetItems.map((asset) => (
               <Card key={asset.id}>
                 <div className="flex items-center justify-between gap-2"><strong className="text-sm text-ink">{asset.name}</strong><Badge>{asset.status}</Badge></div>
                 <p className="mt-2 text-xs leading-5 text-muted">{asset.originalFilename} · {asset.mimeType}</p>

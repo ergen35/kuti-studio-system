@@ -10,48 +10,48 @@ export const projectCreateSchema = z.object({
 export const characterSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255),
   alias: z.string().max(255),
-  narrative_role: z.string().max(255),
+  narrativeRole: z.string().max(255),
   description: z.string(),
-  physical_description: z.string(),
-  key_traits_json: z.string(),
-  color_palette_json: z.string(),
-  costume_elements_json: z.string(),
+  physicalDescription: z.string(),
+  keyTraitsJson: z.string(),
+  colorPaletteJson: z.string(),
+  costumeElementsJson: z.string(),
   personality: z.string(),
-  narrative_arc: z.string(),
-  tags_json: z.string(),
+  narrativeArc: z.string(),
+  tagsJson: z.string(),
 });
 
 // Relation schema
 export const relationSchema = z.object({
-  target_character_id: z.string().min(1, 'Target character is required'),
-  relation_type: z.string().min(1, 'Type is required'),
+  targetCharacterId: z.string().min(1, 'Target character is required'),
+  relationType: z.string().min(1, 'Type is required'),
   strength: z.number().int().min(0).max(100),
 });
 
 // Scene schema
 export const sceneSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),
-  scene_type: z.string(),
+  sceneType: z.string(),
   location: z.string(),
   summary: z.string(),
   content: z.string(),
-  characters_json: z.string(),
-  tags_json: z.string(),
+  charactersJson: z.string(),
+  tagsJson: z.string(),
   notes: z.string(),
 });
 
 // Asset import schema
 export const assetImportSchema = z.object({
-  source_path: z.string().min(1, 'Source path is required'),
+  sourcePath: z.string().min(1, 'Source path is required'),
   name: z.string(),
   tags: z.string(),
 });
 
 // Generation job schema
 export const generationJobSchema = z.object({
-  source_kind: z.enum(['scene', 'chapter', 'tome']),
-  source_id: z.string().min(1, 'Source is required'),
-  model_key: z.string(),
+  sourceKind: z.enum(['scene', 'chapter', 'tome']),
+  sourceId: z.string().min(1, 'Source is required'),
+  modelKey: z.string(),
   mode: z.enum(['separate', 'grid']),
 });
 
@@ -66,7 +66,7 @@ export const exportCreateSchema = z.object({
   kind: z.enum(['work', 'publication']),
   format: z.enum(['json', 'tree', 'zip']),
   label: z.string().min(1, 'Label is required'),
-  summary: z.string().default(''),
+  summary: z.string(),
 });
 
 // Project settings schema

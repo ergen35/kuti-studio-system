@@ -38,8 +38,11 @@ import {
   Undo,
   Redo,
 } from 'lucide-react';
+import { Button } from '~/components/ui';
+import { useTranslation } from '~/hooks/useTranslation';
 
 export function EditorToolbar() {
+  const { t } = useTranslation('story');
   const [editor] = useLexicalComposerContext();
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [canUndo, setCanUndo] = useState(false);
@@ -201,15 +204,16 @@ export function EditorToolbar() {
     disabled?: boolean;
     title: string;
   }) => (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
       disabled={disabled}
       className={`toolbar-btn ${isActive ? 'active' : ''}`}
       title={title}
     >
       <Icon size={16} />
-    </button>
+    </Button>
   );
 
   const Separator = () => <div className="toolbar-separator" />;
@@ -221,25 +225,25 @@ export function EditorToolbar() {
         onClick={toggleBold}
         icon={Bold}
         isActive={activeFormats.has('bold')}
-        title="Gras (Ctrl+B)"
+        title={t('editor.toolbar.bold')}
       />
       <ToolbarButton
         onClick={toggleItalic}
         icon={Italic}
         isActive={activeFormats.has('italic')}
-        title="Italique (Ctrl+I)"
+        title={t('editor.toolbar.italic')}
       />
       <ToolbarButton
         onClick={toggleUnderline}
         icon={Underline}
         isActive={activeFormats.has('underline')}
-        title="Souligné (Ctrl+U)"
+        title={t('editor.toolbar.underline')}
       />
       <ToolbarButton
         onClick={toggleStrikethrough}
         icon={Strikethrough}
         isActive={activeFormats.has('strikethrough')}
-        title="Barré"
+        title={t('editor.toolbar.strikethrough')}
       />
 
       <Separator />
@@ -249,19 +253,19 @@ export function EditorToolbar() {
         onClick={() => toggleHeading('h1')}
         icon={Heading1}
         isActive={activeFormats.has('h1')}
-        title="Titre 1"
+        title={t('editor.toolbar.heading1')}
       />
       <ToolbarButton
         onClick={() => toggleHeading('h2')}
         icon={Heading2}
         isActive={activeFormats.has('h2')}
-        title="Titre 2"
+        title={t('editor.toolbar.heading2')}
       />
       <ToolbarButton
         onClick={() => toggleHeading('h3')}
         icon={Heading3}
         isActive={activeFormats.has('h3')}
-        title="Titre 3"
+        title={t('editor.toolbar.heading3')}
       />
 
       <Separator />
@@ -271,13 +275,13 @@ export function EditorToolbar() {
         onClick={toggleBulletList}
         icon={List}
         isActive={activeFormats.has('ul')}
-        title="Liste à puces"
+        title={t('editor.toolbar.bulletList')}
       />
       <ToolbarButton
         onClick={toggleNumberedList}
         icon={ListOrdered}
         isActive={activeFormats.has('ol')}
-        title="Liste numérotée"
+        title={t('editor.toolbar.numberedList')}
       />
 
       <Separator />
@@ -287,13 +291,13 @@ export function EditorToolbar() {
         onClick={toggleQuote}
         icon={Quote}
         isActive={activeFormats.has('quote')}
-        title="Citation"
+        title={t('editor.toolbar.quote')}
       />
       <ToolbarButton
         onClick={toggleCode}
         icon={Code}
         isActive={activeFormats.has('code')}
-        title="Code"
+        title={t('editor.toolbar.code')}
       />
 
       <Separator />
@@ -303,13 +307,13 @@ export function EditorToolbar() {
         onClick={handleUndo}
         icon={Undo}
         disabled={!canUndo}
-        title="Annuler (Ctrl+Z)"
+        title={t('editor.toolbar.undo')}
       />
       <ToolbarButton
         onClick={handleRedo}
         icon={Redo}
         disabled={!canRedo}
-        title="Refaire (Ctrl+Y)"
+        title={t('editor.toolbar.redo')}
       />
     </div>
   );

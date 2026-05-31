@@ -11,21 +11,18 @@ import {
   ThemeToggle,
   ViewToggle,
 } from "~/components/home";
-import {
-  Badge,
-  Button,
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  SectionTitle,
-  dateLabel,
-} from "~/components/ui";
+import { Badge, EmptyState, ErrorState, LoadingState } from "~/components/ui";
 import { apiErrorMessage, API_BASE_URL } from "~/lib/errors";
 import { characterImageUrlFromData, type CharacterImageWithUrl } from "~/lib/image-urls";
 import type { Project } from "~/lib/backend/types.gen";
 import {
   listProjectsOptions,
   createProjectMutation,
+  getProjectCharacterImagesOptions,
+  getHealthOptions,
+  openProjectMutation,
+  archiveProjectMutation,
+  cloneProjectMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
 import { keys, queryClient } from "~/lib/query";
 import { projectCreateSchema } from "~/lib/schemas";
@@ -69,10 +66,7 @@ function useBackgroundImages() {
       const results: string[] = [];
       for (const { projectId } of projectImagesQueries) {
         try {
-          const { getProjectCharacterImages } = await import("~/lib/backend/sdk.gen");
-          const { data: images } = await getProjectCharacterImages({
-            path: { projectId }
-          });
+          const images = await queryClient.fetchQuery(getProjectCharacterImagesOptions({ path: { projectId } }));
           if (images) {
             const imageUrls = Object.values(images).flat().slice(0, 2);
             for (const img of imageUrls) {
@@ -122,15 +116,7 @@ function generateProjectMetrics(project: Project): ProjectMetrics {
 
 function BackendStatusSection() {
   const { t } = useTranslation('home');
-  const health = useQuery({
-    queryKey: keys.health,
-    queryFn: async () => {
-      const { getHealth } = await import("~/lib/backend/sdk.gen");
-      const { data } = await getHealth();
-      return data;
-    },
-    retry: 0
-  });
+  const health = useQuery({ ...getHealthOptions(), retry: 0 });
   
   const status: "ok" | "error" | "loading" | "unknown" = health.isLoading 
     ? "loading" 
@@ -165,13 +151,7 @@ function ProjectsSection() {
   const projects = useQuery(listProjectsOptions());
   
   const open = useMutation({
-    mutationFn: async (projectId: string) => {
-      const { openProject } = await import("~/lib/backend/sdk.gen");
-      const { data } = await openProject({
-        path: { projectId }
-      });
-      return data;
-    },
+    ...openProjectMutation(),
     onSuccess: async (project) => {
       await queryClient.invalidateQueries({ queryKey: keys.projects });
       if (project) {
@@ -181,25 +161,12 @@ function ProjectsSection() {
   });
   
   const archive = useMutation({
-    mutationFn: async (projectId: string) => {
-      const { archiveProject } = await import("~/lib/backend/sdk.gen");
-      const { data } = await archiveProject({
-        path: { projectId }
-      });
-      return data;
-    },
+    ...archiveProjectMutation(),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }),
   });
   
   const clone = useMutation({
-    mutationFn: async (projectId: string) => {
-      const { cloneProject } = await import("~/lib/backend/sdk.gen");
-      const { data } = await cloneProject({
-        path: { projectId },
-        body: {}
-      });
-      return data;
-    },
+    ...cloneProjectMutation(),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.projects }),
   });
 
@@ -232,23 +199,22 @@ function ProjectsSection() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header with toggle */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-3">
         <div className="flex items-center gap-4">
-          <SectionTitle
-            title={t('home:projects.title')}
-            meta={`${items.length} ${items.length === 1 ? 'projet' : 'projets'}`}
-          />
+          <div>
+            <h2 className="text-base font-semibold text-foreground">{t('home:projects.title')}</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t('home:projects.count', { count: items.length })}</p>
+          </div>
           <div className="hidden sm:flex items-center gap-2">
             {activeCount > 0 && (
               <Badge tone="active" className="text-[10px]">
-                {activeCount} actif{activeCount > 1 ? 's' : ''}
+                {t('home:projects.statusCount.active', { count: activeCount })}
               </Badge>
             )}
             {draftCount > 0 && (
               <Badge tone="draft" className="text-[10px]">
-                {draftCount} brouillon{draftCount > 1 ? 's' : ''}
+                {t('home:projects.statusCount.draft', { count: draftCount })}
               </Badge>
             )}
           </div>
@@ -256,8 +222,7 @@ function ProjectsSection() {
         <ViewToggle mode={viewMode} onChange={setViewMode} />
       </div>
 
-      {/* Projects grid/list */}
-      <div className={viewMode === "grid" 
+      <div className={viewMode === "grid"
         ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
         : "space-y-2"
       }>
@@ -266,14 +231,14 @@ function ProjectsSection() {
             key={project.id}
             project={project}
             metrics={metrics}
-            onOpen={() => open.mutate(project.id)}
-            onClone={() => clone.mutate(project.id)}
-            onArchive={() => archive.mutate(project.id)}
+            onOpen={() => open.mutate({ path: { projectId: project.id } })}
+            onClone={() => clone.mutate({ path: { projectId: project.id }, body: {} })}
+            onArchive={() => archive.mutate({ path: { projectId: project.id } })}
             viewMode={viewMode}
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -316,13 +281,11 @@ export default function HomeRoute() {
       
       {/* Main content */}
       <main className="relative z-10 p-4 md:p-6 lg:p-8">
-        {/* Top bar with backend status */}
-        <div className="mb-8">
+        <div className="mb-6">
           <BackendStatusSection />
         </div>
-        
-        {/* Hero section with title and create form */}
-        <div className="mb-12 max-w-4xl mx-auto">
+
+        <div className="mx-auto mb-8 max-w-6xl">
           <HeroSection
             projectName={projectName}
             onProjectNameChange={setProjectName}
@@ -332,8 +295,7 @@ export default function HomeRoute() {
           />
         </div>
         
-        {/* Projects section */}
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-6xl">
           <ProjectsSection />
         </div>
       </main>

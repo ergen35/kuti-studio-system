@@ -67,7 +67,7 @@ export const exportResponseSchema = z.object({
   summary: z.string(),
   artifactPath: z.string().nullable(),
   artifactName: z.string().nullable(),
-  metadataJson: z.record(z.unknown()),
+  metadataJson: z.record(z.string(), z.unknown()),
   sizeBytes: z.number().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

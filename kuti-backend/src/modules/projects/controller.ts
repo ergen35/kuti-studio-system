@@ -8,6 +8,7 @@ import slugify from "slugify";
 import { mkdir, cp } from "node:fs/promises";
 import { config, getProjectDir } from "@lib/config";
 import { prisma } from "@lib/db";
+import type { Prisma } from "@lib/db/generated/client";
 import { serializeProject } from "./utils";
 import type {
   CreateProjectBody,
@@ -93,7 +94,7 @@ export async function createProject(
       slug,
       status: data.status,
       rootPath,
-      settingsJson: data.settingsJson || {},
+      settingsJson: (data.settingsJson || {}) as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
     },
@@ -122,7 +123,7 @@ export async function updateProject(
     data: {
       name: data.name,
       status: data.status,
-      settingsJson: data.settingsJson,
+      settingsJson: data.settingsJson as Prisma.InputJsonValue | undefined,
       updatedAt: new Date(),
     },
   });
@@ -225,7 +226,7 @@ export async function cloneProject(
       slug: cloneSlug,
       status: "draft",
       rootPath: cloneRoot,
-      settingsJson: sourceProject.settingsJson,
+      settingsJson: sourceProject.settingsJson as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
     },

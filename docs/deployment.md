@@ -17,7 +17,7 @@ Guide de configuration et déploiement de Kuti Studio.
 
 ```bash
 # Backend
-cd kuti-backend-v2
+cd kuti-backend
 bun install
 
 # Frontend
@@ -27,7 +27,7 @@ yarn install
 
 #### 2. Configurer les variables d'environnement
 
-**Backend** (`kuti-backend-v2/.env`)
+**Backend** (`kuti-backend/.env`)
 
 ```bash
 # Copier le template
@@ -106,7 +106,7 @@ VITE_BETTER_AUTH_URL=http://localhost:8000
 #### Backend
 
 ```bash
-cd kuti-backend-v2
+cd kuti-backend
 
 # Initialiser la base de données
 bun run db:generate
@@ -289,7 +289,7 @@ After=network.target
 [Service]
 Type=simple
 User=kuti
-WorkingDirectory=/opt/kuti/kuti-backend-v2
+WorkingDirectory=/opt/kuti/kuti-backend
 Environment=NODE_ENV=production
 Environment=PORT=8000
 EnvironmentFile=/opt/kuti/.env
@@ -370,7 +370,7 @@ services:
 
   backend:
     build:
-      context: ./kuti-backend-v2
+      context: ./kuti-backend
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production

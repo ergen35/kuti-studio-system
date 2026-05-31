@@ -1,0 +1,55 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "generation": {
+    "title": "Generate manga page",
+    "description": "Configure references and context before launching generation.",
+    "loadingConfigs": "Loading configurations...",
+    "config": "Configuration",
+    "selectConfig": "Select a configuration",
+    "defaultConfig": "(default)",
+    "colorMode": {
+      "bw": "Black and white",
+      "color": "Color"
+    },
+    "pageCount": "Number of pages",
+    "characterRefs": "Character references",
+    "additionalContext": "Additional context (optional)",
+    "additionalContextPlaceholder": "Add details about style, camera angles or mood.",
+    "promptPreview": "Prompt preview",
+    "loadingPreview": "Generating preview...",
+    "styleLabel": "Style",
+    "viewSystemPrompt": "View system prompt ({{count}} characters)",
+    "generating": "Generating...",
+    "generateOne": "Generate page",
+    "generateMany": "Generate {{count}} pages"
+  },
+  "mangaGallery": {
+    "loading": "Loading pages...",
+    "empty": {
+      "title": "No generated page",
+      "description": "Generate manga pages for this scene with the generation button."
+    },
+    "generated": "Generated pages",
+    "lightboxTitle": "Manga page",
+    "lightboxDescription": "Generated page preview with approval actions.",
+    "pageCounter": "Page {{current}} / {{total}}",
+    "download": "Download",
+    "previous": "Previous page",
+    "next": "Next page",
+    "pageAlt": "Page {{number}}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "view": "View"
+  },
+  "characterSelector": {
+    "empty": "No character in this scene.",
+    "referenceSelected": "Reference image selected",
+    "imageAvailable": "Image available",
+    "noImage": "No generated image",
+    "selected": "Selected",
+    "help": "Select the image to use as the visual reference for this character."
+  }
+}

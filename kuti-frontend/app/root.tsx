@@ -5,6 +5,7 @@ import type { Route } from "./+types/root";
 import { queryClient } from "~/lib/query";
 import { useUiStore } from "~/stores/ui";
 import { initI18n } from "~/i18n/config";
+import { TooltipProvider } from "~/components/ui/tooltip";
 import "~/styles/app.css";
 
 // Initialize i18n before app render
@@ -29,6 +30,7 @@ function ThemeBridge() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.density = density;
+    document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme, density]);
   return null;
 }
@@ -54,8 +56,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeBridge />
-      <Outlet />
+      <TooltipProvider>
+        <ThemeBridge />
+        <Outlet />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }

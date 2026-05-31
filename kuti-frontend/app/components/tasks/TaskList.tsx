@@ -1,4 +1,5 @@
 import { EmptyState, LoadingState } from "~/components/ui";
+import { useTranslation } from "~/hooks/useTranslation";
 import { TaskTreeItem } from "./TaskTreeItem";
 import type { TaskItem } from "~/lib/tasks/types";
 import { useTasksStore } from "~/stores/tasks";
@@ -20,12 +21,13 @@ export function TaskList({
   onOpenDetail,
   showProgressBar = true,
   compact = false,
-  emptyMessage = "Aucune tâche",
+  emptyMessage,
 }: TaskListProps) {
+  const { t } = useTranslation("tasks");
   const { searchQuery, selectedStatuses, selectedSourceKinds } = useTasksStore();
 
   if (isLoading) {
-    return <LoadingState label="Chargement des tâches..." />;
+    return <LoadingState label={t("loading")} />;
   }
 
   // Filter tasks
@@ -56,18 +58,18 @@ export function TaskList({
   if (filteredTasks.length === 0) {
     return (
       <EmptyState
-        title={emptyMessage}
+        title={emptyMessage ?? t("empty")}
         description={
           searchQuery
-            ? "Aucun résultat pour votre recherche"
-            : "Les tâches apparaîtront ici lorsqu'elles seront créées"
+            ? t("emptySearch")
+            : t("emptyDescription")
         }
       />
     );
   }
 
   return (
-    <div className={compact ? "space-y-2" : "space-y-3"}>
+    <div className={compact ? "flex flex-col gap-2" : "flex flex-col gap-3"}>
       {filteredTasks.map((task) => (
         <TaskTreeItem
           key={task.id}

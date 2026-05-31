@@ -432,8 +432,8 @@ export type ListCharactersResponse = ListCharactersResponses[keyof ListCharacter
 export type CreateCharacterData = {
     body: {
         name: string;
-        alias?: string;
-        narrativeRole?: string;
+        alias?: string | unknown;
+        narrativeRole?: string | unknown;
         description?: string;
         physicalDescription?: string;
         colorPaletteJson?: Array<string>;
@@ -710,12 +710,9 @@ export type CreateRelationResponse = CreateRelationResponses[keyof CreateRelatio
 
 export type CreateVoiceSampleData = {
     body: {
-        sourceCharacterId: string;
-        targetCharacterId: string;
-        relationType: string;
-        strength: number;
-        narrativeDependency?: string;
-        notes?: string;
+        label: string;
+        assetPath?: string;
+        voiceNotes?: string;
     };
     path: {
         projectId: string;
@@ -876,8 +873,13 @@ export type GetStorySummaryResponse = GetStorySummaryResponses[keyof GetStorySum
 
 export type GetReferenceSuggestionsData = {
     body?: never;
-    path?: never;
-    query?: never;
+    path: {
+        projectId: string;
+        type: string;
+    };
+    query?: {
+        q?: string;
+    };
     url: '/api/projects/{projectId}/references/{type}';
 };
 
@@ -925,7 +927,10 @@ export type CreateTomeResponse = CreateTomeResponses[keyof CreateTomeResponses];
 
 export type DeleteTomeData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        tomeId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/story/tomes/{tomeId}';
 };
@@ -937,7 +942,10 @@ export type UpdateTomeData = {
         status?: 'active' | 'draft' | 'archived';
         orderIndex?: number;
     };
-    path?: never;
+    path: {
+        projectId: string;
+        tomeId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/story/tomes/{tomeId}';
 };
@@ -963,8 +971,12 @@ export type UpdateTomeResponse = UpdateTomeResponses[keyof UpdateTomeResponses];
 
 export type ListChaptersData = {
     body?: never;
-    path?: never;
-    query?: never;
+    path: {
+        projectId: string;
+    };
+    query?: {
+        tomeId?: string;
+    };
     url: '/api/projects/{projectId}/story/chapters';
 };
 
@@ -1005,7 +1017,10 @@ export type CreateChapterResponse = CreateChapterResponses[keyof CreateChapterRe
 
 export type DeleteChapterData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        chapterId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/story/chapters/{chapterId}';
 };
@@ -1018,7 +1033,10 @@ export type UpdateChapterData = {
         status?: 'active' | 'draft' | 'archived';
         orderIndex?: number;
     };
-    path?: never;
+    path: {
+        projectId: string;
+        chapterId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/story/chapters/{chapterId}';
 };
@@ -1045,8 +1063,12 @@ export type UpdateChapterResponse = UpdateChapterResponses[keyof UpdateChapterRe
 
 export type ListScenesData = {
     body?: never;
-    path?: never;
-    query?: never;
+    path: {
+        projectId: string;
+    };
+    query?: {
+        chapterId?: string;
+    };
     url: '/api/projects/{projectId}/story/scenes';
 };
 
@@ -1101,7 +1123,10 @@ export type CreateSceneResponse = CreateSceneResponses[keyof CreateSceneResponse
 
 export type DeleteSceneData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        sceneId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/story/scenes/{sceneId}';
 };
@@ -1121,7 +1146,10 @@ export type UpdateSceneData = {
         status?: 'active' | 'draft' | 'archived';
         orderIndex?: number;
     };
-    path?: never;
+    path: {
+        projectId: string;
+        sceneId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/story/scenes/{sceneId}';
 };
@@ -1177,7 +1205,9 @@ export type CreateGenerationJobData = {
         title?: string;
         summary?: string;
     };
-    path?: never;
+    path: {
+        projectId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/jobs';
 };
@@ -1215,7 +1245,10 @@ export type CreateGenerationJobResponse = CreateGenerationJobResponses[keyof Cre
 
 export type GetGenerationJobData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        jobId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/jobs/{jobId}';
 };
@@ -1262,7 +1295,10 @@ export type ListGenerationBoardsData = {
 
 export type GetGenerationBoardData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        boardId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/boards/{boardId}';
 };
@@ -1314,7 +1350,10 @@ export type ValidateGenerationBoardData = {
     body: {
         note?: string;
     };
-    path?: never;
+    path: {
+        projectId: string;
+        boardId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/boards/{boardId}/validate';
 };
@@ -1368,24 +1407,98 @@ export type UpdateGenerationPanelData = {
         caption?: string;
         title?: string;
     };
-    path?: never;
+    path: {
+        projectId: string;
+        boardId: string;
+        panelId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/boards/{boardId}/panels/{panelId}';
 };
 
 export type GetGenerationPanelImageData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        boardId: string;
+        panelId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/boards/{boardId}/panels/{panelId}/image';
 };
 
 export type DownloadBoardArtifactData = {
     body?: never;
-    path?: never;
+    path: {
+        projectId: string;
+        boardId: string;
+    };
     query?: never;
     url: '/api/projects/{projectId}/generation/boards/{boardId}/download';
 };
+
+export type CancelGenerationJobData = {
+    body?: never;
+    path: {
+        projectId: string;
+        jobId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/generation/jobs/{jobId}/cancel';
+};
+
+export type CancelGenerationJobResponses = {
+    /**
+     * Response for status 200
+     */
+    200: {
+        success: boolean;
+        message: string;
+    };
+};
+
+export type CancelGenerationJobResponse = CancelGenerationJobResponses[keyof CancelGenerationJobResponses];
+
+export type RelaunchGenerationJobData = {
+    body?: never;
+    path: {
+        projectId: string;
+        jobId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/generation/jobs/{jobId}/relaunch';
+};
+
+export type RelaunchGenerationJobResponses = {
+    /**
+     * Response for status 200
+     */
+    200: {
+        id: string;
+        projectId: string;
+        sourceKind: 'scene' | 'chapter' | 'tome' | 'panel' | 'custom';
+        sourceId: string;
+        sourceLabel: string;
+        sourceVersionId: string | unknown;
+        strategy: 'direct' | 'intermediate';
+        entrypoint: string;
+        title: string;
+        prompt: string;
+        summary: string;
+        status: 'pending' | 'running' | 'ready' | 'validated' | 'failed';
+        progress: number;
+        metadataJson: {
+            [key: string]: unknown;
+        };
+        createdAt: string;
+        updatedAt: string;
+        completedAt: string | unknown;
+        failedAt: string | unknown;
+        errorMessage: string | unknown;
+    };
+};
+
+export type RelaunchGenerationJobResponse = RelaunchGenerationJobResponses[keyof RelaunchGenerationJobResponses];
 
 export type ListAssetsData = {
     body?: never;
@@ -2168,6 +2281,9 @@ export type ScanWarningsResponses = {
      * Response for status 200
      */
     200: {
+        scanned: number;
+        added: number;
+        resolved: number;
         items: Array<{
             id: string;
             projectId: string;

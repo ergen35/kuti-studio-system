@@ -6,7 +6,7 @@ Checklist pour garantir la qualité du code et la cohérence du projet.
 
 - [ ] Lire la documentation du module concerné dans `docs/`
 - [ ] Vérifier que la base de données est à jour (`bun run db:migrate`)
-- [ ] Vérifier que le SDK frontend est à jour (`yarn openapi-ts`)
+- [ ] Vérifier que le SDK frontend est à jour (`yarn api:generate`)
 - [ ] Identifier les routes/API nécessaires
 - [ ] Créer une branche git descriptive (`feature/nom-feature`)
 
@@ -141,7 +141,7 @@ bun run test:coverage
 ### Validation backend
 
 ```bash
-cd kuti-backend-v2
+cd kuti-backend
 
 # Vérifier les types
 bun run typecheck
@@ -219,7 +219,7 @@ feat(characters): ajout de la génération d'images
 
 ### API
 
-- [ ] Regénérer le SDK frontend (`yarn openapi-ts`)
+- [ ] Regénérer le SDK frontend (`yarn api:generate`)
 - [ ] Vérifier que le SDK compile sans erreur
 - [ ] Documenter les changements de breaking changes
 
@@ -268,7 +268,7 @@ feat(characters): ajout de la génération d'images
 
 ```bash
 # Backend
-cd kuti-backend-v2
+cd kuti-backend
 bun run dev                 # Dev server
 bun run db:migrate          # Migrations
 bun run db:studio           # Prisma Studio
@@ -277,7 +277,7 @@ bun run typecheck           # Type checking
 # Frontend
 cd kuti-frontend
 yarn dev                    # Dev server
-yarn openapi-ts             # Regénérer SDK
+yarn api:generate             # Regénérer SDK
 yarn typecheck              # Type checking
 yarn build                  # Build production
 ```
