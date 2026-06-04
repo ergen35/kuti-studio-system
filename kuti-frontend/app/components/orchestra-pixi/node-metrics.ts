@@ -1,6 +1,6 @@
-import { Point } from 'pixi.js';
-import { NODE_DIMENSIONS, SPACING } from './constants';
-import type { NodeType } from '~/lib/orchestra/types';
+import { Point } from "pixi.js";
+import { NODE_DIMENSIONS, SPACING } from "./constants";
+import type { NodeType } from "~/lib/orchestra/types";
 
 /**
  * Calculate the input and output socket positions for a narrative node
@@ -13,10 +13,10 @@ import type { NodeType } from '~/lib/orchestra/types';
  * @returns Object with input and output port positions (undefined if not applicable)
  */
 export function getPortPositions(
-  type: 'tome' | 'chapter' | 'scene',
+  type: "tome" | "chapter" | "scene",
   centerX: number,
   centerY: number,
-  connectionType?: 'tome-chapter' | 'chapter-scene' | 'scene-scene'
+  connectionType?: "tome-chapter" | "chapter-scene" | "scene-scene",
 ): {
   input?: { x: number; y: number };
   output?: { x: number; y: number };
@@ -26,7 +26,7 @@ export function getPortPositions(
   const halfHeight = dims.height / 2;
 
   switch (type) {
-    case 'tome':
+    case "tome":
       // Tome only has output at bottom center
       return {
         output: {
@@ -35,7 +35,7 @@ export function getPortPositions(
         },
       };
 
-    case 'chapter':
+    case "chapter":
       // Chapter has input at top and output at bottom
       return {
         input: {
@@ -48,13 +48,13 @@ export function getPortPositions(
         },
       };
 
-    case 'scene':
+    case "scene":
       // Scene has more complex port positioning:
       // - First scene in chapter: input at top (from chapter), output at right
       // - Other scenes: input at left (from previous scene), output at right
       // - Last scene might have different output, but we keep consistent for now
 
-      const isFirstScene = connectionType === 'chapter-scene';
+      const isFirstScene = connectionType === "chapter-scene";
 
       return {
         input: {
@@ -82,9 +82,9 @@ export function getPortPositions(
  * @returns Object with x, y (top-left), width, height
  */
 export function getCardBounds(
-  type: 'tome' | 'chapter' | 'scene',
+  type: "tome" | "chapter" | "scene",
   centerX: number,
-  centerY: number
+  centerY: number,
 ): { x: number; y: number; width: number; height: number } {
   const dims = NODE_DIMENSIONS[type];
   return {
@@ -107,19 +107,19 @@ export function getCardBounds(
  */
 export function getSocketPosition(
   cardBounds: { x: number; y: number; width: number; height: number },
-  type: 'tome' | 'chapter' | 'scene',
-  socketType: 'input' | 'output',
-  connectionType?: 'chapter-scene' | 'scene-scene'
+  type: "tome" | "chapter" | "scene",
+  socketType: "input" | "output",
+  connectionType?: "chapter-scene" | "scene-scene",
 ): Point {
   const centerX = cardBounds.x + cardBounds.width / 2;
   const centerY = cardBounds.y + cardBounds.height / 2;
 
   const ports = getPortPositions(type, centerX, centerY, connectionType);
 
-  if (socketType === 'input' && ports.input) {
+  if (socketType === "input" && ports.input) {
     return new Point(ports.input.x, ports.input.y);
   }
-  if (socketType === 'output' && ports.output) {
+  if (socketType === "output" && ports.output) {
     return new Point(ports.output.x, ports.output.y);
   }
 
@@ -138,24 +138,24 @@ export function getSocketPosition(
  * @returns Object with start and end Points
  */
 export function calculateConnectionPoints(
-  sourceType: 'tome' | 'chapter' | 'scene',
+  sourceType: "tome" | "chapter" | "scene",
   sourceBounds: { x: number; y: number; width: number; height: number },
-  targetType: 'tome' | 'chapter' | 'scene',
+  targetType: "tome" | "chapter" | "scene",
   targetBounds: { x: number; y: number; width: number; height: number },
-  connectionType: 'tome-chapter' | 'chapter-scene' | 'scene-scene'
+  connectionType: "tome-chapter" | "chapter-scene" | "scene-scene",
 ): { start: Point; end: Point } {
   const start = getSocketPosition(
     sourceBounds,
     sourceType,
-    'output',
-    connectionType === 'chapter-scene' ? 'chapter-scene' : undefined
+    "output",
+    connectionType === "chapter-scene" ? "chapter-scene" : undefined,
   );
 
   const end = getSocketPosition(
     targetBounds,
     targetType,
-    'input',
-    connectionType === 'chapter-scene' ? 'chapter-scene' : undefined
+    "input",
+    connectionType === "chapter-scene" ? "chapter-scene" : undefined,
   );
 
   return { start, end };
@@ -165,10 +165,14 @@ export function calculateConnectionPoints(
  * Truncate text to fit within a given pixel width.
  * Simple character-based truncation with ellipsis.
  */
-export function truncateText(text: string, maxWidth: number, charWidth = 7): string {
+export function truncateText(
+  text: string,
+  maxWidth: number,
+  charWidth = 7,
+): string {
   const maxChars = Math.floor(maxWidth / charWidth);
   if (text.length <= maxChars) return text;
-  return text.slice(0, maxChars - 3) + '...';
+  return text.slice(0, maxChars - 3) + "...";
 }
 
 /**
@@ -176,13 +180,13 @@ export function truncateText(text: string, maxWidth: number, charWidth = 7): str
  */
 export function getNodeTypeLabel(type: NodeType): string {
   switch (type) {
-    case 'tome':
-      return 'TOME';
-    case 'chapter':
-      return 'CHAP';
-    case 'scene':
-      return 'SCÈNE';
+    case "tome":
+      return "TOME";
+    case "chapter":
+      return "CHAP";
+    case "scene":
+      return "SCÈNE";
     default:
-      return '';
+      return "";
   }
 }

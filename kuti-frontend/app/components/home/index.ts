@@ -1,4 +1,5 @@
 export { CreativeBackground } from "./CreativeBackground";
+export { ImportProjectDialog } from "./ImportProjectDialog";
 export { HeroSection } from "./HeroSection";
 export { MinimalBackendStatus } from "./MinimalBackendStatus";
 export { ProjectCard } from "./ProjectCard";

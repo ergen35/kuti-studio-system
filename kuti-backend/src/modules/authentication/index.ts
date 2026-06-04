@@ -1,5 +1,6 @@
 import { cors } from "@elysiajs/cors";
 import { auth } from "@lib/auth";
+import { isTrustedOrigin } from "@lib/cors";
 import { Elysia } from "elysia";
 
 type AccessControlParams = {
@@ -10,7 +11,7 @@ type AccessControlParams = {
 export const authModule = new Elysia({ name: "authModule" })
   .use(
     cors({
-      origin: String(process.env.TRUSTED_ORIGINS || "").split(","),
+      origin: (request) => isTrustedOrigin(request.headers.get("Origin")),
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
       methods: ["GET", "POST", "PUT", "DELETE", "HEAD"],

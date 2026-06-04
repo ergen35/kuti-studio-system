@@ -1,9 +1,9 @@
-import { Graphics, Container } from 'pixi.js';
-import { CONNECTION_STYLES, LAYERS } from './constants';
-import { drawCableBezier } from './pixi-utils';
-import type { Point } from 'pixi.js';
-import type { ConnectionData } from '~/lib/orchestra/types';
-import type { NarrativeNode2D } from './NarrativeNode2D';
+import { Graphics, Container } from "pixi.js";
+import { CONNECTION_STYLES, LAYERS } from "./constants";
+import { drawCableBezier } from "./pixi-utils";
+import type { Point } from "pixi.js";
+import type { ConnectionData } from "~/lib/orchestra/types";
+import type { NarrativeNode2D } from "./NarrativeNode2D";
 
 /**
  * ConnectionCable represents a curved connection between two narrative nodes.
@@ -15,7 +15,7 @@ export class ConnectionCable {
   private connectionId: string;
   private sourceNode: NarrativeNode2D;
   private targetNode: NarrativeNode2D;
-  private connectionType: 'tome-chapter' | 'chapter-scene' | 'scene-scene';
+  private connectionType: "tome-chapter" | "chapter-scene" | "scene-scene";
 
   // Cached positions
   private lastStartX: number = 0;
@@ -27,7 +27,7 @@ export class ConnectionCable {
     id: string,
     sourceNode: NarrativeNode2D,
     targetNode: NarrativeNode2D,
-    connectionType: 'tome-chapter' | 'chapter-scene' | 'scene-scene'
+    connectionType: "tome-chapter" | "chapter-scene" | "scene-scene",
   ) {
     this.connectionId = id;
     this.sourceNode = sourceNode;
@@ -79,7 +79,7 @@ export class ConnectionCable {
     // Get socket positions
     const sourceSockets = this.sourceNode.getSocketPositions();
     const targetSockets = this.targetNode.getSocketPositions(
-      this.connectionType === 'chapter-scene' ? 'chapter-scene' : undefined
+      this.connectionType === "chapter-scene" ? "chapter-scene" : undefined,
     );
 
     if (!sourceSockets.output || !targetSockets.input) {
@@ -117,7 +117,7 @@ export class ConnectionCable {
   forceRedraw(): void {
     const sourceSockets = this.sourceNode.getSocketPositions();
     const targetSockets = this.targetNode.getSocketPositions(
-      this.connectionType === 'chapter-scene' ? 'chapter-scene' : undefined
+      this.connectionType === "chapter-scene" ? "chapter-scene" : undefined,
     );
 
     if (sourceSockets.output && targetSockets.input) {
@@ -126,14 +126,24 @@ export class ConnectionCable {
       this.lastEndX = targetSockets.input.x;
       this.lastEndY = targetSockets.input.y;
 
-      this.redraw(this.lastStartX, this.lastStartY, this.lastEndX, this.lastEndY);
+      this.redraw(
+        this.lastStartX,
+        this.lastStartY,
+        this.lastEndX,
+        this.lastEndY,
+      );
     }
   }
 
   /**
    * Redraw the cable with given coordinates.
    */
-  private redraw(startX: number, startY: number, endX: number, endY: number): void {
+  private redraw(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+  ): void {
     this.graphics.clear();
 
     const style = CONNECTION_STYLES[this.connectionType];
@@ -176,7 +186,7 @@ export class ConnectionCable {
  */
 export function createConnectionCable(
   connection: ConnectionData,
-  nodeMap: Map<string, NarrativeNode2D>
+  nodeMap: Map<string, NarrativeNode2D>,
 ): ConnectionCable | null {
   // Extract source and target node IDs from connection ID
   // Format: "tome-{tomeId}", "chapter-tome-{chapterId}", "scene-chapter-{sceneId}", "scene-chain-{sceneId}"
@@ -186,22 +196,22 @@ export function createConnectionCable(
   const connId = connection.id;
 
   // Parse connection ID to find source and target
-  if (connId.startsWith('tome-')) {
+  if (connId.startsWith("tome-")) {
     // Tome to chapter connection
-    const tomeId = connId.replace('tome-', '');
+    const tomeId = connId.replace("tome-", "");
     sourceNode = nodeMap.get(tomeId);
     // Target is implicit - find the chapter connected to this tome
     // This is handled differently as we don't have the target in the connection ID
     // We'll need to look at the connection start/end positions
-  } else if (connId.startsWith('chapter-tome-')) {
-    const chapterId = connId.replace('chapter-tome-', '');
+  } else if (connId.startsWith("chapter-tome-")) {
+    const chapterId = connId.replace("chapter-tome-", "");
     targetNode = nodeMap.get(chapterId);
     // Source is the tome - need to find it from connection start
-  } else if (connId.startsWith('scene-chapter-')) {
-    const sceneId = connId.replace('scene-chapter-', '');
+  } else if (connId.startsWith("scene-chapter-")) {
+    const sceneId = connId.replace("scene-chapter-", "");
     targetNode = nodeMap.get(sceneId);
-  } else if (connId.startsWith('scene-chain-')) {
-    const sceneId = connId.replace('scene-chain-', '');
+  } else if (connId.startsWith("scene-chain-")) {
+    const sceneId = connId.replace("scene-chain-", "");
     targetNode = nodeMap.get(sceneId);
     // Source is the previous scene - need to determine from position or data
   }
@@ -213,12 +223,20 @@ export function createConnectionCable(
       const pos = node.getPosition();
 
       // Check if this node is at the start position
-      if (!sourceNode && Math.abs(pos.x - connection.start.x) < 1 && Math.abs(pos.y - connection.start.y) < 1) {
+      if (
+        !sourceNode &&
+        Math.abs(pos.x - connection.start.x) < 1 &&
+        Math.abs(pos.y - connection.start.y) < 1
+      ) {
         sourceNode = node;
       }
 
       // Check if this node is at the end position
-      if (!targetNode && Math.abs(pos.x - connection.end.x) < 1 && Math.abs(pos.y - connection.end.y) < 1) {
+      if (
+        !targetNode &&
+        Math.abs(pos.x - connection.end.x) < 1 &&
+        Math.abs(pos.y - connection.end.y) < 1
+      ) {
         targetNode = node;
       }
 
@@ -250,7 +268,7 @@ export function updateAllCables(cables: ConnectionCable[]): void {
 export function drawAllCables(
   graphics: Graphics,
   connections: ConnectionData[],
-  nodeMap: Map<string, NarrativeNode2D>
+  nodeMap: Map<string, NarrativeNode2D>,
 ): void {
   graphics.clear();
 
@@ -262,11 +280,19 @@ export function drawAllCables(
     for (const node of nodeMap.values()) {
       const pos = node.getPosition();
 
-      if (!sourceNode && Math.abs(pos.x - conn.start.x) < 1 && Math.abs(pos.y - conn.start.y) < 1) {
+      if (
+        !sourceNode &&
+        Math.abs(pos.x - conn.start.x) < 1 &&
+        Math.abs(pos.y - conn.start.y) < 1
+      ) {
         sourceNode = node;
       }
 
-      if (!targetNode && Math.abs(pos.x - conn.end.x) < 1 && Math.abs(pos.y - conn.end.y) < 1) {
+      if (
+        !targetNode &&
+        Math.abs(pos.x - conn.end.x) < 1 &&
+        Math.abs(pos.y - conn.end.y) < 1
+      ) {
         targetNode = node;
       }
 
@@ -278,7 +304,7 @@ export function drawAllCables(
     // Get socket positions
     const sourceSockets = sourceNode.getSocketPositions();
     const targetSockets = targetNode.getSocketPositions(
-      conn.type === 'chapter-scene' ? 'chapter-scene' : undefined
+      conn.type === "chapter-scene" ? "chapter-scene" : undefined,
     );
 
     if (!sourceSockets.output || !targetSockets.input) continue;
@@ -297,7 +323,7 @@ export function drawAllCables(
         alpha: style.alpha,
         shadowAlpha: style.shadowAlpha,
         tension: 0.45,
-      }
+      },
     );
   }
 }

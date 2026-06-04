@@ -10,8 +10,10 @@ import {
   restoreVersionBodySchema,
   compareVersionsBodySchema,
   versionResponseSchema,
-  versionBranchSchema,
+  versionListResponseSchema,
+  versionBranchListResponseSchema,
   versionCompareResponseSchema,
+  restoreVersionResponseSchema,
 } from "./dto";
 import {
   listVersions,
@@ -33,13 +35,13 @@ export const versionsModule = new Elysia({
 })
   // GET /api/projects/:projectId/versions - Liste toutes les versions
   .get("/", ({ params: { projectId } }) => listVersions(projectId), {
-    response: [versionResponseSchema],
+    response: versionListResponseSchema,
     detail: { operationId: "listVersions", summary: "List all versions" },
   })
 
   // GET /api/projects/:projectId/versions/branches - Liste les branches
   .get("/branches", ({ params: { projectId } }) => listBranches(projectId), {
-    response: [versionBranchSchema],
+    response: versionBranchListResponseSchema,
     detail: { operationId: "listBranches", summary: "List version branches" },
   })
 
@@ -84,6 +86,6 @@ export const versionsModule = new Elysia({
   }, {
     params: versionIdParamsSchema,
     body: restoreVersionBodySchema,
-    response: versionResponseSchema,
+    response: restoreVersionResponseSchema,
     detail: { operationId: "restoreVersion", summary: "Restore a version" },
   });

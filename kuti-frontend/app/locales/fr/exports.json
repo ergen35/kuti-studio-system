@@ -1,28 +1,75 @@
 {
   "title": "Exports",
-  "description": "Générez des exports de travail en JSON, arborescence ou ZIP.",
+  "description": "Générez des exports de travail ou de publication en lot et téléchargez-les dès qu'ils sont prêts.",
   "panels": {
     "create": {
-      "title": "Créer export",
+      "title": "Créer un export",
+      "subtitle": "Choisissez un périmètre projet et un ou plusieurs formats.",
       "kind": "Type",
       "kinds": {
-        "work": "travail",
-        "publication": "publication"
+        "work": {
+          "label": "Travail",
+          "description": "JSON interne, arborescence et ZIP pour l'édition."
+        },
+        "publication": {
+          "label": "Publication",
+          "description": "Formats prêts à lire pour la diffusion."
+        }
       },
-      "format": "Format",
       "formats": {
-        "json": "json",
-        "tree": "arborescence",
-        "zip": "zip"
+        "label": "Formats",
+        "hint": "Sélectionnez un ou plusieurs formats. Chaque format sélectionné crée un export distinct.",
+        "json": {
+          "label": "JSON",
+          "description": "Snapshot structuré pour l'archivage et les outils."
+        },
+        "tree": {
+          "label": "Arborescence",
+          "description": "Hiérarchie de dossiers lisible avec les fichiers story."
+        },
+        "zip": {
+          "label": "ZIP",
+          "description": "Archive portable avec les données et les assets."
+        },
+        "pagedImages": {
+          "label": "Images paginées",
+          "description": "Dossiers de pages ordonnées pour la lecture et la revue."
+        },
+        "pdf": {
+          "label": "PDF",
+          "description": "Document linéaire pour le partage et la relecture."
+        },
+        "cbz": {
+          "label": "CBZ",
+          "description": "Archive BD compatible avec les lecteurs comics."
+        },
+        "epub": {
+          "label": "EPUB",
+          "description": "Paquet e-book avec navigation et images."
+        }
       },
       "label": "Libellé",
-      "button": "Créer l'export"
+      "summary": "Résumé",
+      "summaryPlaceholder": "Note optionnelle affichée dans l'historique des exports",
+      "button": "Créer l'export",
+      "buttonMultiple": "Créer {{count}} exports",
+      "submitHint": "{{count}} format(s) sélectionné(s)",
+      "defaults": {
+        "workLabel": "Export de travail",
+        "publicationLabel": "Export de publication"
+      }
     },
     "artifacts": {
-      "title": "Artifacts"
+      "title": "Historique",
+      "loading": "Chargement des exports",
+      "count": "{{count}} export(s)",
+      "sizeUnknown": "Taille indisponible",
+      "sourceSnapshot": "Snapshot source",
+      "sourceSnapshotCount": "{{count}} éléments suivis"
     }
   },
   "empty": {
-    "title": "Aucun export"
+    "title": "Aucun export pour le moment",
+    "description": "Créez un export de travail ou de publication pour générer un artefact téléchargeable."
   }
 }

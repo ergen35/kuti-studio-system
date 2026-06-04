@@ -12,6 +12,9 @@ export const StylePresetSchema = z.enum(["shonen", "shojo", "seinen", "generic"]
 export const ColorModeSchema = z.enum(["bw", "color", "spot_color"]);
 export const MangaPageStatusSchema = z.enum(["draft", "selected", "rejected"]);
 export const DramaVideoStatusSchema = z.enum(["draft", "queued", "running", "ready", "failed", "archived"]);
+export const MangaPageMetadataSchema = z.object({
+  readyForExport: z.boolean().optional(),
+});
 
 // ============================================================================
 // Params Schemas
@@ -86,6 +89,8 @@ export const updateMangaPageBodySchema = z.object({
   imageUrl: z.string().optional(),
   caption: z.string().max(2000).optional(),
   prompt: z.string().max(4000).optional(),
+  pageNumber: z.number().int().min(1).optional(),
+  metadataJson: MangaPageMetadataSchema.optional(),
 });
 
 export const generateDramaVideoBodySchema = z.object({
@@ -130,6 +135,7 @@ export const mangaPageResponseSchema = z.object({
   imageUrl: z.string().nullable(),
   caption: z.string().nullable(),
   prompt: z.string().nullable(),
+  metadataJson: MangaPageMetadataSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });

@@ -330,6 +330,9 @@ export const generateSceneMangaFunction = inngest.createFunction(
               imageUrl: panel.imagePath,
               caption: panel.caption,
               prompt: panel.prompt,
+              metadataJson: {
+                readyForExport: false,
+              },
             },
           });
         }

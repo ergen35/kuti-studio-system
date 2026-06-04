@@ -45,7 +45,31 @@
     "pageAlt": "Planche {{number}}",
     "approve": "Valider",
     "reject": "Rejeter",
-    "view": "Voir"
+    "view": "Voir",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "pagination": {
+      "summary": "Affichage {{start}}-{{end}} sur {{total}}",
+      "pageRange": "Planches {{start}}-{{end}} sur {{total}}",
+      "prev": "Précédent",
+      "next": "Suivant"
+    },
+    "readyForExport": "Prête à exporter",
+    "markReadyForExport": "Marquer prête à exporter",
+    "unmarkReadyForExport": "Retirer le flag d’export",
+    "replace": "Remplacer",
+    "replaceDialog": {
+      "title": "Remplacer l'image de la planche",
+      "description": "Choisissez un asset image du projet pour remplacer la planche courante.",
+      "current": "Planche actuelle",
+      "noCurrentImage": "Aucune image disponible pour cette planche.",
+      "loading": "Chargement des assets image...",
+      "selectAsset": "Sélectionner un asset image",
+      "selectAssetPlaceholder": "Choisir une image du projet",
+      "preview": "Aperçu du remplacement",
+      "empty": "Aucun asset image disponible dans le projet.",
+      "confirm": "Remplacer"
+    }
   },
   "drama": {
     "title": "Vidéo drama coréen",

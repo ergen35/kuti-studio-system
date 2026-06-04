@@ -23,10 +23,15 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { CharacterImageSelector } from "./CharacterImageSelector";
-import type { ListCharactersResponse, GetProjectCharacterImagesResponse, GetStorySummaryResponse, ListModelsResponse } from "~/lib/backend/types.gen";
+import type {
+  ListCharactersResponse,
+  GetProjectCharacterImagesResponse,
+  GetStorySummaryResponse,
+  ListModelsResponse,
+} from "~/lib/backend/types.gen";
 
 type Character = ListCharactersResponse[number];
-type Scene = GetStorySummaryResponse['scenes'][number];
+type Scene = GetStorySummaryResponse["scenes"][number];
 import {
   listSceneConfigsOptions,
   generateSceneMangaMutation,
@@ -64,13 +69,18 @@ export function SceneGenerationModal({
   const [selectedConfigId, setSelectedConfigId] = useState<string>("");
   const [selectedModelKey, setSelectedModelKey] = useState<string>("");
   const [imageCount, setImageCount] = useState(6);
-  const [selectedCharacterImages, setSelectedCharacterImages] = useState<Record<string, string>>({});
+  const [selectedCharacterImages, setSelectedCharacterImages] = useState<
+    Record<string, string>
+  >({});
   const [additionalContext, setAdditionalContext] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
   // Fetch configs
   const configs = useQuery({
-    ...listSceneConfigsOptions({ client, path: { projectId, sceneId: scene.id } }),
+    ...listSceneConfigsOptions({
+      client,
+      path: { projectId, sceneId: scene.id },
+    }),
     enabled: isOpen,
   });
 
@@ -83,7 +93,8 @@ export function SceneGenerationModal({
   // Set default config when loaded
   useEffect(() => {
     if (configs.data && configs.data.length > 0 && !selectedConfigId) {
-      const defaultConfig = configs.data.find((c) => c.isDefault) || configs.data[0];
+      const defaultConfig =
+        configs.data.find((c) => c.isDefault) || configs.data[0];
       setSelectedConfigId(defaultConfig.id);
       setImageCount(defaultConfig.defaultImageCount);
     }
@@ -94,19 +105,34 @@ export function SceneGenerationModal({
   const selectedConfig = configItems.find((c) => c.id === selectedConfigId);
   const imageModels = useMemo(() => {
     const items = (models.data ?? []) as ListModelsResponse;
-    return items.filter((model) => model.kind === "image" && model.enabled && model.configured);
+    return items.filter(
+      (model) => model.kind === "image" && model.enabled && model.configured,
+    );
   }, [models.data]);
-  const activeModelKey = selectedModelKey || imageModels.find((model) => model.key === "gpt_images_2")?.key || imageModels[0]?.key || "";
+  const activeModelKey =
+    selectedModelKey ||
+    imageModels.find((model) => model.key === "gpt_images_2")?.key ||
+    imageModels[0]?.key ||
+    "";
 
   // Compute preview options
-  const previewOptions = useMemo(() => ({
-    path: { projectId, sceneId: scene.id },
-    body: {
-      ...(selectedConfigId ? { configId: selectedConfigId } : {}),
-      characterImageRefs: selectedCharacterImages,
-      panelCount: imageCount,
-    },
-  }), [projectId, scene.id, selectedConfigId, selectedCharacterImages, imageCount]);
+  const previewOptions = useMemo(
+    () => ({
+      path: { projectId, sceneId: scene.id },
+      body: {
+        ...(selectedConfigId ? { configId: selectedConfigId } : {}),
+        characterImageRefs: selectedCharacterImages,
+        panelCount: imageCount,
+      },
+    }),
+    [
+      projectId,
+      scene.id,
+      selectedConfigId,
+      selectedCharacterImages,
+      imageCount,
+    ],
+  );
 
   // Preview mutation config
   const previewMutationConfig = useMemo(() => {
@@ -119,16 +145,27 @@ export function SceneGenerationModal({
   });
 
   // Compute generate options
-  const generateOptions = useMemo(() => ({
-    path: { projectId, sceneId: scene.id },
-    body: {
-      ...(selectedConfigId ? { configId: selectedConfigId } : {}),
-      ...(activeModelKey ? { modelKey: activeModelKey } : {}),
+  const generateOptions = useMemo(
+    () => ({
+      path: { projectId, sceneId: scene.id },
+      body: {
+        ...(selectedConfigId ? { configId: selectedConfigId } : {}),
+        ...(activeModelKey ? { modelKey: activeModelKey } : {}),
+        imageCount,
+        characterImageRefs: selectedCharacterImages,
+        additionalContext,
+      },
+    }),
+    [
+      projectId,
+      scene.id,
+      selectedConfigId,
+      activeModelKey,
       imageCount,
-      characterImageRefs: selectedCharacterImages,
+      selectedCharacterImages,
       additionalContext,
-    },
-  }), [projectId, scene.id, selectedConfigId, activeModelKey, imageCount, selectedCharacterImages, additionalContext]);
+    ],
+  );
 
   // Generate mutation config
   const generateMutationConfig = useMemo(() => {
@@ -140,15 +177,26 @@ export function SceneGenerationModal({
     ...generateMutationConfig,
     onSuccess: () => {
       invalidateWorkspace(projectId);
-      void queryClient.invalidateQueries({ queryKey: listGenerationJobsQueryKey({ path: { projectId } }) });
-      void queryClient.invalidateQueries({ queryKey: listGenerationBoardsQueryKey({ path: { projectId } }) });
-      void queryClient.invalidateQueries({ queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId: scene.id } }) });
+      void queryClient.invalidateQueries({
+        queryKey: listGenerationJobsQueryKey({ path: { projectId } }),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: listGenerationBoardsQueryKey({ path: { projectId } }),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: listSceneMangaPagesQueryKey({
+          path: { projectId, sceneId: scene.id },
+        }),
+      });
       onClose();
     },
   });
 
   // Handle character image selection
-  const handleCharacterImageSelect = (characterId: string, imageId: string | null) => {
+  const handleCharacterImageSelect = (
+    characterId: string,
+    imageId: string | null,
+  ) => {
     setSelectedCharacterImages((prev) => {
       const next = { ...prev };
       if (imageId) {
@@ -186,7 +234,9 @@ export function SceneGenerationModal({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-1 flex flex-col gap-4">
-          {configs.isLoading && <LoadingState label={t("generation.loadingConfigs")} />}
+          {configs.isLoading && (
+            <LoadingState label={t("generation.loadingConfigs")} />
+          )}
           {configs.error && (
             <ErrorState message={apiErrorMessage(configs.error)} />
           )}
@@ -195,7 +245,9 @@ export function SceneGenerationModal({
             <>
               {/* Config Selector */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-ink">{t("generation.config")}</label>
+                <label className="text-sm font-medium text-ink">
+                  {t("generation.config")}
+                </label>
                 {hasConfigs ? (
                   <Select
                     value={selectedConfigId}
@@ -214,7 +266,10 @@ export function SceneGenerationModal({
                       <SelectGroup>
                         {configItems.map((config) => (
                           <SelectItem key={config.id} value={config.id}>
-                            {config.name} {config.isDefault ? t("generation.defaultConfig") : ""}
+                            {config.name}{" "}
+                            {config.isDefault
+                              ? t("generation.defaultConfig")
+                              : ""}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -227,8 +282,14 @@ export function SceneGenerationModal({
                 )}
                 {selectedConfig && (
                   <div className="flex items-center gap-2 text-xs">
-                    <Badge tone={selectedConfig.colorMode === "bw" ? "default" : "info"}>
-                      {selectedConfig.colorMode === "bw" ? t("generation.colorMode.bw") : t("generation.colorMode.color")}
+                    <Badge
+                      tone={
+                        selectedConfig.colorMode === "bw" ? "default" : "info"
+                      }
+                    >
+                      {selectedConfig.colorMode === "bw"
+                        ? t("generation.colorMode.bw")
+                        : t("generation.colorMode.color")}
                     </Badge>
                     <Badge tone="default">{selectedConfig.stylePreset}</Badge>
                   </div>
@@ -237,8 +298,13 @@ export function SceneGenerationModal({
 
               {imageModels.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-ink">{t("generation.model")}</label>
-                  <Select value={activeModelKey} onValueChange={setSelectedModelKey}>
+                  <label className="text-sm font-medium text-ink">
+                    {t("generation.model")}
+                  </label>
+                  <Select
+                    value={activeModelKey}
+                    onValueChange={setSelectedModelKey}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={t("generation.selectModel")} />
                     </SelectTrigger>
@@ -257,7 +323,9 @@ export function SceneGenerationModal({
 
               {/* Image Count */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-ink">{t("generation.pageCount")}</label>
+                <label className="text-sm font-medium text-ink">
+                  {t("generation.pageCount")}
+                </label>
                 <div className="flex items-center gap-3">
                   <Button
                     type="button"
@@ -267,7 +335,9 @@ export function SceneGenerationModal({
                   >
                     -
                   </Button>
-                  <span className="w-8 text-center font-medium">{imageCount}</span>
+                  <span className="w-8 text-center font-medium">
+                    {imageCount}
+                  </span>
                   <Button
                     type="button"
                     variant="ghost"
@@ -282,7 +352,9 @@ export function SceneGenerationModal({
               {/* Character References */}
               {characters.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-ink">{t("generation.characterRefs")}</label>
+                  <label className="text-sm font-medium text-ink">
+                    {t("generation.characterRefs")}
+                  </label>
                   <CharacterImageSelector
                     projectId={projectId}
                     characters={characters}
@@ -295,7 +367,9 @@ export function SceneGenerationModal({
 
               {/* Additional Context */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-ink">{t("generation.additionalContext")}</label>
+                <label className="text-sm font-medium text-ink">
+                  {t("generation.additionalContext")}
+                </label>
                 <Textarea
                   value={additionalContext}
                   onChange={(e) => setAdditionalContext(e.target.value)}
@@ -314,31 +388,49 @@ export function SceneGenerationModal({
                 >
                   <div className="flex items-center gap-2">
                     <Eye size={16} className="text-muted" />
-                    <span className="text-sm font-medium">{t("generation.promptPreview")}</span>
+                    <span className="text-sm font-medium">
+                      {t("generation.promptPreview")}
+                    </span>
                   </div>
-                  {showPreview ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  {showPreview ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
                 </Button>
 
                 {showPreview && (
                   <div className="p-3 border-t border-line bg-surface-2/20">
-                    {preview.isPending && <LoadingState label={t("generation.loadingPreview")} />}
+                    {preview.isPending && (
+                      <LoadingState label={t("generation.loadingPreview")} />
+                    )}
                     {preview.error && (
                       <ErrorState message={apiErrorMessage(preview.error)} />
                     )}
                     {preview.data && (
                       <div className="space-y-3">
                         <div className="text-xs text-muted mb-2">
-                          {t("generation.styleLabel")}: {preview.data.styleDescription}
+                          {t("generation.styleLabel")}:{" "}
+                          {preview.data.styleDescription}
                         </div>
                         {preview.data.prompts.map((promptItem, i) => (
-                          <div key={i} className="border border-line rounded p-2">
-                            <div className="text-xs font-medium text-ink">{promptItem.title}</div>
-                            <div className="text-xs text-muted">{promptItem.caption}</div>
+                          <div
+                            key={i}
+                            className="border border-line rounded p-2"
+                          >
+                            <div className="text-xs font-medium text-ink">
+                              {promptItem.title}
+                            </div>
+                            <div className="text-xs text-muted">
+                              {promptItem.caption}
+                            </div>
                           </div>
                         ))}
                         <details className="text-xs">
                           <summary className="cursor-pointer text-muted hover:text-ink">
-                            {t("generation.viewSystemPrompt", { count: preview.data.systemPrompt.length })}
+                            {t("generation.viewSystemPrompt", {
+                              count: preview.data.systemPrompt.length,
+                            })}
                           </summary>
                           <pre className="mt-2 p-2 bg-ink/5 rounded text-[10px] whitespace-pre-wrap max-h-40 overflow-y-auto">
                             {preview.data.systemPrompt}
@@ -354,7 +446,11 @@ export function SceneGenerationModal({
         </div>
 
         <DialogFooter className="shrink-0">
-          <Button variant="ghost" onClick={onClose} disabled={generate.isPending}>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={generate.isPending}
+          >
             {t("actions.cancel")}
           </Button>
           <Button
@@ -370,7 +466,12 @@ export function SceneGenerationModal({
             ) : (
               <>
                 <Sparkles />
-                {t(imageCount > 1 ? "generation.generateMany" : "generation.generateOne", { count: imageCount })}
+                {t(
+                  imageCount > 1
+                    ? "generation.generateMany"
+                    : "generation.generateOne",
+                  { count: imageCount },
+                )}
               </>
             )}
           </Button>

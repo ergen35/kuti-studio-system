@@ -29,10 +29,10 @@ export interface CharacterImageWithUrl {
  * Falls back to constructing from fileName if publicUrl not available
  */
 export function characterImageUrlFromData(
-  image: CharacterImageWithUrl
+  image: CharacterImageWithUrl,
 ): string {
   // If publicUrl is available and non-empty
-  if (image.publicUrl && image.publicUrl.trim() !== '') {
+  if (image.publicUrl && image.publicUrl.trim() !== "") {
     return backendUrl(image.publicUrl);
   }
 
@@ -48,7 +48,7 @@ export function characterImageUrlFromData(
 export function characterImageUrl(
   projectId: string,
   characterId: string,
-  imageId: string
+  imageId: string,
 ): string {
   return `${API_BASE_URL}/api/v1/projects/${projectId}/characters/${characterId}/images/${imageId}/file`;
 }
@@ -59,7 +59,7 @@ export function characterImageUrl(
 export function generationPanelImageUrl(
   projectId: string,
   boardId: string,
-  panelId: string
+  panelId: string,
 ): string {
   return `${API_BASE_URL}/api/projects/${projectId}/generation/boards/${boardId}/panels/${panelId}/image`;
 }

@@ -3,6 +3,15 @@ import { z } from "zod";
 export const storyStatusSchema = z.enum(["active", "draft", "archived"]);
 export type StoryStatus = z.infer<typeof storyStatusSchema>;
 
+export const sceneMetadataSchema = z.object({
+  narrativeIntent: z.string().optional(),
+  duration: z.string().optional(),
+  tone: z.string().optional(),
+  rhythm: z.string().optional(),
+  visualConstraints: z.string().optional(),
+  stagingNotes: z.string().optional(),
+});
+
 // Tome
 export const tomeResponseSchema = z.object({
   id: z.string(),
@@ -75,6 +84,7 @@ export const sceneResponseSchema = z.object({
   notes: z.string(),
   charactersJson: z.array(z.string()),
   tagsJson: z.array(z.string()),
+  metadataJson: sceneMetadataSchema,
   status: storyStatusSchema,
   orderIndex: z.number(),
   createdAt: z.iso.datetime(),
@@ -92,6 +102,7 @@ export const createSceneBodySchema = z.object({
   notes: z.string().optional(),
   charactersJson: z.array(z.string()).optional(),
   tagsJson: z.array(z.string()).optional(),
+  metadataJson: sceneMetadataSchema.optional(),
   status: storyStatusSchema.optional(),
   orderIndex: z.number().optional(),
 });
@@ -107,6 +118,7 @@ export const updateSceneBodySchema = z.object({
   notes: z.string().optional(),
   charactersJson: z.array(z.string()).optional(),
   tagsJson: z.array(z.string()).optional(),
+  metadataJson: sceneMetadataSchema.optional(),
   status: storyStatusSchema.optional(),
   orderIndex: z.number().optional(),
 });
@@ -126,6 +138,7 @@ export const storySummaryResponseSchema = z.object({
   tomes: z.array(tomeResponseSchema),
   chapters: z.array(chapterResponseSchema),
   scenes: z.array(sceneResponseSchema),
+  references: z.array(storyReferenceSchema),
   orphanReferences: z.array(z.object({
     reference: storyReferenceSchema,
     reason: z.string(),
@@ -133,9 +146,15 @@ export const storySummaryResponseSchema = z.object({
 });
 
 export const referenceSuggestionSchema = z.object({
+  kind: z.enum(["character", "scene", "chapter", "tome", "asset", "environment"]),
   slug: z.string(),
   label: z.string(),
+  entityId: z.string(),
+  href: z.string(),
+  description: z.string().optional(),
 });
+
+export type ReferenceSuggestion = z.infer<typeof referenceSuggestionSchema>;
 
 // Story completion
 export const storyCompletionTargetKindSchema = z.enum(["tome", "chapter", "scene"]);

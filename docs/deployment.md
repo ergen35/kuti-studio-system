@@ -112,8 +112,7 @@ cd kuti-backend
 bun run db:generate
 bun run db:migrate
 
-# Optionnel: Seeder la base
-bun run db:seed
+# La base démarre vide; importer ou créer un projet via l'UI si nécessaire.
 
 # Démarrer le serveur
 cd ../kuti-frontend

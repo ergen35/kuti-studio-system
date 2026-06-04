@@ -87,6 +87,7 @@ export type SceneMangaPageCountAggregateOutputType = {
   imageUrl: number
   caption: number
   prompt: number
+  metadataJson: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -154,6 +155,7 @@ export type SceneMangaPageCountAggregateInputType = {
   imageUrl?: true
   caption?: true
   prompt?: true
+  metadataJson?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -260,6 +262,7 @@ export type SceneMangaPageGroupByOutputType = {
   imageUrl: string | null
   caption: string | null
   prompt: string | null
+  metadataJson: runtime.JsonValue
   createdAt: Date
   updatedAt: Date
   _count: SceneMangaPageCountAggregateOutputType | null
@@ -302,6 +305,7 @@ export type SceneMangaPageWhereInput = {
   imageUrl?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
   caption?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
   prompt?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
+  metadataJson?: Prisma.JsonFilter<"SceneMangaPage">
   createdAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
@@ -323,6 +327,7 @@ export type SceneMangaPageOrderByWithRelationInput = {
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   prompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
@@ -347,6 +352,7 @@ export type SceneMangaPageWhereUniqueInput = Prisma.AtLeast<{
   imageUrl?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
   caption?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
   prompt?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
+  metadataJson?: Prisma.JsonFilter<"SceneMangaPage">
   createdAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
@@ -368,6 +374,7 @@ export type SceneMangaPageOrderByWithAggregationInput = {
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   prompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SceneMangaPageCountOrderByAggregateInput
@@ -395,6 +402,7 @@ export type SceneMangaPageScalarWhereWithAggregatesInput = {
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"SceneMangaPage"> | string | null
   caption?: Prisma.StringNullableWithAggregatesFilter<"SceneMangaPage"> | string | null
   prompt?: Prisma.StringNullableWithAggregatesFilter<"SceneMangaPage"> | string | null
+  metadataJson?: Prisma.JsonWithAggregatesFilter<"SceneMangaPage">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SceneMangaPage"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SceneMangaPage"> | Date | string
 }
@@ -413,6 +421,7 @@ export type SceneMangaPageCreateInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutSceneMangaPagesInput
@@ -434,6 +443,7 @@ export type SceneMangaPageUncheckedCreateInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutSourceMangaPageInput
@@ -453,6 +463,7 @@ export type SceneMangaPageUpdateInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutSceneMangaPagesNestedInput
@@ -474,6 +485,7 @@ export type SceneMangaPageUncheckedUpdateInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutSourceMangaPageNestedInput
@@ -494,6 +506,7 @@ export type SceneMangaPageCreateManyInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -512,6 +525,7 @@ export type SceneMangaPageUpdateManyMutationInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -531,6 +545,7 @@ export type SceneMangaPageUncheckedUpdateManyInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -560,6 +575,7 @@ export type SceneMangaPageCountOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
+  metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -691,6 +707,7 @@ export type SceneMangaPageCreateWithoutProjectInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutSourceMangaPageInput
@@ -710,6 +727,7 @@ export type SceneMangaPageUncheckedCreateWithoutProjectInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutSourceMangaPageInput
@@ -759,6 +777,7 @@ export type SceneMangaPageScalarWhereInput = {
   imageUrl?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
   caption?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
   prompt?: Prisma.StringNullableFilter<"SceneMangaPage"> | string | null
+  metadataJson?: Prisma.JsonFilter<"SceneMangaPage">
   createdAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SceneMangaPage"> | Date | string
 }
@@ -777,6 +796,7 @@ export type SceneMangaPageCreateWithoutDramaVideosInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutSceneMangaPagesInput
@@ -797,6 +817,7 @@ export type SceneMangaPageUncheckedCreateWithoutDramaVideosInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -831,6 +852,7 @@ export type SceneMangaPageUpdateWithoutDramaVideosInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutSceneMangaPagesNestedInput
@@ -851,6 +873,7 @@ export type SceneMangaPageUncheckedUpdateWithoutDramaVideosInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -869,6 +892,7 @@ export type SceneMangaPageCreateManyProjectInput = {
   imageUrl?: string | null
   caption?: string | null
   prompt?: string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -887,6 +911,7 @@ export type SceneMangaPageUpdateWithoutProjectInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dramaVideos?: Prisma.DramaVideoUpdateManyWithoutSourceMangaPageNestedInput
@@ -906,6 +931,7 @@ export type SceneMangaPageUncheckedUpdateWithoutProjectInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutSourceMangaPageNestedInput
@@ -925,6 +951,7 @@ export type SceneMangaPageUncheckedUpdateManyWithoutProjectInput = {
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -975,6 +1002,7 @@ export type SceneMangaPageSelect<ExtArgs extends runtime.Types.Extensions.Intern
   imageUrl?: boolean
   caption?: boolean
   prompt?: boolean
+  metadataJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -997,6 +1025,7 @@ export type SceneMangaPageSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   imageUrl?: boolean
   caption?: boolean
   prompt?: boolean
+  metadataJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -1017,6 +1046,7 @@ export type SceneMangaPageSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   imageUrl?: boolean
   caption?: boolean
   prompt?: boolean
+  metadataJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -1037,11 +1067,12 @@ export type SceneMangaPageSelectScalar = {
   imageUrl?: boolean
   caption?: boolean
   prompt?: boolean
+  metadataJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SceneMangaPageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sceneId" | "tomeId" | "chapterId" | "jobId" | "boardId" | "panelId" | "pageNumber" | "label" | "status" | "imageUrl" | "caption" | "prompt" | "createdAt" | "updatedAt", ExtArgs["result"]["sceneMangaPage"]>
+export type SceneMangaPageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sceneId" | "tomeId" | "chapterId" | "jobId" | "boardId" | "panelId" | "pageNumber" | "label" | "status" | "imageUrl" | "caption" | "prompt" | "metadataJson" | "createdAt" | "updatedAt", ExtArgs["result"]["sceneMangaPage"]>
 export type SceneMangaPageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   dramaVideos?: boolean | Prisma.SceneMangaPage$dramaVideosArgs<ExtArgs>
@@ -1075,6 +1106,7 @@ export type $SceneMangaPagePayload<ExtArgs extends runtime.Types.Extensions.Inte
     imageUrl: string | null
     caption: string | null
     prompt: string | null
+    metadataJson: runtime.JsonValue
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["sceneMangaPage"]>
@@ -1516,6 +1548,7 @@ export interface SceneMangaPageFieldRefs {
   readonly imageUrl: Prisma.FieldRef<"SceneMangaPage", 'String'>
   readonly caption: Prisma.FieldRef<"SceneMangaPage", 'String'>
   readonly prompt: Prisma.FieldRef<"SceneMangaPage", 'String'>
+  readonly metadataJson: Prisma.FieldRef<"SceneMangaPage", 'Json'>
   readonly createdAt: Prisma.FieldRef<"SceneMangaPage", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"SceneMangaPage", 'DateTime'>
 }

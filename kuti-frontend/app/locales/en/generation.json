@@ -35,6 +35,12 @@
     "video": "Videos",
     "audio": "Audio"
   },
+  "pagination": {
+    "page": "Page {{current}} / {{total}}",
+    "summary": "Showing {{start}}-{{end}} of {{total}}",
+    "prev": "Prev",
+    "next": "Next"
+  },
   "empty": {
     "noJob": "No generation job",
     "noBoard": "No board generated yet"

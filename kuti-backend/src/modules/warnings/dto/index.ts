@@ -34,6 +34,8 @@ export const listWarningsQuerySchema = z.object({
   status: WarningStatusSchema.optional(),
   kind: z.string().optional(),
   severity: WarningSeveritySchema.optional(),
+  entityKind: z.string().optional(),
+  entityId: z.string().optional(),
 });
 
 export type ListWarningsQuery = z.infer<typeof listWarningsQuerySchema>;

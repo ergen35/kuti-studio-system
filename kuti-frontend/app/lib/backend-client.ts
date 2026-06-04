@@ -5,14 +5,14 @@
 
 import { client } from "~/lib/backend/client.gen";
 
-const API_BASE_URL = ((import.meta.env.VITE_KUTI_API_URL as string | undefined) || "http://127.0.0.1:8000").replace(/\/$/, "");
+const API_BASE_URL = (
+  (import.meta.env.VITE_KUTI_API_URL as string | undefined) ||
+  "http://127.0.0.1:8000"
+).replace(/\/$/, "");
 
 // Configuration du client
 client.setConfig({
   baseUrl: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Intercepteur pour la gestion des erreurs
@@ -32,7 +32,7 @@ client.interceptors.response.use(async (response) => {
 export class ApiError extends Error {
   constructor(
     public status: number,
-    public data: unknown
+    public data: unknown,
   ) {
     super(`API Error ${status}`);
     this.name = "ApiError";

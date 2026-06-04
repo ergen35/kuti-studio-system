@@ -1,6 +1,6 @@
 {
   "title": "Gestionnaire de tâches",
-  "description": "Suivi des jobs de génération en cours",
+  "description": "Suivi des jobs techniques et des tâches éditoriales ouvertes",
   "lastUpdated": "Dernière mise à jour : {{time}}",
   "loading": "Chargement des tâches...",
   "empty": "Aucune tâche trouvée",
@@ -21,12 +21,23 @@
   },
   "statusLabel": "Statuts",
   "typesLabel": "Types",
+  "prioritiesLabel": "Priorités",
   "status": {
     "pending": "En attente",
     "running": "En cours",
     "ready": "Prêt",
     "validated": "Validé",
     "failed": "Échoué"
+  },
+  "taskTypes": {
+    "technical": "Technique",
+    "editorial": "Éditorial"
+  },
+  "priorities": {
+    "low": "Faible",
+    "medium": "Moyenne",
+    "high": "Élevée",
+    "critical": "Critique"
   },
   "sourceKinds": {
     "tome": "Tome",
@@ -44,13 +55,16 @@
   },
   "detail": {
     "status": "Statut",
-    "type": "Type",
+    "taskType": "Type",
+    "priority": "Priorité",
     "elapsed": "Temps",
     "progress": "Progrès",
     "details": "Détails",
     "jobId": "ID job",
     "sourceId": "ID source",
     "source": "Source",
+    "description": "Description",
+    "openSource": "Ouvrir la source",
     "createdAt": "Créé le",
     "updatedAt": "Mis à jour"
   }

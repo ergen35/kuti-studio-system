@@ -8,7 +8,10 @@ interface CreativeBackgroundProps {
   className?: string;
 }
 
-export function CreativeBackground({ images, className }: CreativeBackgroundProps) {
+export function CreativeBackground({
+  images,
+  className,
+}: CreativeBackgroundProps) {
   const gridItems = useMemo(() => {
     if (images.length === 0) return [];
     const filledImages = [...images];
@@ -34,8 +37,19 @@ export function CreativeBackground({ images, className }: CreativeBackgroundProp
       <div className="absolute inset-0 bg-bg" />
       <div className="absolute inset-x-0 top-0 grid h-[44vh] grid-cols-4 gap-px opacity-[0.16] grayscale dark:opacity-[0.10] md:grid-cols-6">
         {gridItems.map((item) => (
-          <div key={item.id} className={clsx("relative overflow-hidden", item.colSpan === 2 && "col-span-2", item.rowSpan === 2 && "row-span-2")}>
-            <img src={item.src} alt="" className="absolute inset-0 w-full h-full object-cover grayscale" />
+          <div
+            key={item.id}
+            className={clsx(
+              "relative overflow-hidden",
+              item.colSpan === 2 && "col-span-2",
+              item.rowSpan === 2 && "row-span-2",
+            )}
+          >
+            <img
+              src={item.src}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover grayscale"
+            />
           </div>
         ))}
       </div>

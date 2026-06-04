@@ -3,9 +3,11 @@
   "subtitle": "Local narrative production",
   "hero": {
     "subtitle": "Narrative studio for multimedia works",
+    "projectNameLabel": "Project name to create",
     "placeholder": "New project name...",
     "create": "Create",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "openExisting": "Open existing project"
   },
   "theme": {
     "darkTitle": "Switch to dark mode",
@@ -37,20 +39,57 @@
     "title": "Projects",
     "count": "{{count}} project",
     "count_plural": "{{count}} projects",
+    "visible": "{{count}} visible",
+    "loadingMetrics": "Loading project metrics...",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived",
+      "maintenance": "Maintenance"
+    },
     "statusCount": {
       "active": "{{count}} active",
       "draft": "{{count}} draft"
+    },
+    "filters": {
+      "search": "Search projects",
+      "searchPlaceholder": "Name, slug, or storage path",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "reset": "Reset filters"
+    },
+    "metrics": {
+      "tomes": "Tomes",
+      "chapters": "Chapters",
+      "scenes": "Scenes",
+      "characters": "Characters"
     },
     "empty": {
       "title": "No project yet",
       "description": "Create one from the form above to initialize storage through the backend."
     },
+    "emptyFiltered": {
+      "title": "No project matches",
+      "description": "Try a different search or clear the filters."
+    },
     "actions": {
       "open": "Open",
+      "quickExport": "Quick export",
+      "quickExportLabel": "Quick export: {{name}}",
+      "quickExportSummary": "Create a work ZIP from the latest project snapshot.",
       "clone": "Clone",
       "archive": "Archive",
       "dashboard": "Dashboard",
       "more": "More actions"
+    },
+    "archive": {
+      "dialogTitle": "Archive project",
+      "dialogDescription": "Archive {{name}}? The project will be hidden from the active workspace but remain stored locally.",
+      "projectLabel": "Project",
+      "confirmButton": "Archive project",
+      "confirming": "Archiving...",
+      "cancelButton": "Cancel",
+      "error": "Failed to archive project"
     },
     "meta": {
       "path": "Path",
@@ -60,5 +99,19 @@
   },
   "errors": {
     "createFailed": "Failed to create project"
+  },
+  "importProject": {
+    "dialogTitle": "Open existing project",
+    "dialogDescription": "Attach a project that already exists on disk. The path should point to a folder inside kuti-data/projects.",
+    "rootPath": "Project path",
+    "rootPathPlaceholder": "./kuti-data/projects/my-project",
+    "rootPathHint": "Use the path relative to the backend workspace or a direct local path already stored by Kuti Studio.",
+    "name": "Project name",
+    "namePlaceholder": "My project",
+    "nameHint": "Leave it blank to derive a readable name from the folder name.",
+    "cancelButton": "Cancel",
+    "confirmButton": "Open project",
+    "confirming": "Opening...",
+    "error": "Failed to open project"
   }
 }

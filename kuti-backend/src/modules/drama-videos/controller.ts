@@ -1,4 +1,5 @@
 import { db } from "@lib/db";
+import { redactSensitivePaths } from "@lib/sanitization";
 
 type DramaVideoRecord = NonNullable<Awaited<ReturnType<typeof db.dramaVideo.findFirst>>>;
 
@@ -24,8 +25,59 @@ function metadataNumber(metadata: Record<string, unknown>, key: string): number 
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function publicMediaUrlOrNull(value: string | null): string | null {
+  if (!value) return null;
+
+  if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("/api/") || value.startsWith("/projects/")) {
+    return value;
+  }
+
+  return null;
+}
+
+function sanitizeDramaMessage(value: string | null | undefined): string | null {
+  const sanitized = redactSensitivePaths(value);
+  return sanitized && sanitized.trim().length > 0 ? sanitized.trim() : null;
+}
+
+function sanitizeDramaMetadataValue(key: string, value: unknown): unknown {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  if (key.endsWith("Url")) {
+    return publicMediaUrlOrNull(value);
+  }
+
+  if (key.endsWith("Path")) {
+    return sanitizeDramaMessage(value);
+  }
+
+  if (key === "providerFailureMessage" || key === "errorMessage") {
+    return sanitizeDramaMessage(value);
+  }
+
+  return sanitizeDramaMessage(value) ?? value;
+}
+
+function sanitizeDramaMetadata(metadata: Record<string, unknown>): Record<string, unknown> {
+  const sanitized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(metadata)) {
+    const nextValue = sanitizeDramaMetadataValue(key, value);
+    if (nextValue === null || nextValue === undefined || nextValue === "") {
+      continue;
+    }
+
+    sanitized[key] = nextValue;
+  }
+
+  return sanitized;
+}
+
 function serializeDramaVideo(video: DramaVideoRecord, source: Awaited<ReturnType<typeof buildSourceContext>>) {
-  const metadata = metadataRecord(video.metadataJson);
+  const metadata = sanitizeDramaMetadata(metadataRecord(video.metadataJson));
+
   return {
     id: video.id,
     projectId: video.projectId,
@@ -44,7 +96,7 @@ function serializeDramaVideo(video: DramaVideoRecord, source: Awaited<ReturnType
     updatedAt: video.updatedAt.toISOString(),
     completedAt: video.completedAt?.toISOString() ?? null,
     failedAt: video.failedAt?.toISOString() ?? null,
-    errorMessage: video.errorMessage,
+    errorMessage: sanitizeDramaMessage(video.errorMessage),
   };
 }
 
@@ -78,7 +130,9 @@ async function buildSourceContext(
     chapterTitle: chapter?.title ?? "Chapter",
     pageNumber: page?.pageNumber ?? metadataNumber(metadata, "pageNumber") ?? 0,
     pageLabel: page?.label ?? metadataString(metadata, "pageLabel") ?? "Manga page",
-    pageImageUrl: page ? publicMangaPageImageUrl(projectId, page) : metadataString(metadata, "sourceImageUrl"),
+    pageImageUrl: page
+      ? publicMangaPageImageUrl(projectId, page)
+      : publicMediaUrlOrNull(metadataString(metadata, "sourceImageUrl")),
   };
 }
 
@@ -96,5 +150,28 @@ export async function listProjectDramaVideos(projectId: string) {
       const metadata = metadataRecord(video.metadataJson);
       return serializeDramaVideo(video, await buildSourceContext(projectId, video.sourceMangaPageId, metadata));
     }),
+  );
+}
+
+export async function archiveDramaVideo(projectId: string, dramaVideoId: string) {
+  const video = await db.dramaVideo.findFirst({
+    where: {
+      id: dramaVideoId,
+      projectId,
+    },
+  });
+
+  if (!video) return null;
+
+  const archived = await db.dramaVideo.update({
+    where: { id: dramaVideoId },
+    data: {
+      status: "archived",
+    },
+  });
+
+  return serializeDramaVideo(
+    archived,
+    await buildSourceContext(projectId, archived.sourceMangaPageId, metadataRecord(archived.metadataJson)),
   );
 }

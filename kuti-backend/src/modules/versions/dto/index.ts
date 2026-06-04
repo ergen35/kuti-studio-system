@@ -6,6 +6,26 @@
 import { z } from "zod";
 
 // ============================================================================
+// Snapshot Schemas
+// ============================================================================
+
+export const versionSnapshotProjectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  status: z.string(),
+});
+
+export const versionSnapshotSummarySchema = z.object({
+  schemaVersion: z.literal(1),
+  capturedAt: z.iso.datetime(),
+  project: versionSnapshotProjectSchema,
+  counts: z.record(z.string(), z.number()),
+});
+
+export type VersionSnapshotSummary = z.infer<typeof versionSnapshotSummarySchema>;
+
+// ============================================================================
 // Body Schemas
 // ============================================================================
 
@@ -53,19 +73,31 @@ export const versionResponseSchema = z.object({
   versionIndex: z.number(),
   label: z.string(),
   summary: z.string(),
+  snapshot: versionSnapshotSummarySchema.nullable(),
   createdAt: z.iso.datetime(),
 });
 
 export type VersionResponse = z.infer<typeof versionResponseSchema>;
 
+export const versionListResponseSchema = z.array(versionResponseSchema);
+
+export type VersionListResponse = z.infer<typeof versionListResponseSchema>;
+
 export const versionBranchSchema = z.object({
   branchName: z.string(),
   versionCount: z.number(),
   latestVersionId: z.string().nullable(),
+  latestVersionLabel: z.string().nullable(),
   latestCreatedAt: z.iso.datetime().nullable(),
+  latestSnapshotCapturedAt: z.iso.datetime().nullable(),
+  latestSnapshotAvailable: z.boolean(),
 });
 
 export type VersionBranch = z.infer<typeof versionBranchSchema>;
+
+export const versionBranchListResponseSchema = z.array(versionBranchSchema);
+
+export type VersionBranchListResponse = z.infer<typeof versionBranchListResponseSchema>;
 
 export const versionCompareResponseSchema = z.object({
   left: versionResponseSchema,
@@ -75,3 +107,10 @@ export const versionCompareResponseSchema = z.object({
 });
 
 export type VersionCompareResponse = z.infer<typeof versionCompareResponseSchema>;
+
+export const restoreVersionResponseSchema = z.object({
+  restoredVersion: versionResponseSchema,
+  backupVersion: versionResponseSchema,
+});
+
+export type RestoreVersionResponse = z.infer<typeof restoreVersionResponseSchema>;

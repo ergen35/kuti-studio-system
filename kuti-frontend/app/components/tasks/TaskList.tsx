@@ -24,7 +24,13 @@ export function TaskList({
   emptyMessage,
 }: TaskListProps) {
   const { t } = useTranslation("tasks");
-  const { searchQuery, selectedStatuses, selectedSourceKinds } = useTasksStore();
+  const {
+    searchQuery,
+    selectedStatuses,
+    selectedTaskTypes,
+    selectedPriorities,
+    selectedSourceKinds,
+  } = useTasksStore();
 
   if (isLoading) {
     return <LoadingState label={t("loading")} />;
@@ -38,8 +44,20 @@ export function TaskList({
       const matchesSearch =
         task.title.toLowerCase().includes(query) ||
         task.sourceLabel?.toLowerCase().includes(query) ||
-        task.sourceKind.toLowerCase().includes(query);
+        task.sourceKind.toLowerCase().includes(query) ||
+        task.taskType.toLowerCase().includes(query) ||
+        task.priority.toLowerCase().includes(query) ||
+        (task.description ?? "").toLowerCase().includes(query) ||
+        (task.sourceEntity?.label ?? "").toLowerCase().includes(query);
       if (!matchesSearch) return false;
+    }
+
+    if (!selectedTaskTypes.includes(task.taskType)) {
+      return false;
+    }
+
+    if (!selectedPriorities.includes(task.priority)) {
+      return false;
     }
 
     // Status filter
@@ -59,11 +77,7 @@ export function TaskList({
     return (
       <EmptyState
         title={emptyMessage ?? t("empty")}
-        description={
-          searchQuery
-            ? t("emptySearch")
-            : t("emptyDescription")
-        }
+        description={searchQuery ? t("emptySearch") : t("emptyDescription")}
       />
     );
   }

@@ -3,8 +3,9 @@
  */
 
 import { db } from "@lib/db";
-import { fileExists, readFile, writeFile, deleteFile, getFileStats } from "@lib/filesystem";
+import { readFile, writeFile, deleteFile, getFileStats } from "@lib/filesystem";
 import { getAssetsDir, sanitizeFileName, getFileExtension } from "@lib/paths";
+import { readProjectAssetSettings } from "@lib/project-settings";
 import type {
   CreateAssetBody,
   UpdateAssetBody,
@@ -229,11 +230,33 @@ export async function archiveAsset(projectId: string, assetId: string) {
 }
 
 export async function deleteAsset(projectId: string, assetId: string) {
-  const asset = await db.asset.findFirst({
-    where: { id: assetId, projectId },
-  });
+  const [asset, project] = await Promise.all([
+    db.asset.findFirst({
+      where: { id: assetId, projectId },
+    }),
+    db.project.findUnique({
+      where: { id: projectId },
+      select: { settingsJson: true },
+    }),
+  ]);
 
   if (!asset) return false;
+
+  const assetSettings = readProjectAssetSettings(project?.settingsJson);
+
+  if (assetSettings.archiveOnDelete) {
+    if (asset.status !== "archived") {
+      await db.asset.update({
+        where: { id: assetId },
+        data: {
+          status: "archived",
+          archivedAt: new Date(),
+        },
+      });
+    }
+
+    return true;
+  }
 
   // Supprimer les liens d'abord
   await db.assetLink.deleteMany({

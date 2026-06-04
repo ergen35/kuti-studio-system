@@ -18,7 +18,8 @@ export const useUiStore = create<UiState>()(
       theme: "light",
       density: "comfortable",
       setTheme: (theme) => set({ theme }),
-      toggleTheme: () => set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
+      toggleTheme: () =>
+        set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
       setDensity: (density) => set({ density }),
     }),
     { name: "kuti-ui" },

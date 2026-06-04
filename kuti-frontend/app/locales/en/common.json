@@ -10,6 +10,7 @@
   "actions": {
     "close": "Close",
     "openMenu": "Open menu",
+    "more": "More",
     "save": "Save",
     "create": "Create",
     "cancel": "Cancel",
@@ -26,6 +27,7 @@
     "add": "Add",
     "import": "Import",
     "update": "Update",
+    "auto": "Auto",
     "light": "Light",
     "dark": "Dark",
     "comfortable": "Comfortable",

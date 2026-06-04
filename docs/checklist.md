@@ -215,9 +215,14 @@ feat(characters): ajout de la génération d'images
 
 - [ ] Migration créée si changement de schéma
 - [ ] Migration testée (up + down)
-- [ ] Données de seed à jour si nécessaire
+- [ ] Données locales nettoyées si nécessaire
 
 ### API
+
+## Limites actuelles
+
+- Le finissage MVP reste ouvert sur le sweep i18n `fr/en`, l'audit des etats vide/chargement/erreur/confirmation, l'accessibilite clavier/focus, et les smoke tests end-to-end publication/maintenance.
+- Les parcours complets sont valides a l'UI sur plusieurs blocs, mais le checkpoint de cloture doit encore confirmer le flux global sans intervention manuelle entre les ecrans.
 
 - [ ] Regénérer le SDK frontend (`yarn api:generate`)
 - [ ] Vérifier que le SDK compile sans erreur

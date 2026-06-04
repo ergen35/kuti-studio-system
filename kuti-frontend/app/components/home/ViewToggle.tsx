@@ -13,7 +13,7 @@ interface ViewToggleProps {
 }
 
 export function ViewToggle({ mode, onChange }: ViewToggleProps) {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation("home");
   return (
     <div className="inline-flex items-center gap-1 p-1 rounded-lg border border-line bg-surface">
       <Button
@@ -24,12 +24,12 @@ export function ViewToggle({ mode, onChange }: ViewToggleProps) {
           "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-colors",
           mode === "grid"
             ? "bg-accent text-accent-ink"
-            : "text-muted hover:text-ink hover:bg-surface-2"
+            : "text-muted hover:text-ink hover:bg-surface-2",
         )}
-        title={t('view.gridTitle')}
+        title={t("view.gridTitle")}
       >
         <Grid3X3 size={16} />
-        <span className="hidden sm:inline">{t('view.grid')}</span>
+        <span className="hidden sm:inline">{t("view.grid")}</span>
       </Button>
       <Button
         type="button"
@@ -39,12 +39,12 @@ export function ViewToggle({ mode, onChange }: ViewToggleProps) {
           "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-colors",
           mode === "list"
             ? "bg-accent text-accent-ink"
-            : "text-muted hover:text-ink hover:bg-surface-2"
+            : "text-muted hover:text-ink hover:bg-surface-2",
         )}
-        title={t('view.listTitle')}
+        title={t("view.listTitle")}
       >
         <List size={16} />
-        <span className="hidden sm:inline">{t('view.list')}</span>
+        <span className="hidden sm:inline">{t("view.list")}</span>
       </Button>
     </div>
   );

@@ -19,6 +19,8 @@
     "addCharacter": "Add character",
     "archive": "Archive",
     "delete": "Delete",
+    "duplicate": "Duplicate",
+    "openGraph": "Relation graph",
     "saveProfile": "Save profile",
     "backToGrid": "Back to characters",
     "cancel": "Cancel",
@@ -61,6 +63,78 @@
     "count": "{{count}} sample",
     "count_plural": "{{count}} samples"
   },
+  "duplicate": {
+    "title": "Duplicate character",
+    "description": "Creates a copy of the profile, then lets you choose which relations and voice samples to carry over.",
+    "nameLabel": "Copy name",
+    "includeRelations": "Copy relations",
+    "includeRelationsHint": "{{count}} linked relation will be carried over.",
+    "includeRelationsHint_plural": "{{count}} linked relations will be carried over.",
+    "includeVoiceSamples": "Copy voice samples",
+    "includeVoiceSamplesHint": "{{count}} voice sample will be carried over.",
+    "includeVoiceSamplesHint_plural": "{{count}} voice samples will be carried over.",
+    "note": "Generated images stay attached to the source character.",
+    "submit": "Duplicate",
+    "cancel": "Cancel",
+    "copySuffix": "copy"
+  },
+  "usage": {
+    "title": "Usage",
+    "meta": "References and dependencies",
+    "status": {
+      "used": "Used",
+      "orphan": "Orphaned",
+      "nonReferenced": "Unreferenced",
+      "archived": "Archived"
+    },
+    "summary": "{{sceneCountLabel}}, {{relationCountLabel}}, {{voiceSampleCountLabel}}",
+    "linkedScenes": "{{count}} linked scene",
+    "linkedScenes_plural": "{{count}} linked scenes",
+    "noLinkedScenes": "No linked scenes",
+    "openStory": "Open story",
+    "scenesTitle": "Linked scenes"
+  },
+  "graph": {
+    "title": "Relation graph",
+    "description": "Full-screen view of {{name}}'s outgoing relations.",
+    "relationCount": "{{count}} relation",
+    "relationCount_plural": "{{count}} relations",
+    "centerLabel": "Source character",
+    "detailsTitle": "Link details",
+    "detailsDescription": "Outgoing links from {{name}} are shown as cards and as a graph to keep the context readable.",
+    "sourceCharacter": "Source",
+    "editorTitle": "Edit relation",
+    "editorMeta": "Direct editing",
+    "editorEmpty": "Select a relation on the right to edit it without leaving the graph.",
+    "targetCharacter": "Target character",
+    "relationTypeLabel": "Relation type",
+    "relationTypePlaceholder": "ally, rival, mentor...",
+    "strengthLabelInput": "Strength",
+    "narrativeDependencyLabel": "Narrative dependency",
+    "narrativeDependencyPlaceholder": "Why this link matters in the story...",
+    "notesFieldLabel": "Notes",
+    "notesPlaceholder": "Observations, context, continuity constraints...",
+    "clearSelection": "Clear selection",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "saveRelation": "Save changes",
+    "removeRelation": "Delete relation",
+    "deleteConfirm": "Delete the relation with {{name}}?",
+    "strength": "{{strength}}%",
+    "strengthLabel": "Strength: {{strength}}%",
+    "dependencyLabel": "Narrative dependency: {{dependency}}",
+    "notesLabel": "Notes: {{notes}}",
+    "openCharacter": "Open profile",
+    "editRelation": "Edit",
+    "relationsListTitle": "Relations",
+    "relationsListMeta": "Cards and editing",
+    "missingCharacter": "Missing character",
+    "emptyTitle": "No relations to display",
+    "emptyMeta": "Empty view",
+    "emptyDescription": "Add a relation from the inspector to make it appear in the full-screen graph.",
+    "close": "Close",
+    "none": "None"
+  },
   "images": {
     "title": "Generated images",
     "empty": "No generated image",
@@ -74,6 +148,9 @@
   "cards": {
     "noRole": "No role defined",
     "viewProfile": "View profile"
+  },
+  "avatar": {
+    "label": "Avatar of {{name}}"
   },
   "sidepanel": {
     "otherCharacters": "Cast",
@@ -105,6 +182,8 @@
     "generate": "Generate",
     "generating": "Generating...",
     "regenerate": "Regenerate",
+    "panelCount": "{{count}} image",
+    "panelCount_plural": "{{count}} images",
     "modalTitle": "Generate character image",
     "modalDescription": "Choose framing, style and the number of variations to generate.",
     "defaultPromptSubject": "A character",
@@ -113,6 +192,11 @@
     "download": "Download",
     "selected": "Selected",
     "insufficientData": "Insufficient data. Add description and physical traits.",
+    "promptLabels": {
+      "physical": "Physical",
+      "wearing": "Wearing",
+      "colors": "Colors"
+    },
     "strategy": {
       "label": "Framing",
       "portrait": "Portrait",

@@ -10,7 +10,15 @@ import { z } from "zod";
 // ============================================================================
 
 export const ExportKindSchema = z.enum(["work", "publication"]);
-export const ExportFormatSchema = z.enum(["json", "tree", "zip"]);
+export const ExportFormatSchema = z.enum([
+  "json",
+  "tree",
+  "zip",
+  "paged_images",
+  "pdf",
+  "cbz",
+  "epub",
+]);
 export const ExportStatusSchema = z.enum(["pending", "ready", "failed"]);
 
 export type ExportKind = z.infer<typeof ExportKindSchema>;

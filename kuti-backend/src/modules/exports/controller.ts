@@ -6,6 +6,7 @@
 import { randomUUIDv7 } from "bun";
 import { prisma } from "@lib/db";
 import { sendExportProjectEvent } from "@lib/inngest";
+import { captureVersionSnapshot, summarizeVersionSnapshot } from "@lib/version-snapshot";
 import type {
   CreateExportBody,
   ExportResponse,
@@ -113,11 +114,18 @@ export async function createExport(
     return null;
   }
 
-  // Vérifier que le format est supporté
-  const supportedFormats = ["json", "tree", "zip"];
+  const supportedFormatsByKind: Record<ExportKind, ExportFormat[]> = {
+    work: ["json", "tree", "zip"],
+    publication: ["paged_images", "pdf", "cbz", "epub"],
+  };
+
+  // Vérifier que le format est supporté pour ce kind
+  const supportedFormats = supportedFormatsByKind[data.kind];
   if (!supportedFormats.includes(data.format)) {
     throw new Error(`unsupported export format: ${data.format}`);
   }
+
+  const sourceSnapshot = summarizeVersionSnapshot(await captureVersionSnapshot(projectId));
 
   const now = new Date();
   const label = data.label || `${data.kind} export (${data.format})`;
@@ -131,7 +139,9 @@ export async function createExport(
       status: "pending",
       label,
       summary: data.summary,
-      metadataJson: {},
+      metadataJson: {
+        sourceSnapshot,
+      },
       createdAt: now,
       updatedAt: now,
     },
@@ -168,7 +178,23 @@ export async function getExportDownload(
   }
 
   const buffer = await readFile(exportRecord.artifactPath);
-  const mimeType = exportRecord.format === "zip" ? "application/zip" : "application/json";
+  const mimeType = (() => {
+    switch (exportRecord.format) {
+      case "json":
+        return "application/json";
+      case "tree":
+      case "zip":
+      case "paged_images":
+      case "cbz":
+        return "application/zip";
+      case "pdf":
+        return "application/pdf";
+      case "epub":
+        return "application/epub+zip";
+      default:
+        return "application/octet-stream";
+    }
+  })();
 
   return {
     buffer,

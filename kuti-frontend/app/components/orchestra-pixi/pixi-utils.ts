@@ -1,5 +1,11 @@
-import { Graphics, Text, TextStyle, Rectangle, type ColorSource } from 'pixi.js';
-import { parseRgba, colorToHex, COLORS, TYPOGRAPHY } from './constants';
+import {
+  Graphics,
+  Text,
+  TextStyle,
+  Rectangle,
+  type ColorSource,
+} from "pixi.js";
+import { parseRgba, colorToHex, COLORS, TYPOGRAPHY } from "./constants";
 
 /**
  * Draw a rounded rectangle with fill and optional stroke.
@@ -18,12 +24,12 @@ export function drawRoundedRect(
     width: number;
     color: string | number;
     alpha?: number;
-  }
+  },
 ): void {
   g.roundRect(x, y, width, height, radius);
 
   // Fill
-  if (typeof fillColor === 'string') {
+  if (typeof fillColor === "string") {
     const { color, alpha } = parseRgba(fillColor);
     g.fill({ color, alpha: fillAlpha * alpha });
   } else {
@@ -33,7 +39,7 @@ export function drawRoundedRect(
   // Stroke if provided
   if (strokeOptions) {
     g.roundRect(x, y, width, height, radius);
-    if (typeof strokeOptions.color === 'string') {
+    if (typeof strokeOptions.color === "string") {
       const { color, alpha } = parseRgba(strokeOptions.color);
       g.stroke({
         width: strokeOptions.width,
@@ -60,10 +66,10 @@ export function drawSocket(
   radius: number,
   fillColor: string | number,
   strokeColor?: string | number,
-  strokeWidth = 2
+  strokeWidth = 2,
 ): void {
   // Fill
-  if (typeof fillColor === 'string') {
+  if (typeof fillColor === "string") {
     const { color, alpha } = parseRgba(fillColor);
     g.circle(x, y, radius);
     g.fill({ color, alpha });
@@ -75,7 +81,7 @@ export function drawSocket(
   // Stroke
   if (strokeColor) {
     g.circle(x, y, radius);
-    if (typeof strokeColor === 'string') {
+    if (typeof strokeColor === "string") {
       const { color, alpha } = parseRgba(strokeColor);
       g.stroke({ width: strokeWidth, color, alpha });
     } else {
@@ -100,7 +106,7 @@ export function drawCableBezier(
     alpha: number;
     shadowAlpha?: number;
     tension?: number;
-  }
+  },
 ): void {
   const { width, color, alpha, shadowAlpha = 0.2, tension = 0.45 } = options;
 
@@ -138,7 +144,7 @@ export function drawCableBezier(
   g.moveTo(startX, startY);
   g.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
 
-  if (typeof color === 'string') {
+  if (typeof color === "string") {
     const { color: col, alpha: a } = parseRgba(color);
     g.stroke({ width, color: col, alpha: alpha * a });
   } else {
@@ -157,12 +163,12 @@ export function drawLine(
   endY: number,
   width: number,
   color: string | number,
-  alpha = 1
+  alpha = 1,
 ): void {
   g.moveTo(startX, startY);
   g.lineTo(endX, endY);
 
-  if (typeof color === 'string') {
+  if (typeof color === "string") {
     const { color: col, alpha: a } = parseRgba(color);
     g.stroke({ width, color: col, alpha: alpha * a });
   } else {
@@ -178,20 +184,20 @@ export function createText(
   options: {
     fontSize?: number;
     color?: string | number;
-    align?: 'left' | 'center' | 'right';
+    align?: "left" | "center" | "right";
     bold?: boolean;
     maxWidth?: number;
-  } = {}
+  } = {},
 ): Text {
   const {
     fontSize = TYPOGRAPHY.titleFontSize,
     color = COLORS.textPrimary,
-    align = 'left',
+    align = "left",
     bold = false,
   } = options;
 
   let fillColor: ColorSource;
-  if (typeof color === 'string') {
+  if (typeof color === "string") {
     fillColor = colorToHex(color);
   } else {
     fillColor = color;
@@ -202,7 +208,7 @@ export function createText(
     fontSize,
     fill: fillColor,
     align,
-    fontWeight: bold ? '600' : '400',
+    fontWeight: bold ? "600" : "400",
   });
 
   const text = new Text({
@@ -211,9 +217,9 @@ export function createText(
   });
 
   // Handle alignment anchors
-  if (align === 'center') {
+  if (align === "center") {
     text.anchor.set(0.5, 0.5);
-  } else if (align === 'right') {
+  } else if (align === "right") {
     text.anchor.set(1, 0.5);
   } else {
     text.anchor.set(0, 0.5);
@@ -229,7 +235,7 @@ export function createText(
 export function measureAndTruncate(
   text: string,
   maxWidth: number,
-  style: TextStyle
+  style: TextStyle,
 ): string {
   const tempText = new Text({ text, style });
   const fullWidth = tempText.width;
@@ -246,7 +252,7 @@ export function measureAndTruncate(
 
   while (low <= high) {
     const mid = Math.floor((low + high) / 2);
-    const testStr = text.slice(0, mid) + '...';
+    const testStr = text.slice(0, mid) + "...";
     tempText.text = testStr;
 
     if (tempText.width <= maxWidth) {
@@ -258,7 +264,7 @@ export function measureAndTruncate(
   }
 
   tempText.destroy();
-  return best > 0 ? text.slice(0, best) + '...' : '...';
+  return best > 0 ? text.slice(0, best) + "..." : "...";
 }
 
 /**
@@ -272,13 +278,19 @@ export function drawSelectionOutline(
   height: number,
   radius: number,
   color: string | number = COLORS.selectionOutline,
-  glowColor: string = COLORS.selectionGlow
+  glowColor: string = COLORS.selectionGlow,
 ): void {
   // Outer glow (simulated with thicker, semi-transparent stroke)
   const padding = 4;
-  g.roundRect(x - padding, y - padding, width + padding * 2, height + padding * 2, radius + 2);
+  g.roundRect(
+    x - padding,
+    y - padding,
+    width + padding * 2,
+    height + padding * 2,
+    radius + 2,
+  );
 
-  if (typeof glowColor === 'string') {
+  if (typeof glowColor === "string") {
     const { color: glowCol, alpha } = parseRgba(glowColor);
     g.stroke({ width: 4, color: glowCol, alpha });
   } else {
@@ -288,7 +300,7 @@ export function drawSelectionOutline(
   // Main outline
   g.roundRect(x, y, width, height, radius);
 
-  if (typeof color === 'string') {
+  if (typeof color === "string") {
     const { color: col } = parseRgba(color);
     g.stroke({ width: 2, color: col, alpha: 1 });
   } else {

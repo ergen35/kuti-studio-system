@@ -45,7 +45,31 @@
     "pageAlt": "Page {{number}}",
     "approve": "Approve",
     "reject": "Reject",
-    "view": "View"
+    "view": "View",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "pagination": {
+      "summary": "Showing {{start}}-{{end}} of {{total}}",
+      "pageRange": "Pages {{start}}-{{end}} of {{total}}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "readyForExport": "Ready for export",
+    "markReadyForExport": "Mark ready for export",
+    "unmarkReadyForExport": "Remove export flag",
+    "replace": "Replace",
+    "replaceDialog": {
+      "title": "Replace page image",
+      "description": "Choose an image asset from the project to replace the current page.",
+      "current": "Current page",
+      "noCurrentImage": "No image available for this page.",
+      "loading": "Loading image assets...",
+      "selectAsset": "Select an image asset",
+      "selectAssetPlaceholder": "Choose a project image",
+      "preview": "Replacement preview",
+      "empty": "No image asset is available in the project.",
+      "confirm": "Replace"
+    }
   },
   "drama": {
     "title": "Korean drama video",

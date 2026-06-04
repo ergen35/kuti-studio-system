@@ -1,19 +1,115 @@
 {
   "title": "Warnings Center",
-  "description": "Run backend coherence checks and manage non-blocking continuity warnings.",
+  "description": "Run backend coherence scans and keep continuity warnings under control.",
   "actions": {
     "scan": "Scan",
-    "resolve": "Resolve"
+    "scanning": "Scanning...",
+    "resolve": "Resolve",
+    "ignore": "Ignore",
+    "openContext": "Open context"
   },
-  "table": {
-    "warning": "Warning",
-    "kind": "Kind",
-    "severity": "Severity",
+  "filters": {
+    "search": "Search",
+    "searchPlaceholder": "Title, message, entity, slug...",
     "status": "Status",
-    "entity": "Entity"
+    "severity": "Severity",
+    "kind": "Kind",
+    "entityKind": "Entity",
+    "origin": "Origin",
+    "all": "All",
+    "reset": "Reset"
+  },
+  "summary": {
+    "title": "Summary",
+    "meta": "{{count}} warning(s) loaded",
+    "open": "{{count}} open",
+    "matched": "{{count}} visible",
+    "critical": "{{count}} critical",
+    "ignored": "{{count}} ignored",
+    "resolved": "{{count}} resolved",
+    "openLabel": "Open warnings",
+    "criticalLabel": "Critical warnings"
+  },
+  "entity": {
+    "title": "Target entity"
+  },
+  "severity": {
+    "critical": "Critical",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "status": {
+    "open": "Open",
+    "ignored": "Ignored",
+    "resolved": "Resolved"
+  },
+  "kinds": {
+    "orphanCharacter": "Orphan character",
+    "brokenReference": "Broken reference",
+    "emptyScene": "Empty scene",
+    "locationConflict": "Location conflict",
+    "timelineConflict": "Timeline conflict",
+    "continuityBreak": "Continuity break",
+    "toneBreak": "Tone break",
+    "impossibleFact": "Impossible fact"
+  },
+  "entityKinds": {
+    "scene": "Scene",
+    "character": "Character",
+    "chapter": "Chapter",
+    "tome": "Tome",
+    "asset": "Asset"
+  },
+  "origin": {
+    "project": "Project",
+    "scene": "Scene",
+    "reference": "Reference",
+    "story": "Story"
+  },
+  "metadata": {
+    "scene": "Scene",
+    "sceneSlug": "Scene slug",
+    "chapter": "Chapter",
+    "location": "Location",
+    "target": "Target",
+    "token": "Token",
+    "allowed": "Allowed locations",
+    "source": "Source",
+    "timeline": "Timeline",
+    "anchor": "Anchor",
+    "expectedOrder": "Expected order",
+    "actualOrder": "Actual order",
+    "continuityKey": "Continuity key",
+    "continuityValue": "Continuity value",
+    "canonicalValue": "Canonical value",
+    "scope": "Scope",
+    "toneTags": "Tone tags",
+    "requiredToneTags": "Required tone tags",
+    "missingToneTags": "Missing tone tags",
+    "forbiddenToneTags": "Forbidden tone tags",
+    "forbiddenHits": "Forbidden hits",
+    "factKey": "Fact key",
+    "factValue": "Fact value",
+    "prohibitedValues": "Prohibited values"
+  },
+  "scan": {
+    "lastRun": {
+      "title": "Last scan",
+      "added": "{{count}} added",
+      "description": "{{scanned}} item(s) scanned, {{resolved}} warning(s) resolved."
+    }
+  },
+  "context": {
+    "title": "How to read this view",
+    "description": "Each card shows the backend message, the target entity, and the actions available.",
+    "hint": "Warnings are advisory. They help you correct inconsistencies without blocking writing."
   },
   "empty": {
     "title": "No warnings",
-    "description": "The backend has no active warning records for this project."
+    "description": "The backend has no active warning records for this project.",
+    "filtered": {
+      "title": "No results",
+      "description": "No warning matches the current filters."
+    }
   }
 }

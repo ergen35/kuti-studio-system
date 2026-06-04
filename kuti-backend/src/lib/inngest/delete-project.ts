@@ -5,6 +5,7 @@
 import { rm } from "node:fs/promises";
 import { inngest } from "./client";
 import { prisma } from "@lib/db";
+import { getProjectPublicDir } from "@lib/paths";
 
 // ============================================================================
 // Type des événements
@@ -59,6 +60,7 @@ export const deleteProjectFunction = inngest.createFunction(
     await step.run("delete-files", async () => {
       try {
         await rm(project.rootPath, { recursive: true, force: true });
+        await rm(getProjectPublicDir(project.id), { recursive: true, force: true });
       } catch (error) {
         // Si le dossier n'existe pas, c'est OK (déjà supprimé ou jamais créé)
         if ((error as NodeJS.ErrnoException).code !== "ENOENT") {

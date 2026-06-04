@@ -1,8 +1,25 @@
-import { Container, Graphics, Text, TextStyle, Rectangle } from 'pixi.js';
-import { COLORS, NODE_DIMENSIONS, SPACING, SELECTION, TYPOGRAPHY, LAYERS } from './constants';
-import { getCardBounds, getPortPositions, getNodeTypeLabel } from './node-metrics';
-import { drawRoundedRect, drawSocket, createText, measureAndTruncate, drawSelectionOutline } from './pixi-utils';
-import type { NodeType } from '~/lib/orchestra/types';
+import { Container, Graphics, Text, TextStyle, Rectangle } from "pixi.js";
+import {
+  COLORS,
+  NODE_DIMENSIONS,
+  SPACING,
+  SELECTION,
+  TYPOGRAPHY,
+  LAYERS,
+} from "./constants";
+import {
+  getCardBounds,
+  getPortPositions,
+  getNodeTypeLabel,
+} from "./node-metrics";
+import {
+  drawRoundedRect,
+  drawSocket,
+  createText,
+  measureAndTruncate,
+  drawSelectionOutline,
+} from "./pixi-utils";
+import type { NodeType } from "~/lib/orchestra/types";
 
 /**
  * NarrativeNode2D represents a single narrative element (tome, chapter, scene)
@@ -17,7 +34,7 @@ export class NarrativeNode2D {
   private badgeText?: Text;
 
   private nodeId: string;
-  private nodeType: 'tome' | 'chapter' | 'scene';
+  private nodeType: "tome" | "chapter" | "scene";
   private isSelected: boolean = false;
   private isHovered: boolean = false;
   private isActive: boolean = false;
@@ -28,11 +45,11 @@ export class NarrativeNode2D {
 
   constructor(
     id: string,
-    type: 'tome' | 'chapter' | 'scene',
+    type: "tome" | "chapter" | "scene",
     title: string,
     orderIndex: number,
     subtitle?: string,
-    isActive: boolean = false
+    isActive: boolean = false,
   ) {
     this.nodeId = id;
     this.nodeType = type;
@@ -56,7 +73,7 @@ export class NarrativeNode2D {
     this.headerText = createText(`${typeLabel} ${orderIndex + 1}`, {
       fontSize: TYPOGRAPHY.headerFontSize,
       color: COLORS.textHeader,
-      align: 'left',
+      align: "left",
       bold: true,
     });
     this.headerText.x = bounds.x + 10;
@@ -68,7 +85,7 @@ export class NarrativeNode2D {
       fontFamily: TYPOGRAPHY.fontFamily,
       fontSize: TYPOGRAPHY.titleFontSize,
       fill: COLORS.textPrimary,
-      fontWeight: '500',
+      fontWeight: "500",
     });
     const maxTitleWidth = dims.width - 20;
     const truncatedTitle = measureAndTruncate(title, maxTitleWidth, titleStyle);
@@ -76,10 +93,11 @@ export class NarrativeNode2D {
     this.titleText = createText(truncatedTitle, {
       fontSize: TYPOGRAPHY.titleFontSize,
       color: COLORS.textPrimary,
-      align: 'left',
+      align: "left",
     });
     this.titleText.x = bounds.x + 10;
-    this.titleText.y = bounds.y + dims.headerHeight + (dims.height - dims.headerHeight) / 2 - 4;
+    this.titleText.y =
+      bounds.y + dims.headerHeight + (dims.height - dims.headerHeight) / 2 - 4;
     this.container.addChild(this.titleText);
 
     // Subtitle (optional metadata)
@@ -89,27 +107,33 @@ export class NarrativeNode2D {
         fontSize: TYPOGRAPHY.subtitleFontSize,
         fill: COLORS.textSecondary,
       });
-      const truncatedSubtitle = measureAndTruncate(subtitle, maxTitleWidth, subtitleStyle);
+      const truncatedSubtitle = measureAndTruncate(
+        subtitle,
+        maxTitleWidth,
+        subtitleStyle,
+      );
 
       this.subtitleText = createText(truncatedSubtitle, {
         fontSize: TYPOGRAPHY.subtitleFontSize,
         color: COLORS.textSecondary,
-        align: 'left',
+        align: "left",
       });
       this.subtitleText.x = bounds.x + 10;
       this.subtitleText.y = bounds.y + dims.height - 14;
       this.container.addChild(this.subtitleText);
     } else {
       // Placeholder for alignment
-      this.subtitleText = createText('', { fontSize: TYPOGRAPHY.subtitleFontSize });
+      this.subtitleText = createText("", {
+        fontSize: TYPOGRAPHY.subtitleFontSize,
+      });
     }
 
     // Active badge for scenes
-    if (type === 'scene' && isActive) {
-      this.badgeText = createText('ACTIF', {
+    if (type === "scene" && isActive) {
+      this.badgeText = createText("ACTIF", {
         fontSize: TYPOGRAPHY.badgeFontSize,
         color: COLORS.textHeader,
-        align: 'center',
+        align: "center",
         bold: true,
       });
       this.badgeText.x = bounds.x + dims.width - 24;
@@ -180,7 +204,7 @@ export class NarrativeNode2D {
   /**
    * Get the type of this node.
    */
-  getType(): 'tome' | 'chapter' | 'scene' {
+  getType(): "tome" | "chapter" | "scene" {
     return this.nodeType;
   }
 
@@ -201,7 +225,7 @@ export class NarrativeNode2D {
    * Get socket positions for connection drawing.
    * @param connectionType - For scenes, determines which input socket to use
    */
-  getSocketPositions(connectionType?: 'chapter-scene' | 'scene-scene'): {
+  getSocketPositions(connectionType?: "chapter-scene" | "scene-scene"): {
     input?: { x: number; y: number };
     output?: { x: number; y: number };
   } {
@@ -221,10 +245,18 @@ export class NarrativeNode2D {
     // Determine colors based on state
     const headerColor = this.getHeaderColor();
     const bodyColor = this.isHovered ? COLORS.nodeBodyHover : COLORS.nodeBody;
-    const borderColor = this.isHovered ? COLORS.nodeBorderHover : COLORS.nodeBorder;
+    const borderColor = this.isHovered
+      ? COLORS.nodeBorderHover
+      : COLORS.nodeBorder;
 
     // Draw shadow
-    this.graphics.roundRect(bounds.x + 2, bounds.y + 2, bounds.width, bounds.height, dims.radius);
+    this.graphics.roundRect(
+      bounds.x + 2,
+      bounds.y + 2,
+      bounds.width,
+      bounds.height,
+      dims.radius,
+    );
     this.graphics.fill({ color: 0x000000, alpha: 0.3 });
 
     // Draw body (background)
@@ -237,7 +269,7 @@ export class NarrativeNode2D {
       dims.radius,
       bodyColor,
       1,
-      { width: 1, color: borderColor, alpha: 0.8 }
+      { width: 1, color: borderColor, alpha: 0.8 },
     );
 
     // Draw header
@@ -250,11 +282,16 @@ export class NarrativeNode2D {
       headerHeight,
       dims.radius,
       headerColor,
-      1
+      1,
     );
 
     // Fill the rest of the header area (for rounded corners continuity)
-    this.graphics.rect(bounds.x, bounds.y + dims.radius, bounds.width, headerHeight - dims.radius);
+    this.graphics.rect(
+      bounds.x,
+      bounds.y + dims.radius,
+      bounds.width,
+      headerHeight - dims.radius,
+    );
     this.graphics.fill({ color: headerColor });
 
     // Draw sockets
@@ -270,7 +307,7 @@ export class NarrativeNode2D {
         socketRadius,
         COLORS.nodeBody,
         COLORS.socketBorder,
-        SPACING.socketBorderWidth
+        SPACING.socketBorderWidth,
       );
     }
 
@@ -283,7 +320,7 @@ export class NarrativeNode2D {
         socketRadius,
         COLORS.nodeBody,
         COLORS.socketBorder,
-        SPACING.socketBorderWidth
+        SPACING.socketBorderWidth,
       );
     }
 
@@ -295,7 +332,7 @@ export class NarrativeNode2D {
         bounds.y,
         bounds.width,
         bounds.height,
-        dims.radius
+        dims.radius,
       );
     }
 
@@ -311,15 +348,15 @@ export class NarrativeNode2D {
    * Get the appropriate header color based on node type and state.
    */
   private getHeaderColor(): string {
-    if (this.nodeType === 'scene' && this.isActive) {
+    if (this.nodeType === "scene" && this.isActive) {
       return COLORS.headerActiveScene;
     }
     switch (this.nodeType) {
-      case 'tome':
+      case "tome":
         return COLORS.headerTome;
-      case 'chapter':
+      case "chapter":
         return COLORS.headerChapter;
-      case 'scene':
+      case "scene":
         return COLORS.headerScene;
       default:
         return COLORS.headerScene;
@@ -330,45 +367,45 @@ export class NarrativeNode2D {
    * Set up interactive events.
    */
   private setupInteractivity(): void {
-    this.container.eventMode = 'static';
-    this.container.cursor = 'pointer';
+    this.container.eventMode = "static";
+    this.container.cursor = "pointer";
 
     // Handle interactions on the graphics
-    this.graphics.eventMode = 'static';
-    this.graphics.cursor = 'pointer';
+    this.graphics.eventMode = "static";
+    this.graphics.cursor = "pointer";
 
     const hitArea = this.container.getBounds();
     this.container.hitArea = new Rectangle(
       hitArea.x - this.container.x,
       hitArea.y - this.container.y,
       hitArea.width,
-      hitArea.height
+      hitArea.height,
     );
 
-    this.graphics.on('pointerenter', () => {
+    this.graphics.on("pointerenter", () => {
       this.setHovered(true);
     });
 
-    this.graphics.on('pointerleave', () => {
+    this.graphics.on("pointerleave", () => {
       this.setHovered(false);
     });
 
-    this.graphics.on('pointerdown', () => {
+    this.graphics.on("pointerdown", () => {
       if (this.onClick) {
         this.onClick();
       }
     });
 
     // Propagate to container
-    this.container.on('pointerenter', () => {
+    this.container.on("pointerenter", () => {
       this.setHovered(true);
     });
 
-    this.container.on('pointerleave', () => {
+    this.container.on("pointerleave", () => {
       this.setHovered(false);
     });
 
-    this.container.on('pointerdown', () => {
+    this.container.on("pointerdown", () => {
       if (this.onClick) {
         this.onClick();
       }

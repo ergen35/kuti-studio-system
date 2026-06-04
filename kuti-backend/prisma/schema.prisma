@@ -311,6 +311,7 @@ model Scene {
   notes         String      @default("")
   charactersJson Json       @default("[]") @map("characters_json")
   tagsJson      Json        @default("[]") @map("tags_json")
+  metadataJson  Json        @default("{}") @map("metadata_json")
   status        StoryStatus @default(draft)
   orderIndex    Int         @default(0) @map("order_index")
   createdAt     DateTime    @default(now()) @map("created_at")
@@ -638,6 +639,7 @@ model SceneMangaPage {
   imageUrl    String?         @map("image_url")
   caption     String?
   prompt      String?
+  metadataJson Json           @default("{}") @map("metadata_json")
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @updatedAt @map("updated_at")
 
@@ -711,6 +713,7 @@ model Version {
   versionIndex  Int       @map("version_index")
   label         String
   summary       String    @default("")
+  snapshotJson  Json?     @map("snapshot_json")
   createdAt     DateTime  @default(now()) @map("created_at")
 
   // Relations
@@ -776,6 +779,10 @@ enum ExportFormat {
   json
   tree
   zip
+  paged_images
+  pdf
+  cbz
+  epub
 
   @@map("export_format")
 }

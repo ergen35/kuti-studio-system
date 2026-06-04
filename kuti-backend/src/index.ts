@@ -6,11 +6,12 @@
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { config } from "@lib/config";
-import { orphanCheckerCron } from "@lib/cron";
+import { isTrustedOrigin } from "@lib/cors";
+import { cleanupCron, orphanCheckerCron } from "@lib/cron";
 import { assetsModule } from "@modules/assets";
 // Modules métier
 // Modules
-import { staticPlugin } from '@elysia/static';
+import { staticPlugin } from "@elysia/static";
 import { authModule } from "@modules/authentication";
 import { charactersModule } from "@modules/characters";
 import { dramaVideosModule } from "@modules/drama-videos";
@@ -26,7 +27,7 @@ import { warningsModule } from "@modules/warnings";
 import { randomUUIDv7 } from "bun";
 import { Elysia } from "elysia";
 import { wideEvent } from "elysia-wide-event";
-import { toJSONSchema } from 'zod';
+import { toJSONSchema } from "zod";
 
 export const app = new Elysia({
   aot: true,
@@ -36,7 +37,7 @@ export const app = new Elysia({
   // CORS
   .use(
     cors({
-      origin: config.trustedOrigins,
+      origin: (request) => isTrustedOrigin(request.headers.get("Origin")),
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization", "X-Client-Key"],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -44,13 +45,13 @@ export const app = new Elysia({
   )
   .use(inngestModule)
 
-    // Logging global
-    .use(
-      wideEvent({
-        generateRequestId: () => `req-${randomUUIDv7()}`,
-        start: { version: config.appVersion },
-      }),
-    )
+  // Logging global
+  .use(
+    wideEvent({
+      generateRequestId: () => `req-${randomUUIDv7()}`,
+      start: { version: config.appVersion },
+    }),
+  )
   // API Documentation
   .use(
     openapi({
@@ -72,13 +73,16 @@ export const app = new Elysia({
   })
 
   // Static plugins
-  .use(staticPlugin({
-    assets: './public',
-    prefix: '/',
-  }))
+  .use(
+    staticPlugin({
+      assets: "./public",
+      prefix: "/",
+    }),
+  )
 
   // Cron jobs
   .use(orphanCheckerCron)
+  .use(cleanupCron)
 
   // Modules
   .use(authModule)

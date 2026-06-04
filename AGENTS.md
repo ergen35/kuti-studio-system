@@ -234,7 +234,6 @@ bun run start # Démarrer en production
 bun run db:generate # Générer le client Prisma
 bun run db:migrate # Appliquer les migrations
 bun run db:studio # Ouvrir Prisma Studio
-bun run db:seed # Seeder la base
 
 # Validation
 

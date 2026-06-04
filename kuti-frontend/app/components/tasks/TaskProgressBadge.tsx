@@ -36,7 +36,7 @@ export function TaskProgressBadge({
             "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium",
             statusClasses,
             isRunning && "animate-pulse",
-            size === "sm" && "text-[10px] px-2 py-0.5"
+            size === "sm" && "text-[10px] px-2 py-0.5",
           )}
         >
           {isRunning && (
@@ -59,7 +59,7 @@ export function TaskProgressBadge({
             <div
               className={clsx(
                 "h-full rounded-full transition-all duration-300",
-                progressBarClass[status]
+                progressBarClass[status],
               )}
               style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
             />
@@ -88,12 +88,10 @@ export function TaskProgressBadgeMini({
         className={clsx(
           "inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-medium",
           statusClasses,
-          isRunning && "animate-pulse"
+          isRunning && "animate-pulse",
         )}
       >
-        {isRunning && (
-          <span className="h-1 w-1 rounded-full bg-current" />
-        )}
+        {isRunning && <span className="h-1 w-1 rounded-full bg-current" />}
         {getStatusLabel(status)}
       </span>
 

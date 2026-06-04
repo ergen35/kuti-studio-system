@@ -14,5 +14,8 @@ export function cn(...inputs: ClassValue[]) {
  * Parse a comma-separated string into an array of trimmed, non-empty values
  */
 export function csv(value: string): string[] {
-  return value.split(",").map((item) => item.trim()).filter(Boolean);
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }

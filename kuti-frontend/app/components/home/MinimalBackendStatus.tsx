@@ -24,12 +24,12 @@ export function MinimalBackendStatus({
   onRefresh,
   isRefreshing,
 }: MinimalBackendStatusProps) {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const [showDetails, setShowDetails] = useState(false);
 
   const statusConfig = {
     ok: { color: "bg-success", text: "OK", pulse: false },
-    error: { color: "bg-danger", text: t('states.error'), pulse: false },
+    error: { color: "bg-danger", text: t("states.error"), pulse: false },
     loading: { color: "bg-warning", text: "...", pulse: true },
     unknown: { color: "bg-muted", text: "?", pulse: false },
   };
@@ -46,16 +46,38 @@ export function MinimalBackendStatus({
           className="rounded-full bg-surface/95"
         >
           <span className={config.pulse ? "relative flex h-2 w-2" : ""}>
-            <span className={config.pulse ? `animate-ping absolute inline-flex h-full w-full rounded-full ${config.color} opacity-75` : ""} />
-            <span className={`relative inline-flex rounded-full h-2 w-2 ${config.color}`} />
+            <span
+              className={
+                config.pulse
+                  ? `animate-ping absolute inline-flex h-full w-full rounded-full ${config.color} opacity-75`
+                  : ""
+              }
+            />
+            <span
+              className={`relative inline-flex rounded-full h-2 w-2 ${config.color}`}
+            />
           </span>
-          <span className="text-xs font-medium text-muted">{t('backend.title')}</span>
-          <span className="text-[10px] text-muted/60 hidden sm:inline">{config.text}</span>
+          <span className="text-xs font-medium text-muted">
+            {t("backend.title")}
+          </span>
+          <span className="text-[10px] text-muted/60 hidden sm:inline">
+            {config.text}
+          </span>
         </Button>
-        
+
         {onRefresh && (
-          <Button variant="ghost" className="p-1.5 h-auto" onClick={onRefresh} disabled={isRefreshing}>
-            <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
+          <Button
+            variant="ghost"
+            className="p-1.5 h-auto"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            aria-label={t("refresh")}
+            title={t("refresh")}
+          >
+            <RefreshCw
+              size={14}
+              className={isRefreshing ? "animate-spin" : ""}
+            />
           </Button>
         )}
       </div>

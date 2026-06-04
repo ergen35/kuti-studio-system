@@ -1,15 +1,12 @@
-import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
-import { Application, extend, useApplication } from '@pixi/react';
-import {
-  Container as PixiContainer,
-  Graphics as PixiGraphics,
-} from 'pixi.js';
-import { Viewport as PixiViewportBase } from 'pixi-viewport';
-import type { Tome, Chapter, Scene, NodePosition } from '~/lib/orchestra/types';
-import { calculateConnections } from '~/lib/orchestra/layout-engine';
-import { useOrchestraStore } from '~/stores/orchestra';
-import { NarrativeNode2D } from './NarrativeNode2D';
-import { drawAllCables } from './ConnectionCable';
+import { useMemo, useRef, useEffect, useState, useCallback } from "react";
+import { Application, extend, useApplication } from "@pixi/react";
+import { Container as PixiContainer, Graphics as PixiGraphics } from "pixi.js";
+import { Viewport as PixiViewportBase } from "pixi-viewport";
+import type { Tome, Chapter, Scene, NodePosition } from "~/lib/orchestra/types";
+import { calculateConnections } from "~/lib/orchestra/layout-engine";
+import { useOrchestraStore } from "~/stores/orchestra";
+import { NarrativeNode2D } from "./NarrativeNode2D";
+import { drawAllCables } from "./ConnectionCable";
 
 // Extend Pixi components for React usage
 extend({
@@ -28,7 +25,7 @@ interface PixiCanvasProps {
   selectedSceneId: string | null;
   width: number;
   height: number;
-  onSelectNode: (type: 'tome' | 'chapter' | 'scene', id: string) => void;
+  onSelectNode: (type: "tome" | "chapter" | "scene", id: string) => void;
 }
 
 export function PixiCanvas(props: PixiCanvasProps) {
@@ -41,7 +38,9 @@ export function PixiCanvas(props: PixiCanvasProps) {
       height={height}
       background="#0f172a"
       antialias={true}
-      resolution={typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1}
+      resolution={
+        typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1
+      }
       autoDensity={true}
     >
       <PixiCanvasInner {...props} />
@@ -74,7 +73,7 @@ function PixiCanvasInner({
   // Calculate connections
   const connections = useMemo(
     () => calculateConnections(tomes, chapters, scenes, positions),
-    [tomes, chapters, scenes, positions]
+    [tomes, chapters, scenes, positions],
   );
 
   // Determine world bounds for viewport
@@ -102,10 +101,12 @@ function PixiCanvasInner({
 
   // Setup viewport
   useEffect(() => {
-    if (!app || !('renderer' in app)) return;
+    if (!app || !("renderer" in app)) return;
 
     const timeoutId = setTimeout(() => {
-      const appWithRenderer = app as typeof app & { renderer?: { events: unknown } };
+      const appWithRenderer = app as typeof app & {
+        renderer?: { events: unknown };
+      };
       if (!appWithRenderer.renderer?.events) return;
 
       const viewport = new PixiViewportBase({
@@ -116,21 +117,16 @@ function PixiCanvasInner({
         events: appWithRenderer.renderer.events,
       });
 
-      viewport
-        .drag()
-        .pinch()
-        .wheel()
-        .decelerate()
-        .clampZoom({
-          minScale: 0.2,
-          maxScale: 3,
-        });
+      viewport.drag().pinch().wheel().decelerate().clampZoom({
+        minScale: 0.2,
+        maxScale: 3,
+      });
 
       viewport.x = viewportState.x;
       viewport.y = viewportState.y;
       viewport.scale.set(viewportState.zoom);
 
-      viewport.on('moved', () => {
+      viewport.on("moved", () => {
         setViewport({
           x: viewport.x,
           y: viewport.y,
@@ -153,31 +149,33 @@ function PixiCanvasInner({
     return () => {
       clearTimeout(timeoutId);
       setIsReady(false);
-      
+
       // Cleanup
       nodesRef.current.forEach((node) => node.destroy());
       nodesRef.current.clear();
-      
+
       if (cablesGraphicsRef.current) {
         cablesGraphicsRef.current.destroy();
         cablesGraphicsRef.current = null;
       }
-      
+
       const viewport = viewportRef.current;
       if (viewport) {
         viewport.destroy();
         viewportRef.current = null;
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app, worldBounds.width, worldBounds.height, width, height]);
 
   // Sync external changes from props (resize)
   useEffect(() => {
-    if (!app || !('renderer' in app)) return;
-    
+    if (!app || !("renderer" in app)) return;
+
     // Resize the renderer when width/height props change
-    const appWithRenderer = app as typeof app & { renderer?: { resize: (w: number, h: number) => void } };
+    const appWithRenderer = app as typeof app & {
+      renderer?: { resize: (w: number, h: number) => void };
+    };
     if (appWithRenderer.renderer?.resize) {
       appWithRenderer.renderer.resize(width, height);
     }
@@ -240,31 +238,31 @@ function PixiCanvasInner({
     // Build all items to render
     const allItems: Array<{
       id: string;
-      type: 'tome' | 'chapter' | 'scene';
+      type: "tome" | "chapter" | "scene";
       title: string;
       orderIndex: number;
       subtitle: string;
     }> = [
       ...tomes.map((t, index) => ({
         id: t.id,
-        type: 'tome' as const,
+        type: "tome" as const,
         title: t.title,
         orderIndex: index,
         subtitle: `Tome ${index + 1}`,
       })),
       ...chapters.map((c, index) => ({
         id: c.id,
-        type: 'chapter' as const,
+        type: "chapter" as const,
         title: c.title,
         orderIndex: index,
         subtitle: `Chapitre ${index + 1}`,
       })),
       ...scenes.map((s, index) => ({
         id: s.id,
-        type: 'scene' as const,
+        type: "scene" as const,
         title: s.title,
         orderIndex: index,
-        subtitle: '',
+        subtitle: "",
       })),
     ];
 
@@ -279,11 +277,11 @@ function PixiCanvasInner({
       currentIds.add(item.id);
 
       const isSelected =
-        (item.type === 'tome' && selectedTomeId === item.id) ||
-        (item.type === 'chapter' && selectedChapterId === item.id) ||
-        (item.type === 'scene' && selectedSceneId === item.id);
-      
-      const isActive = item.type === 'scene' && currentSceneId === item.id;
+        (item.type === "tome" && selectedTomeId === item.id) ||
+        (item.type === "chapter" && selectedChapterId === item.id) ||
+        (item.type === "scene" && selectedSceneId === item.id);
+
+      const isActive = item.type === "scene" && currentSceneId === item.id;
 
       let node = nodeMap.get(item.id);
 
@@ -295,7 +293,7 @@ function PixiCanvasInner({
           item.title,
           item.orderIndex,
           item.subtitle,
-          isActive
+          isActive,
         );
 
         node.setPosition(pos.x, pos.y);

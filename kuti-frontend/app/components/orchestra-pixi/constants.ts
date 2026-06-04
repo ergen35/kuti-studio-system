@@ -9,45 +9,45 @@
 
 export const COLORS = {
   // Canvas
-  canvasBase: '#1b1d20',
-  canvasVignette: '#111214',
+  canvasBase: "#1b1d20",
+  canvasVignette: "#111214",
 
   // Grid
-  gridMinor: 'rgba(42, 45, 49, 0.5)',
-  gridMajor: 'rgba(58, 62, 69, 0.7)',
+  gridMinor: "rgba(42, 45, 49, 0.5)",
+  gridMajor: "rgba(58, 62, 69, 0.7)",
 
   // Node body
-  nodeBody: '#2b2f35',
-  nodeBodyHover: '#343941',
-  nodeBorder: '#4a4f57',
-  nodeBorderHover: '#5a6069',
-  nodeShadow: 'rgba(0, 0, 0, 0.4)',
+  nodeBody: "#2b2f35",
+  nodeBodyHover: "#343941",
+  nodeBorder: "#4a4f57",
+  nodeBorderHover: "#5a6069",
+  nodeShadow: "rgba(0, 0, 0, 0.4)",
 
   // Node headers by type
-  headerTome: '#3f6ea8',
-  headerChapter: '#4f7d5f',
-  headerScene: '#5f6f82',
-  headerActiveScene: '#b9782d',
+  headerTome: "#3f6ea8",
+  headerChapter: "#4f7d5f",
+  headerScene: "#5f6f82",
+  headerActiveScene: "#b9782d",
 
   // Text
-  textPrimary: '#e6e8eb',
-  textSecondary: '#9aa1aa',
-  textMuted: '#6b7280',
-  textHeader: '#ffffff',
+  textPrimary: "#e6e8eb",
+  textSecondary: "#9aa1aa",
+  textMuted: "#6b7280",
+  textHeader: "#ffffff",
 
   // Sockets
-  socketNeutral: '#b5bbc5',
-  socketBorder: '#4a4f57',
+  socketNeutral: "#b5bbc5",
+  socketBorder: "#4a4f57",
 
   // Selection and active states
-  selectionOutline: '#f6a63a',
-  selectionGlow: 'rgba(246, 166, 58, 0.3)',
-  activeBadge: '#f59e0b',
+  selectionOutline: "#f6a63a",
+  selectionGlow: "rgba(246, 166, 58, 0.3)",
+  activeBadge: "#f59e0b",
 
   // Connections
-  connectionTomeChapter: '#9aa1aa',
-  connectionChapterScene: '#c9d1d9',
-  connectionSceneScene: '#8f98a3',
+  connectionTomeChapter: "#9aa1aa",
+  connectionChapterScene: "#c9d1d9",
+  connectionSceneScene: "#8f98a3",
 } as const;
 
 // ============================================
@@ -61,7 +61,10 @@ export interface NodeDimensions {
   radius: number;
 }
 
-export const NODE_DIMENSIONS: Record<'tome' | 'chapter' | 'scene', NodeDimensions> = {
+export const NODE_DIMENSIONS: Record<
+  "tome" | "chapter" | "scene",
+  NodeDimensions
+> = {
   tome: {
     width: 190,
     height: 88,
@@ -110,20 +113,23 @@ export interface ConnectionStyle {
   shadowAlpha: number;
 }
 
-export const CONNECTION_STYLES: Record<'tome-chapter' | 'chapter-scene' | 'scene-scene', ConnectionStyle> = {
-  'tome-chapter': {
+export const CONNECTION_STYLES: Record<
+  "tome-chapter" | "chapter-scene" | "scene-scene",
+  ConnectionStyle
+> = {
+  "tome-chapter": {
     width: 2,
     alpha: 0.55,
     color: COLORS.connectionTomeChapter,
     shadowAlpha: 0.2,
   },
-  'chapter-scene': {
+  "chapter-scene": {
     width: 3,
     alpha: 0.7,
     color: COLORS.connectionChapterScene,
     shadowAlpha: 0.25,
   },
-  'scene-scene': {
+  "scene-scene": {
     width: 2,
     alpha: 0.55,
     color: COLORS.connectionSceneScene,
@@ -175,7 +181,7 @@ export const SELECTION = {
 // ============================================
 
 export const TYPOGRAPHY = {
-  fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+  fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   headerFontSize: 13,
   titleFontSize: 12,
   subtitleFontSize: 11,
@@ -191,16 +197,16 @@ export const TYPOGRAPHY = {
  */
 export function colorToHex(color: string): number {
   // Handle rgba format
-  if (color.startsWith('rgba')) {
+  if (color.startsWith("rgba")) {
     // Extract hex portion or default to white
     return 0xffffff;
   }
-  // Handle rgb format  
-  if (color.startsWith('rgb')) {
+  // Handle rgb format
+  if (color.startsWith("rgb")) {
     return 0xffffff;
   }
   // Handle hex format
-  return parseInt(color.replace('#', ''), 16);
+  return parseInt(color.replace("#", ""), 16);
 }
 
 /**
@@ -208,7 +214,9 @@ export function colorToHex(color: string): number {
  * Returns { color: number, alpha: number }
  */
 export function parseRgba(rgba: string): { color: number; alpha: number } {
-  const match = rgba.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)/);
+  const match = rgba.match(
+    /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)/,
+  );
   if (match) {
     const r = parseInt(match[1], 10);
     const g = parseInt(match[2], 10);
@@ -217,8 +225,8 @@ export function parseRgba(rgba: string): { color: number; alpha: number } {
     return { color: (r << 16) | (g << 8) | b, alpha: a };
   }
   // Fallback for hex
-  if (rgba.startsWith('#')) {
-    return { color: parseInt(rgba.replace('#', ''), 16), alpha: 1 };
+  if (rgba.startsWith("#")) {
+    return { color: parseInt(rgba.replace("#", ""), 16), alpha: 1 };
   }
   return { color: 0xffffff, alpha: 1 };
 }

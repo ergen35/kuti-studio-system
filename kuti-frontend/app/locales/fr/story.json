@@ -18,17 +18,44 @@
     "sceneEditor": {
       "title": "Éditeur de scène"
     },
+    "context": {
+      "title": "Contexte de scène",
+      "description": "Repères, personnages, assets liés et warnings sur cette scène.",
+      "scene": "Scène",
+      "inChapter": "{{tome}} · {{chapter}}",
+      "location": "Lieu",
+      "locationLinked": "Dans le registre",
+      "locationUnlinked": "Hors registre",
+      "locationHint": "Ce lieu est disponible dans les settings du projet.",
+      "locationHintFallback": "Ajoutez ce lieu dans les settings pour le retrouver et le filtrer.",
+      "characters": "Personnages",
+      "assets": "Assets liés",
+      "warnings": "Warnings",
+      "emptyAssets": "Aucun asset lié à cette scène.",
+      "emptyWarnings": "Aucun warning sur cette scène.",
+      "openWarnings": "{{count}} warning",
+      "openWarnings_plural": "{{count}} warnings",
+      "openWarningsCta": "Voir les warnings",
+      "openTome": "Voir le tome",
+      "openChapter": "Voir le chapitre",
+      "openSettings": "Ouvrir les settings"
+    },
     "references": {
       "title": "Références et cohérence",
-      "count": "{{count}} référence orpheline",
-      "count_plural": "{{count}} références orphelines",
+      "count": "{{count}} référence",
+      "count_plural": "{{count}} références",
       "empty": {
-        "title": "Aucune référence orpheline",
-        "description": "Les références indexées depuis le contenu des scènes sont résolvables."
-      }
+        "title": "Aucune référence dans la scène",
+        "description": "Ajoutez des références typées dans le contenu, le résumé ou les notes pour les indexer."
+      },
+      "resolved": "Résolue",
+      "orphan": "Orpheline",
+      "open": "Ouvrir",
+      "fix": "Corriger"
     },
     "metadata": {
-      "title": "Métadonnées"
+      "title": "Métadonnées",
+      "description": "Intention narrative, rythme, ton et notes de mise en scène associés à cette scène."
     }
   },
   "tree": {
@@ -42,6 +69,44 @@
   },
   "orchestra": {
     "resetView": "Réinitialiser la vue"
+  },
+  "reorder": {
+    "up": "Monter {{item}}",
+    "down": "Descendre {{item}}"
+  },
+  "search": {
+    "title": "Recherche storyline",
+    "meta": "{{count}} résultat",
+    "meta_plural": "{{count}} résultats",
+    "metaEmpty": "Recherche plein texte",
+    "openFirst": "Ouvrir le premier résultat",
+    "placeholder": "Rechercher un tome, chapitre, scène, résumé, contenu, notes ou tags",
+    "inputLabel": "Rechercher dans l'histoire",
+    "clear": "Effacer",
+    "open": "Ouvrir",
+    "helper": {
+      "title": "Recherchez dans tout le projet",
+      "description": "La recherche parcourt les titres, résumés, contenus, notes et tags des tomes, chapitres et scènes."
+    },
+    "empty": {
+      "title": "Aucun résultat",
+      "description": "Essayez un autre mot-clé ou un terme plus spécifique."
+    },
+    "kinds": {
+      "tome": "Tome",
+      "chapter": "Chapitre",
+      "scene": "Scène"
+    },
+    "fields": {
+      "title": "Titre",
+      "synopsis": "Synopsis",
+      "summary": "Résumé",
+      "content": "Contenu",
+      "notes": "Notes",
+      "tags": "Tags",
+      "sceneType": "Type",
+      "location": "Lieu"
+    }
   },
   "actions": {
     "addTome": "Ajouter tome",
@@ -68,7 +133,13 @@
     "content": "Contenu",
     "characters": "Personnages",
     "tags": "Tags",
-    "notes": "Notes"
+    "notes": "Notes",
+    "narrativeIntent": "Intention narrative",
+    "duration": "Durée",
+    "tone": "Ton",
+    "rhythm": "Rythme",
+    "visualConstraints": "Contraintes visuelles",
+    "stagingNotes": "Notes de mise en scène"
   },
   "empty": {
     "noTome": {
@@ -152,7 +223,13 @@
       "summary": "Résumé de la scène...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romantique, combat, révélation...",
-      "notes": "Notes internes..."
+      "notes": "Notes internes...",
+      "narrativeIntent": "Ce que cette scène doit accomplir...",
+      "duration": "Durée ou nombre de pages approximatif...",
+      "tone": "Tendu, calme, doux-amer...",
+      "rhythm": "Rapide, posé, fragmenté...",
+      "visualConstraints": "Limites de caméra, cadre, continuité ou production...",
+      "stagingNotes": "Déplacements, gestes, accessoires ou repères spatiaux..."
     },
     "orchestra": {
       "mode": "Mode Orchestra",

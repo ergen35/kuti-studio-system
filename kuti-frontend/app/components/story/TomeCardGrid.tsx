@@ -1,26 +1,38 @@
-import { useTranslation } from '~/hooks/useTranslation';
-import { TomeCard } from './TomeCard';
-import { EmptyState, Button } from '~/components/ui';
-import { Skeleton } from '~/components/ui/skeleton';
-import { Plus } from 'lucide-react';
-import type { GetStorySummaryResponse } from '~/lib/backend';
+import { useTranslation } from "~/hooks/useTranslation";
+import { TomeCard } from "./TomeCard";
+import { EmptyState, Button } from "~/components/ui";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Plus } from "lucide-react";
+import type { GetStorySummaryResponse } from "~/lib/backend";
+import { ReorderControls } from "./ReorderControls";
 
-type Tome = GetStorySummaryResponse['tomes'][number];
+type Tome = GetStorySummaryResponse["tomes"][number];
 
 interface TomeCardGridProps {
-  tomes: Array<Tome & {
-    chapterCount: number;
-    sceneCount: number;
-    lastModified: Date;
-  }>;
+  tomes: Array<
+    Tome & {
+      chapterCount: number;
+      sceneCount: number;
+      lastModified: Date;
+    }
+  >;
   onSelect: (tomeId: string) => void;
   onCreate?: () => void;
   isLoading?: boolean;
+  onMoveTome?: (tomeId: string, direction: -1 | 1) => void;
+  reorderDisabled?: boolean;
 }
 
-export function TomeCardGrid({ tomes, onSelect, onCreate, isLoading }: TomeCardGridProps) {
-  const { t } = useTranslation('story');
-  
+export function TomeCardGrid({
+  tomes,
+  onSelect,
+  onCreate,
+  isLoading,
+  onMoveTome,
+  reorderDisabled = false,
+}: TomeCardGridProps) {
+  const { t } = useTranslation("story");
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -30,23 +42,23 @@ export function TomeCardGrid({ tomes, onSelect, onCreate, isLoading }: TomeCardG
       </div>
     );
   }
-  
+
   if (tomes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <EmptyState 
-          title={t('empty.noTome.title')} 
-          description={t('empty.noTome.description')} 
+        <EmptyState
+          title={t("empty.noTome.title")}
+          description={t("empty.noTome.description")}
         />
         {onCreate && (
           <Button variant="primary" onClick={onCreate} className="mt-6">
-            <Plus size={16} /> {t('actions.addTome')}
+            <Plus size={16} /> {t("actions.addTome")}
           </Button>
         )}
       </div>
     );
   }
-  
+
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {tomes.map((tome, index) => (
@@ -55,6 +67,18 @@ export function TomeCardGrid({ tomes, onSelect, onCreate, isLoading }: TomeCardG
           tome={tome}
           tomeNumber={index + 1}
           onClick={() => onSelect(tome.id)}
+          controls={
+            onMoveTome ? (
+              <ReorderControls
+                entityLabel={tome.title}
+                canMoveUp={index > 0}
+                canMoveDown={index < tomes.length - 1}
+                disabled={reorderDisabled}
+                onMoveUp={() => onMoveTome(tome.id, -1)}
+                onMoveDown={() => onMoveTome(tome.id, 1)}
+              />
+            ) : undefined
+          }
         />
       ))}
     </div>

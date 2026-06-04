@@ -243,6 +243,10 @@ export async function saveExportFile(
     json: ".json",
     tree: ".zip",
     zip: ".zip",
+    paged_images: ".zip",
+    pdf: ".pdf",
+    cbz: ".cbz",
+    epub: ".epub",
   };
 
   const fileName = `export_${exportId}${extMap[format]}`;

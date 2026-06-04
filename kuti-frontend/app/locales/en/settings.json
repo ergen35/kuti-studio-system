@@ -1,14 +1,288 @@
 {
   "title": "Project Settings",
-  "description": "Edit backend project metadata and coherence location settings.",
+  "description": "Edit project metadata, generation defaults, coherence rules, and publication preferences.",
   "fields": {
     "name": "Name",
     "status": "Status",
     "allowedLocations": "Allowed locations",
     "locationsPlaceholder": "Moon Docks, Lower City"
   },
+  "sections": {
+    "navigation": {
+      "title": "Quick navigation",
+      "meta": "Jump directly to the section you need"
+    },
+    "general": {
+      "title": "Project metadata",
+      "meta": "Identity, status, and local tracking"
+    },
+    "generation": {
+      "title": "Generation defaults",
+      "meta": "Fallback values used when a flow does not specify them",
+      "helper": "These preferences act as the base for new generation jobs and can still be overridden when launching a job.",
+      "defaultModel": {
+        "label": "Default model",
+        "placeholder": "Choose a default model",
+        "empty": "No model available",
+        "none": "No model set"
+      },
+      "defaultMode": {
+        "label": "Default mode",
+        "placeholder": "Choose a mode",
+        "options": {
+          "separate": "Separate",
+          "grid": "Grid"
+        }
+      },
+      "groups": {
+        "images": "Images",
+        "videos": "Videos",
+        "audio": "Audio"
+      },
+      "notConfigured": "(not configured)"
+    },
+    "preview": {
+      "title": "Manga preview",
+      "meta": "Reading direction and panel density",
+      "helper": "These options shape the reading and review interface for generated boards.",
+      "readingDirection": {
+        "label": "Reading direction",
+        "placeholder": "Choose a direction",
+        "options": {
+          "rtl": "Right to left",
+          "ltr": "Left to right"
+        }
+      },
+      "panelDensity": {
+        "label": "Panel density",
+        "placeholder": "Choose a density",
+        "options": {
+          "comfortable": "Comfortable",
+          "compact": "Compact"
+        }
+      }
+    },
+    "coherence": {
+      "title": "Coherence rules",
+      "meta": "Controls what the warning scanner reports",
+      "helper": "These rules are non-blocking: they do not stop writing, they only change what the scanner reports.",
+      "preview": {
+        "title": "Location preview",
+        "description": "The list below mirrors the allowed locations used by the scanner.",
+        "count": "{{count}} location(s)",
+        "empty": "No allowed locations are defined yet."
+      }
+    },
+    "signals": {
+      "title": "Narrative signals",
+      "meta": "Timeline anchors, tone tags, continuity facts, and impossible fact traps",
+      "helper": "Use the tokens @timeline:slug, @continuity:key=value, @tone:tag, and @fact:key=value inside scenes.",
+      "timelineAnchors": {
+        "label": "Timeline anchors",
+        "placeholder": "chapter-1 | Chapter 1 | 0 | opening"
+      },
+      "requiredToneTags": {
+        "label": "Required tone tags",
+        "placeholder": "noir, tense"
+      },
+      "forbiddenToneTags": {
+        "label": "Forbidden tone tags",
+        "placeholder": "comedic, slapstick"
+      },
+      "continuityFacts": {
+        "label": "Continuity facts",
+        "placeholder": "ship-status | operational | project"
+      },
+      "impossibleFacts": {
+        "label": "Impossible facts",
+        "placeholder": "gravity | zero | project"
+      },
+      "autoScan": {
+        "label": "Auto-scan on save",
+        "description": "Automatically re-run the coherence scanner after scene, character, relation, and settings saves."
+      }
+    },
+    "versioning": {
+      "title": "Versioning",
+      "meta": "How many versions to retain per branch",
+      "helper": "The oldest versions are pruned automatically when the limit is exceeded.",
+      "retained": {
+        "label": "Versions retained per branch"
+      }
+    },
+    "exports": {
+      "title": "Exports",
+      "meta": "Default formats enabled for new publications",
+      "helper": "The format set below is used as the starting point when creating an export.",
+      "defaultKind": {
+        "label": "Default kind",
+        "placeholder": "Choose a kind",
+        "options": {
+          "work": "Work",
+          "publication": "Publication"
+        }
+      },
+      "formats": {
+        "json": {
+          "label": "JSON",
+          "description": "Structured project data for integration or archival."
+        },
+        "tree": {
+          "label": "Tree",
+          "description": "Readable hierarchical view of project folders and contents."
+        },
+        "zip": {
+          "label": "ZIP",
+          "description": "Compressed archive of the full project for transport and backup."
+        },
+        "paged_images": {
+          "label": "Paged images",
+          "description": "Ordered image folders for reading and review."
+        },
+        "pdf": {
+          "label": "PDF",
+          "description": "Shareable reading document with preserved pagination."
+        },
+        "cbz": {
+          "label": "CBZ",
+          "description": "Image archive compatible with comic readers."
+        },
+        "epub": {
+          "label": "EPUB",
+          "description": "E-reader format prepared for future distribution."
+        }
+      }
+    },
+    "language": {
+      "title": "Language",
+      "meta": "Project language preference",
+      "helper": "This language can serve as the default for the interface and project-scoped content.",
+      "preferredLocale": {
+        "label": "Preferred language",
+        "placeholder": "Choose a language"
+      },
+      "options": {
+        "fr": "French",
+        "en": "English"
+      }
+    },
+    "assets": {
+      "title": "Assets",
+      "meta": "Deletion behavior and contextual help",
+      "helper": "These options adjust how deletes and media-related guidance are presented.",
+      "archiveOnDelete": {
+        "label": "Archive on delete",
+        "description": "Keep a local trace of deleted assets instead of hard-deleting the file.",
+        "enabled": "Archiving on",
+        "disabled": "Archiving off"
+      },
+      "showUsageHints": {
+        "label": "Show usage hints",
+        "description": "Display contextual guidance for assets and reuse.",
+        "enabled": "Hints visible",
+        "disabled": "Hints hidden"
+      }
+    },
+    "summary": {
+      "title": "Summary",
+      "meta": "Current settings state",
+      "generation": {
+        "title": "Generation",
+        "model": "Model: {{model}}",
+        "mode": "Mode: {{mode}}"
+      },
+      "versioning": {
+        "title": "Versioning",
+        "description": "Retention of {{count}} version(s) per branch"
+      },
+      "exports": {
+        "title": "Exports",
+        "empty": "No default export formats selected"
+      },
+      "language": {
+        "title": "Language",
+        "description": "Preference used as the default for project reading and editing"
+      },
+      "assets": {
+        "title": "Assets"
+      },
+      "locations": {
+        "title": "Configured locations",
+        "count": "{{count}} location(s)",
+        "empty": "No allowed locations yet."
+      },
+      "rules": {
+        "title": "Enabled rules",
+        "count": "{{count}} rule(s)",
+        "empty": "No rules are enabled."
+      },
+      "signals": {
+        "title": "Signal registry",
+        "count": "{{count}} item(s)",
+        "timeline": "{{count}} timeline anchor(s)",
+        "requiredTone": "{{count}} required tone tag(s)",
+        "forbiddenTone": "{{count}} forbidden tone tag(s)",
+        "continuity": "{{count}} continuity fact(s)",
+        "impossible": "{{count}} impossible fact(s)",
+        "preview": "Preview: {{value}}",
+        "empty": "No narrative signals registered yet."
+      },
+      "automation": {
+        "title": "Automation",
+        "on": "On",
+        "off": "Off",
+        "description": "The auto-scan mode mirrors the manual warnings scan after supported writes."
+      }
+    }
+  },
   "actions": {
-    "save": "Save settings"
+    "save": "Save settings",
+    "saving": "Saving...",
+    "reset": "Reset"
+  },
+  "unsavedChanges": {
+    "label": "Changed",
+    "saved": "Saved",
+    "hint": "There are unsaved changes.",
+    "summary": "The changes will be written into the project's local JSON.",
+    "savedHint": "The settings are synced with local storage.",
+    "confirm": "You have unsaved changes. Leave this page anyway?"
+  },
+  "coherence": {
+    "rules": {
+      "orphanCharacter": {
+        "label": "Orphan characters",
+        "description": "Flags active characters that are not linked to any scene or relation."
+      },
+      "brokenReference": {
+        "label": "Broken references",
+        "description": "Flags @ references that point to a missing entity."
+      },
+      "emptyScene": {
+        "label": "Empty scenes",
+        "description": "Warns when an active scene still has very little content."
+      },
+      "locationConflict": {
+        "label": "Location conflicts",
+        "description": "Detects scenes that use a location missing from the allowed list."
+      },
+      "timelineConflict": {
+        "label": "Timeline conflicts",
+        "description": "Flags scenes whose timeline token does not match the registry order."
+      },
+      "continuityBreak": {
+        "label": "Continuity breaks",
+        "description": "Flags scene assertions that disagree with the canonical continuity registry."
+      },
+      "toneBreak": {
+        "label": "Tone breaks",
+        "description": "Flags scenes that miss required tone tags or include forbidden ones."
+      },
+      "impossibleFact": {
+        "label": "Impossible facts",
+        "description": "Flags scene facts that are explicitly forbidden by the project registry."
+      }
+    }
   },
   "delete": {
     "sectionTitle": "Danger Zone",

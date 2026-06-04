@@ -1,2 +1,2 @@
-export { LexicalEditor } from './LexicalEditor';
-export { EditorToolbar } from './EditorToolbar';
+export { LexicalEditor } from "./LexicalEditor";
+export { EditorToolbar } from "./EditorToolbar";

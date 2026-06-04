@@ -18,17 +18,44 @@
     "sceneEditor": {
       "title": "Scene editor"
     },
+    "context": {
+      "title": "Scene context",
+      "description": "Anchors, linked characters, assets, and warnings for this scene.",
+      "scene": "Scene",
+      "inChapter": "{{tome}} · {{chapter}}",
+      "location": "Location",
+      "locationLinked": "In registry",
+      "locationUnlinked": "Not registered",
+      "locationHint": "This location is available in project settings.",
+      "locationHintFallback": "Add this location in settings to find and filter it later.",
+      "characters": "Characters",
+      "assets": "Linked assets",
+      "warnings": "Warnings",
+      "emptyAssets": "No assets linked to this scene.",
+      "emptyWarnings": "No warnings on this scene.",
+      "openWarnings": "{{count}} warning",
+      "openWarnings_plural": "{{count}} warnings",
+      "openWarningsCta": "Open warnings",
+      "openTome": "Open tome",
+      "openChapter": "Open chapter",
+      "openSettings": "Open settings"
+    },
     "references": {
       "title": "References and coherence",
-      "count": "{{count}} orphan reference",
-      "count_plural": "{{count}} orphan references",
+      "count": "{{count}} reference",
+      "count_plural": "{{count}} references",
       "empty": {
-        "title": "No orphan reference",
-        "description": "References indexed from scene content are currently resolvable."
-      }
+        "title": "No references in this scene",
+        "description": "Add typed references in content, summary, or notes to index them."
+      },
+      "resolved": "Resolved",
+      "orphan": "Orphan",
+      "open": "Open",
+      "fix": "Fix"
     },
     "metadata": {
-      "title": "Metadata"
+      "title": "Metadata",
+      "description": "Narrative intent, pacing, tone, and staging notes attached to this scene."
     }
   },
   "tree": {
@@ -42,6 +69,44 @@
   },
   "orchestra": {
     "resetView": "Reset view"
+  },
+  "reorder": {
+    "up": "Move {{item}} up",
+    "down": "Move {{item}} down"
+  },
+  "search": {
+    "title": "Story search",
+    "meta": "{{count}} result",
+    "meta_plural": "{{count}} results",
+    "metaEmpty": "Full-text search",
+    "openFirst": "Open first result",
+    "placeholder": "Search a tome, chapter, scene, summary, content, notes, or tags",
+    "inputLabel": "Search the story",
+    "clear": "Clear",
+    "open": "Open",
+    "helper": {
+      "title": "Search across the whole project",
+      "description": "The search scans tome, chapter, and scene titles, summaries, content, notes, and tags."
+    },
+    "empty": {
+      "title": "No results",
+      "description": "Try another keyword or a more specific term."
+    },
+    "kinds": {
+      "tome": "Tome",
+      "chapter": "Chapter",
+      "scene": "Scene"
+    },
+    "fields": {
+      "title": "Title",
+      "synopsis": "Synopsis",
+      "summary": "Summary",
+      "content": "Content",
+      "notes": "Notes",
+      "tags": "Tags",
+      "sceneType": "Type",
+      "location": "Location"
+    }
   },
   "actions": {
     "addTome": "Add tome",
@@ -68,7 +133,13 @@
     "content": "Content",
     "characters": "Characters",
     "tags": "Tags",
-    "notes": "Notes"
+    "notes": "Notes",
+    "narrativeIntent": "Narrative intent",
+    "duration": "Duration",
+    "tone": "Tone",
+    "rhythm": "Rhythm",
+    "visualConstraints": "Visual constraints",
+    "stagingNotes": "Staging notes"
   },
   "empty": {
     "noTome": {
@@ -152,7 +223,13 @@
       "summary": "Scene summary...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romance, fight, reveal...",
-      "notes": "Internal notes..."
+      "notes": "Internal notes...",
+      "narrativeIntent": "What this scene must accomplish...",
+      "duration": "Approx. duration or page count...",
+      "tone": "Tense, calm, bittersweet...",
+      "rhythm": "Fast, steady, fragmented...",
+      "visualConstraints": "Camera, framing, continuity, or production limits...",
+      "stagingNotes": "Blocking, gestures, props, or spatial cues..."
     },
     "orchestra": {
       "mode": "Orchestra Mode",

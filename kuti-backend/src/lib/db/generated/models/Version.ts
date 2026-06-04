@@ -61,6 +61,7 @@ export type VersionCountAggregateOutputType = {
   versionIndex: number
   label: number
   summary: number
+  snapshotJson: number
   createdAt: number
   _all: number
 }
@@ -101,6 +102,7 @@ export type VersionCountAggregateInputType = {
   versionIndex?: true
   label?: true
   summary?: true
+  snapshotJson?: true
   createdAt?: true
   _all?: true
 }
@@ -198,6 +200,7 @@ export type VersionGroupByOutputType = {
   versionIndex: number
   label: string
   summary: string
+  snapshotJson: runtime.JsonValue | null
   createdAt: Date
   _count: VersionCountAggregateOutputType | null
   _avg: VersionAvgAggregateOutputType | null
@@ -231,6 +234,7 @@ export type VersionWhereInput = {
   versionIndex?: Prisma.IntFilter<"Version"> | number
   label?: Prisma.StringFilter<"Version"> | string
   summary?: Prisma.StringFilter<"Version"> | string
+  snapshotJson?: Prisma.JsonNullableFilter<"Version">
   createdAt?: Prisma.DateTimeFilter<"Version"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }
@@ -242,6 +246,7 @@ export type VersionOrderByWithRelationInput = {
   versionIndex?: Prisma.SortOrder
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  snapshotJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
 }
@@ -256,6 +261,7 @@ export type VersionWhereUniqueInput = Prisma.AtLeast<{
   versionIndex?: Prisma.IntFilter<"Version"> | number
   label?: Prisma.StringFilter<"Version"> | string
   summary?: Prisma.StringFilter<"Version"> | string
+  snapshotJson?: Prisma.JsonNullableFilter<"Version">
   createdAt?: Prisma.DateTimeFilter<"Version"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }, "id">
@@ -267,6 +273,7 @@ export type VersionOrderByWithAggregationInput = {
   versionIndex?: Prisma.SortOrder
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  snapshotJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.VersionCountOrderByAggregateInput
   _avg?: Prisma.VersionAvgOrderByAggregateInput
@@ -285,6 +292,7 @@ export type VersionScalarWhereWithAggregatesInput = {
   versionIndex?: Prisma.IntWithAggregatesFilter<"Version"> | number
   label?: Prisma.StringWithAggregatesFilter<"Version"> | string
   summary?: Prisma.StringWithAggregatesFilter<"Version"> | string
+  snapshotJson?: Prisma.JsonNullableWithAggregatesFilter<"Version">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Version"> | Date | string
 }
 
@@ -294,6 +302,7 @@ export type VersionCreateInput = {
   versionIndex: number
   label: string
   summary?: string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutVersionsInput
 }
@@ -305,6 +314,7 @@ export type VersionUncheckedCreateInput = {
   versionIndex: number
   label: string
   summary?: string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -314,6 +324,7 @@ export type VersionUpdateInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutVersionsNestedInput
 }
@@ -325,6 +336,7 @@ export type VersionUncheckedUpdateInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -335,6 +347,7 @@ export type VersionCreateManyInput = {
   versionIndex: number
   label: string
   summary?: string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -344,6 +357,7 @@ export type VersionUpdateManyMutationInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -354,6 +368,7 @@ export type VersionUncheckedUpdateManyInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -374,6 +389,7 @@ export type VersionCountOrderByAggregateInput = {
   versionIndex?: Prisma.SortOrder
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  snapshotJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -453,6 +469,7 @@ export type VersionCreateWithoutProjectInput = {
   versionIndex: number
   label: string
   summary?: string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -462,6 +479,7 @@ export type VersionUncheckedCreateWithoutProjectInput = {
   versionIndex: number
   label: string
   summary?: string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -501,6 +519,7 @@ export type VersionScalarWhereInput = {
   versionIndex?: Prisma.IntFilter<"Version"> | number
   label?: Prisma.StringFilter<"Version"> | string
   summary?: Prisma.StringFilter<"Version"> | string
+  snapshotJson?: Prisma.JsonNullableFilter<"Version">
   createdAt?: Prisma.DateTimeFilter<"Version"> | Date | string
 }
 
@@ -510,6 +529,7 @@ export type VersionCreateManyProjectInput = {
   versionIndex: number
   label: string
   summary?: string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -519,6 +539,7 @@ export type VersionUpdateWithoutProjectInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -528,6 +549,7 @@ export type VersionUncheckedUpdateWithoutProjectInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -537,6 +559,7 @@ export type VersionUncheckedUpdateManyWithoutProjectInput = {
   versionIndex?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -549,6 +572,7 @@ export type VersionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   versionIndex?: boolean
   label?: boolean
   summary?: boolean
+  snapshotJson?: boolean
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["version"]>
@@ -560,6 +584,7 @@ export type VersionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   versionIndex?: boolean
   label?: boolean
   summary?: boolean
+  snapshotJson?: boolean
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["version"]>
@@ -571,6 +596,7 @@ export type VersionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   versionIndex?: boolean
   label?: boolean
   summary?: boolean
+  snapshotJson?: boolean
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["version"]>
@@ -582,10 +608,11 @@ export type VersionSelectScalar = {
   versionIndex?: boolean
   label?: boolean
   summary?: boolean
+  snapshotJson?: boolean
   createdAt?: boolean
 }
 
-export type VersionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "branchName" | "versionIndex" | "label" | "summary" | "createdAt", ExtArgs["result"]["version"]>
+export type VersionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "branchName" | "versionIndex" | "label" | "summary" | "snapshotJson" | "createdAt", ExtArgs["result"]["version"]>
 export type VersionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }
@@ -608,6 +635,7 @@ export type $VersionPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     versionIndex: number
     label: string
     summary: string
+    snapshotJson: runtime.JsonValue | null
     createdAt: Date
   }, ExtArgs["result"]["version"]>
   composites: {}
@@ -1039,6 +1067,7 @@ export interface VersionFieldRefs {
   readonly versionIndex: Prisma.FieldRef<"Version", 'Int'>
   readonly label: Prisma.FieldRef<"Version", 'String'>
   readonly summary: Prisma.FieldRef<"Version", 'String'>
+  readonly snapshotJson: Prisma.FieldRef<"Version", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Version", 'DateTime'>
 }
     

@@ -11,16 +11,21 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { TaskProgressBadge, TaskProgressBadgeMini } from "./TaskProgressBadge";
-import { Button } from "~/components/ui";
+import { Badge, Button } from "~/components/ui";
+import { useTranslation } from "~/hooks/useTranslation";
 import type {
   TaskItem,
   TaskStatus,
   SourceKind,
   HierarchyProgress,
 } from "~/lib/tasks/types";
+import { getTaskPriorityTone, getTaskTypeTone } from "~/lib/tasks/types";
 import { useTasksStore } from "~/stores/tasks";
 
-const SOURCE_ICONS: Record<SourceKind, React.ComponentType<{ size?: number; className?: string }>> = {
+const SOURCE_ICONS: Record<
+  SourceKind,
+  React.ComponentType<{ size?: number; className?: string }>
+> = {
   tome: BookOpen,
   chapter: Book,
   scene: FileText,
@@ -62,6 +67,7 @@ export function TaskTreeItem({
   showProgressBar = false,
   compact = false,
 }: TaskTreeItemProps) {
+  const { t } = useTranslation("tasks");
   const { expandedTaskIds, toggleExpanded } = useTasksStore();
   const isExpanded = expandedTaskIds.has(task.id);
   const hasChildren = task.children && task.children.length > 0;
@@ -85,7 +91,7 @@ export function TaskTreeItem({
         <Button
           type="button"
           variant="ghost"
-          onClick={() => onOpenDetail ? onOpenDetail(task) : handleClick()}
+          onClick={() => (onOpenDetail ? onOpenDetail(task) : handleClick())}
           className="h-auto w-full justify-start gap-2 p-2 text-left"
         >
           <Icon size={16} className="shrink-0 text-muted-foreground" />
@@ -109,7 +115,7 @@ export function TaskTreeItem({
                 size={14}
                 className={clsx(
                   "text-muted-foreground transition-transform",
-                  isExpanded && "rotate-90"
+                  isExpanded && "rotate-90",
                 )}
               />
             </Button>
@@ -140,7 +146,7 @@ export function TaskTreeItem({
         onClick={handleClick}
         className={clsx(
           "flex h-auto w-full items-center gap-3 p-3 text-left transition-colors",
-          level > 0 && "pl-6"
+          level > 0 && "pl-6",
         )}
       >
         {hasChildren ? (
@@ -148,7 +154,7 @@ export function TaskTreeItem({
             size={16}
             className={clsx(
               "shrink-0 text-muted-foreground transition-transform duration-200",
-              !isExpanded && "-rotate-90"
+              !isExpanded && "-rotate-90",
             )}
           />
         ) : (
@@ -158,24 +164,40 @@ export function TaskTreeItem({
         <div
           className={clsx(
             "shrink-0 rounded-md p-1.5",
-            STATUS_ICON_BG_CLASS[task.status]
+            STATUS_ICON_BG_CLASS[task.status],
           )}
         >
-          <Icon
-            size={18}
-            className={STATUS_ICON_CLASS[task.status]}
-          />
+          <Icon size={18} className={STATUS_ICON_CLASS[task.status]} />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium text-foreground">{task.title}</span>
+            <span className="truncate text-sm font-medium text-foreground">
+              {task.title}
+            </span>
             {isFailed && (
               <AlertCircle size={14} className="shrink-0 text-destructive" />
             )}
           </div>
-          <div className="text-xs text-muted-foreground">
-            {task.sourceLabel}
+          <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] uppercase tracking-[0.16em]">
+            <Badge
+              tone={getTaskTypeTone(task.taskType)}
+              className="rounded-full px-2 py-0.5"
+            >
+              {t(`taskTypes.${task.taskType}`)}
+            </Badge>
+            <Badge
+              tone={getTaskPriorityTone(task.priority)}
+              className="rounded-full px-2 py-0.5"
+            >
+              {t(`priorities.${task.priority}`)}
+            </Badge>
+          </div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            <span className="block truncate">{task.sourceLabel}</span>
+            {task.description ? (
+              <span className="mt-0.5 block truncate">{task.description}</span>
+            ) : null}
           </div>
         </div>
 
@@ -214,7 +236,11 @@ interface TaskTreeItemChildProps {
   onOpenDetail?: (task: TaskItem) => void;
 }
 
-function TaskTreeItemChild({ child, onNavigate, onOpenDetail }: TaskTreeItemChildProps) {
+function TaskTreeItemChild({
+  child,
+  onNavigate,
+  onOpenDetail,
+}: TaskTreeItemChildProps) {
   const Icon = SOURCE_ICONS[child.sourceKind] || PanelTop;
   const isFailed = child.status === "failed";
 
@@ -222,7 +248,9 @@ function TaskTreeItemChild({ child, onNavigate, onOpenDetail }: TaskTreeItemChil
     <Button
       type="button"
       variant="ghost"
-      onClick={() => onOpenDetail ? onOpenDetail(child) : onNavigate?.(child.id)}
+      onClick={() =>
+        onOpenDetail ? onOpenDetail(child) : onNavigate?.(child.id)
+      }
       className="flex h-auto w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-left transition-colors hover:border-primary"
     >
       <span className="w-4" />
@@ -232,7 +260,9 @@ function TaskTreeItemChild({ child, onNavigate, onOpenDetail }: TaskTreeItemChil
         className={clsx("shrink-0", STATUS_ICON_CLASS[child.status])}
       />
 
-      <span className="flex-1 truncate text-sm text-foreground">{child.title}</span>
+      <span className="flex-1 truncate text-sm text-foreground">
+        {child.title}
+      </span>
 
       <div className="flex items-center gap-2">
         {isFailed && <AlertCircle size={12} className="text-destructive" />}

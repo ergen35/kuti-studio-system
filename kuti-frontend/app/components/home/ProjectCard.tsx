@@ -1,7 +1,17 @@
 "use client";
 
 import { clsx } from "clsx";
-import { FolderOpen, Copy, Archive, MoreHorizontal, BookOpen, Film, Users } from "lucide-react";
+import {
+  FolderOpen,
+  Copy,
+  Archive,
+  Download,
+  MoreHorizontal,
+  BookOpen,
+  FileText,
+  Film,
+  Users,
+} from "lucide-react";
 import { Button, Badge, dateLabel } from "~/components/ui";
 import {
   DropdownMenu,
@@ -24,8 +34,10 @@ interface ProjectCardProps {
   project: Project;
   metrics: ProjectMetrics;
   onOpen: () => void;
+  onQuickExport: () => void;
   onClone: () => void;
   onArchive: () => void;
+  isQuickExporting?: boolean;
   viewMode: "grid" | "list";
 }
 
@@ -33,88 +45,145 @@ export function ProjectCard({
   project,
   metrics,
   onOpen,
+  onQuickExport,
   onClone,
   onArchive,
+  isQuickExporting = false,
   viewMode,
 }: ProjectCardProps) {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation("home");
   const isGrid = viewMode === "grid";
+  const statusLabel =
+    project.status === "active"
+      ? t("projects.status.active")
+      : project.status === "draft"
+        ? t("projects.status.draft")
+        : project.status === "archived"
+          ? t("projects.status.archived")
+          : t("projects.status.maintenance");
 
   return (
     <div
       className={clsx(
         "group relative overflow-hidden rounded-lg border border-border bg-card transition-colors",
         "hover:border-primary/50 hover:shadow-card",
-        isGrid ? "p-4" : "flex items-center gap-4 p-3"
+        isGrid ? "p-4" : "flex items-center gap-4 p-3",
       )}
     >
-      <div className={clsx(
-        "absolute inset-y-0 left-0 w-1",
-        project.status === "active" ? "bg-success" :
-        project.status === "draft" ? "bg-draft" : "bg-muted"
-      )} />
+      <div
+        className={clsx(
+          "absolute inset-y-0 left-0 w-1",
+          project.status === "active"
+            ? "bg-success"
+            : project.status === "draft"
+              ? "bg-draft"
+              : "bg-muted",
+        )}
+      />
 
-      <div className={clsx(isGrid ? "space-y-4" : "flex-1 flex items-center gap-6")}>
+      <div
+        className={clsx(
+          isGrid ? "space-y-4" : "flex-1 flex items-center gap-6",
+        )}
+      >
         <div className={clsx(isGrid ? "" : "flex-1 min-w-0")}>
           <div className="flex items-start justify-between gap-2">
-            <h3 className={clsx(
-              "font-semibold text-ink truncate",
-              isGrid ? "text-base" : "text-sm"
-            )}>
+            <h3
+              className={clsx(
+                "font-semibold text-ink truncate",
+                isGrid ? "text-base" : "text-sm",
+              )}
+            >
               {project.name}
             </h3>
             <Badge tone={project.status} className="text-[10px] uppercase">
-              {project.status}
+              {statusLabel}
             </Badge>
           </div>
-          
+
           <p className="text-xs text-muted mt-1 truncate">
             {isGrid ? project.rootPath : dateLabel(project.updatedAt)}
           </p>
         </div>
 
-        <div className={clsx(
-          "flex items-center gap-4 text-xs",
-          isGrid ? "py-2 border-y border-line/50" : "shrink-0"
-        )}>
-          <Metric icon={BookOpen} value={metrics.tomes} label="Tomes" />
-          <Metric icon={Film} value={metrics.scenes} label="Scènes" />
-          <Metric icon={Users} value={metrics.characters} label="Persos" />
+        <div
+          className={clsx(
+            "flex flex-wrap items-center gap-4 text-xs",
+            isGrid ? "py-2 border-y border-line/50" : "shrink-0",
+          )}
+        >
+          <Metric
+            icon={BookOpen}
+            value={metrics.tomes}
+            label={t("projects.metrics.tomes")}
+          />
+          <Metric
+            icon={FileText}
+            value={metrics.chapters}
+            label={t("projects.metrics.chapters")}
+          />
+          <Metric
+            icon={Film}
+            value={metrics.scenes}
+            label={t("projects.metrics.scenes")}
+          />
+          <Metric
+            icon={Users}
+            value={metrics.characters}
+            label={t("projects.metrics.characters")}
+          />
         </div>
 
-        <div className={clsx(
-          isGrid
-            ? "flex items-center justify-between pt-1"
-            : "flex items-center gap-2 shrink-0"
-        )}>
-            {isGrid && (
-              <span className="text-[10px] text-muted">
-                {dateLabel(project.updatedAt)}
-              </span>
-            )}
-          
+        <div
+          className={clsx(
+            isGrid
+              ? "flex items-center justify-between pt-1"
+              : "flex items-center gap-2 shrink-0",
+          )}
+        >
+          {isGrid && (
+            <span className="text-[10px] text-muted">
+              {dateLabel(project.updatedAt)}
+            </span>
+          )}
+
           <div className="flex items-center gap-1">
-            <Button variant="primary" onClick={onOpen} className="text-xs py-1 px-2">
+            <Button
+              variant="primary"
+              onClick={onOpen}
+              className="text-xs py-1 px-2"
+            >
               <FolderOpen size={14} className="mr-1" />
-              {t('projects.actions.open')}
+              {t("projects.actions.open")}
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-2 py-1" aria-label={t('projects.actions.more')}>
-                <MoreHorizontal size={14} />
-              </Button>
+                <Button
+                  variant="ghost"
+                  className="px-2 py-1"
+                  aria-label={t("projects.actions.more")}
+                >
+                  <MoreHorizontal size={14} />
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={onClone}>
-                  <Copy size={14} />
-                  {t('projects.actions.clone')}
-                </DropdownMenuItem>
-                <DropdownMenuItem variant="destructive" onSelect={onArchive}>
-                  <Archive size={14} />
-                  {t('projects.actions.archive')}
-                </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={onQuickExport}
+                    disabled={isQuickExporting}
+                  >
+                    <Download size={14} />
+                    {t("projects.actions.quickExport")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={onClone}>
+                    <Copy size={14} />
+                    {t("projects.actions.clone")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem variant="destructive" onSelect={onArchive}>
+                    <Archive size={14} />
+                    {t("projects.actions.archive")}
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -125,7 +194,15 @@ export function ProjectCard({
   );
 }
 
-function Metric({ icon: Icon, value, label }: { icon: typeof BookOpen; value: number; label: string }) {
+function Metric({
+  icon: Icon,
+  value,
+  label,
+}: {
+  icon: typeof BookOpen;
+  value: number;
+  label: string;
+}) {
   return (
     <div className="flex items-center gap-1.5 text-muted" title={label}>
       <Icon size={12} className="text-primary/70" />

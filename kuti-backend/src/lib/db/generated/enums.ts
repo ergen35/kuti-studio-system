@@ -166,7 +166,11 @@ export type WarningStatus = (typeof WarningStatus)[keyof typeof WarningStatus]
 export const ExportFormat = {
   json: 'json',
   tree: 'tree',
-  zip: 'zip'
+  zip: 'zip',
+  paged_images: 'paged_images',
+  pdf: 'pdf',
+  cbz: 'cbz',
+  epub: 'epub'
 } as const
 
 export type ExportFormat = (typeof ExportFormat)[keyof typeof ExportFormat]

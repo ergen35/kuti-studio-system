@@ -1,6 +1,6 @@
 {
   "title": "Task Manager",
-  "description": "Track generation jobs in progress",
+  "description": "Track technical jobs and open editorial tasks",
   "lastUpdated": "Last updated: {{time}}",
   "loading": "Loading tasks...",
   "empty": "No tasks found",
@@ -21,12 +21,23 @@
   },
   "statusLabel": "Statuses",
   "typesLabel": "Types",
+  "prioritiesLabel": "Priorities",
   "status": {
     "pending": "Pending",
     "running": "Running",
     "ready": "Ready",
     "validated": "Validated",
     "failed": "Failed"
+  },
+  "taskTypes": {
+    "technical": "Technical",
+    "editorial": "Editorial"
+  },
+  "priorities": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
   },
   "sourceKinds": {
     "tome": "Tome",
@@ -44,13 +55,16 @@
   },
   "detail": {
     "status": "Status",
-    "type": "Type",
+    "taskType": "Type",
+    "priority": "Priority",
     "elapsed": "Time",
     "progress": "Progress",
     "details": "Details",
     "jobId": "Job ID",
     "sourceId": "Source ID",
     "source": "Source",
+    "description": "Description",
+    "openSource": "Open source",
     "createdAt": "Created",
     "updatedAt": "Updated"
   }

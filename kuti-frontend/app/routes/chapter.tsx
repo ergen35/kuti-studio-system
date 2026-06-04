@@ -1,31 +1,64 @@
-import { useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useParams, Link, useNavigate } from 'react-router';
-import { clsx } from 'clsx';
-import { ArrowLeft, BookOpen, FileText, Film, ChevronRight, Pencil, X, Check, Plus, MapPin } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useTranslation } from '~/hooks/useTranslation';
-import { AppShell } from '~/components/layout';
-import { Badge, Button, EmptyState, ErrorState, LoadingState, Panel, SectionTitle, Field } from '~/components/ui';
+import { useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useParams, Link, useNavigate } from "react-router";
+import { clsx } from "clsx";
+import {
+  ArrowLeft,
+  BookOpen,
+  FileText,
+  Film,
+  ChevronRight,
+  Pencil,
+  X,
+  Check,
+  Plus,
+  MapPin,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useTranslation } from "~/hooks/useTranslation";
+import { AppShell } from "~/components/layout";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  Panel,
+  SectionTitle,
+  Field,
+} from "~/components/ui";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { Textarea } from '~/components/ui/textarea';
-import { apiErrorMessage } from '~/lib/errors';
-import { invalidateWorkspace } from '~/lib/query';
-import { StoryBreadcrumb, StoryCompletionButton } from '~/components/story';
-import { createSceneMutation, getStorySummaryOptions, updateChapterMutation } from '~/lib/backend/@tanstack/react-query.gen';
-import type { CreateSceneData, GetStorySummaryResponse, Options, UpdateChapterData } from '~/lib/backend';
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { apiErrorMessage } from "~/lib/errors";
+import { invalidateWorkspace } from "~/lib/query";
+import { StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
+import { ReorderControls } from "~/components/story/ReorderControls";
+import {
+  createSceneMutation,
+  getStorySummaryOptions,
+  updateChapterMutation,
+  updateSceneMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
+import { getOrderSwap } from "~/lib/story-order";
+import type {
+  CreateSceneData,
+  GetStorySummaryResponse,
+  Options,
+  UpdateChapterData,
+  UpdateSceneData,
+} from "~/lib/backend";
 
 const editChapterSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(1, "Title is required"),
   synopsis: z.string().optional(),
 });
 
@@ -33,7 +66,7 @@ type EditChapterInput = z.infer<typeof editChapterSchema>;
 
 // Schema for creating a new scene
 const createSceneSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(1, "Title is required"),
   location: z.string().optional(),
 });
 
@@ -47,11 +80,21 @@ interface CreateSceneModalProps {
   isLoading: boolean;
 }
 
-function CreateSceneModal({ isOpen, onClose, onSubmit, isLoading }: CreateSceneModalProps) {
-  const { t } = useTranslation('story');
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateSceneInput>({
+function CreateSceneModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+}: CreateSceneModalProps) {
+  const { t } = useTranslation("story");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateSceneInput>({
     resolver: zodResolver(createSceneSchema),
-    defaultValues: { title: '', location: '' },
+    defaultValues: { title: "", location: "" },
   });
 
   const handleFormSubmit = (data: CreateSceneInput) => {
@@ -68,14 +111,17 @@ function CreateSceneModal({ isOpen, onClose, onSubmit, isLoading }: CreateSceneM
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('scenes.createTitle')}</DialogTitle>
+          <DialogTitle>{t("scenes.createTitle")}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
-          <Field label={t('fields.title')}>
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <Field label={t("fields.title")}>
             <Input
-              {...register('title')}
+              {...register("title")}
               autoFocus
-              placeholder={t('placeholders.sceneTitle')}
+              placeholder={t("placeholders.sceneTitle")}
               className="w-full"
             />
           </Field>
@@ -83,23 +129,31 @@ function CreateSceneModal({ isOpen, onClose, onSubmit, isLoading }: CreateSceneM
             <span className="text-danger text-xs">{errors.title.message}</span>
           )}
 
-          <Field label={t('fields.location')}>
+          <Field label={t("fields.location")}>
             <div className="relative">
-              <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <MapPin
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
               <Input
-                {...register('location')}
-                placeholder={t('placeholders.sceneLocation')}
+                {...register("location")}
+                placeholder={t("placeholders.sceneLocation")}
                 className="w-full pl-10"
               />
             </div>
           </Field>
 
           <DialogFooter>
-            <Button variant="ghost" type="button" onClick={handleClose} disabled={isLoading}>
-              {t('actions.cancel')}
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              {t("actions.cancel")}
             </Button>
             <Button variant="primary" disabled={isLoading}>
-              {isLoading ? t('actions.creating') : t('actions.create')}
+              {isLoading ? t("actions.creating") : t("actions.create")}
             </Button>
           </DialogFooter>
         </form>
@@ -109,9 +163,9 @@ function CreateSceneModal({ isOpen, onClose, onSubmit, isLoading }: CreateSceneM
 }
 
 // SDK types from GetStorySummaryResponse
-type Tome = GetStorySummaryResponse['tomes'][number];
-type Chapter = GetStorySummaryResponse['chapters'][number];
-type Scene = GetStorySummaryResponse['scenes'][number];
+type Tome = GetStorySummaryResponse["tomes"][number];
+type Chapter = GetStorySummaryResponse["chapters"][number];
+type Scene = GetStorySummaryResponse["scenes"][number];
 
 // Sidepanel with chapters in this tome
 function ChapterNavigationPanel({
@@ -119,22 +173,28 @@ function ChapterNavigationPanel({
   currentChapterId,
   projectId,
   tomeId,
+  onMoveChapter,
+  reorderDisabled = false,
 }: {
   chapters: Chapter[];
   currentChapterId: string;
   projectId: string;
   tomeId: string;
+  onMoveChapter?: (chapterId: string, direction: -1 | 1) => void;
+  reorderDisabled?: boolean;
 }) {
-  const { t } = useTranslation('story');
+  const { t } = useTranslation("story");
   const navigate = useNavigate();
 
   // Sort chapters by orderIndex
-  const sortedChapters = [...chapters].sort((a, b) => a.orderIndex - b.orderIndex);
+  const sortedChapters = [...chapters].sort(
+    (a, b) => a.orderIndex - b.orderIndex,
+  );
 
   return (
     <Panel className="!p-3">
       <SectionTitle
-        title={t('chapter.navigation.title')}
+        title={t("chapter.navigation.title")}
         meta={String(sortedChapters.length)}
       />
 
@@ -142,43 +202,67 @@ function ChapterNavigationPanel({
         {sortedChapters.map((chapter, index) => {
           const isCurrent = chapter.id === currentChapterId;
           return (
-            <Button
-              type="button"
-              variant="ghost"
-              key={chapter.id}
-              onClick={() => navigate(`/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`)}
-              className={clsx(
-                "flex h-auto w-full items-center gap-3 rounded-lg border p-2.5 text-left transition-colors hover:text-foreground",
-                isCurrent
-                  ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_3px_0_0_var(--primary)]"
-                  : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-primary/8"
-              )}
-            >
-              <span className={clsx(
-                "text-xs font-semibold",
-                isCurrent ? "text-primary" : "text-muted-foreground"
-              )}>
-                {t('chapter.shortNumber', { number: index + 1 })}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className={clsx(
-                  "truncate text-sm",
-                  isCurrent ? "font-medium text-primary" : "text-foreground"
-                )}>
-                  {chapter.title}
-                </p>
-              </div>
-              {isCurrent && (
-                <span className="size-2 rounded-full bg-primary" />
-              )}
-              {!isCurrent && <ChevronRight size={14} className="text-muted-foreground" />}
-            </Button>
+            <div key={chapter.id} className="group flex items-stretch gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() =>
+                  navigate(
+                    `/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`,
+                  )
+                }
+                className={clsx(
+                  "flex h-auto flex-1 items-center gap-3 rounded-lg border p-2.5 text-left transition-colors hover:text-foreground",
+                  isCurrent
+                    ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_3px_0_0_var(--primary)]"
+                    : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-primary/8",
+                )}
+              >
+                <span
+                  className={clsx(
+                    "text-xs font-semibold",
+                    isCurrent ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  {t("chapter.shortNumber", { number: index + 1 })}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={clsx(
+                      "truncate text-sm",
+                      isCurrent
+                        ? "font-medium text-primary"
+                        : "text-foreground",
+                    )}
+                  >
+                    {chapter.title}
+                  </p>
+                </div>
+                {isCurrent && (
+                  <span className="size-2 rounded-full bg-primary" />
+                )}
+                {!isCurrent && (
+                  <ChevronRight size={14} className="text-muted-foreground" />
+                )}
+              </Button>
+              {onMoveChapter ? (
+                <ReorderControls
+                  entityLabel={chapter.title}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < sortedChapters.length - 1}
+                  disabled={reorderDisabled}
+                  onMoveUp={() => onMoveChapter(chapter.id, -1)}
+                  onMoveDown={() => onMoveChapter(chapter.id, 1)}
+                  className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                />
+              ) : null}
+            </div>
           );
         })}
 
         {sortedChapters.length === 0 && (
           <p className="py-4 text-center text-sm text-muted-foreground">
-            {t('chapter.navigation.empty')}
+            {t("chapter.navigation.empty")}
           </p>
         )}
       </div>
@@ -187,9 +271,9 @@ function ChapterNavigationPanel({
 }
 
 export default function ChapterRoute() {
-  const { projectId = '', tomeId = '', chapterId = '' } = useParams();
+  const { projectId = "", tomeId = "", chapterId = "" } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation(['story', 'common']);
+  const { t } = useTranslation(["story", "common"]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -202,12 +286,12 @@ export default function ChapterRoute() {
 
   // Get current chapter
   const chapter = useMemo(() => {
-    return story.data?.chapters.find(c => c.id === chapterId);
+    return story.data?.chapters.find((c) => c.id === chapterId);
   }, [story.data, chapterId]);
 
   // Get tome
   const tome = useMemo(() => {
-    return story.data?.tomes.find(t => t.id === tomeId);
+    return story.data?.tomes.find((t) => t.id === tomeId);
   }, [story.data, tomeId]);
 
   // Get chapter data
@@ -215,11 +299,11 @@ export default function ChapterRoute() {
     if (!chapter || !story.data) return null;
 
     const scenes = story.data.scenes
-      .filter(s => s.chapterId === chapterId)
+      .filter((s) => s.chapterId === chapterId)
       .sort((a, b) => a.orderIndex - b.orderIndex);
 
     const tomeChapters = story.data.chapters
-      .filter(c => c.tomeId === tomeId)
+      .filter((c) => c.tomeId === tomeId)
       .sort((a, b) => a.orderIndex - b.orderIndex);
 
     return { chapter, scenes, tomeChapters };
@@ -229,16 +313,16 @@ export default function ChapterRoute() {
   const chapterNumber = useMemo(() => {
     if (!story.data || !chapter) return 0;
     const tomeChapters = story.data.chapters
-      .filter(c => c.tomeId === tomeId)
+      .filter((c) => c.tomeId === tomeId)
       .sort((a, b) => a.orderIndex - b.orderIndex);
-    const index = tomeChapters.findIndex(c => c.id === chapterId);
+    const index = tomeChapters.findIndex((c) => c.id === chapterId);
     return index + 1;
   }, [story.data, chapterId, tomeId, chapter]);
 
   // Calculate tome number
   const tomeNumber = useMemo(() => {
     if (!story.data || !tome) return 0;
-    const index = story.data.tomes.findIndex(t => t.id === tomeId);
+    const index = story.data.tomes.findIndex((t) => t.id === tomeId);
     return index + 1;
   }, [story.data, tomeId, tome]);
 
@@ -248,6 +332,20 @@ export default function ChapterRoute() {
     onSuccess: () => {
       invalidateWorkspace(projectId);
       setIsEditing(false);
+    },
+  });
+
+  const reorderChapterMut = useMutation({
+    ...updateChapterMutation(),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+    },
+  });
+
+  const reorderSceneMut = useMutation({
+    ...updateSceneMutation(),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
     },
   });
 
@@ -262,9 +360,66 @@ export default function ChapterRoute() {
     },
   });
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<EditChapterInput>({
+  const moveChapter = async (movingChapterId: string, direction: -1 | 1) => {
+    if (!chapterData) {
+      return;
+    }
+
+    const swap = getOrderSwap(
+      chapterData.tomeChapters,
+      movingChapterId,
+      direction,
+    );
+    if (!swap) {
+      return;
+    }
+
+    await Promise.all([
+      reorderChapterMut.mutateAsync({
+        path: { projectId, chapterId: swap.current.id },
+        body: { orderIndex: swap.target.orderIndex },
+      } as unknown as Options<UpdateChapterData>),
+      reorderChapterMut.mutateAsync({
+        path: { projectId, chapterId: swap.target.id },
+        body: { orderIndex: swap.current.orderIndex },
+      } as unknown as Options<UpdateChapterData>),
+    ]);
+  };
+
+  const moveScene = async (movingSceneId: string, direction: -1 | 1) => {
+    if (!chapterData) {
+      return;
+    }
+
+    const swap = getOrderSwap(chapterData.scenes, movingSceneId, direction);
+    if (!swap) {
+      return;
+    }
+
+    await Promise.all([
+      reorderSceneMut.mutateAsync({
+        path: { projectId, sceneId: swap.current.id },
+        body: { orderIndex: swap.target.orderIndex },
+      } as unknown as Options<UpdateSceneData>),
+      reorderSceneMut.mutateAsync({
+        path: { projectId, sceneId: swap.target.id },
+        body: { orderIndex: swap.current.orderIndex },
+      } as unknown as Options<UpdateSceneData>),
+    ]);
+  };
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<EditChapterInput>({
     resolver: zodResolver(editChapterSchema),
-    defaultValues: { title: chapter?.title || '', synopsis: chapter?.synopsis || '' },
+    defaultValues: {
+      title: chapter?.title || "",
+      synopsis: chapter?.synopsis || "",
+    },
   });
 
   const onSubmit = (data: EditChapterInput) => {
@@ -276,8 +431,12 @@ export default function ChapterRoute() {
 
   const handleCreateScene = (data: CreateSceneInput) => {
     // Calculate orderIndex based on existing scenes in this chapter
-    const existingScenes = story.data?.scenes.filter(s => s.chapterId === chapterId) || [];
-    const maxOrderIndex = existingScenes.reduce((max, s) => Math.max(max, s.orderIndex), 0);
+    const existingScenes =
+      story.data?.scenes.filter((s) => s.chapterId === chapterId) || [];
+    const maxOrderIndex = existingScenes.reduce(
+      (max, s) => Math.max(max, s.orderIndex),
+      0,
+    );
 
     createSceneMut.mutate({
       path: { projectId },
@@ -287,7 +446,7 @@ export default function ChapterRoute() {
         title: data.title,
         location: data.location || undefined,
         orderIndex: maxOrderIndex + 1,
-      } as CreateSceneData['body'],
+      } as CreateSceneData["body"],
     });
   };
 
@@ -310,7 +469,7 @@ export default function ChapterRoute() {
   if (!chapterData || !chapter || !tome) {
     return (
       <AppShell>
-        <EmptyState title={t('chapter.notFound')} />
+        <EmptyState title={t("chapter.notFound")} />
       </AppShell>
     );
   }
@@ -336,7 +495,7 @@ export default function ChapterRoute() {
           to={`/projects/${projectId}/story/${tomeId}`}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
         >
-          <ArrowLeft size={16} /> {t('chapter.backToTome')}
+          <ArrowLeft size={16} /> {t("chapter.backToTome")}
         </Link>
       </div>
 
@@ -352,47 +511,65 @@ export default function ChapterRoute() {
               <div className="min-w-0 flex-1">
                 {/* Mobile breadcrumb */}
                 <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground lg:hidden">
-                  <span>{t('tome.number', { number: tomeNumber })}</span>
+                  <span>{t("tome.number", { number: tomeNumber })}</span>
                   <span>/</span>
-                  <span className="text-primary">{t('chapter.number', { number: chapterNumber })}</span>
+                  <span className="text-primary">
+                    {t("chapter.number", { number: chapterNumber })}
+                  </span>
                 </div>
 
                 {isEditing ? (
-                  <form onSubmit={handleSubmit(onSubmit)} className="mt-2 flex flex-col gap-2">
+                  <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="mt-2 flex flex-col gap-2"
+                  >
                     <div className="grid gap-1.5 text-xs text-muted-foreground">
                       <div className="flex items-center justify-between gap-2">
-                        <span>{t('fields.title')}</span>
+                        <span>{t("fields.title")}</span>
                         <StoryCompletionButton
                           projectId={projectId}
                           targetKind="chapter"
                           targetId={chapterId}
                           field="title"
-                          currentValue={watch('title')}
-                          onComplete={(text) => setValue('title', text, { shouldDirty: true, shouldValidate: true })}
+                          currentValue={watch("title")}
+                          onComplete={(text) =>
+                            setValue("title", text, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            })
+                          }
                         />
                       </div>
                       <Input
-                        {...register('title')}
+                        {...register("title")}
                         autoFocus
                         className="w-full text-lg font-semibold"
                       />
                     </div>
                     {errors.title && (
-                      <span className="text-danger text-xs">{errors.title.message}</span>
+                      <span className="text-danger text-xs">
+                        {errors.title.message}
+                      </span>
                     )}
                     <div className="grid gap-1.5 text-xs text-muted-foreground">
                       <div className="flex items-center justify-between gap-2">
-                        <span>{t('chapter.synopsis')}</span>
+                        <span>{t("chapter.synopsis")}</span>
                         <StoryCompletionButton
                           projectId={projectId}
                           targetKind="chapter"
                           targetId={chapterId}
                           field="synopsis"
-                          currentValue={watch('synopsis')}
-                          onComplete={(text) => setValue('synopsis', text, { shouldDirty: true })}
+                          currentValue={watch("synopsis")}
+                          onComplete={(text) =>
+                            setValue("synopsis", text, { shouldDirty: true })
+                          }
                         />
                       </div>
-                      <Textarea {...register('synopsis')} rows={4} className="w-full" />
+                      <Textarea
+                        {...register("synopsis")}
+                        rows={4}
+                        className="w-full"
+                      />
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button
@@ -400,12 +577,16 @@ export default function ChapterRoute() {
                         type="button"
                         onClick={() => setIsEditing(false)}
                         disabled={updateChapterMut.isPending}
+                        aria-label={t("actions.cancel")}
+                        title={t("actions.cancel")}
                       >
                         <X size={16} />
                       </Button>
                       <Button
                         variant="primary"
                         disabled={updateChapterMut.isPending}
+                        aria-label={t("actions.save")}
+                        title={t("actions.save")}
                       >
                         <Check size={16} />
                       </Button>
@@ -416,27 +597,35 @@ export default function ChapterRoute() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                          {t('chapter.number', { number: chapterNumber })}
+                          {t("chapter.number", { number: chapterNumber })}
                         </span>
-                        <h1 className="mt-1 text-xl font-semibold text-foreground">{chapter.title}</h1>
+                        <h1 className="mt-1 text-xl font-semibold text-foreground">
+                          {chapter.title}
+                        </h1>
                       </div>
                       <Button
                         variant="ghost"
                         className="size-8 p-0 hover:bg-primary/8 hover:text-primary"
                         onClick={() => setIsEditing(true)}
-                        title={t('actions.edit')}
+                        aria-label={t("actions.edit")}
+                        title={t("actions.edit")}
                       >
                         <Pencil size={16} />
                       </Button>
                     </div>
-                    <p className="mt-0.5 font-mono text-sm text-muted-foreground">{chapter.slug}</p>
+                    <p className="mt-0.5 font-mono text-sm text-muted-foreground">
+                      {chapter.slug}
+                    </p>
                   </>
                 )}
 
                 <div className="flex flex-wrap items-center gap-4 mt-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Film size={14} className="text-primary" />
-                    <span>{scenes.length} {t('chapter.stats.scenes', { count: scenes.length })}</span>
+                    <span>
+                      {scenes.length}{" "}
+                      {t("chapter.stats.scenes", { count: scenes.length })}
+                    </span>
                   </div>
                   <Badge tone={chapter.status}>{chapter.status}</Badge>
                 </div>
@@ -445,8 +634,12 @@ export default function ChapterRoute() {
 
             {chapter.synopsis && (
               <div className="mb-4">
-                <h3 className="mb-2 text-sm font-medium text-foreground">{t('chapter.synopsis')}</h3>
-                <p className="text-sm leading-6 text-muted-foreground">{chapter.synopsis}</p>
+                <h3 className="mb-2 text-sm font-medium text-foreground">
+                  {t("chapter.synopsis")}
+                </h3>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {chapter.synopsis}
+                </p>
               </div>
             )}
           </Panel>
@@ -454,17 +647,17 @@ export default function ChapterRoute() {
           {/* Scenes list */}
           <Panel>
             <SectionTitle
-              title={t('chapter.scenes')}
+              title={t("chapter.scenes")}
               meta={`${scenes.length}`}
               actions={
                 <Button
                   variant="primary"
                   onClick={() => setIsCreateModalOpen(true)}
                   className="h-8 gap-1.5 px-2.5"
-                  title={t('scenes.add')}
+                  title={t("scenes.add")}
                 >
                   <Plus size={18} />
-                  {t('actions.addScene')}
+                  {t("actions.addScene")}
                 </Button>
               }
             />
@@ -472,31 +665,55 @@ export default function ChapterRoute() {
             <div className="mt-3 flex flex-col gap-2">
               {scenes.length > 0 ? (
                 scenes.map((scene, index) => (
-                  <Button
-                    type="button"
-                    variant="ghost"
+                  <div
                     key={scene.id}
-                    onClick={() => navigate(`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`)}
-                    className={clsx(
-                      "flex h-auto min-h-14 w-full items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/35 hover:bg-primary/8 hover:text-foreground"
-                    )}
+                    className="group flex items-stretch gap-2"
                   >
-                    <span className="text-xs font-semibold text-primary">
-                      {t('scene.number', { number: index + 1 })}
-                    </span>
-                    <FileText size={14} className="text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-foreground">{scene.title}</p>
-                      <p className="truncate text-xs text-muted-foreground">{scene.slug}</p>
-                    </div>
-                    <Badge tone={scene.status}>{scene.status}</Badge>
-                    <ChevronRight size={14} className="text-muted-foreground" />
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() =>
+                        navigate(
+                          `/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`,
+                        )
+                      }
+                      className={clsx(
+                        "flex h-auto min-h-14 w-full flex-1 items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/35 hover:bg-primary/8 hover:text-foreground",
+                      )}
+                    >
+                      <span className="text-xs font-semibold text-primary">
+                        {t("scene.number", { number: index + 1 })}
+                      </span>
+                      <FileText size={14} className="text-muted-foreground" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {scene.title}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {scene.slug}
+                        </p>
+                      </div>
+                      <Badge tone={scene.status}>{scene.status}</Badge>
+                      <ChevronRight
+                        size={14}
+                        className="text-muted-foreground"
+                      />
+                    </Button>
+                    <ReorderControls
+                      entityLabel={scene.title}
+                      canMoveUp={index > 0}
+                      canMoveDown={index < scenes.length - 1}
+                      disabled={reorderSceneMut.isPending}
+                      onMoveUp={() => moveScene(scene.id, -1)}
+                      onMoveDown={() => moveScene(scene.id, 1)}
+                      className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                    />
+                  </div>
                 ))
               ) : (
                 <EmptyState
-                  title={t('chapter.empty.noScenes.title')}
-                  description={t('chapter.empty.noScenes.description')}
+                  title={t("chapter.empty.noScenes.title")}
+                  description={t("chapter.empty.noScenes.description")}
                 />
               )}
             </div>
@@ -511,6 +728,10 @@ export default function ChapterRoute() {
               currentChapterId={chapterId}
               projectId={projectId}
               tomeId={tomeId}
+              onMoveChapter={moveChapter}
+              reorderDisabled={
+                updateChapterMut.isPending || reorderChapterMut.isPending
+              }
             />
           )}
         </div>

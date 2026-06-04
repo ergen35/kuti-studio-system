@@ -3,12 +3,20 @@
  * Extracted from legacy api.ts for SDK compatibility
  */
 
-export const API_BASE_URL = ((import.meta.env.VITE_KUTI_API_URL as string | undefined) || "http://127.0.0.1:8000").replace(/\/$/, "");
+export const API_BASE_URL = (
+  (import.meta.env.VITE_KUTI_API_URL as string | undefined) ||
+  "http://127.0.0.1:8000"
+).replace(/\/$/, "");
 
 export function backendUrl(pathOrUrl: unknown): string {
   if (typeof pathOrUrl !== "string" || !pathOrUrl.trim()) return "";
   const value = pathOrUrl.trim();
-  if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("data:")) return value;
+  if (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("data:")
+  )
+    return value;
   if (value.startsWith("/")) return `${API_BASE_URL}${value}`;
   return `${API_BASE_URL}/${value}`;
 }

@@ -1,30 +1,48 @@
-import { Plus } from 'lucide-react';
-import { useMemo, useState, useEffect } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useTranslation } from '~/hooks/useTranslation';
-import { AppShell } from '~/components/layout';
-import { Button, ErrorState, LoadingState, PageHeader, Stat } from '~/components/ui';
+import { Plus } from "lucide-react";
+import {
+  useDeferredValue,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useParams, useNavigate, useSearchParams } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useTranslation } from "~/hooks/useTranslation";
+import { AppShell } from "~/components/layout";
+import {
+  Button,
+  ErrorState,
+  LoadingState,
+  PageHeader,
+  Stat,
+} from "~/components/ui";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { FormField } from '~/components/FormField';
-import { TomeCardGrid } from '~/components/story';
-import { apiErrorMessage } from '~/lib/errors';
-import { getStorySummaryOptions, createTomeMutation } from '~/lib/backend/@tanstack/react-query.gen';
-import { queryClient } from '~/lib/query';
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { FormField } from "~/components/FormField";
+import { StorySearchPanel, TomeCardGrid } from "~/components/story";
+import { apiErrorMessage } from "~/lib/errors";
+import { invalidateWorkspace } from "~/lib/query";
+import {
+  getStorySummaryOptions,
+  createTomeMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
+import { updateTomeMutation } from "~/lib/backend/@tanstack/react-query.gen";
+import { getOrderSwap } from "~/lib/story-order";
+import { buildStorySearchResults } from "~/lib/story-search";
 
 // Schema for creating a new tome
 const createTomeSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(1, "Title is required"),
 });
 
 type CreateTomeInput = z.infer<typeof createTomeSchema>;
@@ -41,62 +59,64 @@ function CreateTomeModal({
   onSubmit: (data: CreateTomeInput) => void;
   isLoading: boolean;
 }) {
-  const { t } = useTranslation('story');
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateTomeInput>({
+  const { t } = useTranslation("story");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateTomeInput>({
     resolver: zodResolver(createTomeSchema),
-    defaultValues: { title: '' },
+    defaultValues: { title: "" },
   });
-  
+
   // Reset form when opened
   useEffect(() => {
     if (isOpen) {
-      reset({ title: '' });
+      reset({ title: "" });
     }
   }, [isOpen, reset]);
-  
+
   const handleFormSubmit = (data: CreateTomeInput) => {
     onSubmit(data);
   };
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('createTome.title')}</DialogTitle>
+          <DialogTitle>{t("createTome.title")}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
-          <FormField 
-            label={t('fields.title')} 
-            error={errors.title}
-          >
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <FormField label={t("fields.title")} error={errors.title}>
             <Input
-              {...register('title')}
+              {...register("title")}
               autoFocus
               className="w-full"
-              placeholder={t('createTome.titlePlaceholder')}
+              placeholder={t("createTome.titlePlaceholder")}
             />
           </FormField>
-          
+
           <DialogFooter>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               onClick={onClose}
               disabled={isLoading}
               type="button"
             >
-              {t('actions.cancel')}
+              {t("actions.cancel")}
             </Button>
-            <Button 
-              variant="primary"
-              disabled={isLoading}
-            >
+            <Button variant="primary" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
-                  {t('actions.creating')}
+                  {t("actions.creating")}
                 </>
               ) : (
-                t('actions.save')
+                t("actions.save")
               )}
             </Button>
           </DialogFooter>
@@ -107,52 +127,91 @@ function CreateTomeModal({
 }
 
 export default function StoryRoute() {
-  const { projectId = '' } = useParams();
+  const { projectId = "" } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation(['story', 'common']);
-  
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation(["story", "common"]);
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Fetch story data
   const story = useQuery(getStorySummaryOptions({ path: { projectId } }));
+  const searchQuery = searchParams.get("q") ?? "";
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   // Create tome mutation
-  const createTome = useMutation(createTomeMutation());
-  
+  const createTome = useMutation({
+    ...createTomeMutation(),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+    },
+  });
+  const updateTome = useMutation({
+    ...updateTomeMutation(),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+    },
+  });
+
+  const reorderTome = async (tomeId: string, direction: -1 | 1) => {
+    if (!story.data) {
+      return;
+    }
+
+    const swap = getOrderSwap(story.data.tomes, tomeId, direction);
+    if (!swap) {
+      return;
+    }
+
+    await Promise.all([
+      updateTome.mutateAsync({
+        path: { projectId, tomeId: swap.current.id },
+        body: { orderIndex: swap.target.orderIndex },
+      }),
+      updateTome.mutateAsync({
+        path: { projectId, tomeId: swap.target.id },
+        body: { orderIndex: swap.current.orderIndex },
+      }),
+    ]);
+  };
+
   const handleCreateSubmit = (data: CreateTomeInput) => {
     createTome.mutate(
       {
         path: { projectId },
         body: {
           title: data.title,
-          orderIndex: (story.data?.tomes?.length ?? 0)
-        }
+          orderIndex: story.data?.tomes?.length ?? 0,
+        },
       },
       {
         onSuccess: () => {
           setIsModalOpen(false);
-        }
-      }
+        },
+      },
     );
   };
-  
+
   // Calculate tome stats
   const tomeStats = useMemo(() => {
     if (!story.data) return [];
-    
+
     const { tomes, chapters, scenes } = story.data;
-    
+
     return tomes
       .map((tome) => {
-        const tomeChapters = chapters.filter(c => c.tomeId === tome.id);
-        const tomeScenes = scenes.filter(s => s.tomeId === tome.id);
+        const tomeChapters = chapters.filter((c) => c.tomeId === tome.id);
+        const tomeScenes = scenes.filter((s) => s.tomeId === tome.id);
 
         // Calculate last modified date
-        const lastSceneUpdate = tomeScenes.length > 0
-          ? Math.max(...tomeScenes.map(s => new Date(s.updatedAt).getTime()))
-          : new Date(tome.updatedAt).getTime();
-        
+        const lastSceneUpdate =
+          tomeScenes.length > 0
+            ? Math.max(
+                ...tomeScenes.map((s) => new Date(s.updatedAt).getTime()),
+              )
+            : new Date(tome.updatedAt).getTime();
+
         return {
           ...tome,
           chapterCount: tomeChapters.length,
@@ -162,61 +221,118 @@ export default function StoryRoute() {
       })
       .sort((a, b) => a.orderIndex - b.orderIndex);
   }, [story.data]);
-  
+
   const handleSelectTome = (tomeId: string) => {
     navigate(`/projects/${projectId}/story/${tomeId}`);
   };
-  
+
   const handleCreateClick = () => {
     setIsModalOpen(true);
   };
-  
 
+  const updateSearchQuery = useCallback(
+    (value: string) => {
+      const nextParams = new URLSearchParams(searchParams);
+      const trimmed = value.trim();
+
+      if (trimmed) {
+        nextParams.set("q", value);
+      } else {
+        nextParams.delete("q");
+      }
+
+      setSearchParams(nextParams, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
+  const searchResults = useMemo(
+    () =>
+      buildStorySearchResults(
+        story.data
+          ? {
+              projectId,
+              tomes: story.data.tomes,
+              chapters: story.data.chapters,
+              scenes: story.data.scenes,
+            }
+          : undefined,
+        deferredSearchQuery,
+      ),
+    [deferredSearchQuery, projectId, story.data],
+  );
 
   return (
     <AppShell>
       <PageHeader
-        title={t('title')}
-        description={t('description')}
-        actions={(
-          <Button variant="primary" onClick={handleCreateClick} className="shrink-0">
-            <Plus size={16} /> {t('actions.addTome')}
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <Button
+            variant="primary"
+            onClick={handleCreateClick}
+            className="shrink-0"
+          >
+            <Plus size={16} /> {t("actions.addTome")}
           </Button>
-        )}
+        }
       />
-      
+
+      {story.data ? (
+        <StorySearchPanel
+          query={searchQuery}
+          onQueryChange={updateSearchQuery}
+          results={searchResults}
+        />
+      ) : null}
+
       {/* Error states */}
       {createTome.error && (
         <div className="mb-4">
           <ErrorState message={apiErrorMessage(createTome.error)} />
         </div>
       )}
-      
+
       {/* Loading state */}
       {story.isLoading && <LoadingState />}
-      
+
       {/* Error state */}
-      {story.error && (
-        <ErrorState message={apiErrorMessage(story.error)} />
-      )}
-      
+      {story.error && <ErrorState message={apiErrorMessage(story.error)} />}
+
       {/* Tome card grid */}
       {story.data && (
         <div className="grid gap-4">
           <div className="grid gap-3 sm:grid-cols-3">
-            <Stat value={story.data.tomes.length} label={t('panels.outline.count', { count: story.data.tomes.length })} />
-            <Stat value={story.data.chapters.length} label={t('tome.stats.chapters', { count: story.data.chapters.length })} />
-            <Stat value={story.data.scenes.length} label={t('tome.stats.scenes', { count: story.data.scenes.length })} />
+            <Stat
+              value={story.data.tomes.length}
+              label={t("panels.outline.count", {
+                count: story.data.tomes.length,
+              })}
+            />
+            <Stat
+              value={story.data.chapters.length}
+              label={t("tome.stats.chapters", {
+                count: story.data.chapters.length,
+              })}
+            />
+            <Stat
+              value={story.data.scenes.length}
+              label={t("tome.stats.scenes", {
+                count: story.data.scenes.length,
+              })}
+            />
           </div>
           <TomeCardGrid
             tomes={tomeStats}
             onSelect={handleSelectTome}
             onCreate={handleCreateClick}
             isLoading={story.isLoading}
+            onMoveTome={reorderTome}
+            reorderDisabled={updateTome.isPending}
           />
         </div>
       )}
-      
+
       {/* Create Tome Modal */}
       <CreateTomeModal
         isOpen={isModalOpen}

@@ -13,7 +13,10 @@ import {
   completeStoryFieldMutation,
   listStoryCompletionModelsOptions,
 } from "~/lib/backend/@tanstack/react-query.gen";
-import type { CompleteStoryFieldData, ListStoryCompletionModelsResponse } from "~/lib/backend";
+import type {
+  CompleteStoryFieldData,
+  ListStoryCompletionModelsResponse,
+} from "~/lib/backend";
 import { useTranslation } from "~/hooks/useTranslation";
 
 type CompletionField = CompleteStoryFieldData["body"]["field"];
@@ -77,7 +80,11 @@ export function StoryCompletionButton({
     <div className="flex items-center gap-1.5">
       {models.length > 1 ? (
         <Select value={selectedModelKey} onValueChange={setModelKey}>
-          <SelectTrigger size="sm" className="h-7 max-w-36 text-xs" title={t("completion.model") }>
+          <SelectTrigger
+            size="sm"
+            className="h-7 max-w-36 text-xs"
+            title={t("completion.model")}
+          >
             <SelectValue placeholder={t("completion.model")} />
           </SelectTrigger>
           <SelectContent>
@@ -94,10 +101,21 @@ export function StoryCompletionButton({
         variant="ghost"
         className="size-7 border border-primary/25 bg-primary/10 p-0 text-primary hover:bg-primary/15"
         onClick={runCompletion}
-        disabled={completion.isPending || modelsQuery.isLoading || !projectId || !targetId}
-        title={completion.error ? t("completion.error") : t("completion.generate")}
+        disabled={
+          completion.isPending ||
+          modelsQuery.isLoading ||
+          !projectId ||
+          !targetId
+        }
+        title={
+          completion.error ? t("completion.error") : t("completion.generate")
+        }
       >
-        {completion.isPending ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+        {completion.isPending ? (
+          <Loader2 size={15} className="animate-spin" />
+        ) : (
+          <Sparkles size={15} />
+        )}
       </Button>
     </div>
   );

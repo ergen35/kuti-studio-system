@@ -1,19 +1,19 @@
-import { useEffect } from 'react';
-import { useTranslation } from '~/hooks/useTranslation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Save, Archive, Trash2, UserRoundPlus } from 'lucide-react';
-import { CharacterAvatar } from './CharacterAvatar';
-import { FormField } from '~/components/FormField';
-import { Button, Panel, SectionTitle, Badge, toCsv } from '~/components/ui';
+import { useEffect } from "react";
+import { useTranslation } from "~/hooks/useTranslation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Save, Archive, Trash2, UserRoundPlus } from "lucide-react";
+import { CharacterAvatar } from "./CharacterAvatar";
+import { FormField } from "~/components/FormField";
+import { Button, Panel, SectionTitle, Badge, toCsv } from "~/components/ui";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -21,12 +21,20 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '~/components/ui/select';
-import { Skeleton } from '~/components/ui/skeleton';
-import { Textarea } from '~/components/ui/textarea';
-import { characterSchema, relationSchema, type CharacterInput, type RelationInput } from '~/lib/schemas';
-import { csv } from '~/lib/utils';
-import type { ListCharactersResponse, GetCharacterResponse } from '~/lib/backend';
+} from "~/components/ui/select";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Textarea } from "~/components/ui/textarea";
+import {
+  characterSchema,
+  relationSchema,
+  type CharacterInput,
+  type RelationInput,
+} from "~/lib/schemas";
+import { csv } from "~/lib/utils";
+import type {
+  ListCharactersResponse,
+  GetCharacterResponse,
+} from "~/lib/backend";
 
 type Character = ListCharactersResponse[number];
 type CharacterDetail = GetCharacterResponse;
@@ -58,14 +66,19 @@ export function CharacterDetailModal({
   onAddRelation,
   saving,
 }: CharacterDetailModalProps) {
-  const { t } = useTranslation('characters');
+  const { t } = useTranslation("characters");
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<CharacterInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<CharacterInput>({
     resolver: zodResolver(characterSchema),
     defaultValues: {
       name: character.name,
-      alias: (character.alias as string | undefined) || '',
-      narrativeRole: (character.narrativeRole as string | undefined) || '',
+      alias: (character.alias as string | undefined) || "",
+      narrativeRole: (character.narrativeRole as string | undefined) || "",
       description: character.description,
       physicalDescription: character.physicalDescription,
       keyTraitsJson: toCsv(character.keyTraitsJson),
@@ -81,8 +94,8 @@ export function CharacterDetailModal({
   useEffect(() => {
     reset({
       name: character.name,
-      alias: (character.alias as string | undefined) || '',
-      narrativeRole: (character.narrativeRole as string | undefined) || '',
+      alias: (character.alias as string | undefined) || "",
+      narrativeRole: (character.narrativeRole as string | undefined) || "",
       description: character.description,
       physicalDescription: character.physicalDescription,
       keyTraitsJson: toCsv(character.keyTraitsJson),
@@ -130,60 +143,90 @@ export function CharacterDetailModal({
             {/* Main form */}
             <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-4 lg:grid-cols-2">
-                <FormField label={t('fields.name')} error={errors.name}>
-                  <Input {...register('name')} />
+                <FormField label={t("fields.name")} error={errors.name}>
+                  <Input {...register("name")} />
                 </FormField>
-                <FormField label={t('fields.alias')} error={errors.alias}>
-                  <Input {...register('alias')} />
+                <FormField label={t("fields.alias")} error={errors.alias}>
+                  <Input {...register("alias")} />
                 </FormField>
               </div>
 
-              <FormField label={t('fields.narrativeRole')} error={errors.narrativeRole}>
-                <Input {...register('narrativeRole')} />
+              <FormField
+                label={t("fields.narrativeRole")}
+                error={errors.narrativeRole}
+              >
+                <Input {...register("narrativeRole")} />
               </FormField>
 
-              <FormField label={t('fields.description')} error={errors.description}>
-                <Textarea {...register('description')} rows={3} />
+              <FormField
+                label={t("fields.description")}
+                error={errors.description}
+              >
+                <Textarea {...register("description")} rows={3} />
               </FormField>
 
-              <FormField label={t('fields.physicalDescription')} error={errors.physicalDescription}>
-                <Textarea {...register('physicalDescription')} rows={3} />
+              <FormField
+                label={t("fields.physicalDescription")}
+                error={errors.physicalDescription}
+              >
+                <Textarea {...register("physicalDescription")} rows={3} />
               </FormField>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <FormField label={t('fields.traits')} error={errors.keyTraitsJson}>
-                  <Input {...register('keyTraitsJson')} placeholder={t('placeholders.traits')} />
+                <FormField
+                  label={t("fields.traits")}
+                  error={errors.keyTraitsJson}
+                >
+                  <Input
+                    {...register("keyTraitsJson")}
+                    placeholder={t("placeholders.traits")}
+                  />
                 </FormField>
-                <FormField label={t('fields.palette')} error={errors.colorPaletteJson}>
-                  <Input {...register('colorPaletteJson')} placeholder={t('placeholders.palette')} />
+                <FormField
+                  label={t("fields.palette")}
+                  error={errors.colorPaletteJson}
+                >
+                  <Input
+                    {...register("colorPaletteJson")}
+                    placeholder={t("placeholders.palette")}
+                  />
                 </FormField>
               </div>
 
-              <FormField label={t('fields.costumeElements')} error={errors.costumeElementsJson}>
-                <Input {...register('costumeElementsJson')} />
+              <FormField
+                label={t("fields.costumeElements")}
+                error={errors.costumeElementsJson}
+              >
+                <Input {...register("costumeElementsJson")} />
               </FormField>
 
-              <FormField label={t('fields.personality')} error={errors.personality}>
-                <Textarea {...register('personality')} rows={3} />
+              <FormField
+                label={t("fields.personality")}
+                error={errors.personality}
+              >
+                <Textarea {...register("personality")} rows={3} />
               </FormField>
 
-              <FormField label={t('fields.narrativeArc')} error={errors.narrativeArc}>
-                <Textarea {...register('narrativeArc')} rows={3} />
+              <FormField
+                label={t("fields.narrativeArc")}
+                error={errors.narrativeArc}
+              >
+                <Textarea {...register("narrativeArc")} rows={3} />
               </FormField>
 
-              <FormField label={t('fields.tags')} error={errors.tagsJson}>
-                <Input {...register('tagsJson')} />
+              <FormField label={t("fields.tags")} error={errors.tagsJson}>
+                <Input {...register("tagsJson")} />
               </FormField>
 
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="primary" disabled={saving || isSubmitting}>
-                  <Save size={16} /> {t('actions.saveProfile')}
+                  <Save size={16} /> {t("actions.saveProfile")}
                 </Button>
                 <Button variant="ghost" onClick={onArchive} type="button">
-                  <Archive size={15} /> {t('actions.archive')}
+                  <Archive size={15} /> {t("actions.archive")}
                 </Button>
                 <Button variant="danger" onClick={onDelete} type="button">
-                  <Trash2 size={15} /> {t('actions.delete')}
+                  <Trash2 size={15} /> {t("actions.delete")}
                 </Button>
               </div>
             </form>
@@ -192,8 +235,12 @@ export function CharacterDetailModal({
             <div className="space-y-4">
               <Panel className="!p-4">
                 <SectionTitle
-                  title={t('relations.title')}
-                  meta={detail ? `${detail.relations.length} ${t('relations.count', { count: detail.relations.length })}` : ''}
+                  title={t("relations.title")}
+                  meta={
+                    detail
+                      ? `${detail.relations.length} ${t("relations.count", { count: detail.relations.length })}`
+                      : ""
+                  }
                 />
 
                 {detailLoading ? (
@@ -204,23 +251,32 @@ export function CharacterDetailModal({
                 ) : detail && detail.relations.length > 0 ? (
                   <div className="space-y-2 mt-3">
                     {detail.relations.map((rel) => (
-                      <div key={rel.id} className="p-3 rounded-lg bg-surface-2/50 border border-line/50">
+                      <div
+                        key={rel.id}
+                        className="p-3 rounded-lg bg-surface-2/50 border border-line/50"
+                      >
                         <div className="flex items-center justify-between">
                           <Badge>{rel.relationType}</Badge>
-                          <span className="text-xs text-muted">{rel.strength}%</span>
+                          <span className="text-xs text-muted">
+                            {rel.strength}%
+                          </span>
                         </div>
-                        <p className="text-xs text-muted mt-1">{rel.targetCharacterId}</p>
+                        <p className="text-xs text-muted mt-1">
+                          {rel.targetCharacterId}
+                        </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted py-4 text-center">{t('relations.empty')}</p>
+                  <p className="text-sm text-muted py-4 text-center">
+                    {t("relations.empty")}
+                  </p>
                 )}
 
                 {/* Quick add relation */}
                 {detail && (
                   <RelationQuickAdd
-                    characters={characters.filter(c => c.id !== character.id)}
+                    characters={characters.filter((c) => c.id !== character.id)}
                     onSubmit={onAddRelation}
                   />
                 )}
@@ -228,20 +284,33 @@ export function CharacterDetailModal({
 
               <Panel className="!p-4">
                 <SectionTitle
-                  title={t('voiceSamples.title')}
-                  meta={detail ? `${detail.voiceSamples.length} ${t('voiceSamples.count', { count: detail.voiceSamples.length })}` : ''}
+                  title={t("voiceSamples.title")}
+                  meta={
+                    detail
+                      ? `${detail.voiceSamples.length} ${t("voiceSamples.count", { count: detail.voiceSamples.length })}`
+                      : ""
+                  }
                 />
                 {detail && detail.voiceSamples.length > 0 ? (
                   <div className="space-y-2 mt-3">
                     {detail.voiceSamples.map((sample) => (
-                      <div key={sample.id} className="p-3 rounded-lg bg-surface-2/50 border border-line/50">
-                        <p className="text-sm font-medium text-ink">{sample.label}</p>
-                        <p className="text-xs text-muted">{String(sample.voiceNotes || sample.assetPath || '')}</p>
+                      <div
+                        key={sample.id}
+                        className="p-3 rounded-lg bg-surface-2/50 border border-line/50"
+                      >
+                        <p className="text-sm font-medium text-ink">
+                          {sample.label}
+                        </p>
+                        <p className="text-xs text-muted">
+                          {String(sample.voiceNotes || sample.assetPath || "")}
+                        </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted py-4 text-center">{t('voiceSamples.empty')}</p>
+                  <p className="text-sm text-muted py-4 text-center">
+                    {t("voiceSamples.empty")}
+                  </p>
                 )}
               </Panel>
             </div>
@@ -253,40 +322,75 @@ export function CharacterDetailModal({
 }
 
 // Quick relation add form
-function RelationQuickAdd({ characters, onSubmit }: { characters: Character[]; onSubmit: (body: RelationInput) => void }) {
-  const { t } = useTranslation('characters');
-  const { register, handleSubmit, formState: { isSubmitting }, watch, setValue } = useForm<RelationInput>({
+function RelationQuickAdd({
+  characters,
+  onSubmit,
+}: {
+  characters: Character[];
+  onSubmit: (body: RelationInput) => void;
+}) {
+  const { t } = useTranslation("characters");
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+    watch,
+    setValue,
+  } = useForm<RelationInput>({
     resolver: zodResolver(relationSchema),
-    defaultValues: { targetCharacterId: '', relationType: 'ally', strength: 50 },
+    defaultValues: {
+      targetCharacterId: "",
+      relationType: "ally",
+      strength: 50,
+    },
   });
 
-  const target = watch('targetCharacterId');
+  const target = watch("targetCharacterId");
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-4 pt-4 border-t border-line/50 space-y-3">
-      <p className="text-sm font-medium text-ink">{t('relations.add.title')}</p>
-      <Select value={target} onValueChange={(value) => setValue('targetCharacterId', value, { shouldDirty: true, shouldValidate: true })}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mt-4 pt-4 border-t border-line/50 space-y-3"
+    >
+      <p className="text-sm font-medium text-ink">{t("relations.add.title")}</p>
+      <Select
+        value={target}
+        onValueChange={(value) =>
+          setValue("targetCharacterId", value, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
+        }
+      >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={t('relations.add.selectTarget')} />
+          <SelectValue placeholder={t("relations.add.selectTarget")} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {characters.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+            {characters.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
           </SelectGroup>
         </SelectContent>
       </Select>
       <div className="grid grid-cols-2 gap-2">
-        <Input {...register('relationType')} className="text-sm" placeholder={t('relations.add.type')} />
+        <Input
+          {...register("relationType")}
+          className="text-sm"
+          placeholder={t("relations.add.type")}
+        />
         <Input
           type="number"
           min={0}
           max={100}
-          {...register('strength', { valueAsNumber: true })}
+          {...register("strength", { valueAsNumber: true })}
           className="text-sm"
         />
       </div>
       <Button disabled={!target || isSubmitting} className="w-full text-sm">
-        <UserRoundPlus size={14} /> {t('relations.add.title')}
+        <UserRoundPlus size={14} /> {t("relations.add.title")}
       </Button>
     </form>
   );

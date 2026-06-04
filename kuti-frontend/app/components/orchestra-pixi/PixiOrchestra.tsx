@@ -1,16 +1,23 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
-import type { Tome, Chapter, Scene } from '~/lib/orchestra/types';
-import { calculateNodePositions, getLayoutBounds } from '~/lib/orchestra/layout-engine';
-import { useOrchestraStore } from '~/stores/orchestra';
-import { PixiCanvas } from './PixiCanvas';
-import { ViewControls } from './ViewControls';
+import { useRef, useState, useEffect, useCallback } from "react";
+import type { Tome, Chapter, Scene } from "~/lib/orchestra/types";
+import {
+  calculateNodePositions,
+  getLayoutBounds,
+} from "~/lib/orchestra/layout-engine";
+import { useOrchestraStore } from "~/stores/orchestra";
+import { PixiCanvas } from "./PixiCanvas";
+import { ViewControls } from "./ViewControls";
 
 interface PixiOrchestraProps {
   tomes: Tome[];
   chapters: Chapter[];
   scenes: Scene[];
   currentSceneId?: string;
-  onNavigateToScene?: (sceneId: string, chapterId: string, tomeId: string) => void;
+  onNavigateToScene?: (
+    sceneId: string,
+    chapterId: string,
+    tomeId: string,
+  ) => void;
 }
 
 export function PixiOrchestra({
@@ -58,20 +65,20 @@ export function PixiOrchestra({
 
     // Delay initial measurement to ensure layout is complete
     const timer = setTimeout(updateSize, 0);
-    window.addEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
 
     const observer = new ResizeObserver(() => {
       // Use requestAnimationFrame to batch updates
       requestAnimationFrame(updateSize);
     });
-    
+
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', updateSize);
+      window.removeEventListener("resize", updateSize);
       observer.disconnect();
     };
   }, []);
@@ -89,7 +96,7 @@ export function PixiOrchestra({
             height: bounds.size.y + 200,
           },
           size.width,
-          size.height
+          size.height,
         );
       }
     }
@@ -98,30 +105,39 @@ export function PixiOrchestra({
   }, [size.width, size.height, nodePositions.size]);
 
   // Build lookup maps for parent relationships
-  const chapterToTome = useCallback((chapterId: string) => {
-    const chapter = chapters.find(c => c.id === chapterId);
-    return chapter?.tomeId;
-  }, [chapters]);
+  const chapterToTome = useCallback(
+    (chapterId: string) => {
+      const chapter = chapters.find((c) => c.id === chapterId);
+      return chapter?.tomeId;
+    },
+    [chapters],
+  );
 
-  const sceneToChapter = useCallback((sceneId: string) => {
-    const scene = scenes.find(s => s.id === sceneId);
-    return scene?.chapterId;
-  }, [scenes]);
+  const sceneToChapter = useCallback(
+    (sceneId: string) => {
+      const scene = scenes.find((s) => s.id === sceneId);
+      return scene?.chapterId;
+    },
+    [scenes],
+  );
 
-  const sceneToTome = useCallback((sceneId: string) => {
-    const scene = scenes.find(s => s.id === sceneId);
-    if (!scene) return undefined;
-    const chapter = chapters.find(c => c.id === scene.chapterId);
-    return chapter?.tomeId;
-  }, [scenes, chapters]);
+  const sceneToTome = useCallback(
+    (sceneId: string) => {
+      const scene = scenes.find((s) => s.id === sceneId);
+      if (!scene) return undefined;
+      const chapter = chapters.find((c) => c.id === scene.chapterId);
+      return chapter?.tomeId;
+    },
+    [scenes, chapters],
+  );
 
   const handleSelectNode = useCallback(
-    (type: 'tome' | 'chapter' | 'scene', id: string) => {
-      if (type === 'tome') {
+    (type: "tome" | "chapter" | "scene", id: string) => {
+      if (type === "tome") {
         // Select and expand tome
         selectTome(id);
         expandTome(id);
-      } else if (type === 'chapter') {
+      } else if (type === "chapter") {
         // Select and expand chapter
         selectChapter(id);
         expandChapter(id);
@@ -130,7 +146,7 @@ export function PixiOrchestra({
         if (tomeId) {
           expandTome(tomeId);
         }
-      } else if (type === 'scene') {
+      } else if (type === "scene") {
         // Navigate to the scene
         const chapterId = sceneToChapter(id);
         const tomeId = sceneToTome(id);
@@ -148,7 +164,17 @@ export function PixiOrchestra({
         }
       }
     },
-    [selectTome, selectChapter, selectScene, expandTome, expandChapter, chapterToTome, sceneToChapter, sceneToTome, onNavigateToScene]
+    [
+      selectTome,
+      selectChapter,
+      selectScene,
+      expandTome,
+      expandChapter,
+      chapterToTome,
+      sceneToChapter,
+      sceneToTome,
+      onNavigateToScene,
+    ],
   );
 
   return (

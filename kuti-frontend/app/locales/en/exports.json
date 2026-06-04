@@ -1,28 +1,75 @@
 {
   "title": "Exports",
-  "description": "Generate backend work exports in JSON, tree or ZIP format.",
+  "description": "Generate work or publication exports in batches and download them when ready.",
   "panels": {
     "create": {
       "title": "Create export",
-      "kind": "Kind",
+      "subtitle": "Pick a project scope and one or more file formats.",
+      "kind": "Type",
       "kinds": {
-        "work": "work",
-        "publication": "publication"
+        "work": {
+          "label": "Work",
+          "description": "Internal JSON, tree, and ZIP bundles for editing."
+        },
+        "publication": {
+          "label": "Publication",
+          "description": "Reader-ready formats for distribution."
+        }
       },
-      "format": "Format",
       "formats": {
-        "json": "json",
-        "tree": "tree",
-        "zip": "zip"
+        "label": "Formats",
+        "hint": "Select one or more formats. Each selected format creates a separate export record.",
+        "json": {
+          "label": "JSON",
+          "description": "Structured snapshot for archiving and tooling."
+        },
+        "tree": {
+          "label": "Tree",
+          "description": "Readable folder hierarchy with story files."
+        },
+        "zip": {
+          "label": "ZIP",
+          "description": "Portable archive with project data and assets."
+        },
+        "pagedImages": {
+          "label": "Paged images",
+          "description": "Ordered page folders for reading and review."
+        },
+        "pdf": {
+          "label": "PDF",
+          "description": "Linear document for shared reading and proofing."
+        },
+        "cbz": {
+          "label": "CBZ",
+          "description": "Comic archive compatible with reader apps."
+        },
+        "epub": {
+          "label": "EPUB",
+          "description": "E-book package with navigation and images."
+        }
       },
       "label": "Label",
-      "button": "Create export"
+      "summary": "Summary",
+      "summaryPlaceholder": "Optional note shown in export history",
+      "button": "Create export",
+      "buttonMultiple": "Create {{count}} exports",
+      "submitHint": "{{count}} format(s) selected",
+      "defaults": {
+        "workLabel": "Work export",
+        "publicationLabel": "Publication export"
+      }
     },
     "artifacts": {
-      "title": "Artifacts"
+      "title": "History",
+      "loading": "Loading exports",
+      "count": "{{count}} export(s)",
+      "sizeUnknown": "Size unavailable",
+      "sourceSnapshot": "Source snapshot",
+      "sourceSnapshotCount": "{{count}} tracked items"
     }
   },
   "empty": {
-    "title": "No export"
+    "title": "No exports yet",
+    "description": "Create a work or publication export to produce a downloadable artifact."
   }
 }

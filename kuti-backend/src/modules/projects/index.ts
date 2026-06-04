@@ -12,6 +12,7 @@ import {
   exportProject,
   getProject,
   listProjects,
+  importProject,
   openProject,
   updateProject,
 } from "./controller";
@@ -20,6 +21,7 @@ import {
   createProjectBodySchema,
   deleteProjectBodySchema,
   deleteProjectResponseSchema,
+  importProjectBodySchema,
   projectIdParamsSchema,
   projectListResponseSchema,
   projectResponseSchema,
@@ -64,6 +66,20 @@ export const projectsModule = new Elysia({
       detail: {
         operationId: "createProject",
         summary: "Create a new project",
+      },
+    }
+  )
+
+  // POST /api/projects/import - Ouvrir ou importer un projet local existant
+  .post(
+    "/import",
+    ({ body }) => importProject(body),
+    {
+      body: importProjectBodySchema,
+      response: projectResponseSchema,
+      detail: {
+        operationId: "importProject",
+        summary: "Import or open an existing local project",
       },
     }
   )

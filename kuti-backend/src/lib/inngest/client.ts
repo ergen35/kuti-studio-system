@@ -9,4 +9,6 @@ export const inngest = new Inngest({
   id: "kuti-studio",
   eventKey: config.inngestEventKey,
   signingKey: config.inngestSigningKey,
+  baseUrl: config.inngestBaseUrl,
+  isDev: config.inngestDev,
 });

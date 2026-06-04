@@ -6,10 +6,13 @@
 import { mkdir, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { randomUUIDv7 } from "bun";
+import slugify from "slugify";
+import { PDFDocument } from "pdf-lib";
 import { db } from "../db";
 import type { ExportStatus } from "../db/generated/enums";
 import { saveExportFile, writeFile } from "../filesystem";
 import { inngest } from "./client";
+import { config } from "../config";
 import { getProjectDir } from "../paths";
 
 type ZipWriterLike = {
@@ -113,6 +116,320 @@ function objectRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 
+type ExportSourceSnapshot = Record<string, unknown>;
+
+function readSourceSnapshot(value: unknown): ExportSourceSnapshot | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as ExportSourceSnapshot
+    : null;
+}
+
+function buildExportManifest(
+  project: Record<string, unknown>,
+  kind: "work" | "publication",
+  format: string,
+  sourceSnapshot: ExportSourceSnapshot | null,
+) {
+  return {
+    name: project.name,
+    slug: project.slug,
+    exportedAt: new Date().toISOString(),
+    kind,
+    format,
+    sourceSnapshot,
+  };
+}
+
+type StorySceneContext = {
+  tome: any;
+  chapter: any;
+  scene: any;
+};
+
+type PublicationPageEntry = {
+  pageId: string;
+  sceneId: string;
+  sceneSlug: string;
+  sceneTitle: string;
+  tomeId: string;
+  tomeSlug: string;
+  tomeTitle: string;
+  chapterId: string;
+  chapterSlug: string;
+  chapterTitle: string;
+  pageNumber: number;
+  label: string;
+  caption: string;
+  prompt: string;
+  imagePath: string;
+  mimeType: string;
+  status: string;
+  sourceKind: "scene_page" | "validated_board";
+  boardId?: string;
+  panelId?: string;
+};
+
+function safeStem(value: string): string {
+  return slugify(value, { lower: true, strict: true, replacement: "_" }) || "export";
+}
+
+function normalizedPath(value: string): string {
+  return value.trim().replace(/\\/g, "/");
+}
+
+function isRemotePath(value: string): boolean {
+  return /^https?:\/\//i.test(value) || value.startsWith("/api/");
+}
+
+function resolveRemotePath(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  return new URL(path, `http://127.0.0.1:${config.port}`).toString();
+}
+
+function mimeTypeFromPath(path: string): string {
+  const ext = normalizedPath(path).split("?")[0].split("#")[0].split(".").pop()?.toLowerCase() || "";
+
+  switch (ext) {
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "webp":
+      return "image/webp";
+    case "gif":
+      return "image/gif";
+    default:
+      return "application/octet-stream";
+  }
+}
+
+async function readBinarySource(path: string): Promise<{ buffer: Buffer; mimeType: string }> {
+  if (isRemotePath(path)) {
+    const response = await fetch(resolveRemotePath(path));
+    if (!response.ok) {
+      throw new Error(`Failed to read remote image: ${path}`);
+    }
+
+    return {
+      buffer: Buffer.from(await response.arrayBuffer()),
+      mimeType: response.headers.get("content-type") || mimeTypeFromPath(path),
+    };
+  }
+
+  return {
+    buffer: Buffer.from(await Bun.file(path).arrayBuffer()),
+    mimeType: mimeTypeFromPath(path),
+  };
+}
+
+function flattenStoryScenes(project: any): StorySceneContext[] {
+  const tomes = Array.isArray(project?.tomes) ? [...project.tomes] : [];
+
+  return tomes
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+    .flatMap((tome) => {
+      const chapters = Array.isArray(tome.chapters) ? [...tome.chapters] : [];
+
+      return chapters
+        .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+        .flatMap((chapter) => {
+          const scenes = Array.isArray(chapter.scenes) ? [...chapter.scenes] : [];
+
+          return scenes
+            .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+            .map((scene) => ({ tome, chapter, scene }));
+        });
+    });
+}
+
+function pageEntryFromScenePage(sceneContext: StorySceneContext, page: any, sourceKind: PublicationPageEntry["sourceKind"]): PublicationPageEntry | null {
+  const imagePath = typeof page.imageUrl === "string" ? page.imageUrl.trim() : "";
+  if (!imagePath) return null;
+
+  return {
+    pageId: page.id,
+    sceneId: sceneContext.scene.id,
+    sceneSlug: sceneContext.scene.slug,
+    sceneTitle: sceneContext.scene.title,
+    tomeId: sceneContext.tome.id,
+    tomeSlug: sceneContext.tome.slug,
+    tomeTitle: sceneContext.tome.title,
+    chapterId: sceneContext.chapter.id,
+    chapterSlug: sceneContext.chapter.slug,
+    chapterTitle: sceneContext.chapter.title,
+    pageNumber: page.pageNumber,
+    label: page.label || `Page ${page.pageNumber}`,
+    caption: page.caption || "",
+    prompt: page.prompt || "",
+    imagePath,
+    mimeType: mimeTypeFromPath(imagePath),
+    status: page.status,
+    sourceKind,
+    boardId: typeof page.boardId === "string" ? page.boardId : undefined,
+    panelId: typeof page.panelId === "string" ? page.panelId : undefined,
+  };
+}
+
+function pageEntryFromBoardPanel(sceneContext: StorySceneContext, board: any, panel: any): PublicationPageEntry | null {
+  const imagePath = typeof panel.imagePath === "string" ? panel.imagePath.trim() : "";
+  if (!imagePath) return null;
+
+  const pageNumber = typeof panel.orderIndex === "number" ? panel.orderIndex + 1 : 1;
+
+  return {
+    pageId: `${board.id}:${panel.id}`,
+    sceneId: sceneContext.scene.id,
+    sceneSlug: sceneContext.scene.slug,
+    sceneTitle: sceneContext.scene.title,
+    tomeId: sceneContext.tome.id,
+    tomeSlug: sceneContext.tome.slug,
+    tomeTitle: sceneContext.tome.title,
+    chapterId: sceneContext.chapter.id,
+    chapterSlug: sceneContext.chapter.slug,
+    chapterTitle: sceneContext.chapter.title,
+    pageNumber,
+    label: panel.title || `Page ${pageNumber}`,
+    caption: panel.caption || "",
+    prompt: panel.prompt || "",
+    imagePath,
+    mimeType: mimeTypeFromPath(imagePath),
+    status: "selected",
+    sourceKind: "validated_board",
+    boardId: board.id,
+    panelId: panel.id,
+  };
+}
+
+function boardSourceSceneId(board: any): string | null {
+  const metadata = objectRecord(board.metadataJson);
+  const sourceId = metadata.sourceId ?? metadata.sceneId ?? metadata.source_id;
+
+  return typeof sourceId === "string" && sourceId.trim().length > 0 ? sourceId : null;
+}
+
+function isPublicationReadyPage(page: any): boolean {
+  return page.status === "selected" || objectRecord(page.metadataJson).readyForExport === true;
+}
+
+async function deriveSelectedPagesFromBoard(projectId: string, sceneContext: StorySceneContext, board: any): Promise<PublicationPageEntry[]> {
+  const panels = Array.isArray(board.panels) ? [...board.panels] : [];
+  const orderedPanels = panels.sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+  const selectedPanels = orderedPanels.filter((panel) => panel.status === "selected");
+  const exportPanels = selectedPanels.length > 0 || board.status !== "validated"
+    ? selectedPanels
+    : orderedPanels;
+  const pages: PublicationPageEntry[] = [];
+
+  for (const panel of exportPanels) {
+    const existingPage = await db.sceneMangaPage.findFirst({
+      where: {
+        projectId,
+        sceneId: sceneContext.scene.id,
+        boardId: board.id,
+        panelId: panel.id,
+      },
+    });
+
+    const imagePath = typeof panel.imagePath === "string" ? panel.imagePath.trim() : "";
+    if (!imagePath) continue;
+
+    const pageData = {
+      projectId,
+      sceneId: sceneContext.scene.id,
+      tomeId: sceneContext.tome.id,
+      chapterId: sceneContext.chapter.id,
+      jobId: board.jobId,
+      boardId: board.id,
+      panelId: panel.id,
+      pageNumber: typeof panel.orderIndex === "number" ? panel.orderIndex + 1 : pages.length + 1,
+      label: panel.title || `Page ${pages.length + 1}`,
+      status: "selected" as const,
+      imageUrl: imagePath,
+      caption: panel.caption || "",
+      prompt: panel.prompt || "",
+    };
+
+    const persistedPage = existingPage
+      ? await db.sceneMangaPage.update({
+          where: { id: existingPage.id },
+          data: pageData,
+        })
+      : await db.sceneMangaPage.create({ data: pageData });
+
+    const pageEntry = pageEntryFromScenePage(sceneContext, persistedPage, "validated_board");
+    if (pageEntry) {
+      pages.push(pageEntry);
+    }
+  }
+
+  return pages.sort((a: PublicationPageEntry, b: PublicationPageEntry) => a.pageNumber - b.pageNumber);
+}
+
+async function collectPublicationPages(project: any): Promise<PublicationPageEntry[]> {
+  const orderedScenes = flattenStoryScenes(project);
+  const scenePages = Array.isArray(project?.sceneMangaPages) ? project.sceneMangaPages : [];
+  const generationBoards = Array.isArray(project?.generationBoards) ? project.generationBoards : [];
+
+  const pagesByScene = new Map<string, PublicationPageEntry[]>();
+
+  for (const sceneContext of orderedScenes) {
+    const publicationPages = scenePages
+      .filter((page: any) => page.sceneId === sceneContext.scene.id && isPublicationReadyPage(page))
+      .map((page: any) => pageEntryFromScenePage(sceneContext, page, "scene_page"))
+      .filter((page: PublicationPageEntry | null): page is PublicationPageEntry => Boolean(page))
+      .sort((a: PublicationPageEntry, b: PublicationPageEntry) => a.pageNumber - b.pageNumber);
+
+    if (publicationPages.length > 0) {
+      pagesByScene.set(sceneContext.scene.id, publicationPages);
+      continue;
+    }
+
+    const validatedBoards = generationBoards.filter((board: any) => {
+      if (board.sourceKind !== "scene" || board.status !== "validated") return false;
+      return boardSourceSceneId(board) === sceneContext.scene.id;
+    });
+
+    if (validatedBoards.length === 0) {
+      continue;
+    }
+
+    const latestBoard = [...validatedBoards].sort((a, b) => {
+      const aDate = a.validatedAt ? new Date(a.validatedAt).getTime() : new Date(a.createdAt).getTime();
+      const bDate = b.validatedAt ? new Date(b.validatedAt).getTime() : new Date(b.createdAt).getTime();
+      return bDate - aDate;
+    })[0];
+
+    if (!latestBoard) continue;
+
+    const derivedPages = await deriveSelectedPagesFromBoard(project.id, sceneContext, latestBoard);
+    if (derivedPages.length > 0) {
+      pagesByScene.set(sceneContext.scene.id, derivedPages);
+    }
+  }
+
+  return orderedScenes.flatMap((sceneContext) => pagesByScene.get(sceneContext.scene.id) || []);
+}
+
+async function collectPublicationAssets(project: any, label: string, sourceSnapshot: ExportSourceSnapshot | null) {
+  const pages = await collectPublicationPages(project);
+  const labelStem = safeStem(label || String(project.name || project.slug || "export"));
+
+  return {
+    labelStem,
+    pages,
+    manifest: {
+      name: project.name,
+      slug: project.slug,
+      exportedAt: new Date().toISOString(),
+      kind: "publication",
+      pages: pages.length,
+      scenes: Array.from(new Set(pages.map((page) => page.sceneId))).length,
+      sourceSnapshot,
+    },
+  };
+}
+
 // ============================================================================
 // Fonction Inngest
 // ============================================================================
@@ -126,151 +443,202 @@ export const exportProjectFunction = inngest.createFunction(
   },
   async ({ event, step }) => {
     const { projectId, exportId, kind, format } = event.data;
-
-    // ============================================================================
-    // Step 1: Récupérer les informations du projet et de l'export
-    // ============================================================================
-    const context = await step.run("fetch-context", async () => {
-      const [project, exportRecord] = await Promise.all([
-        db.project.findUnique({
-          where: { id: projectId },
-          include: {
-            characters: {
-              include: {
-                sourceRelations: true,
-                targetRelations: true,
-                voiceSamples: true,
-                images: true,
+    try {
+      // ============================================================================
+      // Step 1: Récupérer les informations du projet et de l'export
+      // ============================================================================
+      const context = await step.run("fetch-context", async () => {
+        const [project, exportRecord] = await Promise.all([
+          db.project.findUnique({
+            where: { id: projectId },
+            include: {
+              characters: {
+                include: {
+                  sourceRelations: true,
+                  targetRelations: true,
+                  voiceSamples: true,
+                  images: true,
+                },
               },
-            },
-            characterRelations: true,
-            tomes: {
-              include: {
-                chapters: {
-                  include: {
-                    scenes: {
-                      include: {
-                        references: true,
+              characterRelations: true,
+              tomes: {
+                include: {
+                  chapters: {
+                    include: {
+                      scenes: {
+                        include: {
+                          references: true,
+                        },
                       },
                     },
                   },
                 },
               },
-            },
-            chapters: true,
-            scenes: true,
-            storyReferences: true,
-            assets: {
-              include: {
-                links: true,
+              chapters: true,
+              scenes: true,
+              storyReferences: true,
+              assets: {
+                include: {
+                  links: true,
+                },
               },
-            },
-            assetLinks: true,
-            generationJobs: {
-              include: {
-                steps: true,
+              assetLinks: true,
+              generationJobs: {
+                include: {
+                  steps: true,
+                },
               },
-            },
-            generationBoards: {
-              include: {
-                panels: true,
+              generationBoards: {
+                include: {
+                  panels: true,
+                },
               },
+              sceneGenerationConfigs: true,
+              sceneMangaPages: true,
+              warnings: true,
+              versions: true,
             },
-            sceneGenerationConfigs: true,
-            sceneMangaPages: true,
-            warnings: true,
-            versions: true,
-          },
-        }),
-        db.exportRecord.findUnique({ where: { id: exportId } }),
-      ]);
+          }),
+          db.exportRecord.findUnique({ where: { id: exportId } }),
+        ]);
 
-      if (!project) throw new Error(`Project ${projectId} not found`);
-      if (!exportRecord) throw new Error(`Export ${exportId} not found`);
+        if (!project) throw new Error(`Project ${projectId} not found`);
+        if (!exportRecord) throw new Error(`Export ${exportId} not found`);
 
-      return { project, exportRecord };
-    });
-
-    const { project, exportRecord } = context;
-
-    // ============================================================================
-    // Step 2: Mettre à jour le statut à running
-    // ============================================================================
-    await step.run("update-export-running", async () => {
-      await db.exportRecord.update({
-        where: { id: exportId },
-        data: {
-          status: "pending" as ExportStatus,
-          summary: "Starting export...",
-        },
+        return { project, exportRecord };
       });
-    });
 
-    // ============================================================================
-    // Step 3: Générer l'export selon le format
-    // ============================================================================
-    let result: { filePath: string; fileName: string; fileSize: number };
+      const { project, exportRecord } = context;
+      const sourceSnapshot = readSourceSnapshot(objectRecord(exportRecord.metadataJson).sourceSnapshot);
 
-    switch (format) {
-      case "json":
-        result = await step.run("export-json", async () => {
-          return await exportAsJson(project, exportRecord.label, kind);
+      // ============================================================================
+      // Step 2: Mettre à jour le statut à running
+      // ============================================================================
+      await step.run("update-export-running", async () => {
+        await db.exportRecord.update({
+          where: { id: exportId },
+          data: {
+            summary: "Starting export...",
+          },
         });
-        break;
+      });
 
-      case "tree":
-        result = await step.run("export-tree", async () => {
-          return await exportAsTree(project, exportRecord.label, kind);
+      // ============================================================================
+      // Step 3: Générer l'export selon le format
+      // ============================================================================
+      let result: { filePath: string; fileName: string; fileSize: number };
+
+      switch (format) {
+        case "json":
+          result = await step.run("export-json", async () => {
+            return await exportAsJson(project, exportRecord.label, kind, sourceSnapshot);
+          });
+          break;
+
+        case "tree":
+          result = await step.run("export-tree", async () => {
+            return await exportAsTree(project, exportRecord.label, kind, sourceSnapshot);
+          });
+          break;
+
+        case "zip":
+          result = await step.run("export-zip", async () => {
+            return await exportAsZip(project, exportRecord.label, kind, sourceSnapshot);
+          });
+          break;
+
+        case "paged_images":
+          result = await step.run("export-paged-images", async () => {
+            return await exportPublicationAsPagedImages(project, exportRecord.label, sourceSnapshot);
+          });
+          break;
+
+        case "pdf":
+          result = await step.run("export-pdf", async () => {
+            return await exportPublicationAsPdf(project, exportRecord.label, sourceSnapshot);
+          });
+          break;
+
+        case "cbz":
+          result = await step.run("export-cbz", async () => {
+            return await exportPublicationAsCbz(project, exportRecord.label, sourceSnapshot);
+          });
+          break;
+
+        case "epub":
+          result = await step.run("export-epub", async () => {
+            return await exportPublicationAsEpub(project, exportRecord.label, sourceSnapshot);
+          });
+          break;
+
+        default:
+          throw new Error(`Unknown export format: ${format}`);
+      }
+
+      // ============================================================================
+      // Step 4: Finaliser l'export
+      // ============================================================================
+      await step.run("finalize-export", async () => {
+        await db.exportRecord.update({
+          where: { id: exportId },
+          data: {
+            status: "ready" as ExportStatus,
+            artifactPath: result.filePath,
+            artifactName: result.fileName,
+            sizeBytes: result.fileSize,
+            completedAt: new Date(),
+            summary: `${kind} export completed: ${format} format`,
+            metadataJson: {
+              ...objectRecord(exportRecord.metadataJson),
+              exportedAt: new Date().toISOString(),
+              entityCounts: {
+                characters: project.characters.length,
+                tomes: project.tomes.length,
+                chapters: project.chapters.length,
+                scenes: project.scenes.length,
+                assets: project.assets.length,
+              },
+            },
+          },
         });
-        break;
+      });
 
-      case "zip":
-        result = await step.run("export-zip", async () => {
-          return await exportAsZip(project, exportRecord.label, kind);
+      return {
+        success: true,
+        exportId,
+        format,
+        kind,
+        filePath: result.filePath,
+        fileName: result.fileName,
+        fileSize: result.fileSize,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      try {
+        await db.exportRecord.update({
+          where: { id: exportId },
+          data: {
+            status: "failed" as ExportStatus,
+            failedAt: new Date(),
+            summary: `Export failed: ${format}`,
+            errorMessage: message,
+          },
         });
-        break;
+      } catch (updateError) {
+        console.error("Failed to persist export failure", updateError);
+      }
 
-      default:
-        throw new Error(`Unknown export format: ${format}`);
+      console.error("Export project failed", {
+        projectId,
+        exportId,
+        kind,
+        format,
+        message,
+      });
+
+      throw error;
     }
-
-    // ============================================================================
-    // Step 4: Finaliser l'export
-    // ============================================================================
-    await step.run("finalize-export", async () => {
-      await db.exportRecord.update({
-        where: { id: exportId },
-        data: {
-          status: "ready" as ExportStatus,
-          artifactPath: result.filePath,
-          artifactName: result.fileName,
-          sizeBytes: result.fileSize,
-          completedAt: new Date(),
-          summary: `${kind} export completed: ${format} format`,
-          metadataJson: {
-            ...objectRecord(exportRecord.metadataJson),
-            exportedAt: new Date().toISOString(),
-            entityCounts: {
-              characters: project.characters.length,
-              tomes: project.tomes.length,
-              chapters: project.chapters.length,
-              scenes: project.scenes.length,
-              assets: project.assets.length,
-            },
-          },
-        },
-      });
-    });
-
-    return {
-      success: true,
-      exportId,
-      format,
-      kind,
-      filePath: result.filePath,
-      fileName: result.fileName,
-      fileSize: result.fileSize,
-    };
   },
 );
 
@@ -278,12 +646,18 @@ export const exportProjectFunction = inngest.createFunction(
 // Export en JSON
 // ============================================================================
 
-async function exportAsJson(project: Record<string, unknown>, label: string, kind: "work" | "publication"): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+async function exportAsJson(
+  project: Record<string, unknown>,
+  label: string,
+  kind: "work" | "publication",
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
   const exportData: Record<string, unknown> = {
     exportFormat: "json",
     exportKind: kind,
     exportedAt: new Date().toISOString(),
     label,
+    sourceSnapshot,
     project: {
       id: project.id,
       name: project.name,
@@ -317,9 +691,11 @@ async function exportAsJson(project: Record<string, unknown>, label: string, kin
     };
   } else {
     // Export publication: uniquement les données de publication
+    const publication = await collectPublicationAssets(project, label, sourceSnapshot);
+
     exportData.data = {
       tomes: project.tomes,
-      sceneMangaPages: project.sceneMangaPages,
+      sceneMangaPages: publication.pages,
     };
   }
 
@@ -341,18 +717,26 @@ async function exportAsJson(project: Record<string, unknown>, label: string, kin
 // Export en arborescence de fichiers
 // ============================================================================
 
-async function exportAsTree(project: Record<string, unknown>, label: string, kind: "work" | "publication"): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+async function exportAsTree(
+  project: Record<string, unknown>,
+  label: string,
+  kind: "work" | "publication",
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
   const exportDir = `${getProjectDir(project.slug as string)}/exports/tree_${Date.now()}`;
   await mkdir(exportDir, { recursive: true });
 
   // Manifest du projet
-  const manifest = {
-    name: project.name,
-    slug: project.slug,
-    exportedAt: new Date().toISOString(),
-    kind,
-    format: "tree",
-  };
+  const publication = kind === "publication"
+    ? await collectPublicationAssets(project, label, sourceSnapshot)
+    : null;
+  const manifest = publication
+    ? {
+        ...publication.manifest,
+        label,
+        format: "tree",
+      }
+    : buildExportManifest(project, kind, "tree", sourceSnapshot);
   await writeFile(`${exportDir}/manifest.json`, JSON.stringify(manifest, null, 2));
 
   if (kind === "work") {
@@ -388,31 +772,17 @@ async function exportAsTree(project: Record<string, unknown>, label: string, kin
     await writeFile(`${exportDir}/assets/index.json`, JSON.stringify(assets, null, 2));
   } else {
     // Export publication: seulement les pages manga
-    const sceneMangaPages = project.sceneMangaPages as Array<Record<string, unknown>>;
     await mkdir(`${exportDir}/pages`, { recursive: true });
 
-    // Grouper par scène
-    const pagesByScene: Record<string, Array<Record<string, unknown>>> = {};
-    for (const page of sceneMangaPages) {
-      const sceneId = page.sceneId as string;
-      if (!pagesByScene[sceneId]) pagesByScene[sceneId] = [];
-      pagesByScene[sceneId].push(page);
-    }
-
-    for (const [sceneId, pages] of Object.entries(pagesByScene)) {
-      await mkdir(`${exportDir}/pages/${sceneId}`, { recursive: true });
-      for (const page of pages) {
-        if (page.imageUrl) {
-          // Copier l'image si elle existe
-          const srcPath = page.imageUrl as string;
-          const destPath = `${exportDir}/pages/${sceneId}/page_${page.pageNumber}.png`;
-          try {
-            const buffer = await Bun.file(srcPath).arrayBuffer();
-            await writeFile(destPath, Buffer.from(buffer));
-          } catch {
-            // Ignorer si le fichier n'existe pas
-          }
-        }
+    for (const page of publication?.pages ?? []) {
+      await mkdir(`${exportDir}/pages/${page.sceneId}`, { recursive: true });
+      try {
+        const { buffer, mimeType } = await readBinarySource(page.imagePath);
+        const extension = mimeType === "image/jpeg" ? ".jpg" : mimeType === "image/webp" ? ".webp" : ".png";
+        const destPath = `${exportDir}/pages/${page.sceneId}/page_${String(page.pageNumber).padStart(3, "0")}${extension}`;
+        await writeFile(destPath, buffer);
+      } catch {
+        // Ignorer si l'image n'est pas lisible
       }
     }
   }
@@ -439,7 +809,12 @@ async function exportAsTree(project: Record<string, unknown>, label: string, kin
 // Export en ZIP (portable)
 // ============================================================================
 
-async function exportAsZip(project: Record<string, unknown>, label: string, kind: "work" | "publication"): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+async function exportAsZip(
+  project: Record<string, unknown>,
+  label: string,
+  kind: "work" | "publication",
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
   const zipFileName = `export_${label.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}.zip`;
   const zipFilePath = `${getProjectDir(project.slug as string)}/exports/${zipFileName}`;
 
@@ -447,11 +822,7 @@ async function exportAsZip(project: Record<string, unknown>, label: string, kind
     // Export travail: données JSON + assets
     const exportData = {
       manifest: {
-        name: project.name,
-        slug: project.slug,
-        exportedAt: new Date().toISOString(),
-        kind: "work",
-        format: "zip",
+        ...buildExportManifest(project, "work", "zip", sourceSnapshot),
         version: "1.0",
       },
       data: {
@@ -520,28 +891,25 @@ async function exportAsZip(project: Record<string, unknown>, label: string, kind
     await writeFile(zipFilePath, zipBuffer);
   } else {
     // Export publication: uniquement les pages manga en format lisible
+    const publication = await collectPublicationAssets(project, label, sourceSnapshot);
     const zip = new StoreZipWriter();
 
     // Manifest
     const manifest = {
-      name: project.name,
-      slug: project.slug,
-      exportedAt: new Date().toISOString(),
-      kind: "publication",
+      ...publication.manifest,
+      label,
       format: "zip",
     };
     zip.add("manifest.json", Buffer.from(JSON.stringify(manifest, null, 2)));
 
     // Pages manga
-    const sceneMangaPages = project.sceneMangaPages as Array<Record<string, unknown>>;
-    for (const page of sceneMangaPages) {
-      if (page.imageUrl) {
-        try {
-          const buffer = await Bun.file(page.imageUrl as string).arrayBuffer();
-          zip.add(`pages/${page.tomeId}/${page.chapterId}/${page.sceneId}/page_${String(page.pageNumber).padStart(3, "0")}.png`, Buffer.from(buffer));
-        } catch {
-          // Ignorer si le fichier n'existe pas
-        }
+    for (const page of publication.pages) {
+      try {
+        const { buffer, mimeType } = await readBinarySource(page.imagePath);
+        const extension = mimeType === "image/jpeg" ? ".jpg" : mimeType === "image/webp" ? ".webp" : ".png";
+        zip.add(`pages/${safeStem(page.tomeSlug)}/${safeStem(page.chapterSlug)}/${safeStem(page.sceneSlug)}/page_${String(page.pageNumber).padStart(3, "0")}${extension}`, buffer);
+      } catch {
+        // Ignorer si le fichier n'est pas lisible
       }
     }
 
@@ -554,6 +922,280 @@ async function exportAsZip(project: Record<string, unknown>, label: string, kind
   return {
     filePath: zipFilePath,
     fileName: zipFileName,
+    fileSize: stats.size,
+  };
+}
+
+// ============================================================================
+// Publication exports
+// ============================================================================
+
+async function exportPublicationAsPagedImages(
+  project: Record<string, unknown>,
+  label: string,
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+  const publication = await collectPublicationAssets(project, label, sourceSnapshot);
+  const zip = new StoreZipWriter();
+
+  zip.add(
+    "manifest.json",
+    Buffer.from(
+      JSON.stringify({
+        ...publication.manifest,
+        label,
+        format: "paged_images",
+      }, null, 2),
+    ),
+  );
+
+  zip.add(
+    "pages/index.json",
+    Buffer.from(JSON.stringify({
+      exportedAt: publication.manifest.exportedAt,
+      pages: publication.pages.map((page) => ({
+        sceneId: page.sceneId,
+        sceneSlug: page.sceneSlug,
+        sceneTitle: page.sceneTitle,
+        tomeSlug: page.tomeSlug,
+        chapterSlug: page.chapterSlug,
+        pageNumber: page.pageNumber,
+        label: page.label,
+        caption: page.caption,
+        prompt: page.prompt,
+        status: page.status,
+      })),
+    }, null, 2)),
+  );
+
+  for (const page of publication.pages) {
+    const { buffer, mimeType } = await readBinarySource(page.imagePath);
+    const extension = mimeType === "image/jpeg" ? ".jpg" : mimeType === "image/webp" ? ".webp" : ".png";
+    const filePath = [
+      "pages",
+      safeStem(page.tomeSlug),
+      safeStem(page.chapterSlug),
+      safeStem(page.sceneSlug),
+      `page_${String(page.pageNumber).padStart(3, "0")}${extension}`,
+    ].join("/");
+
+    zip.add(filePath, buffer);
+  }
+
+  const fileName = `publication_${publication.labelStem}_${Date.now()}.zip`;
+  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
+  const zipBuffer = await zip.end();
+  await writeFile(filePath, zipBuffer);
+
+  const stats = await stat(filePath);
+  return {
+    filePath,
+    fileName,
+    fileSize: stats.size,
+  };
+}
+
+async function exportPublicationAsCbz(
+  project: Record<string, unknown>,
+  label: string,
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+  const publication = await collectPublicationAssets(project, label, sourceSnapshot);
+  const zip = new StoreZipWriter();
+
+  zip.add(
+    "manifest.json",
+    Buffer.from(
+      JSON.stringify({
+        ...publication.manifest,
+        label,
+        format: "cbz",
+      }, null, 2),
+    ),
+  );
+
+  zip.add(
+    "pages/index.json",
+    Buffer.from(JSON.stringify({
+      exportedAt: publication.manifest.exportedAt,
+      pages: publication.pages.map((page) => ({
+        sceneId: page.sceneId,
+        sceneSlug: page.sceneSlug,
+        sceneTitle: page.sceneTitle,
+        tomeSlug: page.tomeSlug,
+        chapterSlug: page.chapterSlug,
+        pageNumber: page.pageNumber,
+        label: page.label,
+        status: page.status,
+      })),
+    }, null, 2)),
+  );
+
+  for (const page of publication.pages) {
+    const { buffer, mimeType } = await readBinarySource(page.imagePath);
+    const extension = mimeType === "image/jpeg" ? ".jpg" : mimeType === "image/webp" ? ".webp" : ".png";
+    const filePath = `page_${String(page.pageNumber).padStart(3, "0")}${extension}`;
+    zip.add(filePath, buffer);
+  }
+
+  const fileName = `publication_${publication.labelStem}_${Date.now()}.cbz`;
+  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
+  const zipBuffer = await zip.end();
+  await writeFile(filePath, zipBuffer);
+
+  const stats = await stat(filePath);
+  return {
+    filePath,
+    fileName,
+    fileSize: stats.size,
+  };
+}
+
+async function exportPublicationAsPdf(
+  project: Record<string, unknown>,
+  label: string,
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+  const publication = await collectPublicationAssets(project, label, sourceSnapshot);
+  const pdf = await PDFDocument.create();
+
+  for (const page of publication.pages) {
+    const { buffer, mimeType } = await readBinarySource(page.imagePath);
+    if (mimeType !== "image/png" && mimeType !== "image/jpeg") {
+      throw new Error(`Unsupported image format for PDF export: ${mimeType}`);
+    }
+
+    const embeddedImage = mimeType === "image/jpeg"
+      ? await pdf.embedJpg(buffer)
+      : await pdf.embedPng(buffer);
+
+    const pdfPage = pdf.addPage([embeddedImage.width, embeddedImage.height]);
+    pdfPage.drawImage(embeddedImage, {
+      x: 0,
+      y: 0,
+      width: embeddedImage.width,
+      height: embeddedImage.height,
+    });
+  }
+
+  const fileName = `publication_${publication.labelStem}_${Date.now()}.pdf`;
+  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
+  const pdfBytes = await pdf.save();
+  await writeFile(filePath, Buffer.from(pdfBytes));
+
+  const stats = await stat(filePath);
+  return {
+    filePath,
+    fileName,
+    fileSize: stats.size,
+  };
+}
+
+async function exportPublicationAsEpub(
+  project: Record<string, unknown>,
+  label: string,
+  sourceSnapshot: ExportSourceSnapshot | null,
+): Promise<{ filePath: string; fileName: string; fileSize: number }> {
+  const publication = await collectPublicationAssets(project, label, sourceSnapshot);
+  const zip = new StoreZipWriter();
+  const title = String(project.name || project.slug || label);
+  const bookId = `urn:uuid:${randomUUIDv7()}`;
+
+  zip.add("mimetype", Buffer.from("application/epub+zip"));
+  zip.add(
+    "META-INF/container.xml",
+    Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml" />
+  </rootfiles>
+</container>`),
+  );
+
+  const imageItems: string[] = [];
+  const xhtmlItems: string[] = [];
+  const navLinks: string[] = [];
+
+  for (const page of publication.pages) {
+    const { buffer, mimeType } = await readBinarySource(page.imagePath);
+    const extension = mimeType === "image/jpeg" ? ".jpg" : mimeType === "image/webp" ? ".webp" : ".png";
+    const safeSceneSlug = safeStem(page.sceneSlug);
+    const safePageSlug = `page_${String(page.pageNumber).padStart(3, "0")}`;
+    const imagePath = `OEBPS/Images/${safeSceneSlug}_${safePageSlug}${extension}`;
+    const xhtmlPath = `OEBPS/Text/${safeSceneSlug}_${safePageSlug}.xhtml`;
+
+    imageItems.push(`    <item id="${safeSceneSlug}_${safePageSlug}_image" href="Images/${safeSceneSlug}_${safePageSlug}${extension}" media-type="${mimeType === "image/jpeg" ? "image/jpeg" : mimeType === "image/webp" ? "image/webp" : "image/png"}" />`);
+    xhtmlItems.push(`    <item id="${safeSceneSlug}_${safePageSlug}_xhtml" href="Text/${safeSceneSlug}_${safePageSlug}.xhtml" media-type="application/xhtml+xml" />`);
+    navLinks.push(`          <li><a href="Text/${safeSceneSlug}_${safePageSlug}.xhtml">${page.sceneTitle} - ${page.label}</a></li>`);
+
+    zip.add(imagePath, buffer);
+    zip.add(xhtmlPath, Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>${page.sceneTitle} - ${page.label}</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="../Styles/style.css" />
+  </head>
+  <body>
+    <section class="page">
+      <img src="../Images/${safeSceneSlug}_${safePageSlug}${extension}" alt="${page.label}" />
+    </section>
+  </body>
+</html>`));
+  }
+
+  const navXhtml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="en" lang="en">
+  <head>
+    <title>${title}</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <nav epub:type="toc" id="toc">
+      <h1>${title}</h1>
+      <ol>
+${navLinks.join("\n")}
+      </ol>
+    </nav>
+  </body>
+</html>`;
+
+  const contentOpf = `<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid" xml:lang="en">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="bookid">${bookId}</dc:identifier>
+    <dc:title>${title}</dc:title>
+    <dc:language>en</dc:language>
+    <meta property="dcterms:modified">${new Date().toISOString()}</meta>
+  </metadata>
+  <manifest>
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav" />
+${imageItems.join("\n")}
+${xhtmlItems.join("\n")}
+    <item id="style" href="Styles/style.css" media-type="text/css" />
+  </manifest>
+  <spine>
+${publication.pages.map((page) => `    <itemref idref="${safeStem(page.sceneSlug)}_page_${String(page.pageNumber).padStart(3, "0")}_xhtml" />`).join("\n")}
+  </spine>
+</package>`;
+
+  zip.add("OEBPS/nav.xhtml", Buffer.from(navXhtml));
+  zip.add("OEBPS/content.opf", Buffer.from(contentOpf));
+  zip.add("OEBPS/Styles/style.css", Buffer.from(`body { margin: 0; padding: 0; background: #000; }
+.page { margin: 0; padding: 0; }
+img { display: block; width: 100%; height: auto; }`));
+
+  const fileName = `publication_${publication.labelStem}_${Date.now()}.epub`;
+  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
+  const epubBuffer = await zip.end();
+  await writeFile(filePath, epubBuffer);
+
+  const stats = await stat(filePath);
+  return {
+    filePath,
+    fileName,
     fileSize: stats.size,
   };
 }

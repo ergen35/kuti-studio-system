@@ -297,9 +297,49 @@ function publicMangaPageImageUrl(projectId: string, page: { imageUrl: string | n
   return `/api/projects/${projectId}/generation/boards/${page.boardId}/panels/${page.panelId}/image`;
 }
 
+type MangaPageMetadataRecord = {
+  readyForExport: boolean;
+};
+
+const DEFAULT_MANGA_PAGE_METADATA: MangaPageMetadataRecord = {
+  readyForExport: false,
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function readMangaPageMetadata(metadataJson: unknown): MangaPageMetadataRecord {
+  const metadata = isRecord(metadataJson) ? metadataJson : {};
+
+  return {
+    readyForExport: metadata.readyForExport === true,
+  };
+}
+
+function readMangaPageMetadataPatch(metadataJson: unknown): Partial<MangaPageMetadataRecord> {
+  const metadata = isRecord(metadataJson) ? metadataJson : {};
+  const patch: Partial<MangaPageMetadataRecord> = {};
+
+  if (typeof metadata.readyForExport === "boolean") {
+    patch.readyForExport = metadata.readyForExport;
+  }
+
+  return patch;
+}
+
+function mergeMangaPageMetadata(baseMetadataJson: unknown, nextMetadataJson: unknown | undefined): MangaPageMetadataRecord {
+  return {
+    ...DEFAULT_MANGA_PAGE_METADATA,
+    ...readMangaPageMetadata(baseMetadataJson),
+    ...readMangaPageMetadataPatch(nextMetadataJson),
+  };
+}
+
 function serializeMangaPage(projectId: string, page: Awaited<ReturnType<typeof db.sceneMangaPage.findFirst>> & {}) {
   return {
     ...page,
+    metadataJson: readMangaPageMetadata(page.metadataJson),
     imageUrl: publicMangaPageImageUrl(projectId, page),
     createdAt: page.createdAt.toISOString(),
     updatedAt: page.updatedAt.toISOString(),
@@ -333,15 +373,52 @@ export async function updateSceneMangaPage(
   });
   if (!page) return null;
 
-  const updated = await db.sceneMangaPage.update({
-    where: { id: pageId },
-    data: {
-      label: data.label,
-      status: data.status,
-      imageUrl: data.imageUrl,
-      caption: data.caption,
-      prompt: data.prompt,
-    },
+  const updated = await db.$transaction(async (tx) => {
+    const desiredPageNumber = typeof data.pageNumber === "number"
+      ? Math.max(1, Math.floor(data.pageNumber))
+      : null;
+
+    if (desiredPageNumber !== null && desiredPageNumber !== page.pageNumber) {
+      const orderedPages = await tx.sceneMangaPage.findMany({
+        where: { projectId, sceneId },
+        select: { id: true, pageNumber: true },
+        orderBy: { pageNumber: "asc" },
+      });
+
+      const maxPageNumber = orderedPages.length > 0 ? orderedPages[orderedPages.length - 1].pageNumber : page.pageNumber;
+      const targetPageNumber = Math.min(desiredPageNumber, maxPageNumber);
+
+      if (targetPageNumber > page.pageNumber) {
+        const pagesToShift = orderedPages.filter((entry) => entry.pageNumber > page.pageNumber && entry.pageNumber <= targetPageNumber);
+        for (const entry of pagesToShift) {
+          await tx.sceneMangaPage.update({
+            where: { id: entry.id },
+            data: { pageNumber: entry.pageNumber - 1 },
+          });
+        }
+      } else {
+        const pagesToShift = orderedPages.filter((entry) => entry.pageNumber >= targetPageNumber && entry.pageNumber < page.pageNumber);
+        for (const entry of pagesToShift) {
+          await tx.sceneMangaPage.update({
+            where: { id: entry.id },
+            data: { pageNumber: entry.pageNumber + 1 },
+          });
+        }
+      }
+    }
+
+    return await tx.sceneMangaPage.update({
+      where: { id: pageId },
+      data: {
+        label: data.label,
+        status: data.status,
+        imageUrl: data.imageUrl,
+        caption: data.caption,
+        prompt: data.prompt,
+        pageNumber: typeof data.pageNumber === "number" ? Math.max(1, Math.floor(data.pageNumber)) : undefined,
+        metadataJson: mergeMangaPageMetadata(page.metadataJson, data.metadataJson),
+      },
+    });
   });
 
   return serializeMangaPage(projectId, updated);

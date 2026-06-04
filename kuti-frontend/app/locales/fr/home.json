@@ -3,9 +3,11 @@
   "subtitle": "Production narrative locale",
   "hero": {
     "subtitle": "Studio narratif pour œuvres multimédias",
+    "projectNameLabel": "Nom du projet à créer",
     "placeholder": "Nom du nouveau projet...",
     "create": "Créer",
-    "creating": "Création..."
+    "creating": "Création...",
+    "openExisting": "Ouvrir un projet existant"
   },
   "theme": {
     "darkTitle": "Passer en mode sombre",
@@ -37,22 +39,59 @@
     "title": "Projets",
     "count": "{{count}} projet",
     "count_plural": "{{count}} projets",
+    "visible": "{{count}} visibles",
+    "loadingMetrics": "Chargement des métriques de projet...",
+    "status": {
+      "draft": "Brouillon",
+      "active": "Actif",
+      "archived": "Archivé",
+      "maintenance": "Maintenance"
+    },
     "statusCount": {
       "active": "{{count}} actif",
       "active_plural": "{{count}} actifs",
       "draft": "{{count}} brouillon",
       "draft_plural": "{{count}} brouillons"
     },
+    "filters": {
+      "search": "Rechercher des projets",
+      "searchPlaceholder": "Nom, slug ou chemin de stockage",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "reset": "Réinitialiser les filtres"
+    },
+    "metrics": {
+      "tomes": "Tomes",
+      "chapters": "Chapitres",
+      "scenes": "Scènes",
+      "characters": "Personnages"
+    },
     "empty": {
       "title": "Aucun projet",
       "description": "Créez-en un depuis le formulaire ci-dessus pour initialiser le stockage via le backend."
     },
+    "emptyFiltered": {
+      "title": "Aucun projet correspondant",
+      "description": "Essayez une autre recherche ou effacez les filtres."
+    },
     "actions": {
       "open": "Ouvrir",
+      "quickExport": "Export rapide",
+      "quickExportLabel": "Export rapide : {{name}}",
+      "quickExportSummary": "Crée un ZIP de travail depuis le dernier instantané du projet.",
       "clone": "Cloner",
       "archive": "Archiver",
       "dashboard": "Tableau de bord",
       "more": "Plus d'actions"
+    },
+    "archive": {
+      "dialogTitle": "Archiver le projet",
+      "dialogDescription": "Archiver {{name}} ? Le projet sera retiré de l'espace actif mais restera stocké localement.",
+      "projectLabel": "Projet",
+      "confirmButton": "Archiver le projet",
+      "confirming": "Archivage...",
+      "cancelButton": "Annuler",
+      "error": "Échec de l'archivage du projet"
     },
     "meta": {
       "path": "Chemin",
@@ -62,5 +101,19 @@
   },
   "errors": {
     "createFailed": "Échec de la création du projet"
+  },
+  "importProject": {
+    "dialogTitle": "Ouvrir un projet existant",
+    "dialogDescription": "Attache un projet déjà présent sur disque. Le chemin doit pointer vers un dossier situé dans kuti-data/projects.",
+    "rootPath": "Chemin du projet",
+    "rootPathPlaceholder": "./kuti-data/projects/mon-projet",
+    "rootPathHint": "Utilise un chemin relatif à l'espace backend ou un chemin local déjà géré par Kuti Studio.",
+    "name": "Nom du projet",
+    "namePlaceholder": "Mon projet",
+    "nameHint": "Laisse vide pour dériver un nom lisible depuis le nom du dossier.",
+    "cancelButton": "Annuler",
+    "confirmButton": "Ouvrir le projet",
+    "confirming": "Ouverture...",
+    "error": "Échec de l'ouverture du projet"
   }
 }

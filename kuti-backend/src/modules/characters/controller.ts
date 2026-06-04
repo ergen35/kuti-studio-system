@@ -6,6 +6,7 @@ import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
 import { readFile } from "node:fs/promises";
 import { prisma } from "@lib/db";
+import { runCoherenceScanIfEnabled } from "@lib/coherence-scan";
 import {
   sendGenerateImageEvent,
 } from "@lib/inngest";
@@ -13,6 +14,7 @@ import type {
   CreateCharacterBody,
   UpdateCharacterBody,
   CreateRelationBody,
+  UpdateRelationBody,
   CharacterResponse,
   CharacterDetailResponse,
   CharacterRelationResponse,
@@ -230,6 +232,8 @@ export async function createCharacter(
     },
   });
 
+  await runCoherenceScanIfEnabled(projectId);
+
   return serializeCharacter(char);
 }
 
@@ -263,6 +267,8 @@ export async function updateCharacter(
     },
   });
 
+  await runCoherenceScanIfEnabled(projectId);
+
   return serializeCharacter(updated);
 }
 
@@ -285,6 +291,8 @@ export async function archiveCharacter(
     },
   });
 
+  await runCoherenceScanIfEnabled(projectId);
+
   return serializeCharacter(updated);
 }
 
@@ -299,6 +307,8 @@ export async function deleteCharacter(
   if (!char) return false;
 
   await prisma.character.delete({ where: { id: characterId } });
+
+  await runCoherenceScanIfEnabled(projectId);
   return true;
 }
 
@@ -348,7 +358,62 @@ export async function createRelation(
     },
   });
 
+  await runCoherenceScanIfEnabled(projectId);
+
   return serializeRelation(relation);
+}
+
+export async function updateRelation(
+  projectId: string,
+  characterId: string,
+  relationId: string,
+  data: UpdateRelationBody,
+): Promise<CharacterRelationResponse | null> {
+  const relation = await prisma.characterRelation.findFirst({
+    where: { id: relationId, projectId },
+  });
+
+  if (!relation) return null;
+
+  if (relation.sourceCharacterId !== characterId) {
+    throw new Error("relation_source_mismatch");
+  }
+
+  const updated = await prisma.characterRelation.update({
+    where: { id: relationId },
+    data: {
+      relationType: data.relationType ?? relation.relationType,
+      strength: data.strength ?? relation.strength,
+      narrativeDependency: data.narrativeDependency ?? relation.narrativeDependency,
+      notes: data.notes ?? relation.notes,
+      updatedAt: new Date(),
+    },
+  });
+
+  await runCoherenceScanIfEnabled(projectId);
+
+  return serializeRelation(updated);
+}
+
+export async function deleteRelation(
+  projectId: string,
+  characterId: string,
+  relationId: string,
+): Promise<boolean> {
+  const relation = await prisma.characterRelation.findFirst({
+    where: { id: relationId, projectId },
+  });
+
+  if (!relation) return false;
+
+  if (relation.sourceCharacterId !== characterId) {
+    throw new Error("relation_source_mismatch");
+  }
+
+  await prisma.characterRelation.delete({ where: { id: relationId } });
+
+  await runCoherenceScanIfEnabled(projectId);
+  return true;
 }
 
 export async function listRelations(

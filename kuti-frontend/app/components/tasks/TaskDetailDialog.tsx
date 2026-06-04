@@ -15,7 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button, Badge } from "~/components/ui";
+import { Button, Badge, RouterLinkButton } from "~/components/ui";
 import {
   Dialog,
   DialogContent,
@@ -28,17 +28,19 @@ import {
   cancelGenerationJobMutation,
   relaunchGenerationJobMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
-import type {
-  TaskItem,
-  TaskStatus,
-  SourceKind,
-} from "~/lib/tasks/types";
+import { invalidateQueriesById } from "~/lib/query";
+import type { TaskItem, TaskStatus, SourceKind } from "~/lib/tasks/types";
 import {
   getStatusLabel,
   formatElapsedTime,
+  getTaskPriorityTone,
+  getTaskTypeTone,
 } from "~/lib/tasks/types";
 
-const SOURCE_ICONS: Record<SourceKind, React.ComponentType<{ size?: number; className?: string }>> = {
+const SOURCE_ICONS: Record<
+  SourceKind,
+  React.ComponentType<{ size?: number; className?: string }>
+> = {
   tome: BookOpen,
   chapter: Book,
   scene: FileText,
@@ -47,7 +49,10 @@ const SOURCE_ICONS: Record<SourceKind, React.ComponentType<{ size?: number; clas
   character: User,
 };
 
-const STATUS_ICONS: Record<TaskStatus, React.ComponentType<{ size?: number; className?: string }>> = {
+const STATUS_ICONS: Record<
+  TaskStatus,
+  React.ComponentType<{ size?: number; className?: string }>
+> = {
   pending: Clock,
   running: Loader2,
   ready: CheckCircle2,
@@ -96,8 +101,14 @@ export function TaskDetailDialog({
   const { t, i18n } = useTranslation(["tasks", "common"]);
 
   // Conditions d'affichage des boutons
-  const canCancel = task.status === "running" || task.status === "pending";
-  const canRelaunch = task.status === "ready" || task.status === "validated" || task.status === "failed";
+  const canCancel =
+    task.taskType === "technical" &&
+    (task.status === "running" || task.status === "pending");
+  const canRelaunch =
+    task.taskType === "technical" &&
+    (task.status === "ready" ||
+      task.status === "validated" ||
+      task.status === "failed");
 
   // Mutation Cancel
   const cancelMutation = useMutation({
@@ -106,7 +117,7 @@ export function TaskDetailDialog({
       // Fermer la boîte de dialogue
       onClose();
       // Actualiser la liste des tâches
-      queryClient.invalidateQueries({ queryKey: ["listGenerationJobs", { path: { projectId } }] });
+      invalidateQueriesById(queryClient, "listGenerationJobs");
     },
   });
 
@@ -117,14 +128,14 @@ export function TaskDetailDialog({
       // Fermer la boîte de dialogue
       onClose();
       // Actualiser la liste des tâches
-      queryClient.invalidateQueries({ queryKey: ["listGenerationJobs", { path: { projectId } }] });
+      invalidateQueriesById(queryClient, "listGenerationJobs");
     },
   });
   const SourceIcon = SOURCE_ICONS[task.sourceKind] || Sparkles;
   const StatusIcon = STATUS_ICONS[task.status];
 
   const elapsedTime = useMemo(() => {
-    if (task.updatedAt && task.status !== 'running') {
+    if (task.updatedAt && task.status !== "running") {
       return formatElapsedTime(task.createdAt);
     }
     return formatElapsedTime(task.createdAt);
@@ -135,29 +146,26 @@ export function TaskDetailDialog({
       <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden p-0 sm:max-w-lg">
         <DialogHeader className="border-b border-border p-4">
           <div className="flex items-start gap-3 pr-8">
-          <div
-            className={clsx(
-              "shrink-0 rounded-lg p-2",
-              STATUS_BG_COLORS[task.status]
-            )}
-          >
-            <SourceIcon
-              size={24}
-              className={STATUS_COLORS[task.status]}
-            />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <DialogTitle className="truncate text-lg font-semibold text-foreground">
-              {task.title}
-            </DialogTitle>
-            <div className="mt-1 flex items-center gap-2">
-              <Badge tone={task.status}>{getStatusLabel(task.status)}</Badge>
-              <span className="text-xs text-muted-foreground">
-                {task.sourceLabel || task.sourceKind}
-              </span>
+            <div
+              className={clsx(
+                "shrink-0 rounded-lg p-2",
+                STATUS_BG_COLORS[task.status],
+              )}
+            >
+              <SourceIcon size={24} className={STATUS_COLORS[task.status]} />
             </div>
-          </div>
+
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="truncate text-lg font-semibold text-foreground">
+                {task.title}
+              </DialogTitle>
+              <div className="mt-1 flex items-center gap-2">
+                <Badge tone={task.status}>{getStatusLabel(task.status)}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {task.sourceLabel || task.sourceKind}
+                </span>
+              </div>
+            </div>
           </div>
         </DialogHeader>
 
@@ -169,9 +177,14 @@ export function TaskDetailDialog({
             <div className="rounded-lg border border-border bg-secondary/30 p-3">
               <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <StatusIcon size={12} className={STATUS_COLORS[task.status]} />
-                <span>{t('detail.status')}</span>
+                <span>{t("detail.status")}</span>
               </div>
-              <p className={clsx("font-medium text-sm", STATUS_COLORS[task.status])}>
+              <p
+                className={clsx(
+                  "font-medium text-sm",
+                  STATUS_COLORS[task.status],
+                )}
+              >
                 {getStatusLabel(task.status)}
               </p>
             </div>
@@ -180,18 +193,23 @@ export function TaskDetailDialog({
             <div className="rounded-lg border border-border bg-secondary/30 p-3">
               <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <SourceIcon size={12} />
-                <span>{t('detail.type')}</span>
+                <span>{t("detail.taskType")}</span>
               </div>
-              <p className="text-sm font-medium capitalize text-foreground">
-                {task.sourceKind}
-              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <Badge tone={getTaskTypeTone(task.taskType)}>
+                  {t(`taskTypes.${task.taskType}`)}
+                </Badge>
+                <Badge tone={getTaskPriorityTone(task.priority)}>
+                  {t(`priorities.${task.priority}`)}
+                </Badge>
+              </div>
             </div>
 
             {/* Elapsed Time */}
             <div className="rounded-lg border border-border bg-secondary/30 p-3">
               <div className="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Clock size={12} />
-                <span>{t('detail.elapsed')}</span>
+                <span>{t("detail.elapsed")}</span>
               </div>
               <p className="text-sm font-medium text-foreground">
                 {elapsedTime}
@@ -202,7 +220,9 @@ export function TaskDetailDialog({
           {/* Progress Section */}
           <div className="flex flex-col gap-3 rounded-lg border border-border bg-secondary/30 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">{t('detail.progress')}</span>
+              <span className="text-sm font-medium text-foreground">
+                {t("detail.progress")}
+              </span>
               <span className="text-sm font-semibold text-primary">
                 {Math.round(task.progress)}%
               </span>
@@ -214,7 +234,7 @@ export function TaskDetailDialog({
                 className={clsx(
                   "h-full rounded-full transition-all duration-300",
                   STATUS_BAR_COLORS[task.status],
-                  task.status === "running" && "animate-pulse"
+                  task.status === "running" && "animate-pulse",
                 )}
                 style={{ width: `${task.progress}%` }}
               />
@@ -236,33 +256,65 @@ export function TaskDetailDialog({
 
           {/* Details Section */}
           <div className="flex flex-col gap-3 rounded-lg border border-border bg-secondary/30 p-4">
-            <h3 className="text-sm font-medium text-foreground">{t('detail.details')}</h3>
+            <h3 className="text-sm font-medium text-foreground">
+              {t("detail.details")}
+            </h3>
 
             <dl className="grid grid-cols-[100px_1fr] gap-y-2 text-sm">
-              <dt className="text-muted-foreground">{t('detail.jobId')}</dt>
+              <dt className="text-muted-foreground">{t("detail.jobId")}</dt>
               <dd className="truncate font-mono text-foreground">{task.id}</dd>
 
-              <dt className="text-muted-foreground">{t('detail.sourceId')}</dt>
-              <dd className="truncate font-mono text-foreground">{task.sourceId || '-'}</dd>
+              <dt className="text-muted-foreground">{t("detail.taskType")}</dt>
+              <dd className="text-foreground">
+                {t(`taskTypes.${task.taskType}`)}
+              </dd>
 
-              <dt className="text-muted-foreground">{t('detail.source')}</dt>
-              <dd className="text-foreground">{task.sourceLabel || '-'}</dd>
+              <dt className="text-muted-foreground">{t("detail.priority")}</dt>
+              <dd className="text-foreground">
+                {t(`priorities.${task.priority}`)}
+              </dd>
 
-              <dt className="text-muted-foreground">{t('detail.createdAt')}</dt>
+              <dt className="text-muted-foreground">{t("detail.sourceId")}</dt>
+              <dd className="truncate font-mono text-foreground">
+                {task.sourceId || "-"}
+              </dd>
+
+              <dt className="text-muted-foreground">{t("detail.source")}</dt>
+              <dd className="text-foreground">
+                {task.sourceLabel || "-"}
+                {task.sourceEntity?.kind ? (
+                  <span className="ml-2 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                    {task.sourceEntity.kind}
+                  </span>
+                ) : null}
+              </dd>
+
+              {task.description ? (
+                <>
+                  <dt className="text-muted-foreground">
+                    {t("detail.description")}
+                  </dt>
+                  <dd className="text-foreground">{task.description}</dd>
+                </>
+              ) : null}
+
+              <dt className="text-muted-foreground">{t("detail.createdAt")}</dt>
               <dd className="text-foreground">
                 {new Date(task.createdAt).toLocaleString(i18n.language, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
+                  dateStyle: "medium",
+                  timeStyle: "short",
                 })}
               </dd>
 
               {task.updatedAt && (
                 <>
-                  <dt className="text-muted-foreground">{t('detail.updatedAt')}</dt>
+                  <dt className="text-muted-foreground">
+                    {t("detail.updatedAt")}
+                  </dt>
                   <dd className="text-foreground">
                     {new Date(task.updatedAt).toLocaleString(i18n.language, {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
+                      dateStyle: "medium",
+                      timeStyle: "short",
                     })}
                   </dd>
                 </>
@@ -272,10 +324,18 @@ export function TaskDetailDialog({
         </div>
 
         <DialogFooter className="flex-row items-center justify-end gap-2">
+          {task.sourceEntity?.href ? (
+            <RouterLinkButton variant="secondary" to={task.sourceEntity.href}>
+              {t("detail.openSource")}
+            </RouterLinkButton>
+          ) : null}
+
           {canCancel && (
             <Button
               variant="danger"
-              onClick={() => cancelMutation.mutate({ path: { projectId, jobId: task.id } })}
+              onClick={() =>
+                cancelMutation.mutate({ path: { projectId, jobId: task.id } })
+              }
               disabled={cancelMutation.isPending}
               className="flex items-center gap-2"
             >
@@ -284,14 +344,16 @@ export function TaskDetailDialog({
               ) : (
                 <Square size={16} />
               )}
-              {t('actions.cancelTask')}
+              {t("actions.cancelTask")}
             </Button>
           )}
 
           {canRelaunch && (
             <Button
               variant="primary"
-              onClick={() => relaunchMutation.mutate({ path: { projectId, jobId: task.id } })}
+              onClick={() =>
+                relaunchMutation.mutate({ path: { projectId, jobId: task.id } })
+              }
               disabled={relaunchMutation.isPending}
               className="flex items-center gap-2"
             >
@@ -300,12 +362,12 @@ export function TaskDetailDialog({
               ) : (
                 <RefreshCw size={16} />
               )}
-              {t('actions.relaunch')}
+              {t("actions.relaunch")}
             </Button>
           )}
 
           <Button variant="ghost" onClick={onClose}>
-            {t('common:actions.close')}
+            {t("common:actions.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,19 +1,115 @@
 {
   "title": "Centre d'Alertes",
-  "description": "Lancez des vérifications de cohérence et gérez les avertissements de continuité.",
+  "description": "Lancez des scans de cohérence et gardez les avertissements de continuité sous contrôle.",
   "actions": {
     "scan": "Scanner",
-    "resolve": "Résoudre"
+    "scanning": "Scan en cours...",
+    "resolve": "Résoudre",
+    "ignore": "Ignorer",
+    "openContext": "Ouvrir le contexte"
   },
-  "table": {
-    "warning": "Alerte",
-    "kind": "Type",
-    "severity": "Sévérité",
+  "filters": {
+    "search": "Recherche",
+    "searchPlaceholder": "Titre, message, entité, slug...",
     "status": "Statut",
-    "entity": "Entité"
+    "severity": "Sévérité",
+    "kind": "Type",
+    "entityKind": "Entité",
+    "origin": "Origine",
+    "all": "Tous",
+    "reset": "Réinitialiser"
+  },
+  "summary": {
+    "title": "Synthèse",
+    "meta": "{{count}} alerte(s) chargée(s)",
+    "open": "{{count}} ouverte(s)",
+    "matched": "{{count}} visible(s)",
+    "critical": "{{count}} critique(s)",
+    "ignored": "{{count}} ignorée(s)",
+    "resolved": "{{count}} résolue(s)",
+    "openLabel": "Alertes ouvertes",
+    "criticalLabel": "Alertes critiques"
+  },
+  "entity": {
+    "title": "Entité cible"
+  },
+  "severity": {
+    "critical": "Critique",
+    "warning": "Avertissement",
+    "info": "Info"
+  },
+  "status": {
+    "open": "Ouvert",
+    "ignored": "Ignoré",
+    "resolved": "Résolu"
+  },
+  "kinds": {
+    "orphanCharacter": "Personnage orphelin",
+    "brokenReference": "Référence cassée",
+    "emptyScene": "Scène vide",
+    "locationConflict": "Conflit de lieu",
+    "timelineConflict": "Conflit temporel",
+    "continuityBreak": "Rupture de continuité",
+    "toneBreak": "Rupture de ton",
+    "impossibleFact": "Fait impossible"
+  },
+  "entityKinds": {
+    "scene": "Scène",
+    "character": "Personnage",
+    "chapter": "Chapitre",
+    "tome": "Tome",
+    "asset": "Ressource"
+  },
+  "origin": {
+    "project": "Projet",
+    "scene": "Scène",
+    "reference": "Référence",
+    "story": "Histoire"
+  },
+  "metadata": {
+    "scene": "Scène",
+    "sceneSlug": "Slug scène",
+    "chapter": "Chapitre",
+    "location": "Lieu",
+    "target": "Cible",
+    "token": "Token",
+    "allowed": "Lieux autorisés",
+    "source": "Source",
+    "timeline": "Chronologie",
+    "anchor": "Ancre",
+    "expectedOrder": "Ordre attendu",
+    "actualOrder": "Ordre actuel",
+    "continuityKey": "Clé de continuité",
+    "continuityValue": "Valeur de continuité",
+    "canonicalValue": "Valeur canonique",
+    "scope": "Portée",
+    "toneTags": "Tags de ton",
+    "requiredToneTags": "Tags de ton requis",
+    "missingToneTags": "Tags de ton manquants",
+    "forbiddenToneTags": "Tags de ton interdits",
+    "forbiddenHits": "Correspondances interdites",
+    "factKey": "Clé de fait",
+    "factValue": "Valeur du fait",
+    "prohibitedValues": "Valeurs interdites"
+  },
+  "scan": {
+    "lastRun": {
+      "title": "Dernier scan",
+      "added": "{{count}} ajouté(s)",
+      "description": "{{scanned}} élément(s) analysé(s), {{resolved}} avertissement(s) résolu(s)."
+    }
+  },
+  "context": {
+    "title": "Mode d'emploi",
+    "description": "Chaque carte affiche le message du backend, l'entité concernée et les actions possibles.",
+    "hint": "Les alertes ne bloquent pas l'écriture. Elles servent à rattraper les incohérences au bon moment."
   },
   "empty": {
     "title": "Aucune alerte",
-    "description": "Le backend n'a aucun avertissement actif pour ce projet."
+    "description": "Le backend n'a aucun avertissement actif pour ce projet.",
+    "filtered": {
+      "title": "Aucun résultat",
+      "description": "Aucun avertissement ne correspond aux filtres actuels."
+    }
   }
 }

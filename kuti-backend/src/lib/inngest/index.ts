@@ -9,6 +9,7 @@ export { inngest } from "./client";
 // Re-exports des fonctions Inngest
 export { deleteProjectFunction, sendDeleteProjectEvent } from "./delete-project";
 export { exportProjectFunction } from "./export-project";
+export { generateGenerationFunction, sendGenerationRunEvent } from "./generate-job";
 export { generateImageFunction } from "./generate-image";
 export { generateSceneMangaFunction } from "./generate-scene-manga";
 export { generateDramaVideoFunction, sendGenerateDramaVideoEvent } from "./generate-drama-video";
@@ -67,7 +68,7 @@ type ExportProjectEvent = {
     projectId: string;
     exportId: string;
     kind: "work" | "publication";
-    format: "json" | "tree" | "zip";
+    format: "json" | "tree" | "zip" | "paged_images" | "pdf" | "cbz" | "epub";
   };
 };
 
@@ -136,6 +137,7 @@ export async function sendExportProjectEvent(
   data: ExportProjectEvent["data"]
 ): Promise<void> {
   await inngest.send({
+    id: `export-project-${data.exportId}`,
     name: "kuti/export-project",
     data,
   });
@@ -159,6 +161,7 @@ export async function sendCheckOrphanImagesEvent(
 
 import { deleteProjectFunction } from "./delete-project";
 import { exportProjectFunction } from "./export-project";
+import { generateGenerationFunction } from "./generate-job";
 import { generateImageFunction } from "./generate-image";
 import { generateSceneMangaFunction } from "./generate-scene-manga";
 import { generateDramaVideoFunction } from "./generate-drama-video";
@@ -167,6 +170,7 @@ import { cancelJobFunction, relaunchJobFunction } from "./job-control";
 export const inngestFunctions = [
   deleteProjectFunction,
   exportProjectFunction,
+  generateGenerationFunction,
   generateImageFunction,
   generateSceneMangaFunction,
   generateDramaVideoFunction,

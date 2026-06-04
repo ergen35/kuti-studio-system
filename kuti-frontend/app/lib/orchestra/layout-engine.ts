@@ -1,5 +1,5 @@
-import type { Tome, Chapter, Scene, NodePosition, LayoutConfig } from './types';
-import { DEFAULT_LAYOUT_CONFIG } from './types';
+import type { Tome, Chapter, Scene, NodePosition, LayoutConfig } from "./types";
+import { DEFAULT_LAYOUT_CONFIG } from "./types";
 
 /**
  * Calcule les positions 2D des nœuds narratifs dans un layout chronologique linéaire.
@@ -29,7 +29,7 @@ export function calculateNodePositions(
   tomes: Tome[],
   chapters: Chapter[],
   scenes: Scene[],
-  config: LayoutConfig = DEFAULT_LAYOUT_CONFIG
+  config: LayoutConfig = DEFAULT_LAYOUT_CONFIG,
 ): Map<string, NodePosition> {
   const positions = new Map<string, NodePosition>();
 
@@ -55,7 +55,10 @@ export function calculateNodePositions(
 
       if (chapterScenes.length === 0) {
         // Chapitre sans scène: allouer un espace minimum
-        chapterToScenes.set(chapter.id, { firstX: currentX, lastX: currentX + sceneSpacing });
+        chapterToScenes.set(chapter.id, {
+          firstX: currentX,
+          lastX: currentX + sceneSpacing,
+        });
         currentX += sceneSpacing * 2; // Espace vide
         continue;
       }
@@ -89,7 +92,8 @@ export function calculateNodePositions(
 
     const firstChapterX = chapterToScenes.get(tomeChapters[0].id)?.firstX ?? 0;
     const lastChapter = tomeChapters[tomeChapters.length - 1];
-    const lastChapterX = chapterToScenes.get(lastChapter.id)?.lastX ?? firstChapterX;
+    const lastChapterX =
+      chapterToScenes.get(lastChapter.id)?.lastX ?? firstChapterX;
 
     tomeToChapters.set(tome.id, { firstX: firstChapterX, lastX: lastChapterX });
 
@@ -129,14 +133,14 @@ export function calculateConnections(
   tomes: Tome[],
   chapters: Chapter[],
   scenes: Scene[],
-  positions: Map<string, NodePosition>
+  positions: Map<string, NodePosition>,
 ): Array<{
   id: string;
   startId: string;
   endId: string;
   start: NodePosition;
   end: NodePosition;
-  type: 'tome-chapter' | 'chapter-scene' | 'scene-scene';
+  type: "tome-chapter" | "chapter-scene" | "scene-scene";
 }> {
   const connections: Array<{
     id: string;
@@ -144,7 +148,7 @@ export function calculateConnections(
     endId: string;
     start: NodePosition;
     end: NodePosition;
-    type: 'tome-chapter' | 'chapter-scene' | 'scene-scene';
+    type: "tome-chapter" | "chapter-scene" | "scene-scene";
   }> = [];
 
   // ═══════════════════════════════════════════════════════════════
@@ -166,7 +170,7 @@ export function calculateConnections(
         endId: chapter.id,
         start: tomePos,
         end: chapterPos,
-        type: 'tome-chapter',
+        type: "tome-chapter",
       });
     });
   });
@@ -195,7 +199,7 @@ export function calculateConnections(
           endId: scene.id,
           start: chapterPos,
           end: scenePos,
-          type: 'chapter-scene',
+          type: "chapter-scene",
         });
       } else {
         // Scènes suivantes: connexion depuis la scène précédente
@@ -208,7 +212,7 @@ export function calculateConnections(
             endId: scene.id,
             start: prevPos,
             end: scenePos,
-            type: 'scene-scene',
+            type: "scene-scene",
           });
         }
       }
@@ -223,7 +227,7 @@ export function calculateConnections(
  */
 export function getCameraTargetForNode(
   nodeId: string,
-  positions: Map<string, NodePosition>
+  positions: Map<string, NodePosition>,
 ): NodePosition | null {
   return positions.get(nodeId) ?? null;
 }
@@ -245,7 +249,7 @@ export function getLayoutBounds(positions: Map<string, NodePosition>): {
       x: Math.min(acc.x, p.x),
       y: Math.min(acc.y, p.y),
     }),
-    { x: Infinity, y: Infinity }
+    { x: Infinity, y: Infinity },
   );
 
   const max = values.reduce(
@@ -253,7 +257,7 @@ export function getLayoutBounds(positions: Map<string, NodePosition>): {
       x: Math.max(acc.x, p.x),
       y: Math.max(acc.y, p.y),
     }),
-    { x: -Infinity, y: -Infinity }
+    { x: -Infinity, y: -Infinity },
   );
 
   const center = {

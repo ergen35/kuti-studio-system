@@ -5,13 +5,16 @@
 
 import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
-import { mkdir, cp } from "node:fs/promises";
-import { config, getProjectDir } from "@lib/config";
+import { mkdir, cp, stat } from "node:fs/promises";
+import { basename, resolve } from "node:path";
+import { getProjectDir } from "@lib/config";
+import { runCoherenceScanIfEnabled } from "@lib/coherence-scan";
 import { prisma } from "@lib/db";
 import type { Prisma } from "@lib/db/generated/client";
 import { serializeProject } from "./utils";
 import type {
   CreateProjectBody,
+  ImportProjectBody,
   UpdateProjectBody,
   CloneProjectBody,
   DeleteProjectBody,
@@ -37,6 +40,37 @@ async function generateUniqueSlug(name: string): Promise<string> {
   }
 
   return candidate;
+}
+
+async function ensureProjectStorage(rootPath: string): Promise<void> {
+  await mkdir(rootPath, { recursive: true });
+  await mkdir(`${rootPath}/assets`, { recursive: true });
+  await mkdir(`${rootPath}/generation`, { recursive: true });
+  await mkdir(`${rootPath}/exports`, { recursive: true });
+}
+
+function normalizeRootPath(rootPath: string): string {
+  return rootPath.trim().replace(/[\\/]+$/, "");
+}
+
+function deriveProjectName(rootPath: string): string {
+  const baseName = basename(normalizeRootPath(rootPath));
+  if (!baseName) {
+    return "Imported project";
+  }
+
+  return baseName
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+async function findProjectByRootPath(rootPath: string) {
+  const resolvedRootPath = resolve(rootPath);
+  const projects = await prisma.project.findMany({
+    select: { id: true, rootPath: true },
+  });
+
+  return projects.find((project) => resolve(project.rootPath) === resolvedRootPath) ?? null;
 }
 
 // ============================================================================
@@ -79,11 +113,7 @@ export async function createProject(
   const slug = await generateUniqueSlug(data.name);
   const rootPath = getProjectDir(slug);
 
-  // Créer le répertoire du projet
-  await mkdir(rootPath, { recursive: true });
-  await mkdir(`${rootPath}/assets`, { recursive: true });
-  await mkdir(`${rootPath}/generation`, { recursive: true });
-  await mkdir(`${rootPath}/exports`, { recursive: true });
+  await ensureProjectStorage(rootPath);
 
   const now = new Date();
 
@@ -97,6 +127,61 @@ export async function createProject(
       settingsJson: (data.settingsJson || {}) as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
+    },
+  });
+
+  return serializeProject(project);
+}
+
+/**
+ * Ouvre un projet existant depuis un chemin local, ou l'enregistre si absent
+ */
+export async function importProject(
+  data: ImportProjectBody
+): Promise<ProjectResponse> {
+  const rootPath = normalizeRootPath(data.rootPath);
+
+  const rootStats = await stat(rootPath).catch((error: NodeJS.ErrnoException) => {
+    if (error.code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  });
+
+  if (!rootStats) {
+    throw new Error("Project root path not found");
+  }
+
+  if (!rootStats.isDirectory()) {
+    throw new Error("Project root path must be a directory");
+  }
+
+  const existingProject = await findProjectByRootPath(rootPath);
+  if (existingProject) {
+    const opened = await openProject(existingProject.id);
+    if (!opened) {
+      throw new Error("Project not found");
+    }
+    return opened;
+  }
+
+  const name = data.name?.trim() || deriveProjectName(rootPath);
+  const slug = await generateUniqueSlug(name);
+
+  await ensureProjectStorage(rootPath);
+
+  const now = new Date();
+  const project = await prisma.project.create({
+    data: {
+      id: randomUUIDv7(),
+      name,
+      slug,
+      status: data.status,
+      rootPath,
+      settingsJson: (data.settingsJson || {}) as Prisma.InputJsonValue,
+      createdAt: now,
+      updatedAt: now,
+      lastOpenedAt: now,
     },
   });
 
@@ -127,6 +212,8 @@ export async function updateProject(
       updatedAt: new Date(),
     },
   });
+
+  await runCoherenceScanIfEnabled(projectId);
 
   return serializeProject(updated);
 }
@@ -201,7 +288,6 @@ export async function cloneProject(
   const cloneSlug = await generateUniqueSlug(cloneName);
   const cloneRoot = getProjectDir(cloneSlug);
 
-  // Copier les fichiers du répertoire source
   try {
     await cp(sourceProject.rootPath, cloneRoot, {
       recursive: true,
@@ -209,12 +295,7 @@ export async function cloneProject(
       errorOnExist: true,
     });
   } catch {
-    // Si le répertoire source n'existe pas ou autre erreur,
-    // créer simplement le répertoire de destination
-    await mkdir(cloneRoot, { recursive: true });
-    await mkdir(`${cloneRoot}/assets`, { recursive: true });
-    await mkdir(`${cloneRoot}/generation`, { recursive: true });
-    await mkdir(`${cloneRoot}/exports`, { recursive: true });
+    await ensureProjectStorage(cloneRoot);
   }
 
   const now = new Date();

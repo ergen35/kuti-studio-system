@@ -9,12 +9,14 @@ import {
   createRelation,
   createVoiceSample,
   deleteCharacter,
+  deleteRelation,
   deleteCharacterImage,
   generateCharacterImage,
   getAllProjectCharacterImages,
   getCharacter,
   listCharacterImages,
   listCharacters,
+  updateRelation,
   updateCharacter
 } from "./controller";
 import {
@@ -30,7 +32,9 @@ import {
   generateCharacterImageQuerySchema,
   imageIdParamsSchema,
   projectCharacterImagesResponseSchema,
+  relationIdParamsSchema,
   updateCharacterBodySchema,
+  updateRelationBodySchema,
   voiceSampleResponseSchema
 } from "./dto";
 
@@ -113,6 +117,28 @@ export const charactersModule = new Elysia({
     body: createRelationBodySchema,
     response: characterRelationResponseSchema,
     detail: { operationId: "createRelation", summary: "Create a character relation" },
+  })
+
+  // Update relation
+  .patch("/:characterId/relations/:relationId", async ({ params, body }) => {
+    const relation = await updateRelation(params.projectId, params.characterId, params.relationId, body);
+    if (!relation) throw new Error("Relation not found");
+    return relation;
+  }, {
+    params: relationIdParamsSchema,
+    body: updateRelationBodySchema,
+    response: characterRelationResponseSchema,
+    detail: { operationId: "updateRelation", summary: "Update a character relation" },
+  })
+
+  // Delete relation
+  .delete("/:characterId/relations/:relationId", async ({ params }) => {
+    const deleted = await deleteRelation(params.projectId, params.characterId, params.relationId);
+    if (!deleted) throw new Error("Relation not found");
+    return;
+  }, {
+    params: relationIdParamsSchema,
+    detail: { operationId: "deleteRelation", summary: "Delete a character relation" },
   })
 
   // Create voice sample

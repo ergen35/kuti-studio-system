@@ -1,4 +1,4 @@
-import type { NodeType, NodePosition } from '~/lib/orchestra/types';
+import type { NodeType, NodePosition } from "~/lib/orchestra/types";
 
 /**
  * Rendering-specific types for Pixi Orchestra components.
@@ -55,7 +55,7 @@ export interface RenderedNodeMeta {
 /**
  * Visual state for a node.
  */
-export type NodeVisualState = 'normal' | 'hover' | 'selected' | 'active';
+export type NodeVisualState = "normal" | "hover" | "selected" | "active";
 
 /**
  * Configuration for a cable/connection style.

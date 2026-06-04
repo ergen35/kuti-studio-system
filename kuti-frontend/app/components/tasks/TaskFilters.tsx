@@ -4,11 +4,32 @@ import { Button } from "~/components/ui";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import { useTranslation } from "~/hooks/useTranslation";
-import { useTasksStore, type TaskStatus, type SourceKind } from "~/stores/tasks";
+import {
+  useTasksStore,
+  type TaskPriority,
+  type TaskStatus,
+  type TaskType,
+  type SourceKind,
+} from "~/stores/tasks";
 import { getStatusColor } from "~/lib/tasks/types";
 
-const ALL_STATUSES: TaskStatus[] = ["pending", "running", "ready", "validated", "failed"];
-const ALL_SOURCE_KINDS: SourceKind[] = ["tome", "chapter", "scene", "panel", "custom", "character"];
+const ALL_STATUSES: TaskStatus[] = [
+  "pending",
+  "running",
+  "ready",
+  "validated",
+  "failed",
+];
+const ALL_TASK_TYPES: TaskType[] = ["technical", "editorial"];
+const ALL_PRIORITIES: TaskPriority[] = ["low", "medium", "high", "critical"];
+const ALL_SOURCE_KINDS: SourceKind[] = [
+  "tome",
+  "chapter",
+  "scene",
+  "panel",
+  "custom",
+  "character",
+];
 
 interface TaskFiltersProps {
   compact?: boolean;
@@ -23,6 +44,14 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
     toggleStatus,
     selectAllStatuses,
     clearStatuses,
+    selectedTaskTypes,
+    toggleTaskType,
+    selectAllTaskTypes,
+    clearTaskTypes,
+    selectedPriorities,
+    togglePriority,
+    selectAllPriorities,
+    clearPriorities,
     selectedSourceKinds,
     toggleSourceKind,
     selectAllSourceKinds,
@@ -32,11 +61,15 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
   const hasFilters =
     searchQuery ||
     selectedStatuses.length !== ALL_STATUSES.length ||
+    selectedTaskTypes.length !== ALL_TASK_TYPES.length ||
+    selectedPriorities.length !== ALL_PRIORITIES.length ||
     selectedSourceKinds.length !== ALL_SOURCE_KINDS.length;
 
   const clearAll = () => {
     setSearchQuery("");
     selectAllStatuses();
+    selectAllTaskTypes();
+    selectAllPriorities();
     selectAllSourceKinds();
   };
 
@@ -80,10 +113,29 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
                 "h-7 px-2 text-[10px]",
                 selectedStatuses.includes(status)
                   ? getStatusColor(status)
-                  : "border-border bg-secondary/50 text-muted-foreground opacity-70"
+                  : "border-border bg-secondary/50 text-muted-foreground opacity-70",
               )}
             >
               {t(`status.${status}`)}
+            </Button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-1">
+          {ALL_TASK_TYPES.map((type) => (
+            <Button
+              type="button"
+              variant="ghost"
+              key={type}
+              onClick={() => toggleTaskType(type)}
+              className={clsx(
+                "h-7 px-2 text-[10px]",
+                selectedTaskTypes.includes(type)
+                  ? "border-border/20 bg-primary/8 text-foreground"
+                  : "border-border bg-secondary/50 text-muted-foreground opacity-70",
+              )}
+            >
+              {t(`taskTypes.${type}`)}
             </Button>
           ))}
         </div>
@@ -95,7 +147,9 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
     <div className="flex flex-col gap-5">
       {/* Search */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-foreground">{t("search.label")}</label>
+        <label className="text-sm font-medium text-foreground">
+          {t("search.label")}
+        </label>
         <div className="relative">
           <Search
             size={16}
@@ -124,7 +178,9 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
       {/* Status filters */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">{t("statusLabel")}</label>
+          <label className="text-sm font-medium text-foreground">
+            {t("statusLabel")}
+          </label>
           <div className="flex items-center gap-1">
             <Button
               type="button"
@@ -156,7 +212,7 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
                 "h-7 px-2.5 text-xs",
                 selectedStatuses.includes(status)
                   ? getStatusColor(status)
-                  : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/25"
+                  : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/25",
               )}
             >
               {t(`status.${status}`)}
@@ -165,10 +221,104 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
         </div>
       </div>
 
+      {/* Task type filters */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-foreground">
+            {t("typesLabel")}
+          </label>
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={selectAllTaskTypes}
+              className="h-6 px-1 text-[10px] text-primary"
+            >
+              {t("filters.all")}
+            </Button>
+            <span className="text-muted-foreground">·</span>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={clearTaskTypes}
+              className="h-6 px-1 text-[10px] text-muted-foreground"
+            >
+              {t("filters.none")}
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {ALL_TASK_TYPES.map((type) => (
+            <Button
+              type="button"
+              variant="ghost"
+              key={type}
+              onClick={() => toggleTaskType(type)}
+              className={clsx(
+                "h-7 px-2.5 text-xs",
+                selectedTaskTypes.includes(type)
+                  ? "border-border/25 bg-primary/8 text-foreground"
+                  : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/25",
+              )}
+            >
+              {t(`taskTypes.${type}`)}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Priority filters */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-foreground">
+            {t("prioritiesLabel")}
+          </label>
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={selectAllPriorities}
+              className="h-6 px-1 text-[10px] text-primary"
+            >
+              {t("filters.all")}
+            </Button>
+            <span className="text-muted-foreground">·</span>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={clearPriorities}
+              className="h-6 px-1 text-[10px] text-muted-foreground"
+            >
+              {t("filters.none")}
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {ALL_PRIORITIES.map((priority) => (
+            <Button
+              type="button"
+              variant="ghost"
+              key={priority}
+              onClick={() => togglePriority(priority)}
+              className={clsx(
+                "h-7 px-2.5 text-xs",
+                selectedPriorities.includes(priority)
+                  ? "border-border/25 bg-primary/8 text-foreground"
+                  : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/25",
+              )}
+            >
+              {t(`priorities.${priority}`)}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       {/* SourceKind filters */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">{t("typesLabel")}</label>
+          <label className="text-sm font-medium text-foreground">
+            {t("typesLabel")}
+          </label>
           <div className="flex items-center gap-1">
             <Button
               type="button"
@@ -199,7 +349,9 @@ export function TaskFilters({ compact = false }: TaskFiltersProps) {
                 checked={selectedSourceKinds.includes(kind)}
                 onCheckedChange={() => toggleSourceKind(kind)}
               />
-              <span className="text-sm text-foreground">{t(`sourceKinds.${kind}`)}</span>
+              <span className="text-sm text-foreground">
+                {t(`sourceKinds.${kind}`)}
+              </span>
             </label>
           ))}
         </div>

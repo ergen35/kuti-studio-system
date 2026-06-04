@@ -13,14 +13,24 @@ void initI18n();
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-  { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+  },
 ];
 
 export function meta() {
   return [
     { title: "Kuti Studio" },
-    { name: "description", content: "Local-first narrative production workspace" },
+    {
+      name: "description",
+      content: "Local-first narrative production workspace",
+    },
   ];
 }
 
@@ -65,6 +75,13 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  const message = error instanceof Error ? error.message : "Unexpected application error";
-  return <main className="mx-auto max-w-[1500px] p-5"><div className="rounded-[7px] border border-danger/45 bg-danger/10 p-4 text-danger"><strong className="text-sm">{message}</strong></div></main>;
+  const message =
+    error instanceof Error ? error.message : "Unexpected application error";
+  return (
+    <main className="mx-auto max-w-[1500px] p-5">
+      <div className="rounded-[7px] border border-danger/45 bg-danger/10 p-4 text-danger">
+        <strong className="text-sm">{message}</strong>
+      </div>
+    </main>
+  );
 }

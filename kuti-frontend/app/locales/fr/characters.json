@@ -19,6 +19,8 @@
     "addCharacter": "Ajouter personnage",
     "archive": "Archiver",
     "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "openGraph": "Graphe relationnel",
     "saveProfile": "Enregistrer le profil",
     "backToGrid": "Retour aux personnages",
     "cancel": "Annuler",
@@ -61,6 +63,78 @@
     "count": "{{count}} échantillon",
     "count_plural": "{{count}} échantillons"
   },
+  "duplicate": {
+    "title": "Dupliquer le personnage",
+    "description": "Crée une copie de la fiche, puis laisse choisir les relations et échantillons vocaux à reprendre.",
+    "nameLabel": "Nom de la copie",
+    "includeRelations": "Copier les relations",
+    "includeRelationsHint": "{{count}} relation liée sera reprise.",
+    "includeRelationsHint_plural": "{{count}} relations liées seront reprises.",
+    "includeVoiceSamples": "Copier les échantillons vocaux",
+    "includeVoiceSamplesHint": "{{count}} échantillon vocal sera repris.",
+    "includeVoiceSamplesHint_plural": "{{count}} échantillons vocaux seront repris.",
+    "note": "Les images générées restent attachées au personnage source.",
+    "submit": "Dupliquer",
+    "cancel": "Annuler",
+    "copySuffix": "copie"
+  },
+  "usage": {
+    "title": "Utilisation",
+    "meta": "Références et dépendances",
+    "status": {
+      "used": "Utilisé",
+      "orphan": "Orphelin",
+      "nonReferenced": "Non référencé",
+      "archived": "Archivé"
+    },
+    "summary": "{{sceneCountLabel}}, {{relationCountLabel}}, {{voiceSampleCountLabel}}",
+    "linkedScenes": "{{count}} scène liée",
+    "linkedScenes_plural": "{{count}} scènes liées",
+    "noLinkedScenes": "Aucune scène liée",
+    "openStory": "Ouvrir l'histoire",
+    "scenesTitle": "Scènes liées"
+  },
+  "graph": {
+    "title": "Graphe relationnel",
+    "description": "Vue plein écran des relations du personnage {{name}}.",
+    "relationCount": "{{count}} relation",
+    "relationCount_plural": "{{count}} relations",
+    "centerLabel": "Personnage source",
+    "detailsTitle": "Détails des liens",
+    "detailsDescription": "Les liens sortants du personnage {{name}} s'affichent en carte et en graphe pour garder le contexte lisible.",
+    "sourceCharacter": "Source",
+    "editorTitle": "Modifier la relation",
+    "editorMeta": "Édition directe",
+    "editorEmpty": "Sélectionnez une relation à droite pour la modifier sans quitter le graphe.",
+    "targetCharacter": "Personnage cible",
+    "relationTypeLabel": "Type de relation",
+    "relationTypePlaceholder": "ally, rival, mentor...",
+    "strengthLabelInput": "Intensité",
+    "narrativeDependencyLabel": "Dépendance narrative",
+    "narrativeDependencyPlaceholder": "Pourquoi ce lien compte dans l'histoire...",
+    "notesFieldLabel": "Notes",
+    "notesPlaceholder": "Observations, contexte, contraintes de continuité...",
+    "clearSelection": "Effacer la sélection",
+    "saving": "Enregistrement...",
+    "deleting": "Suppression...",
+    "saveRelation": "Enregistrer",
+    "removeRelation": "Supprimer",
+    "deleteConfirm": "Supprimer la relation avec {{name}} ?",
+    "strength": "{{strength}}%",
+    "strengthLabel": "Intensité: {{strength}}%",
+    "dependencyLabel": "Dépendance narrative: {{dependency}}",
+    "notesLabel": "Notes: {{notes}}",
+    "openCharacter": "Ouvrir la fiche",
+    "editRelation": "Modifier",
+    "relationsListTitle": "Relations",
+    "relationsListMeta": "Carte et édition",
+    "missingCharacter": "Personnage manquant",
+    "emptyTitle": "Aucune relation à afficher",
+    "emptyMeta": "Vue vide",
+    "emptyDescription": "Ajoutez une relation depuis l'inspecteur pour la faire apparaître dans le graphe plein écran.",
+    "close": "Fermer",
+    "none": "Aucune"
+  },
   "images": {
     "title": "Images générées",
     "empty": "Aucune image générée",
@@ -74,6 +148,9 @@
   "cards": {
     "noRole": "Aucun rôle défini",
     "viewProfile": "Voir la fiche"
+  },
+  "avatar": {
+    "label": "Avatar de {{name}}"
   },
   "sidepanel": {
     "otherCharacters": "Distribution",
@@ -105,6 +182,8 @@
     "generate": "Générer",
     "generating": "Génération...",
     "regenerate": "Regénérer",
+    "panelCount": "{{count}} image",
+    "panelCount_plural": "{{count}} images",
     "modalTitle": "Générer une image",
     "modalDescription": "Choisissez le cadrage, le style et le nombre de variantes à produire.",
     "defaultPromptSubject": "Un personnage",
@@ -113,6 +192,11 @@
     "download": "Télécharger",
     "selected": "Sélectionné",
     "insufficientData": "Données insuffisantes. Ajoutez description et traits physiques.",
+    "promptLabels": {
+      "physical": "Physique",
+      "wearing": "Vêtement",
+      "colors": "Couleurs"
+    },
     "strategy": {
       "label": "Cadrage",
       "portrait": "Portrait",

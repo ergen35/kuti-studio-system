@@ -1,14 +1,288 @@
 {
   "title": "Paramètres du Projet",
-  "description": "Éditez les métadonnées du projet et les lieux de cohérence.",
+  "description": "Éditez les métadonnées du projet, les réglages de génération, les règles de cohérence et les préférences de publication.",
   "fields": {
     "name": "Nom",
     "status": "Statut",
     "allowedLocations": "Lieux autorisés",
     "locationsPlaceholder": "Docks Lunaires, Basse Ville"
   },
+  "sections": {
+    "navigation": {
+      "title": "Navigation rapide",
+      "meta": "Accédez directement à la section voulue"
+    },
+    "general": {
+      "title": "Métadonnées du projet",
+      "meta": "Identité, statut et suivi local"
+    },
+    "generation": {
+      "title": "Réglages de génération",
+      "meta": "Valeurs par défaut utilisées quand un flux ne précise rien",
+      "helper": "Ces préférences servent de base aux nouveaux jobs de génération et peuvent être surchargées au moment de lancer un job.",
+      "defaultModel": {
+        "label": "Modèle par défaut",
+        "placeholder": "Choisir un modèle par défaut",
+        "empty": "Aucun modèle disponible",
+        "none": "Aucun modèle défini"
+      },
+      "defaultMode": {
+        "label": "Mode par défaut",
+        "placeholder": "Choisir un mode",
+        "options": {
+          "separate": "Séparé",
+          "grid": "Grille"
+        }
+      },
+      "groups": {
+        "images": "Images",
+        "videos": "Vidéos",
+        "audio": "Audio"
+      },
+      "notConfigured": "(non configuré)"
+    },
+    "preview": {
+      "title": "Prévisualisation manga",
+      "meta": "Direction de lecture et densité de panneau",
+      "helper": "Ces options préparent l’interface de lecture et de revue des planches.",
+      "readingDirection": {
+        "label": "Direction de lecture",
+        "placeholder": "Choisir une direction",
+        "options": {
+          "rtl": "Droite vers gauche",
+          "ltr": "Gauche vers droite"
+        }
+      },
+      "panelDensity": {
+        "label": "Densité des panneaux",
+        "placeholder": "Choisir une densité",
+        "options": {
+          "comfortable": "Confortable",
+          "compact": "Compacte"
+        }
+      }
+    },
+    "coherence": {
+      "title": "Règles de cohérence",
+      "meta": "Contrôle les avertissements générés par le scan",
+      "helper": "Ces règles restent non bloquantes: elles n'empêchent pas l'écriture, elles modifient seulement ce que le scanner remonte.",
+      "preview": {
+        "title": "Aperçu des lieux",
+        "description": "La liste ci-dessous reflète les lieux autorisés qui seront utilisés par le scanner.",
+        "count": "{{count}} lieu(s)",
+        "empty": "Aucun lieu autorisé n'est encore défini."
+      }
+    },
+    "signals": {
+      "title": "Signaux narratifs",
+      "meta": "Ancrages temporels, tags de ton, faits de continuité et faits impossibles",
+      "helper": "Utilisez les tokens @timeline:slug, @continuity:key=value, @tone:tag et @fact:key=value dans les scènes.",
+      "timelineAnchors": {
+        "label": "Ancrages temporels",
+        "placeholder": "chapter-1 | Chapitre 1 | 0 | ouverture"
+      },
+      "requiredToneTags": {
+        "label": "Tags de ton requis",
+        "placeholder": "noir, tendu"
+      },
+      "forbiddenToneTags": {
+        "label": "Tags de ton interdits",
+        "placeholder": "comique, slapstick"
+      },
+      "continuityFacts": {
+        "label": "Faits de continuité",
+        "placeholder": "ship-status | operational | project"
+      },
+      "impossibleFacts": {
+        "label": "Faits impossibles",
+        "placeholder": "gravity | zero | project"
+      },
+      "autoScan": {
+        "label": "Auto-scan à l'enregistrement",
+        "description": "Relance automatiquement le scan de cohérence après la sauvegarde des scènes, personnages, relations et réglages pris en charge."
+      }
+    },
+    "versioning": {
+      "title": "Versioning",
+      "meta": "Combien de versions garder par branche",
+      "helper": "Les versions les plus anciennes sont purgées automatiquement lorsque la limite est dépassée.",
+      "retained": {
+        "label": "Versions conservées par branche"
+      }
+    },
+    "exports": {
+      "title": "Exports",
+      "meta": "Formats activés par défaut pour les nouvelles publications",
+      "helper": "Le jeu de formats ci-dessous est utilisé comme base lors de la création d’un export.",
+      "defaultKind": {
+        "label": "Type par défaut",
+        "placeholder": "Choisir un type",
+        "options": {
+          "work": "Travail",
+          "publication": "Publication"
+        }
+      },
+      "formats": {
+        "json": {
+          "label": "JSON",
+          "description": "Copie structurée des données du projet pour intégration ou archivage."
+        },
+        "tree": {
+          "label": "Arborescence",
+          "description": "Vue hiérarchique lisible des dossiers et contenus du projet."
+        },
+        "zip": {
+          "label": "ZIP",
+          "description": "Archive compressée du projet complet pour transport et sauvegarde."
+        },
+        "paged_images": {
+          "label": "Images paginées",
+          "description": "Dossiers d'images ordonnés pour la lecture et la relecture."
+        },
+        "pdf": {
+          "label": "PDF",
+          "description": "Document de lecture prêt à partager avec pagination conservée."
+        },
+        "cbz": {
+          "label": "CBZ",
+          "description": "Archive d’images compatible avec les lecteurs de bande dessinée."
+        },
+        "epub": {
+          "label": "EPUB",
+          "description": "Format e-reader préparé pour une diffusion future."
+        }
+      }
+    },
+    "language": {
+      "title": "Langue",
+      "meta": "Préférence linguistique du projet",
+      "helper": "Cette langue peut servir de défaut pour l’interface et les contenus contextualisés au projet.",
+      "preferredLocale": {
+        "label": "Langue préférée",
+        "placeholder": "Choisir une langue"
+      },
+      "options": {
+        "fr": "Français",
+        "en": "Anglais"
+      }
+    },
+    "assets": {
+      "title": "Assets",
+      "meta": "Comportement lors des suppressions et aide contextuelle",
+      "helper": "Ces options ajustent la manière dont les suppressions et les conseils liés aux médias sont présentés.",
+      "archiveOnDelete": {
+        "label": "Archiver à la suppression",
+        "description": "Conserve une trace locale de l’asset supprimé au lieu d’effacer brutalement le fichier.",
+        "enabled": "Archivage activé",
+        "disabled": "Archivage désactivé"
+      },
+      "showUsageHints": {
+        "label": "Afficher les conseils d’usage",
+        "description": "Montre des indices contextuels sur les assets et leur réutilisation.",
+        "enabled": "Aide visible",
+        "disabled": "Aide masquée"
+      }
+    },
+    "summary": {
+      "title": "Résumé",
+      "meta": "État actuel des réglages",
+      "generation": {
+        "title": "Génération",
+        "model": "Modèle: {{model}}",
+        "mode": "Mode: {{mode}}"
+      },
+      "versioning": {
+        "title": "Versioning",
+        "description": "Conservation de {{count}} version(s) par branche"
+      },
+      "exports": {
+        "title": "Exports",
+        "empty": "Aucun format par défaut n’est sélectionné"
+      },
+      "language": {
+        "title": "Langue",
+        "description": "Préférence utilisée comme défaut pour la lecture et l’édition du projet"
+      },
+      "assets": {
+        "title": "Assets"
+      },
+      "locations": {
+        "title": "Lieux configurés",
+        "count": "{{count}} lieu(s)",
+        "empty": "Aucun lieu autorisé pour le moment."
+      },
+      "rules": {
+        "title": "Règles actives",
+        "count": "{{count}} règle(s)",
+        "empty": "Aucune règle n'est activée."
+      },
+      "signals": {
+        "title": "Registre des signaux",
+        "count": "{{count}} élément(s)",
+        "timeline": "{{count}} ancrage(s) temporel(s)",
+        "requiredTone": "{{count}} tag(s) de ton requis",
+        "forbiddenTone": "{{count}} tag(s) de ton interdit(s)",
+        "continuity": "{{count}} fait(s) de continuité",
+        "impossible": "{{count}} fait(s) impossible(s)",
+        "preview": "Aperçu : {{value}}",
+        "empty": "Aucun signal narratif n'est encore enregistré."
+      },
+      "automation": {
+        "title": "Automatisation",
+        "on": "Activée",
+        "off": "Désactivée",
+        "description": "Le mode auto-scan reflète le scan manuel après les écritures prises en charge."
+      }
+    }
+  },
   "actions": {
-    "save": "Enregistrer les paramètres"
+    "save": "Enregistrer les paramètres",
+    "saving": "Enregistrement...",
+    "reset": "Réinitialiser"
+  },
+  "unsavedChanges": {
+    "label": "Modifié",
+    "saved": "Enregistré",
+    "hint": "Des changements n'ont pas encore été enregistrés.",
+    "summary": "Les modifications seront écrites dans le JSON local du projet.",
+    "savedHint": "Les réglages sont synchronisés avec le stockage local.",
+    "confirm": "Vous avez des modifications non enregistrées. Quitter cette page quand même ?"
+  },
+  "coherence": {
+    "rules": {
+      "orphanCharacter": {
+        "label": "Personnages orphelins",
+        "description": "Détecte les personnages actifs qui ne sont liés à aucune scène ni relation."
+      },
+      "brokenReference": {
+        "label": "Références cassées",
+        "description": "Signale les références @ qui pointent vers une entité introuvable."
+      },
+      "emptyScene": {
+        "label": "Scènes vides",
+        "description": "Alerte sur les scènes actives dont le contenu reste trop court."
+      },
+      "locationConflict": {
+        "label": "Conflits de lieux",
+        "description": "Détecte les scènes qui utilisent un lieu absent de la liste autorisée."
+      },
+      "timelineConflict": {
+        "label": "Conflits temporels",
+        "description": "Signale les scènes dont le token temporel ne correspond pas à l'ordre du registre."
+      },
+      "continuityBreak": {
+        "label": "Ruptures de continuité",
+        "description": "Signale les assertions de scène qui contredisent le registre canonique de continuité."
+      },
+      "toneBreak": {
+        "label": "Ruptures de ton",
+        "description": "Signale les scènes qui oublient des tags de ton requis ou incluent des tags interdits."
+      },
+      "impossibleFact": {
+        "label": "Faits impossibles",
+        "description": "Signale les faits de scène explicitement interdits par le registre du projet."
+      }
+    }
   },
   "delete": {
     "sectionTitle": "Zone de danger",

@@ -18,6 +18,9 @@ const configSchema = z.object({
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    // React Router dev can fall back to 3001 when 3000 is already taken.
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
   ]),
 
   // App info
@@ -38,6 +41,8 @@ const configSchema = z.object({
   // Inngest
   inngestEventKey: z.string().optional(),
   inngestSigningKey: z.string().optional(),
+  inngestBaseUrl: z.string().optional(),
+  inngestDev: z.boolean().default(false),
 
   // Redis (pour Inngest/BentoCache)
   redisUrl: z.string().optional(),
@@ -131,6 +136,8 @@ function parseConfig(): Config {
     // Inngest
     inngestEventKey: process.env.INNGEST_EVENT_KEY,
     inngestSigningKey: process.env.INNGEST_SIGNING_KEY,
+    inngestBaseUrl: process.env.INNGEST_BASE_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:8288" : undefined),
+    inngestDev: process.env.INNGEST_DEV === "1" || process.env.INNGEST_DEV === "true" || process.env.NODE_ENV === "development",
 
     // Redis
     redisUrl: process.env.REDIS_URL,

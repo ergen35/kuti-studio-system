@@ -93,6 +93,15 @@ export const createRelationBodySchema = z.object({
 
 export type CreateRelationBody = z.infer<typeof createRelationBodySchema>;
 
+export const updateRelationBodySchema = z.object({
+  relationType: z.string().min(1).optional(),
+  strength: z.number().min(0).max(100).optional(),
+  narrativeDependency: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type UpdateRelationBody = z.infer<typeof updateRelationBodySchema>;
+
 // Voice Sample
 export const voiceSampleResponseSchema = z.object({
   id: z.string(),

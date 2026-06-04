@@ -126,8 +126,16 @@
     font-size: 14px;
     letter-spacing: 0;
     background-image:
-      linear-gradient(180deg, color-mix(in oklab, var(--surface-2), transparent 70%), transparent 240px),
-      radial-gradient(circle at 20% 0%, color-mix(in oklab, var(--accent), transparent 92%), transparent 320px);
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--surface-2), transparent 70%),
+        transparent 240px
+      ),
+      radial-gradient(
+        circle at 20% 0%,
+        color-mix(in oklab, var(--accent), transparent 92%),
+        transparent 320px
+      );
     background-attachment: fixed;
   }
   button {

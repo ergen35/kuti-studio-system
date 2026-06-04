@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const projectIdParamsSchema = z.object({ projectId: z.string().uuid() });
+export const dramaVideoIdParamsSchema = projectIdParamsSchema.extend({ dramaVideoId: z.string().uuid() });
 
 export const dramaVideoStatusSchema = z.enum(["draft", "queued", "running", "ready", "failed", "archived"]);
 

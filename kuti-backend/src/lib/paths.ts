@@ -44,6 +44,13 @@ export function getProjectDir(projectSlug: string): string {
 }
 
 /**
+ * Retourne le répertoire public associé à un projet spécifique.
+ */
+export function getProjectPublicDir(projectId: string): string {
+  return `public/projects/${projectId}`;
+}
+
+/**
  * Retourne le chemin racine d'un projet (comme dans v1)
  */
 export function getProjectRootPath(projectSlug: string): string {

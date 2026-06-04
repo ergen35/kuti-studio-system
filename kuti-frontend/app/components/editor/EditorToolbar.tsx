@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { useCallback, useEffect, useState } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
   $isRangeSelection,
@@ -9,20 +9,15 @@ import {
   CAN_UNDO_COMMAND,
   CAN_REDO_COMMAND,
   $createParagraphNode,
-} from 'lexical';
+} from "lexical";
 import {
   $isListNode,
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   REMOVE_LIST_COMMAND,
-} from '@lexical/list';
-import {
-  $isHeadingNode,
-  $createHeadingNode,
-} from '@lexical/rich-text';
-import {
-  $wrapNodes,
-} from '@lexical/selection';
+} from "@lexical/list";
+import { $isHeadingNode, $createHeadingNode } from "@lexical/rich-text";
+import { $wrapNodes } from "@lexical/selection";
 import {
   Bold,
   Italic,
@@ -37,12 +32,12 @@ import {
   ListOrdered,
   Undo,
   Redo,
-} from 'lucide-react';
-import { Button } from '~/components/ui';
-import { useTranslation } from '~/hooks/useTranslation';
+} from "lucide-react";
+import { Button } from "~/components/ui";
+import { useTranslation } from "~/hooks/useTranslation";
 
 export function EditorToolbar() {
-  const { t } = useTranslation('story');
+  const { t } = useTranslation("story");
   const [editor] = useLexicalComposerContext();
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [canUndo, setCanUndo] = useState(false);
@@ -53,31 +48,32 @@ export function EditorToolbar() {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const formats = new Set<string>();
-      
+
       // Text formats
-      if (selection.hasFormat('bold')) formats.add('bold');
-      if (selection.hasFormat('italic')) formats.add('italic');
-      if (selection.hasFormat('underline')) formats.add('underline');
-      if (selection.hasFormat('strikethrough')) formats.add('strikethrough');
-      if (selection.hasFormat('code')) formats.add('code');
+      if (selection.hasFormat("bold")) formats.add("bold");
+      if (selection.hasFormat("italic")) formats.add("italic");
+      if (selection.hasFormat("underline")) formats.add("underline");
+      if (selection.hasFormat("strikethrough")) formats.add("strikethrough");
+      if (selection.hasFormat("code")) formats.add("code");
 
       // Block types
       const anchorNode = selection.anchor.getNode();
-      const element = anchorNode.getKey() === 'root'
-        ? anchorNode
-        : anchorNode.getTopLevelElementOrThrow();
+      const element =
+        anchorNode.getKey() === "root"
+          ? anchorNode
+          : anchorNode.getTopLevelElementOrThrow();
 
       if ($isHeadingNode(element)) {
         const tag = element.getTag();
-        if (tag === 'h1') formats.add('h1');
-        if (tag === 'h2') formats.add('h2');
-        if (tag === 'h3') formats.add('h3');
+        if (tag === "h1") formats.add("h1");
+        if (tag === "h2") formats.add("h2");
+        if (tag === "h3") formats.add("h3");
       } else if ($isListNode(element)) {
         const listType = element.getListType();
-        if (listType === 'bullet') formats.add('ul');
-        if (listType === 'number') formats.add('ol');
-      } else if (element.getType() === 'quote') {
-        formats.add('quote');
+        if (listType === "bullet") formats.add("ul");
+        if (listType === "number") formats.add("ol");
+      } else if (element.getType() === "quote") {
+        formats.add("quote");
       }
 
       setActiveFormats(formats);
@@ -87,11 +83,13 @@ export function EditorToolbar() {
   // Register listeners
   useEffect(() => {
     // Listen for selection changes
-    const removeUpdateListener = editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        updateToolbar();
-      });
-    });
+    const removeUpdateListener = editor.registerUpdateListener(
+      ({ editorState }) => {
+        editorState.read(() => {
+          updateToolbar();
+        });
+      },
+    );
 
     // Listen for undo/redo state
     const removeUndoListener = editor.registerCommand(
@@ -100,7 +98,7 @@ export function EditorToolbar() {
         setCanUndo(payload);
         return false;
       },
-      1
+      1,
     );
 
     const removeRedoListener = editor.registerCommand(
@@ -109,7 +107,7 @@ export function EditorToolbar() {
         setCanRedo(payload);
         return false;
       },
-      1
+      1,
     );
 
     return () => {
@@ -121,32 +119,32 @@ export function EditorToolbar() {
 
   // Format commands
   const toggleBold = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
   };
 
   const toggleItalic = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
   };
 
   const toggleUnderline = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
   };
 
   const toggleStrikethrough = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough');
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
   };
 
   const toggleCode = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
   };
 
-  const toggleHeading = (headingSize: 'h1' | 'h2' | 'h3') => {
+  const toggleHeading = (headingSize: "h1" | "h2" | "h3") => {
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         const anchorNode = selection.anchor.getNode();
         const element = anchorNode.getTopLevelElementOrThrow();
-        
+
         // If already this heading, convert back to paragraph
         if ($isHeadingNode(element) && element.getTag() === headingSize) {
           $wrapNodes(selection, () => $createParagraphNode());
@@ -158,7 +156,7 @@ export function EditorToolbar() {
   };
 
   const toggleBulletList = () => {
-    if (activeFormats.has('ul')) {
+    if (activeFormats.has("ul")) {
       editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     } else {
       editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
@@ -166,7 +164,7 @@ export function EditorToolbar() {
   };
 
   const toggleNumberedList = () => {
-    if (activeFormats.has('ol')) {
+    if (activeFormats.has("ol")) {
       editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     } else {
       editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
@@ -209,7 +207,7 @@ export function EditorToolbar() {
       variant="ghost"
       onClick={onClick}
       disabled={disabled}
-      className={`toolbar-btn ${isActive ? 'active' : ''}`}
+      className={`toolbar-btn ${isActive ? "active" : ""}`}
       title={title}
     >
       <Icon size={16} />
@@ -224,48 +222,48 @@ export function EditorToolbar() {
       <ToolbarButton
         onClick={toggleBold}
         icon={Bold}
-        isActive={activeFormats.has('bold')}
-        title={t('editor.toolbar.bold')}
+        isActive={activeFormats.has("bold")}
+        title={t("editor.toolbar.bold")}
       />
       <ToolbarButton
         onClick={toggleItalic}
         icon={Italic}
-        isActive={activeFormats.has('italic')}
-        title={t('editor.toolbar.italic')}
+        isActive={activeFormats.has("italic")}
+        title={t("editor.toolbar.italic")}
       />
       <ToolbarButton
         onClick={toggleUnderline}
         icon={Underline}
-        isActive={activeFormats.has('underline')}
-        title={t('editor.toolbar.underline')}
+        isActive={activeFormats.has("underline")}
+        title={t("editor.toolbar.underline")}
       />
       <ToolbarButton
         onClick={toggleStrikethrough}
         icon={Strikethrough}
-        isActive={activeFormats.has('strikethrough')}
-        title={t('editor.toolbar.strikethrough')}
+        isActive={activeFormats.has("strikethrough")}
+        title={t("editor.toolbar.strikethrough")}
       />
 
       <Separator />
 
       {/* Headings */}
       <ToolbarButton
-        onClick={() => toggleHeading('h1')}
+        onClick={() => toggleHeading("h1")}
         icon={Heading1}
-        isActive={activeFormats.has('h1')}
-        title={t('editor.toolbar.heading1')}
+        isActive={activeFormats.has("h1")}
+        title={t("editor.toolbar.heading1")}
       />
       <ToolbarButton
-        onClick={() => toggleHeading('h2')}
+        onClick={() => toggleHeading("h2")}
         icon={Heading2}
-        isActive={activeFormats.has('h2')}
-        title={t('editor.toolbar.heading2')}
+        isActive={activeFormats.has("h2")}
+        title={t("editor.toolbar.heading2")}
       />
       <ToolbarButton
-        onClick={() => toggleHeading('h3')}
+        onClick={() => toggleHeading("h3")}
         icon={Heading3}
-        isActive={activeFormats.has('h3')}
-        title={t('editor.toolbar.heading3')}
+        isActive={activeFormats.has("h3")}
+        title={t("editor.toolbar.heading3")}
       />
 
       <Separator />
@@ -274,14 +272,14 @@ export function EditorToolbar() {
       <ToolbarButton
         onClick={toggleBulletList}
         icon={List}
-        isActive={activeFormats.has('ul')}
-        title={t('editor.toolbar.bulletList')}
+        isActive={activeFormats.has("ul")}
+        title={t("editor.toolbar.bulletList")}
       />
       <ToolbarButton
         onClick={toggleNumberedList}
         icon={ListOrdered}
-        isActive={activeFormats.has('ol')}
-        title={t('editor.toolbar.numberedList')}
+        isActive={activeFormats.has("ol")}
+        title={t("editor.toolbar.numberedList")}
       />
 
       <Separator />
@@ -290,14 +288,14 @@ export function EditorToolbar() {
       <ToolbarButton
         onClick={toggleQuote}
         icon={Quote}
-        isActive={activeFormats.has('quote')}
-        title={t('editor.toolbar.quote')}
+        isActive={activeFormats.has("quote")}
+        title={t("editor.toolbar.quote")}
       />
       <ToolbarButton
         onClick={toggleCode}
         icon={Code}
-        isActive={activeFormats.has('code')}
-        title={t('editor.toolbar.code')}
+        isActive={activeFormats.has("code")}
+        title={t("editor.toolbar.code")}
       />
 
       <Separator />
@@ -307,13 +305,13 @@ export function EditorToolbar() {
         onClick={handleUndo}
         icon={Undo}
         disabled={!canUndo}
-        title={t('editor.toolbar.undo')}
+        title={t("editor.toolbar.undo")}
       />
       <ToolbarButton
         onClick={handleRedo}
         icon={Redo}
         disabled={!canRedo}
-        title={t('editor.toolbar.redo')}
+        title={t("editor.toolbar.redo")}
       />
     </div>
   );

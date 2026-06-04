@@ -4,7 +4,8 @@ import { prisma } from "@lib/db";
 import type { Prisma } from "@lib/db/generated/client";
 import type { GenerationPanelStatus } from "@lib/db/generated/enums";
 import { throwIfNotExists } from "@lib/db/utils";
-import { sendCancelJobEvent, sendRelaunchJobEvent } from "@lib/inngest";
+import { readProjectGenerationSettings } from "@lib/project-settings";
+import { sendCancelJobEvent, sendGenerationRunEvent, sendRelaunchJobEvent } from "@lib/inngest";
 import type {
   GenerationJobResponse,
   GenerationBoardResponse,
@@ -106,6 +107,12 @@ export async function createGenerationJob(
   // Vérifier que le projet existe
   await throwIfNotExists.project(projectId);
 
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { settingsJson: true },
+  });
+  const projectSettings = readProjectGenerationSettings(project?.settingsJson);
+
   // Vérifier la source
   const sourceInfo = await resolveSource(projectId, data.sourceKind, data.sourceId);
 
@@ -121,24 +128,26 @@ export async function createGenerationJob(
       sourceLabel: sourceInfo.label,
       sourceVersionId: data.sourceVersionId ?? null,
       strategy: data.strategy,
-      entrypoint: data.modelKey || "gpt_images_2",
+      entrypoint: data.modelKey || projectSettings.defaultModelKey || "gpt_images_2",
       title: data.title || `${sourceInfo.label} · ${data.strategy} generation`,
       prompt: "", // Sera rempli par le worker
       summary: data.summary ?? "",
       status: "pending",
       progress: 0,
       metadataJson: {
-        mode: data.mode,
+        mode: data.mode ?? projectSettings.defaultMode,
         selectionIds: data.selectionIds,
         gridRows: data.gridRows,
         gridCols: data.gridCols,
         imageCount: data.imageCount,
-        modelKey: data.modelKey,
+        modelKey: data.modelKey || projectSettings.defaultModelKey || "gpt_images_2",
       } as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
     },
   });
+
+  await sendGenerationRunEvent({ jobId: job.id });
 
   return serializeJob(job);
 }
@@ -404,7 +413,12 @@ export async function relaunchGenerationJob(
       summary: originalJob.summary,
       status: "pending",
       progress: 0,
-      metadataJson: originalJob.metadataJson as Prisma.InputJsonValue,
+      metadataJson: {
+        ...(originalJob.metadataJson as Record<string, unknown>),
+        relaunchedFrom: jobId,
+        relaunchedAt: now.toISOString(),
+        children: [],
+      } as Prisma.InputJsonValue,
       createdAt: now,
       updatedAt: now,
     },

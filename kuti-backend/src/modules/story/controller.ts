@@ -9,7 +9,10 @@ import {
   completeStoryField as completeStoryFieldWithProvider,
   getStoryCompletionModels,
 } from "@lib/story-completion";
+import { runCoherenceScanIfEnabled } from "@lib/coherence-scan";
+import { normalizeReferenceKind, syncSceneReferences } from "@lib/story-references";
 import type {
+  ReferenceSuggestion,
   TomeResponse,
   ChapterResponse,
   SceneResponse,
@@ -25,6 +28,67 @@ import type {
 // ============================================================================
 // Helpers
 // ============================================================================
+
+type SceneMetadataRecord = {
+  narrativeIntent: string;
+  duration: string;
+  tone: string;
+  rhythm: string;
+  visualConstraints: string;
+  stagingNotes: string;
+};
+
+const DEFAULT_SCENE_METADATA: SceneMetadataRecord = {
+  narrativeIntent: "",
+  duration: "",
+  tone: "",
+  rhythm: "",
+  visualConstraints: "",
+  stagingNotes: "",
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function readSceneMetadataValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function readSceneMetadata(metadataJson: unknown): SceneMetadataRecord {
+  const metadata = isRecord(metadataJson) ? metadataJson : {};
+
+  return {
+    narrativeIntent: readSceneMetadataValue(metadata.narrativeIntent),
+    duration: readSceneMetadataValue(metadata.duration),
+    tone: readSceneMetadataValue(metadata.tone),
+    rhythm: readSceneMetadataValue(metadata.rhythm),
+    visualConstraints: readSceneMetadataValue(metadata.visualConstraints),
+    stagingNotes: readSceneMetadataValue(metadata.stagingNotes),
+  };
+}
+
+function readSceneMetadataPatch(metadataJson: unknown): Partial<SceneMetadataRecord> {
+  const metadata = isRecord(metadataJson) ? metadataJson : {};
+  const patch: Partial<SceneMetadataRecord> = {};
+
+  if (typeof metadata.narrativeIntent === "string") patch.narrativeIntent = metadata.narrativeIntent;
+  if (typeof metadata.duration === "string") patch.duration = metadata.duration;
+  if (typeof metadata.tone === "string") patch.tone = metadata.tone;
+  if (typeof metadata.rhythm === "string") patch.rhythm = metadata.rhythm;
+  if (typeof metadata.visualConstraints === "string") patch.visualConstraints = metadata.visualConstraints;
+  if (typeof metadata.stagingNotes === "string") patch.stagingNotes = metadata.stagingNotes;
+
+  return patch;
+}
+
+function mergeSceneMetadata(baseMetadataJson: unknown, nextMetadataJson: unknown | undefined): SceneMetadataRecord {
+  return {
+    ...DEFAULT_SCENE_METADATA,
+    ...readSceneMetadata(baseMetadataJson),
+    ...readSceneMetadataPatch(nextMetadataJson),
+  };
+}
 
 function serializeTome(t: {
   id: string;
@@ -90,6 +154,7 @@ function serializeScene(s: {
   notes: string;
   charactersJson: unknown;
   tagsJson: unknown;
+  metadataJson: unknown;
   status: string;
   orderIndex: number;
   createdAt: Date;
@@ -129,11 +194,40 @@ function serializeScene(s: {
     notes: s.notes,
     charactersJson: characters,
     tagsJson: tags,
+    metadataJson: readSceneMetadata(s.metadataJson),
     status: s.status as "active" | "draft" | "archived",
     orderIndex: s.orderIndex,
     createdAt: s.createdAt.toISOString(),
     updatedAt: s.updatedAt.toISOString(),
   };
+}
+
+function serializeStoryReference(ref: {
+  id: string;
+  projectId: string;
+  sceneId: string;
+  referenceKind: string;
+  targetSlug: string;
+  rawToken: string;
+  createdAt: Date;
+}) {
+  return {
+    id: ref.id,
+    projectId: ref.projectId,
+    sceneId: ref.sceneId,
+    referenceKind: ref.referenceKind,
+    targetSlug: ref.targetSlug,
+    rawToken: ref.rawToken,
+    createdAt: ref.createdAt.toISOString(),
+  };
+}
+
+function normalizeLocationSlug(value: string): string {
+  return slugify(value, { lower: true, strict: true, replacement: "-" });
+}
+
+function buildReferenceSuggestion(data: ReferenceSuggestion): ReferenceSuggestion {
+  return data;
 }
 
 async function generateUniqueSlug(projectId: string, title: string, model: "tome" | "chapter" | "scene"): Promise<string> {
@@ -165,19 +259,34 @@ export async function getStorySummary(projectId: string) {
     prisma.tome.findMany({ where: { projectId }, orderBy: { orderIndex: "asc" } }),
     prisma.chapter.findMany({ where: { projectId }, orderBy: { orderIndex: "asc" } }),
     prisma.scene.findMany({ where: { projectId }, orderBy: { orderIndex: "asc" } }),
-    prisma.storyReference.findMany({ where: { projectId } }),
+    prisma.storyReference.findMany({ where: { projectId }, orderBy: { createdAt: "asc" } }),
+  ]);
+
+  const [characters, assets, project] = await Promise.all([
+    prisma.character.findMany({ where: { projectId }, select: { slug: true } }),
+    prisma.asset.findMany({ where: { projectId }, select: { slug: true } }),
+    prisma.project.findUnique({ where: { id: projectId }, select: { settingsJson: true } }),
   ]);
 
   // Vérifier les références orphelines
   const sceneSlugs = new Set(scenes.map(s => s.slug));
-  const charSlugs = new Set((await prisma.character.findMany({ where: { projectId } })).map(c => c.slug));
   const tomeSlugs = new Set(tomes.map(t => t.slug));
   const chapterSlugs = new Set(chapters.map(c => c.slug));
+  const charSlugs = new Set(characters.map((c) => c.slug));
+  const assetSlugs = new Set(assets.map((asset) => asset.slug));
+  const settings = (project?.settingsJson as Record<string, unknown> | null) ?? {};
+  const projectLocations = Array.isArray(settings.locationsJson)
+    ? (settings.locationsJson as string[])
+    : [];
+  const locationSlugs = new Set([
+    ...projectLocations.map(normalizeLocationSlug),
+    ...scenes.flatMap((scene) => scene.location ? [normalizeLocationSlug(scene.location)] : []),
+  ]);
 
   const orphanReferences = references
     .map(ref => {
       let reason = "";
-      switch (ref.referenceKind) {
+      switch (normalizeReferenceKind(ref.referenceKind)) {
         case "character":
           if (!charSlugs.has(ref.targetSlug)) reason = "Character not found";
           break;
@@ -190,20 +299,21 @@ export async function getStorySummary(projectId: string) {
         case "tome":
           if (!tomeSlugs.has(ref.targetSlug)) reason = "Tome not found";
           break;
+        case "asset":
+          if (!assetSlugs.has(ref.targetSlug)) reason = "Asset not found";
+          break;
+        case "environment":
+          if (!locationSlugs.has(ref.targetSlug)) reason = "Location not found";
+          break;
+        default:
+          reason = `Unsupported reference kind: ${ref.referenceKind}`;
+          break;
       }
       return { ref, reason };
     })
     .filter(({ reason }) => reason !== "")
     .map(({ ref, reason }) => ({
-      reference: {
-        id: ref.id,
-        projectId: ref.projectId,
-        sceneId: ref.sceneId,
-        referenceKind: ref.referenceKind,
-        targetSlug: ref.targetSlug,
-        rawToken: ref.rawToken,
-        createdAt: ref.createdAt.toISOString(),
-      },
+      reference: serializeStoryReference(ref),
       reason,
     }));
 
@@ -211,6 +321,7 @@ export async function getStorySummary(projectId: string) {
     tomes: tomes.map(serializeTome),
     chapters: chapters.map(serializeChapter),
     scenes: scenes.map(serializeScene),
+    references: references.map(serializeStoryReference),
     orphanReferences,
   };
 }
@@ -394,27 +505,40 @@ export async function createScene(projectId: string, data: CreateSceneBody): Pro
   const slug = await generateUniqueSlug(projectId, data.title, "scene");
   const now = new Date();
 
-  const scene = await prisma.scene.create({
-    data: {
-      id: randomUUIDv7(),
-      projectId,
-      tomeId: data.tomeId,
-      chapterId: data.chapterId,
-      slug,
-      title: data.title,
-      sceneType: data.sceneType ?? "",
-      location: data.location ?? "",
-      summary: data.summary ?? "",
-      content: data.content ?? "",
-      notes: data.notes ?? "",
-      charactersJson: (data.charactersJson as string[]) ?? [],
-      tagsJson: (data.tagsJson as string[]) ?? [],
-      status: data.status ?? "draft",
-      orderIndex: data.orderIndex ?? 0,
-      createdAt: now,
-      updatedAt: now,
-    },
+  const scene = await prisma.$transaction(async (tx) => {
+    const created = await tx.scene.create({
+      data: {
+        id: randomUUIDv7(),
+        projectId,
+        tomeId: data.tomeId,
+        chapterId: data.chapterId,
+        slug,
+        title: data.title,
+        sceneType: data.sceneType ?? "",
+        location: data.location ?? "",
+        summary: data.summary ?? "",
+        content: data.content ?? "",
+        notes: data.notes ?? "",
+        charactersJson: (data.charactersJson as string[]) ?? [],
+        tagsJson: (data.tagsJson as string[]) ?? [],
+        metadataJson: mergeSceneMetadata({}, data.metadataJson),
+        status: data.status ?? "draft",
+        orderIndex: data.orderIndex ?? 0,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+
+    await syncSceneReferences(created.id, projectId, {
+      summary: created.summary,
+      content: created.content,
+      notes: created.notes,
+    }, tx);
+
+    return created;
   });
+
+  await runCoherenceScanIfEnabled(projectId);
 
   return serializeScene(scene);
 }
@@ -436,27 +560,40 @@ export async function updateScene(
       where: { id: newChapterId, projectId, tomeId: newTomeId },
     });
 
-    if (!chapter) throw new Error("scene_hierarchy_mismatch");
+  if (!chapter) throw new Error("scene_hierarchy_mismatch");
   }
 
-  const updated = await prisma.scene.update({
-    where: { id: sceneId },
-    data: {
-      tomeId: data.tomeId,
-      chapterId: data.chapterId,
-      title: data.title,
-      sceneType: data.sceneType,
-      location: data.location,
-      summary: data.summary,
-      content: data.content,
-      notes: data.notes,
-      charactersJson: data.charactersJson as string[],
-      tagsJson: data.tagsJson as string[],
-      status: data.status,
-      orderIndex: data.orderIndex,
-      updatedAt: new Date(),
-    },
+  const updated = await prisma.$transaction(async (tx) => {
+    const nextScene = await tx.scene.update({
+      where: { id: sceneId },
+      data: {
+        tomeId: data.tomeId,
+        chapterId: data.chapterId,
+        title: data.title,
+        sceneType: data.sceneType,
+        location: data.location,
+        summary: data.summary,
+        content: data.content,
+        notes: data.notes,
+        charactersJson: data.charactersJson as string[],
+        tagsJson: data.tagsJson as string[],
+        metadataJson: mergeSceneMetadata(scene.metadataJson, data.metadataJson),
+        status: data.status,
+        orderIndex: data.orderIndex,
+        updatedAt: new Date(),
+      },
+    });
+
+    await syncSceneReferences(nextScene.id, projectId, {
+      summary: nextScene.summary,
+      content: nextScene.content,
+      notes: nextScene.notes,
+    }, tx);
+
+    return nextScene;
   });
+
+  await runCoherenceScanIfEnabled(projectId);
 
   return serializeScene(updated);
 }
@@ -466,6 +603,7 @@ export async function deleteScene(projectId: string, sceneId: string): Promise<b
   if (!scene) return false;
 
   await prisma.scene.delete({ where: { id: sceneId } });
+  await runCoherenceScanIfEnabled(projectId);
   return true;
 }
 
@@ -477,10 +615,11 @@ export async function getReferenceSuggestions(
   projectId: string,
   type: string,
   query: string
-): Promise<Array<{ slug: string; label: string }>> {
-  const q = query.toLowerCase();
+): Promise<ReferenceSuggestion[]> {
+  const q = query.toLowerCase().trim();
+  const canonicalType = normalizeReferenceKind(type);
 
-  switch (type) {
+  switch (canonicalType) {
     case "character": {
       const chars = await prisma.character.findMany({
         where: { projectId },
@@ -489,14 +628,28 @@ export async function getReferenceSuggestions(
       return chars
         .filter(c => c.slug.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
         .slice(0, 10)
-        .map(c => ({ slug: c.slug, label: c.name }));
+        .map((character) => buildReferenceSuggestion({
+          kind: "character",
+          slug: character.slug,
+          label: character.name,
+          entityId: character.id,
+          href: `/projects/${projectId}/characters/${character.id}`,
+          description: "character",
+        }));
     }
     case "scene": {
       const scenes = await prisma.scene.findMany({ where: { projectId }, orderBy: { title: "asc" } });
       return scenes
         .filter(s => s.slug.toLowerCase().includes(q) || s.title.toLowerCase().includes(q))
         .slice(0, 10)
-        .map(s => ({ slug: s.slug, label: s.title }));
+        .map((scene) => buildReferenceSuggestion({
+          kind: "scene",
+          slug: scene.slug,
+          label: scene.title,
+          entityId: scene.id,
+          href: `/projects/${projectId}/story/${scene.tomeId}/scenes/${scene.id}`,
+          description: "scene",
+        }));
     }
     case "chapter": {
       const chapters = await prisma.chapter.findMany({
@@ -506,14 +659,28 @@ export async function getReferenceSuggestions(
       return chapters
         .filter(c => c.slug.toLowerCase().includes(q) || c.title.toLowerCase().includes(q))
         .slice(0, 10)
-        .map(c => ({ slug: c.slug, label: c.title }));
+        .map((chapter) => buildReferenceSuggestion({
+          kind: "chapter",
+          slug: chapter.slug,
+          label: chapter.title,
+          entityId: chapter.id,
+          href: `/projects/${projectId}/story/${chapter.tomeId}/chapters/${chapter.id}`,
+          description: "chapter",
+        }));
     }
     case "tome": {
       const tomes = await prisma.tome.findMany({ where: { projectId }, orderBy: { title: "asc" } });
       return tomes
         .filter(t => t.slug.toLowerCase().includes(q) || t.title.toLowerCase().includes(q))
         .slice(0, 10)
-        .map(t => ({ slug: t.slug, label: t.title }));
+        .map((tome) => buildReferenceSuggestion({
+          kind: "tome",
+          slug: tome.slug,
+          label: tome.title,
+          entityId: tome.id,
+          href: `/projects/${projectId}/story/${tome.id}`,
+          description: "tome",
+        }));
     }
     case "asset": {
       const assets = await prisma.asset.findMany({
@@ -523,7 +690,54 @@ export async function getReferenceSuggestions(
       return assets
         .filter(a => a.slug.toLowerCase().includes(q) || a.name.toLowerCase().includes(q))
         .slice(0, 10)
-        .map(a => ({ slug: a.slug, label: a.name }));
+        .map((asset) => buildReferenceSuggestion({
+          kind: "asset",
+          slug: asset.slug,
+          label: asset.name,
+          entityId: asset.id,
+          href: `/projects/${projectId}/assets?asset=${encodeURIComponent(asset.slug)}`,
+          description: "asset",
+        }));
+    }
+    case "environment": {
+      const [project, scenes] = await Promise.all([
+        prisma.project.findUnique({
+          where: { id: projectId },
+          select: { settingsJson: true },
+        }),
+        prisma.scene.findMany({
+          where: { projectId },
+          select: { location: true },
+        }),
+      ]);
+
+      const settings = (project?.settingsJson as Record<string, unknown> | null) ?? {};
+      const projectLocations = Array.isArray(settings.locationsJson)
+        ? (settings.locationsJson as string[])
+        : [];
+      const sceneLocations = scenes.map((scene) => scene.location).filter(Boolean);
+
+      const uniqueLocations = new Map<string, string>();
+      for (const location of [...projectLocations, ...sceneLocations]) {
+        const label = location.trim();
+        if (!label) continue;
+        const slug = normalizeLocationSlug(label);
+        if (!uniqueLocations.has(slug)) {
+          uniqueLocations.set(slug, label);
+        }
+      }
+
+      return Array.from(uniqueLocations.entries())
+        .filter(([slug, label]) => slug.includes(q) || label.toLowerCase().includes(q))
+        .slice(0, 10)
+        .map(([slug, label]) => buildReferenceSuggestion({
+          kind: "environment",
+          slug,
+          label,
+          entityId: slug,
+          href: `/projects/${projectId}/settings?location=${encodeURIComponent(slug)}`,
+          description: "environment",
+        }));
     }
     default:
       return [];

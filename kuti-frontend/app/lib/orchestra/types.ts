@@ -1,10 +1,10 @@
-import type { GetStorySummaryResponse } from '~/lib/backend';
+import type { GetStorySummaryResponse } from "~/lib/backend";
 
-export type Tome = GetStorySummaryResponse['tomes'][number];
-export type Chapter = GetStorySummaryResponse['chapters'][number];
-export type Scene = GetStorySummaryResponse['scenes'][number];
+export type Tome = GetStorySummaryResponse["tomes"][number];
+export type Chapter = GetStorySummaryResponse["chapters"][number];
+export type Scene = GetStorySummaryResponse["scenes"][number];
 
-export type NodeType = 'tome' | 'chapter' | 'scene';
+export type NodeType = "tome" | "chapter" | "scene";
 
 export interface NodePosition {
   x: number;
@@ -24,7 +24,7 @@ export interface ConnectionData {
   id: string;
   start: NodePosition;
   end: NodePosition;
-  type: 'tome-chapter' | 'chapter-scene' | 'scene-scene';
+  type: "tome-chapter" | "chapter-scene" | "scene-scene";
 }
 
 export interface LayoutConfig {
@@ -48,21 +48,21 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
 // Configuration couleurs CSS pour PixiJS (format string)
 export const NODE_COLORS = {
   /** Tome - accent color (indigo-600) */
-  tome: '#4f46e5',
+  tome: "#4f46e5",
   /** Chapter - lighter accent (indigo-500) */
-  chapter: '#6366f1',
+  chapter: "#6366f1",
   /** Scene - muted color (slate-400) */
-  scene: '#94a3b8',
+  scene: "#94a3b8",
   /** Scene active - warning/amber */
-  sceneActive: '#f59e0b',
+  sceneActive: "#f59e0b",
   /** Selected highlight - brighter */
-  selected: '#ffffff',
+  selected: "#ffffff",
   /** Connection line color (slate-200) */
-  connection: '#e2e8f0',
+  connection: "#e2e8f0",
   /** Background color (slate-900) */
-  background: '#0f172a',
+  background: "#0f172a",
   /** Hover state color */
-  hover: '#818cf8',
+  hover: "#818cf8",
 } as const;
 
 // Tailles des nœuds en pixels (diamètre)
@@ -74,5 +74,5 @@ export const NODE_SIZES = {
 
 // Conversion string color → hex pour Pixi Graphics
 export function colorToHex(color: string): number {
-  return parseInt(color.replace('#', ''), 16);
+  return parseInt(color.replace("#", ""), 16);
 }

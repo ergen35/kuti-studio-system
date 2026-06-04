@@ -7,8 +7,14 @@ export default [
   route("projects/:projectId/characters/:characterId", "routes/character.tsx"),
   route("projects/:projectId/story", "routes/story.tsx"),
   route("projects/:projectId/story/:tomeId", "routes/tome.tsx"),
-  route("projects/:projectId/story/:tomeId/chapters/:chapterId", "routes/chapter.tsx"),
-  route("projects/:projectId/story/:tomeId/scenes/:sceneId", "routes/scene.tsx"),
+  route(
+    "projects/:projectId/story/:tomeId/chapters/:chapterId",
+    "routes/chapter.tsx",
+  ),
+  route(
+    "projects/:projectId/story/:tomeId/scenes/:sceneId",
+    "routes/scene.tsx",
+  ),
   route("projects/:projectId/assets", "routes/assets.tsx"),
   route("projects/:projectId/generation", "routes/generation.tsx"),
   route("projects/:projectId/drama-videos", "routes/drama-videos.tsx"),

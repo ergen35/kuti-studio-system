@@ -1,5 +1,6 @@
-import { inngest } from "./client";
 import { prisma } from "@lib/db";
+import { inngest } from "./client";
+import { sendGenerationRunEvent } from "./generate-job";
 
 // Event type: kuti/job.cancel
 export const cancelJobFunction = inngest.createFunction(
@@ -24,6 +25,9 @@ export const cancelJobFunction = inngest.createFunction(
       }
 
       const now = new Date();
+      const board = await prisma.generationBoard.findFirst({ where: { jobId } });
+      const metadata = (job.metadataJson as Record<string, unknown> | null) ?? {};
+      const children = Array.isArray(metadata.children) ? metadata.children as Array<Record<string, unknown>> : [];
 
       // Annuler le job
       await prisma.generationJob.update({
@@ -33,26 +37,44 @@ export const cancelJobFunction = inngest.createFunction(
           errorMessage: "Cancelled by user",
           failedAt: now,
           updatedAt: now,
+          metadataJson: {
+            ...metadata,
+            children: children.map((child) => ({
+              ...child,
+              status: "failed",
+              progress: 0,
+              errorMessage: "Cancelled by user",
+              updatedAt: now.toISOString(),
+            })) ?? [],
+          },
         },
       });
 
-      // Annuler les jobs enfants si présents dans metadataJson
-      const metadata = job.metadataJson as Record<string, unknown> | null;
-      const childrenIds = metadata?.["children"] as string[] | undefined;
+      await prisma.generationJobStep.updateMany({
+        where: { jobId },
+        data: {
+          status: "failed",
+          errorMessage: "Cancelled by user",
+          failedAt: now,
+          updatedAt: now,
+        },
+      });
 
-      if (childrenIds && childrenIds.length > 0) {
-        await prisma.generationJob.updateMany({
-          where: { id: { in: childrenIds } },
+      if (board) {
+        await prisma.generationBoardPanel.updateMany({
+          where: { boardId: board.id },
           data: {
-            status: "failed",
-            errorMessage: "Parent job cancelled",
-            failedAt: now,
+            status: "rejected",
             updatedAt: now,
+            metadataJson: {
+              cancelled: true,
+              errorMessage: "Cancelled by user",
+            },
           },
         });
       }
 
-      return { cancelledChildrenCount: childrenIds?.length || 0 };
+      return { cancelledChildrenCount: children.length };
     });
 
     return {
@@ -88,12 +110,15 @@ export const relaunchJobFunction = inngest.createFunction(
         data: {
           status: "pending",
           metadataJson: {
-            ...(existingJob?.metadataJson as Record<string, unknown> ?? {}),
+            ...((existingJob?.metadataJson as Record<string, unknown>) ?? {}),
             relaunchedFrom: originalJobId,
             relaunchedAt: new Date().toISOString(),
+            children: [],
           },
         },
       });
+
+      await sendGenerationRunEvent({ jobId: newJobId });
     });
 
     return {

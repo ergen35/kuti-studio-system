@@ -40,6 +40,19 @@ export const createProjectBodySchema = z.object({
 export type CreateProjectBody = z.infer<typeof createProjectBodySchema>;
 
 // ============================================================================
+// Import
+// ============================================================================
+
+export const importProjectBodySchema = z.object({
+  rootPath: z.string().trim().min(1).max(1024),
+  name: z.string().trim().min(1).max(255).optional(),
+  status: projectStatusSchema.default("draft"),
+  settingsJson: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type ImportProjectBody = z.infer<typeof importProjectBodySchema>;
+
+// ============================================================================
 // Update
 // ============================================================================
 

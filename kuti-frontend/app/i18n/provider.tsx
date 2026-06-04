@@ -1,7 +1,7 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { I18nextProvider } from 'react-i18next';
-import i18n from 'i18next';
-import { initI18n } from './config';
+import { useEffect, useState, type ReactNode } from "react";
+import { I18nextProvider } from "react-i18next";
+import i18n from "i18next";
+import { initI18n } from "./config";
 
 let initialized = false;
 

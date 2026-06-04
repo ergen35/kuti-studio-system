@@ -18,11 +18,65 @@
   },
   "actions": {
     "open": "Ouvrir",
-    "archive": "Archiver"
+    "archive": "Archiver",
+    "delete": "Supprimer"
   },
   "meta": {
     "size": "octets",
-    "path": "Chemin"
+    "path": "Chemin",
+    "archivedAt": "Archivée le"
+  },
+  "hints": {
+    "title": "Indices d'usage activés",
+    "description": "Les réglages du projet affichent les usages réels des assets pour voir où un fichier est déjà réutilisé.",
+    "archiveOnDeleteEnabled": "Suppression = archivage",
+    "archiveOnDeleteDisabled": "Suppression définitive",
+    "showUsageHintsEnabled": "Indices d'usage actifs"
+  },
+  "usage": {
+    "title": "Usage projet",
+    "loading": "Vérification des usages",
+    "loadingDescription": "La ressource est comparée aux personnages et aux sorties de génération.",
+    "linked": "{{count}} usage dans le projet",
+    "linked_plural": "{{count}} usages dans le projet",
+    "orphan": "Non utilisé dans le projet",
+    "empty": "Aucun usage projet détecté pour le moment."
+  },
+  "links": {
+    "title": "Liens explicites",
+    "loading": "Vérification des liens",
+    "linked": "{{count}} lien explicite",
+    "linked_plural": "{{count}} liens explicites",
+    "orphan": "Aucun lien explicite",
+    "detach": "Détacher",
+    "targetKinds": {
+      "character": "Personnage",
+      "scene": "Scène",
+      "chapter": "Chapitre",
+      "tome": "Tome"
+    },
+    "detachDialog": {
+      "title": "Détacher le lien ?",
+      "description": "Retirer ce lien de {{assetName}} n'efface pas le fichier et ne touche pas aux usages réels.",
+      "note": "Le fichier reste dans la bibliothèque. Seul ce lien explicite est retiré du projet.",
+      "cancel": "Annuler",
+      "confirm": "Détacher le lien"
+    }
+  },
+  "usageKinds": {
+    "character_image": "Image de personnage",
+    "generation_panel": "Panneau de génération"
+  },
+  "deleteDialog": {
+    "title": "Supprimer l'asset ?",
+    "archiveDescription": "Supprimer {{name}} l'archivera au lieu d'effacer définitivement le fichier.",
+    "hardDeleteDescription": "Supprimer {{name}} effacera définitivement le fichier et le détachera du projet.",
+    "usageTitle": "Usages connus",
+    "checkingUsages": "Vérification des usages avant action.",
+    "noUsages": "Aucun usage n'est actuellement suivi pour cet asset.",
+    "cancel": "Annuler",
+    "confirmArchive": "Archiver la ressource",
+    "confirmDelete": "Supprimer définitivement"
   },
   "empty": {
     "title": "Aucune ressource",

@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
-import { ZoomIn, ZoomOut, Maximize, RotateCcw, Focus } from 'lucide-react';
-import { Button } from '~/components/ui';
-import { useTranslation } from '~/hooks/useTranslation';
-import { useOrchestraStore } from '~/stores/orchestra';
-import { getLayoutBounds } from '~/lib/orchestra/layout-engine';
+import { useCallback } from "react";
+import { ZoomIn, ZoomOut, Maximize, RotateCcw, Focus } from "lucide-react";
+import { Button } from "~/components/ui";
+import { useTranslation } from "~/hooks/useTranslation";
+import { useOrchestraStore } from "~/stores/orchestra";
+import { getLayoutBounds } from "~/lib/orchestra/layout-engine";
 
 interface ViewControlsProps {
   canvasWidth: number;
@@ -18,7 +18,7 @@ export function ViewControls({
   getNodePosition,
   selectedNodeId,
 }: ViewControlsProps) {
-  const { t } = useTranslation('story');
+  const { t } = useTranslation("story");
   const {
     zoomViewport,
     resetViewport,
@@ -57,7 +57,7 @@ export function ViewControls({
           height: bounds.size.y + 240,
         },
         canvasWidth,
-        canvasHeight
+        canvasHeight,
       );
     }
   }, [fitToBounds, nodePositions, canvasWidth, canvasHeight]);
@@ -68,26 +68,23 @@ export function ViewControls({
   return (
     <div className="absolute bottom-4 left-4 pointer-events-auto">
       {/* Main controls panel - Blender-like compact style */}
-      <div 
+      <div
         className="flex flex-col gap-1 rounded-md p-1.5 shadow-lg"
         style={{
-          backgroundColor: 'rgba(35, 38, 43, 0.94)',
-          border: '1px solid #3a3e45',
+          backgroundColor: "rgba(35, 38, 43, 0.94)",
+          border: "1px solid #3a3e45",
         }}
       >
         {/* Zoom percentage display */}
-        <div 
+        <div
           className="flex items-center justify-center py-1 px-2 text-[11px] font-medium tracking-wide"
-          style={{ color: '#9aa1aa' }}
+          style={{ color: "#9aa1aa" }}
         >
           {zoomPercent}%
         </div>
 
         {/* Divider */}
-        <div 
-          className="h-px my-0.5"
-          style={{ backgroundColor: '#3a3e45' }}
-        />
+        <div className="h-px my-0.5" style={{ backgroundColor: "#3a3e45" }} />
 
         {/* Zoom controls */}
         <div className="flex flex-col gap-0.5">
@@ -104,17 +101,16 @@ export function ViewControls({
         </div>
 
         {/* Divider */}
-        <div 
-          className="h-px my-0.5"
-          style={{ backgroundColor: '#3a3e45' }}
-        />
+        <div className="h-px my-0.5" style={{ backgroundColor: "#3a3e45" }} />
 
         {/* Navigation controls */}
         <div className="flex flex-col gap-0.5">
           <ControlButton
             onClick={handleFocus}
             disabled={!selectedNodeId}
-            title={selectedNodeId ? "Focus selected node (F)" : "Select a node first"}
+            title={
+              selectedNodeId ? "Focus selected node (F)" : "Select a node first"
+            }
             icon={<Focus size={16} />}
             accent={!!selectedNodeId}
           />
@@ -126,15 +122,12 @@ export function ViewControls({
         </div>
 
         {/* Divider */}
-        <div 
-          className="h-px my-0.5"
-          style={{ backgroundColor: '#3a3e45' }}
-        />
+        <div className="h-px my-0.5" style={{ backgroundColor: "#3a3e45" }} />
 
         {/* Reset */}
         <ControlButton
           onClick={handleReset}
-          title={t('orchestra.resetView')}
+          title={t("orchestra.resetView")}
           icon={<RotateCcw size={16} />}
         />
       </div>
@@ -153,7 +146,13 @@ interface ControlButtonProps {
   accent?: boolean;
 }
 
-function ControlButton({ onClick, icon, title, disabled, accent }: ControlButtonProps) {
+function ControlButton({
+  onClick,
+  icon,
+  title,
+  disabled,
+  accent,
+}: ControlButtonProps) {
   return (
     <Button
       onClick={onClick}
@@ -163,18 +162,18 @@ function ControlButton({ onClick, icon, title, disabled, accent }: ControlButton
       variant="ghost"
       className={`
         flex items-center justify-center w-7 h-7 rounded transition-colors
-        ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#343941]'}
+        ${disabled ? "opacity-40 cursor-not-allowed" : "hover:bg-[#343941]"}
       `}
       style={{
-        color: accent ? '#f6a63a' : '#b5bbc5',
+        color: accent ? "#f6a63a" : "#b5bbc5",
       }}
       onMouseEnter={(e) => {
         if (!disabled) {
-          e.currentTarget.style.backgroundColor = '#343941';
+          e.currentTarget.style.backgroundColor = "#343941";
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
+        e.currentTarget.style.backgroundColor = "transparent";
       }}
     >
       {icon}
