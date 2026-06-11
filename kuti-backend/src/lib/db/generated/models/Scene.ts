@@ -27,10 +27,12 @@ export type AggregateScene = {
 }
 
 export type SceneAvgAggregateOutputType = {
+  targetPageCount: number | null
   orderIndex: number | null
 }
 
 export type SceneSumAggregateOutputType = {
+  targetPageCount: number | null
   orderIndex: number | null
 }
 
@@ -46,6 +48,7 @@ export type SceneMinAggregateOutputType = {
   summary: string | null
   content: string | null
   notes: string | null
+  targetPageCount: number | null
   status: $Enums.StoryStatus | null
   orderIndex: number | null
   createdAt: Date | null
@@ -64,6 +67,7 @@ export type SceneMaxAggregateOutputType = {
   summary: string | null
   content: string | null
   notes: string | null
+  targetPageCount: number | null
   status: $Enums.StoryStatus | null
   orderIndex: number | null
   createdAt: Date | null
@@ -85,6 +89,7 @@ export type SceneCountAggregateOutputType = {
   charactersJson: number
   tagsJson: number
   metadataJson: number
+  targetPageCount: number
   status: number
   orderIndex: number
   createdAt: number
@@ -94,10 +99,12 @@ export type SceneCountAggregateOutputType = {
 
 
 export type SceneAvgAggregateInputType = {
+  targetPageCount?: true
   orderIndex?: true
 }
 
 export type SceneSumAggregateInputType = {
+  targetPageCount?: true
   orderIndex?: true
 }
 
@@ -113,6 +120,7 @@ export type SceneMinAggregateInputType = {
   summary?: true
   content?: true
   notes?: true
+  targetPageCount?: true
   status?: true
   orderIndex?: true
   createdAt?: true
@@ -131,6 +139,7 @@ export type SceneMaxAggregateInputType = {
   summary?: true
   content?: true
   notes?: true
+  targetPageCount?: true
   status?: true
   orderIndex?: true
   createdAt?: true
@@ -152,6 +161,7 @@ export type SceneCountAggregateInputType = {
   charactersJson?: true
   tagsJson?: true
   metadataJson?: true
+  targetPageCount?: true
   status?: true
   orderIndex?: true
   createdAt?: true
@@ -260,6 +270,7 @@ export type SceneGroupByOutputType = {
   charactersJson: runtime.JsonValue
   tagsJson: runtime.JsonValue
   metadataJson: runtime.JsonValue
+  targetPageCount: number | null
   status: $Enums.StoryStatus
   orderIndex: number
   createdAt: Date
@@ -304,6 +315,7 @@ export type SceneWhereInput = {
   charactersJson?: Prisma.JsonFilter<"Scene">
   tagsJson?: Prisma.JsonFilter<"Scene">
   metadataJson?: Prisma.JsonFilter<"Scene">
+  targetPageCount?: Prisma.IntNullableFilter<"Scene"> | number | null
   status?: Prisma.EnumStoryStatusFilter<"Scene"> | $Enums.StoryStatus
   orderIndex?: Prisma.IntFilter<"Scene"> | number
   createdAt?: Prisma.DateTimeFilter<"Scene"> | Date | string
@@ -329,6 +341,7 @@ export type SceneOrderByWithRelationInput = {
   charactersJson?: Prisma.SortOrder
   tagsJson?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
+  targetPageCount?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -358,6 +371,7 @@ export type SceneWhereUniqueInput = Prisma.AtLeast<{
   charactersJson?: Prisma.JsonFilter<"Scene">
   tagsJson?: Prisma.JsonFilter<"Scene">
   metadataJson?: Prisma.JsonFilter<"Scene">
+  targetPageCount?: Prisma.IntNullableFilter<"Scene"> | number | null
   status?: Prisma.EnumStoryStatusFilter<"Scene"> | $Enums.StoryStatus
   orderIndex?: Prisma.IntFilter<"Scene"> | number
   createdAt?: Prisma.DateTimeFilter<"Scene"> | Date | string
@@ -383,6 +397,7 @@ export type SceneOrderByWithAggregationInput = {
   charactersJson?: Prisma.SortOrder
   tagsJson?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
+  targetPageCount?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -412,6 +427,7 @@ export type SceneScalarWhereWithAggregatesInput = {
   charactersJson?: Prisma.JsonWithAggregatesFilter<"Scene">
   tagsJson?: Prisma.JsonWithAggregatesFilter<"Scene">
   metadataJson?: Prisma.JsonWithAggregatesFilter<"Scene">
+  targetPageCount?: Prisma.IntNullableWithAggregatesFilter<"Scene"> | number | null
   status?: Prisma.EnumStoryStatusWithAggregatesFilter<"Scene"> | $Enums.StoryStatus
   orderIndex?: Prisma.IntWithAggregatesFilter<"Scene"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Scene"> | Date | string
@@ -430,6 +446,7 @@ export type SceneCreateInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -455,6 +472,7 @@ export type SceneUncheckedCreateInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -474,6 +492,7 @@ export type SceneUpdateInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -499,6 +518,7 @@ export type SceneUncheckedUpdateInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -521,6 +541,7 @@ export type SceneCreateManyInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -539,6 +560,7 @@ export type SceneUpdateManyMutationInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -560,6 +582,7 @@ export type SceneUncheckedUpdateManyInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -596,6 +619,7 @@ export type SceneCountOrderByAggregateInput = {
   charactersJson?: Prisma.SortOrder
   tagsJson?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
+  targetPageCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -603,6 +627,7 @@ export type SceneCountOrderByAggregateInput = {
 }
 
 export type SceneAvgOrderByAggregateInput = {
+  targetPageCount?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
 }
 
@@ -618,6 +643,7 @@ export type SceneMaxOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   content?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  targetPageCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -636,6 +662,7 @@ export type SceneMinOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   content?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  targetPageCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -643,6 +670,7 @@ export type SceneMinOrderByAggregateInput = {
 }
 
 export type SceneSumOrderByAggregateInput = {
+  targetPageCount?: Prisma.SortOrder
   orderIndex?: Prisma.SortOrder
 }
 
@@ -803,6 +831,7 @@ export type SceneCreateWithoutProjectInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -826,6 +855,7 @@ export type SceneUncheckedCreateWithoutProjectInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -877,6 +907,7 @@ export type SceneScalarWhereInput = {
   charactersJson?: Prisma.JsonFilter<"Scene">
   tagsJson?: Prisma.JsonFilter<"Scene">
   metadataJson?: Prisma.JsonFilter<"Scene">
+  targetPageCount?: Prisma.IntNullableFilter<"Scene"> | number | null
   status?: Prisma.EnumStoryStatusFilter<"Scene"> | $Enums.StoryStatus
   orderIndex?: Prisma.IntFilter<"Scene"> | number
   createdAt?: Prisma.DateTimeFilter<"Scene"> | Date | string
@@ -895,6 +926,7 @@ export type SceneCreateWithoutTomeInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -918,6 +950,7 @@ export type SceneUncheckedCreateWithoutTomeInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -963,6 +996,7 @@ export type SceneCreateWithoutChapterInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -986,6 +1020,7 @@ export type SceneUncheckedCreateWithoutChapterInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -1031,6 +1066,7 @@ export type SceneCreateWithoutReferencesInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -1055,6 +1091,7 @@ export type SceneUncheckedCreateWithoutReferencesInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -1089,6 +1126,7 @@ export type SceneUpdateWithoutReferencesInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1113,6 +1151,7 @@ export type SceneUncheckedUpdateWithoutReferencesInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1133,6 +1172,7 @@ export type SceneCreateManyProjectInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -1151,6 +1191,7 @@ export type SceneUpdateWithoutProjectInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1174,6 +1215,7 @@ export type SceneUncheckedUpdateWithoutProjectInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1195,6 +1237,7 @@ export type SceneUncheckedUpdateManyWithoutProjectInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1215,6 +1258,7 @@ export type SceneCreateManyTomeInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -1233,6 +1277,7 @@ export type SceneUpdateWithoutTomeInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1256,6 +1301,7 @@ export type SceneUncheckedUpdateWithoutTomeInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1277,6 +1323,7 @@ export type SceneUncheckedUpdateManyWithoutTomeInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1297,6 +1344,7 @@ export type SceneCreateManyChapterInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: number | null
   status?: $Enums.StoryStatus
   orderIndex?: number
   createdAt?: Date | string
@@ -1315,6 +1363,7 @@ export type SceneUpdateWithoutChapterInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1338,6 +1387,7 @@ export type SceneUncheckedUpdateWithoutChapterInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1359,6 +1409,7 @@ export type SceneUncheckedUpdateManyWithoutChapterInput = {
   charactersJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tagsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  targetPageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumStoryStatusFieldUpdateOperationsInput | $Enums.StoryStatus
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1411,6 +1462,7 @@ export type SceneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   charactersJson?: boolean
   tagsJson?: boolean
   metadataJson?: boolean
+  targetPageCount?: boolean
   status?: boolean
   orderIndex?: boolean
   createdAt?: boolean
@@ -1437,6 +1489,7 @@ export type SceneSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   charactersJson?: boolean
   tagsJson?: boolean
   metadataJson?: boolean
+  targetPageCount?: boolean
   status?: boolean
   orderIndex?: boolean
   createdAt?: boolean
@@ -1461,6 +1514,7 @@ export type SceneSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   charactersJson?: boolean
   tagsJson?: boolean
   metadataJson?: boolean
+  targetPageCount?: boolean
   status?: boolean
   orderIndex?: boolean
   createdAt?: boolean
@@ -1485,13 +1539,14 @@ export type SceneSelectScalar = {
   charactersJson?: boolean
   tagsJson?: boolean
   metadataJson?: boolean
+  targetPageCount?: boolean
   status?: boolean
   orderIndex?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SceneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "tomeId" | "chapterId" | "title" | "slug" | "sceneType" | "location" | "summary" | "content" | "notes" | "charactersJson" | "tagsJson" | "metadataJson" | "status" | "orderIndex" | "createdAt" | "updatedAt", ExtArgs["result"]["scene"]>
+export type SceneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "tomeId" | "chapterId" | "title" | "slug" | "sceneType" | "location" | "summary" | "content" | "notes" | "charactersJson" | "tagsJson" | "metadataJson" | "targetPageCount" | "status" | "orderIndex" | "createdAt" | "updatedAt", ExtArgs["result"]["scene"]>
 export type SceneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   tome?: boolean | Prisma.TomeDefaultArgs<ExtArgs>
@@ -1533,6 +1588,7 @@ export type $ScenePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     charactersJson: runtime.JsonValue
     tagsJson: runtime.JsonValue
     metadataJson: runtime.JsonValue
+    targetPageCount: number | null
     status: $Enums.StoryStatus
     orderIndex: number
     createdAt: Date
@@ -1978,6 +2034,7 @@ export interface SceneFieldRefs {
   readonly charactersJson: Prisma.FieldRef<"Scene", 'Json'>
   readonly tagsJson: Prisma.FieldRef<"Scene", 'Json'>
   readonly metadataJson: Prisma.FieldRef<"Scene", 'Json'>
+  readonly targetPageCount: Prisma.FieldRef<"Scene", 'Int'>
   readonly status: Prisma.FieldRef<"Scene", 'StoryStatus'>
   readonly orderIndex: Prisma.FieldRef<"Scene", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Scene", 'DateTime'>

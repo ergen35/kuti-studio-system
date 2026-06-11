@@ -43,6 +43,11 @@ export type Verification = Prisma.VerificationModel
  */
 export type Project = Prisma.ProjectModel
 /**
+ * Model NarrativeRole
+ * 
+ */
+export type NarrativeRole = Prisma.NarrativeRoleModel
+/**
  * Model Character
  * 
  */

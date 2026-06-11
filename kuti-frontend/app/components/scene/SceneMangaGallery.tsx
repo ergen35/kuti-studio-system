@@ -66,7 +66,6 @@ import { apiErrorMessage, backendUrl } from "~/lib/errors";
 import { invalidateWorkspace } from "~/lib/query";
 import { client } from "~/lib/backend-client";
 
-const ITEMS_PER_PAGE = 12;
 
 type SceneMangaPage = ListSceneMangaPagesResponse[number];
 type SceneMangaPageUpdateBody = UpdateSceneMangaPageData["body"];
@@ -119,7 +118,6 @@ export function SceneMangaGallery({
   const [selectedReplacementAssetId, setSelectedReplacementAssetId] =
     useState("");
   const [selectedVideoModel, setSelectedVideoModel] = useState("");
-  const [currentGalleryPage, setCurrentGalleryPage] = useState(1);
 
   // Fetch pages using SDK
   const pagesQuery = useQuery({
@@ -166,13 +164,23 @@ export function SceneMangaGallery({
   // Delete page mutation using SDK
   const deletePage = useMutation({
     ...deleteSceneMangaPageMutation(),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      const deletedPageId = variables.path.pageId;
+      if (selectedPageId === deletedPageId) {
+        setSelectedPageId(null);
+        setLightboxOpen(false);
+        setReplaceDialogOpen(false);
+      }
+
       invalidateWorkspace(projectId);
       void queryClient.invalidateQueries({
         queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId } }),
       });
       void queryClient.invalidateQueries({
         queryKey: listDramaVideosQueryKey({ path: { projectId, sceneId } }),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: listProjectDramaVideosQueryKey({ path: { projectId } }),
       });
     },
   });
@@ -206,6 +214,10 @@ export function SceneMangaGallery({
   );
   const selectedPage = pages.find((p) => p.id === selectedPageId);
   const selectedPageReadyForExport = readyForExport(selectedPage);
+  const isSelectedPageDeleting = selectedPage
+    ? deletePage.isPending &&
+      deletePage.variables?.path.pageId === selectedPage.id
+    : false;
   const selectedPageVideos = selectedPage
     ? videos.filter((video) => video.sourceMangaPageId === selectedPage.id)
     : [];
@@ -222,7 +234,6 @@ export function SceneMangaGallery({
     null;
 
   useEffect(() => {
-    setCurrentGalleryPage(1);
     setSelectedPageId(null);
     setLightboxOpen(false);
     setReplaceDialogOpen(false);
@@ -239,38 +250,10 @@ export function SceneMangaGallery({
     setSelectedReplacementAssetId(currentAsset?.id ?? imageAssets[0]?.id ?? "");
   }, [imageAssets, projectId, replaceDialogOpen, selectedPage]);
 
-  const totalGalleryPages = Math.ceil(pages.length / ITEMS_PER_PAGE);
-  const activeGalleryPage =
-    totalGalleryPages === 0
-      ? 1
-      : Math.min(currentGalleryPage, totalGalleryPages);
-
-  useEffect(() => {
-    if (currentGalleryPage !== activeGalleryPage) {
-      setCurrentGalleryPage(activeGalleryPage);
-    }
-  }, [activeGalleryPage, currentGalleryPage]);
-
-  const paginatedPages = useMemo(() => {
-    const start = (activeGalleryPage - 1) * ITEMS_PER_PAGE;
-    return pages.slice(start, start + ITEMS_PER_PAGE);
-  }, [activeGalleryPage, pages]);
-
-  const galleryRangeStart =
-    pages.length === 0 ? 0 : (activeGalleryPage - 1) * ITEMS_PER_PAGE + 1;
-  const galleryRangeEnd = Math.min(
-    activeGalleryPage * ITEMS_PER_PAGE,
-    pages.length,
-  );
 
   const openPage = (page: SceneMangaPage) => {
     setSelectedPageId(page.id);
     setLightboxOpen(true);
-
-    const index = pageIndexById.get(page.id);
-    if (typeof index === "number" && index >= 0) {
-      setCurrentGalleryPage(Math.floor(index / ITEMS_PER_PAGE) + 1);
-    }
   };
 
   // Lightbox navigation
@@ -282,7 +265,6 @@ export function SceneMangaGallery({
     if (canGoPrevious) {
       const nextIndex = currentIndex - 1;
       setSelectedPageId(pageId(pages[nextIndex]));
-      setCurrentGalleryPage(Math.floor(nextIndex / ITEMS_PER_PAGE) + 1);
     }
   };
 
@@ -290,7 +272,6 @@ export function SceneMangaGallery({
     if (canGoNext) {
       const nextIndex = currentIndex + 1;
       setSelectedPageId(pageId(pages[nextIndex]));
-      setCurrentGalleryPage(Math.floor(nextIndex / ITEMS_PER_PAGE) + 1);
     }
   };
 
@@ -304,6 +285,12 @@ export function SceneMangaGallery({
       body: { imageUrl: assetFileUrl(projectId, selectedReplacementAsset.id) },
     });
     setReplaceDialogOpen(false);
+  };
+
+  const deleteMangaPage = (pageId: string) => {
+    deletePage.mutate({
+      path: { projectId, sceneId, pageId },
+    });
   };
 
   if (pagesQuery.isLoading) {
@@ -341,65 +328,11 @@ export function SceneMangaGallery({
           {t("mangaGallery.generated")}
           <span className="ml-2 text-xs text-muted">({pages.length})</span>
         </h3>
-        {totalGalleryPages > 1 ? (
-          <div className="flex items-center gap-2 rounded-2xl border border-border bg-secondary/40 px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">
-              {t("mangaGallery.pagination.summary", {
-                start: galleryRangeStart,
-                end: galleryRangeEnd,
-                total: pages.length,
-              })}
-            </span>
-            <Badge tone="info" className="text-[10px]">
-              {activeGalleryPage}/{totalGalleryPages}
-            </Badge>
-          </div>
-        ) : null}
       </div>
 
-      {totalGalleryPages > 1 ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-secondary/25 px-3 py-2">
-          <span className="text-xs text-muted-foreground">
-            {t("mangaGallery.pagination.pageRange", {
-              start: galleryRangeStart,
-              end: galleryRangeEnd,
-              total: pages.length,
-            })}
-          </span>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() =>
-                setCurrentGalleryPage((page) => Math.max(1, page - 1))
-              }
-              disabled={activeGalleryPage === 1}
-              className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <ChevronLeft size={14} />
-              {t("mangaGallery.pagination.prev")}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() =>
-                setCurrentGalleryPage((page) =>
-                  Math.min(totalGalleryPages, page + 1),
-                )
-              }
-              disabled={activeGalleryPage === totalGalleryPages}
-              className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {t("mangaGallery.pagination.next")}
-              <ChevronRight size={14} />
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
-      {/* Pages Grid */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-        {paginatedPages.map((page, index) => {
+      {/* Pages Horizontal Scroll */}
+      <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory">
+        {pages.map((page, index) => {
           const globalPageIndex = pageIndexById.get(page.id) ?? index;
           const canMoveUp = globalPageIndex > 0;
           const canMoveDown = globalPageIndex < pages.length - 1;
@@ -463,7 +396,7 @@ export function SceneMangaGallery({
       >
         {selectedPage && (
           <DialogContent
-            className="h-[92vh] max-w-[min(96vw,1200px)] overflow-hidden bg-ink text-white"
+            className="h-[92vh] max-w-[min(98vw,1600px)] overflow-hidden bg-ink text-white lg:max-w-[min(98vw,1760px)]"
             showCloseButton={false}
           >
             <DialogHeader className="sr-only">
@@ -578,7 +511,7 @@ export function SceneMangaGallery({
                     },
                   })
                 }
-                disabled={updatePage.isPending}
+                disabled={updatePage.isPending || deletePage.isPending}
               >
                 <Check />
                 {selectedPageReadyForExport
@@ -600,7 +533,7 @@ export function SceneMangaGallery({
                     body: { status: "selected" },
                   })
                 }
-                disabled={updatePage.isPending}
+                disabled={updatePage.isPending || deletePage.isPending}
               >
                 <Check />
                 {t("mangaGallery.approve")}
@@ -614,22 +547,25 @@ export function SceneMangaGallery({
                     ? ""
                     : "text-white hover:bg-white/10"
                 }
-                onClick={() =>
-                  updatePage.mutate({
-                    path: { projectId, sceneId, pageId: selectedPage.id },
-                    body: { status: "rejected" },
-                  })
-                }
-                disabled={updatePage.isPending}
+                onClick={() => deleteMangaPage(selectedPage.id)}
+                disabled={updatePage.isPending || deletePage.isPending}
               >
-                <X />
+                {isSelectedPageDeleting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <X />
+                )}
                 {t("mangaGallery.reject")}
               </Button>
               <Button
                 variant="ghost"
                 className="text-white hover:bg-white/10"
                 onClick={() => setReplaceDialogOpen(true)}
-                disabled={imageAssets.length === 0 || updatePage.isPending}
+                disabled={
+                  imageAssets.length === 0 ||
+                  updatePage.isPending ||
+                  deletePage.isPending
+                }
               >
                 <ImageIcon />
                 {t("mangaGallery.replace")}
@@ -637,14 +573,10 @@ export function SceneMangaGallery({
               <Button
                 variant="ghost"
                 className="text-white hover:bg-white/10"
-                onClick={() =>
-                  deletePage.mutate({
-                    path: { projectId, sceneId, pageId: selectedPage.id },
-                  })
-                }
-                disabled={deletePage.isPending}
+                onClick={() => deleteMangaPage(selectedPage.id)}
+                disabled={updatePage.isPending || deletePage.isPending}
               >
-                {deletePage.isPending ? (
+                {isSelectedPageDeleting ? (
                   <Loader2 className="animate-spin" />
                 ) : (
                   <Trash2 />
@@ -689,6 +621,7 @@ export function SceneMangaGallery({
                     className="border border-white/15 bg-white/10 text-white hover:bg-white/15"
                     disabled={
                       generateDrama.isPending ||
+                      deletePage.isPending ||
                       selectedPage.status !== "selected"
                     }
                     onClick={() =>
@@ -935,7 +868,7 @@ function PageThumbnail({
 
   return (
     <div
-      className="group relative aspect-[3/4] rounded-lg border border-line bg-surface overflow-hidden cursor-pointer"
+      className="group relative aspect-[3/4] min-w-[200px] w-[200px] md:min-w-[260px] md:w-[260px] flex-shrink-0 snap-start rounded-lg border border-line bg-surface overflow-hidden cursor-pointer"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -1036,8 +969,8 @@ function PageThumbnail({
             <Button
               type="button"
               variant="ghost"
-              onClick={() => onUpdate({ status: "rejected" })}
-              disabled={isUpdating}
+              onClick={onDelete}
+              disabled={isUpdating || isDeleting}
               className={clsx(
                 "text-white",
                 page.status === "rejected"
@@ -1045,13 +978,17 @@ function PageThumbnail({
                   : "bg-white/20 text-white hover:bg-danger/80",
               )}
             >
-              <X size={14} />
+              {isDeleting ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <X size={14} />
+              )}
             </Button>
             <Button
               type="button"
               variant="ghost"
               onClick={onDelete}
-              disabled={isDeleting}
+              disabled={isUpdating || isDeleting}
               className="bg-white/20 text-white hover:bg-danger/80"
             >
               {isDeleting ? (

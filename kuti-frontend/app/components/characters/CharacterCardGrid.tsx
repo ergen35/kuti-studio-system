@@ -13,6 +13,7 @@ type CharacterImage = ListCharacterImagesResponse[number];
 interface CharacterCardGridProps {
   characters: Character[];
   imagesByCharacter?: Record<string, CharacterImage[]>;
+  narrativeRoleLabelsByCharacterId?: Record<string, string>;
   onSelect: (character: Character) => void;
   onCreate?: () => void;
   isLoading?: boolean;
@@ -21,6 +22,7 @@ interface CharacterCardGridProps {
 export function CharacterCardGrid({
   characters,
   imagesByCharacter = {},
+  narrativeRoleLabelsByCharacterId = {},
   onSelect,
   onCreate,
   isLoading,
@@ -69,6 +71,7 @@ export function CharacterCardGrid({
             key={character.id}
             character={character}
             image={latestImage}
+            narrativeRoleLabel={narrativeRoleLabelsByCharacterId[character.id]}
             onClick={() => onSelect(character)}
           />
         );

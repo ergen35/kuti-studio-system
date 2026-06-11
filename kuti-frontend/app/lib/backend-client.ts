@@ -13,6 +13,7 @@ const API_BASE_URL = (
 // Configuration du client
 client.setConfig({
   baseUrl: API_BASE_URL,
+  credentials: "include",
 });
 
 // Intercepteur pour la gestion des erreurs

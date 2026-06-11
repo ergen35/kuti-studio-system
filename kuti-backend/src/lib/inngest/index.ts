@@ -9,6 +9,7 @@ export { inngest } from "./client";
 // Re-exports des fonctions Inngest
 export { deleteProjectFunction, sendDeleteProjectEvent } from "./delete-project";
 export { exportProjectFunction } from "./export-project";
+export { generateChapterScenesFunction } from "./generate-chapter-scenes";
 export { generateGenerationFunction, sendGenerationRunEvent } from "./generate-job";
 export { generateImageFunction } from "./generate-image";
 export { generateSceneMangaFunction } from "./generate-scene-manga";
@@ -31,6 +32,7 @@ type GenerateImageEvent = {
     projectId: string;
     characterId: string;
     jobId: string;
+    kind: "character_sheet" | "free_image";
     strategy: string;
     style?: string;
     imageCount: number;
@@ -48,6 +50,14 @@ type GenerateSceneMangaEvent = {
     imageCount: number;
     characterImageRefs?: Record<string, string>;
     additionalContext?: string;
+  };
+};
+
+type GenerateChapterScenesEvent = {
+  data: {
+    projectId: string;
+    chapterId: string;
+    jobId: string;
   };
 };
 
@@ -131,6 +141,19 @@ export async function sendGenerateSceneMangaEvent(
 }
 
 /**
+ * Déclenche la génération automatique des scènes d'un chapitre
+ */
+export async function sendGenerateChapterScenesEvent(
+  data: GenerateChapterScenesEvent["data"]
+): Promise<void> {
+  await inngest.send({
+    id: `chapter-scenes-${data.jobId}`,
+    name: "kuti/chapter-scenes.generate",
+    data,
+  });
+}
+
+/**
  * Déclenche un événement d'export de projet
  */
 export async function sendExportProjectEvent(
@@ -161,6 +184,7 @@ export async function sendCheckOrphanImagesEvent(
 
 import { deleteProjectFunction } from "./delete-project";
 import { exportProjectFunction } from "./export-project";
+import { generateChapterScenesFunction } from "./generate-chapter-scenes";
 import { generateGenerationFunction } from "./generate-job";
 import { generateImageFunction } from "./generate-image";
 import { generateSceneMangaFunction } from "./generate-scene-manga";
@@ -170,6 +194,7 @@ import { cancelJobFunction, relaunchJobFunction } from "./job-control";
 export const inngestFunctions = [
   deleteProjectFunction,
   exportProjectFunction,
+  generateChapterScenesFunction,
   generateGenerationFunction,
   generateImageFunction,
   generateSceneMangaFunction,
@@ -183,6 +208,7 @@ declare module "inngest" {
   interface Events {
     "kuti/generate-image": GenerateImageEvent;
     "kuti/generate-scene-manga": GenerateSceneMangaEvent;
+    "kuti/chapter-scenes.generate": GenerateChapterScenesEvent;
     "kuti/drama-video.generate": GenerateDramaVideoEvent;
     "kuti/export-project": ExportProjectEvent;
     "kuti/delete-project": DeleteProjectEvent;

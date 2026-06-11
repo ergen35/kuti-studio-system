@@ -11,6 +11,9 @@ import {
   createChapterBodySchema,
   updateChapterBodySchema,
   chapterResponseSchema,
+  chapterAutoGenerateBodySchema,
+  chapterAutoGenerateResponseSchema,
+  chapterMangaPagesResponseSchema,
   createSceneBodySchema,
   updateSceneBodySchema,
   sceneResponseSchema,
@@ -32,6 +35,8 @@ import {
   createChapter,
   updateChapter,
   deleteChapter,
+  autoGenerateChapterScenes,
+  listChapterMangaPages,
   listScenes,
   getScene,
   createScene,
@@ -149,6 +154,27 @@ export const storyModule = new Elysia({
   }, {
     params: chapterIdParamsSchema,
     detail: { operationId: "deleteChapter", summary: "Delete a chapter" },
+  })
+  .post("/story/chapters/:chapterId/auto-generate", async ({ params: { projectId, chapterId }, body }) => {
+    return autoGenerateChapterScenes(projectId, chapterId, body);
+  }, {
+    params: chapterIdParamsSchema,
+    body: chapterAutoGenerateBodySchema,
+    response: chapterAutoGenerateResponseSchema,
+    detail: {
+      operationId: "autoGenerateChapterScenes",
+      summary: "Auto-generate chapter scenes",
+    },
+  })
+  .get("/story/chapters/:chapterId/manga-pages", async ({ params: { projectId, chapterId } }) => {
+    return listChapterMangaPages(projectId, chapterId);
+  }, {
+    params: chapterIdParamsSchema,
+    response: chapterMangaPagesResponseSchema,
+    detail: {
+      operationId: "listChapterMangaPages",
+      summary: "List manga pages for a chapter",
+    },
   })
 
   // Scenes

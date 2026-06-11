@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
@@ -17,8 +17,13 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { FormField } from "~/components/FormField";
-import { CharacterCardGrid } from "~/components/characters";
+import { CharacterCardGrid, NarrativeRoleCombobox } from "~/components/characters";
 import { apiErrorMessage } from "~/lib/errors";
+import { listNarrativeRoles } from "~/lib/narrative-roles-api";
+import {
+  mergeNarrativeRoleCatalog,
+  resolveNarrativeRoleLabel,
+} from "~/lib/narrative-roles";
 import {
   listCharactersOptions,
   createCharacterMutation,
@@ -38,11 +43,13 @@ type CreateCharacterInput = z.infer<typeof createCharacterSchema>;
 
 // Create Character Modal
 function CreateCharacterModal({
+  projectId,
   isOpen,
   onClose,
   onSubmit,
   isLoading,
 }: {
+  projectId: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: CreateCharacterInput) => void;
@@ -54,10 +61,13 @@ function CreateCharacterModal({
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<CreateCharacterInput>({
     resolver: zodResolver(createCharacterSchema),
     defaultValues: { name: "", narrativeRole: "" },
   });
+  const narrativeRole = watch("narrativeRole");
 
   // Reset form when opened
   useEffect(() => {
@@ -89,16 +99,18 @@ function CreateCharacterModal({
             />
           </FormField>
 
-          <FormField
-            label={t("fields.narrativeRole")}
+          <NarrativeRoleCombobox
+            projectId={projectId}
+            value={narrativeRole || ""}
+            onValueChange={(role) =>
+              setValue("narrativeRole", role, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
             error={errors.narrativeRole}
-          >
-            <Input
-              {...register("narrativeRole")}
-              className="w-full"
-              placeholder={t("createModal.rolePlaceholder")}
-            />
-          </FormField>
+            resetKey={isOpen ? `${projectId}-create` : undefined}
+          />
 
           <DialogFooter>
             <Button
@@ -136,6 +148,28 @@ export default function CharactersRoute() {
 
   // Fetch all characters
   const characters = useQuery(listCharactersOptions({ path: { projectId } }));
+
+  const narrativeRoles = useQuery({
+    queryKey: ["narrativeRoles", projectId],
+    queryFn: () => listNarrativeRoles(projectId),
+    enabled: !!projectId,
+  });
+
+  const narrativeRoleLabelsByCharacterId = useMemo(() => {
+    const catalog = mergeNarrativeRoleCatalog(narrativeRoles.data ?? []);
+
+    return Object.fromEntries(
+      (characters.data ?? []).map((character) => [
+        character.id,
+        resolveNarrativeRoleLabel(
+          typeof character.narrativeRole === "string"
+            ? character.narrativeRole
+            : null,
+          catalog,
+        ),
+      ]),
+    );
+  }, [characters.data, narrativeRoles.data]);
 
   // Fetch character images for all characters
   const characterImages = useQuery({
@@ -219,6 +253,7 @@ export default function CharactersRoute() {
         <CharacterCardGrid
           characters={characters.data}
           imagesByCharacter={characterImages.data || {}}
+          narrativeRoleLabelsByCharacterId={narrativeRoleLabelsByCharacterId}
           onSelect={(char) => handleSelect(char.id)}
           onCreate={handleCreateClick}
           isLoading={characters.isLoading}
@@ -227,6 +262,7 @@ export default function CharactersRoute() {
 
       {/* Create Character Modal */}
       <CreateCharacterModal
+        projectId={projectId}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleCreateSubmit}

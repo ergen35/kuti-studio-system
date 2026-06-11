@@ -164,9 +164,12 @@ export async function saveCharacterImage(
   projectId: string,
   characterId: string,
   imageData: Buffer,
-  strategy: string,
-  style?: string,
-  variationIndex?: number
+  options: {
+    kind: "character_sheet" | "free_image";
+    strategy: string;
+    style?: string;
+    variationIndex?: number;
+  }
 ): Promise<{
   filePath: string;
   publicUrl: string;
@@ -176,9 +179,10 @@ export async function saveCharacterImage(
   const { getCharacterImagesDir, getCharacterImagePublicUrl } = require("./paths");
 
   const dir = getCharacterImagesDir(projectId);
-  const suffix = style ? `_${style}` : "";
-  const varSuffix = variationIndex !== undefined ? `_v${variationIndex + 1}` : "";
-  const fileName = `char_${characterId}_${strategy}${suffix}${varSuffix}_${randomUUIDv7(
+  const kindPrefix = options.kind === "character_sheet" ? "sheet" : "free";
+  const suffix = options.style ? `_${options.style}` : "";
+  const varSuffix = options.variationIndex !== undefined ? `_v${options.variationIndex + 1}` : "";
+  const fileName = `char_${characterId}_${kindPrefix}_${options.strategy}${suffix}${varSuffix}_${randomUUIDv7(
     "base64url"
   )}.png`;
   const filePath = `${dir}/${fileName}`;

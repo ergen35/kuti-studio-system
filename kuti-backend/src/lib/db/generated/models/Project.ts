@@ -219,6 +219,7 @@ export type ProjectWhereInput = {
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   archivedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   characters?: Prisma.CharacterListRelationFilter
+  narrativeRoles?: Prisma.NarrativeRoleListRelationFilter
   characterRelations?: Prisma.CharacterRelationListRelationFilter
   voiceSamples?: Prisma.VoiceSampleListRelationFilter
   tomes?: Prisma.TomeListRelationFilter
@@ -250,6 +251,7 @@ export type ProjectOrderByWithRelationInput = {
   lastOpenedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   characters?: Prisma.CharacterOrderByRelationAggregateInput
+  narrativeRoles?: Prisma.NarrativeRoleOrderByRelationAggregateInput
   characterRelations?: Prisma.CharacterRelationOrderByRelationAggregateInput
   voiceSamples?: Prisma.VoiceSampleOrderByRelationAggregateInput
   tomes?: Prisma.TomeOrderByRelationAggregateInput
@@ -284,6 +286,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   archivedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   characters?: Prisma.CharacterListRelationFilter
+  narrativeRoles?: Prisma.NarrativeRoleListRelationFilter
   characterRelations?: Prisma.CharacterRelationListRelationFilter
   voiceSamples?: Prisma.VoiceSampleListRelationFilter
   tomes?: Prisma.TomeListRelationFilter
@@ -347,6 +350,7 @@ export type ProjectCreateInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -378,6 +382,7 @@ export type ProjectUncheckedCreateInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -409,6 +414,7 @@ export type ProjectUpdateInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -440,6 +446,7 @@ export type ProjectUncheckedUpdateInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -542,6 +549,20 @@ export type ProjectScalarRelationFilter = {
 
 export type EnumProjectStatusFieldUpdateOperationsInput = {
   set?: $Enums.ProjectStatus
+}
+
+export type ProjectCreateNestedOneWithoutNarrativeRolesInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutNarrativeRolesInput, Prisma.ProjectUncheckedCreateWithoutNarrativeRolesInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutNarrativeRolesInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutNarrativeRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutNarrativeRolesInput, Prisma.ProjectUncheckedCreateWithoutNarrativeRolesInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutNarrativeRolesInput
+  upsert?: Prisma.ProjectUpsertWithoutNarrativeRolesInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutNarrativeRolesInput, Prisma.ProjectUpdateWithoutNarrativeRolesInput>, Prisma.ProjectUncheckedUpdateWithoutNarrativeRolesInput>
 }
 
 export type ProjectCreateNestedOneWithoutCharactersInput = {
@@ -796,6 +817,146 @@ export type ProjectUpdateOneRequiredWithoutExportsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutExportsInput, Prisma.ProjectUpdateWithoutExportsInput>, Prisma.ProjectUncheckedUpdateWithoutExportsInput>
 }
 
+export type ProjectCreateWithoutNarrativeRolesInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.ProjectStatus
+  rootPath: string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastOpenedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
+  voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
+  tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
+  chapters?: Prisma.ChapterCreateNestedManyWithoutProjectInput
+  scenes?: Prisma.SceneCreateNestedManyWithoutProjectInput
+  storyReferences?: Prisma.StoryReferenceCreateNestedManyWithoutProjectInput
+  assets?: Prisma.AssetCreateNestedManyWithoutProjectInput
+  assetLinks?: Prisma.AssetLinkCreateNestedManyWithoutProjectInput
+  generationJobs?: Prisma.GenerationJobCreateNestedManyWithoutProjectInput
+  generationBoards?: Prisma.GenerationBoardCreateNestedManyWithoutProjectInput
+  warnings?: Prisma.WarningCreateNestedManyWithoutProjectInput
+  versions?: Prisma.VersionCreateNestedManyWithoutProjectInput
+  exports?: Prisma.ExportRecordCreateNestedManyWithoutProjectInput
+  characterImages?: Prisma.CharacterImageCreateNestedManyWithoutProjectInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigCreateNestedManyWithoutProjectInput
+  sceneMangaPages?: Prisma.SceneMangaPageCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutNarrativeRolesInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.ProjectStatus
+  rootPath: string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastOpenedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
+  voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
+  tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
+  chapters?: Prisma.ChapterUncheckedCreateNestedManyWithoutProjectInput
+  scenes?: Prisma.SceneUncheckedCreateNestedManyWithoutProjectInput
+  storyReferences?: Prisma.StoryReferenceUncheckedCreateNestedManyWithoutProjectInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutProjectInput
+  assetLinks?: Prisma.AssetLinkUncheckedCreateNestedManyWithoutProjectInput
+  generationJobs?: Prisma.GenerationJobUncheckedCreateNestedManyWithoutProjectInput
+  generationBoards?: Prisma.GenerationBoardUncheckedCreateNestedManyWithoutProjectInput
+  warnings?: Prisma.WarningUncheckedCreateNestedManyWithoutProjectInput
+  versions?: Prisma.VersionUncheckedCreateNestedManyWithoutProjectInput
+  exports?: Prisma.ExportRecordUncheckedCreateNestedManyWithoutProjectInput
+  characterImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutProjectInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedCreateNestedManyWithoutProjectInput
+  sceneMangaPages?: Prisma.SceneMangaPageUncheckedCreateNestedManyWithoutProjectInput
+  dramaVideos?: Prisma.DramaVideoUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutNarrativeRolesInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutNarrativeRolesInput, Prisma.ProjectUncheckedCreateWithoutNarrativeRolesInput>
+}
+
+export type ProjectUpsertWithoutNarrativeRolesInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutNarrativeRolesInput, Prisma.ProjectUncheckedUpdateWithoutNarrativeRolesInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutNarrativeRolesInput, Prisma.ProjectUncheckedCreateWithoutNarrativeRolesInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutNarrativeRolesInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutNarrativeRolesInput, Prisma.ProjectUncheckedUpdateWithoutNarrativeRolesInput>
+}
+
+export type ProjectUpdateWithoutNarrativeRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  rootPath?: Prisma.StringFieldUpdateOperationsInput | string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
+  voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
+  tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
+  chapters?: Prisma.ChapterUpdateManyWithoutProjectNestedInput
+  scenes?: Prisma.SceneUpdateManyWithoutProjectNestedInput
+  storyReferences?: Prisma.StoryReferenceUpdateManyWithoutProjectNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutProjectNestedInput
+  assetLinks?: Prisma.AssetLinkUpdateManyWithoutProjectNestedInput
+  generationJobs?: Prisma.GenerationJobUpdateManyWithoutProjectNestedInput
+  generationBoards?: Prisma.GenerationBoardUpdateManyWithoutProjectNestedInput
+  warnings?: Prisma.WarningUpdateManyWithoutProjectNestedInput
+  versions?: Prisma.VersionUpdateManyWithoutProjectNestedInput
+  exports?: Prisma.ExportRecordUpdateManyWithoutProjectNestedInput
+  characterImages?: Prisma.CharacterImageUpdateManyWithoutProjectNestedInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigUpdateManyWithoutProjectNestedInput
+  sceneMangaPages?: Prisma.SceneMangaPageUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutNarrativeRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  rootPath?: Prisma.StringFieldUpdateOperationsInput | string
+  settingsJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
+  voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
+  tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
+  chapters?: Prisma.ChapterUncheckedUpdateManyWithoutProjectNestedInput
+  scenes?: Prisma.SceneUncheckedUpdateManyWithoutProjectNestedInput
+  storyReferences?: Prisma.StoryReferenceUncheckedUpdateManyWithoutProjectNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutProjectNestedInput
+  assetLinks?: Prisma.AssetLinkUncheckedUpdateManyWithoutProjectNestedInput
+  generationJobs?: Prisma.GenerationJobUncheckedUpdateManyWithoutProjectNestedInput
+  generationBoards?: Prisma.GenerationBoardUncheckedUpdateManyWithoutProjectNestedInput
+  warnings?: Prisma.WarningUncheckedUpdateManyWithoutProjectNestedInput
+  versions?: Prisma.VersionUncheckedUpdateManyWithoutProjectNestedInput
+  exports?: Prisma.ExportRecordUncheckedUpdateManyWithoutProjectNestedInput
+  characterImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutProjectNestedInput
+  sceneGenerationConfigs?: Prisma.SceneGenerationConfigUncheckedUpdateManyWithoutProjectNestedInput
+  sceneMangaPages?: Prisma.SceneMangaPageUncheckedUpdateManyWithoutProjectNestedInput
+  dramaVideos?: Prisma.DramaVideoUncheckedUpdateManyWithoutProjectNestedInput
+}
+
 export type ProjectCreateWithoutCharactersInput = {
   id?: string
   name: string
@@ -807,6 +968,7 @@ export type ProjectCreateWithoutCharactersInput = {
   updatedAt?: Date | string
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -837,6 +999,7 @@ export type ProjectUncheckedCreateWithoutCharactersInput = {
   updatedAt?: Date | string
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -883,6 +1046,7 @@ export type ProjectUpdateWithoutCharactersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -913,6 +1077,7 @@ export type ProjectUncheckedUpdateWithoutCharactersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -944,6 +1109,7 @@ export type ProjectCreateWithoutCharacterRelationsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
   chapters?: Prisma.ChapterCreateNestedManyWithoutProjectInput
@@ -974,6 +1140,7 @@ export type ProjectUncheckedCreateWithoutCharacterRelationsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
   chapters?: Prisma.ChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1020,6 +1187,7 @@ export type ProjectUpdateWithoutCharacterRelationsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
   chapters?: Prisma.ChapterUpdateManyWithoutProjectNestedInput
@@ -1050,6 +1218,7 @@ export type ProjectUncheckedUpdateWithoutCharacterRelationsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
   chapters?: Prisma.ChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -1080,6 +1249,7 @@ export type ProjectCreateWithoutVoiceSamplesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
   chapters?: Prisma.ChapterCreateNestedManyWithoutProjectInput
@@ -1110,6 +1280,7 @@ export type ProjectUncheckedCreateWithoutVoiceSamplesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
   chapters?: Prisma.ChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1156,6 +1327,7 @@ export type ProjectUpdateWithoutVoiceSamplesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
   chapters?: Prisma.ChapterUpdateManyWithoutProjectNestedInput
@@ -1186,6 +1358,7 @@ export type ProjectUncheckedUpdateWithoutVoiceSamplesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
   chapters?: Prisma.ChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -1216,6 +1389,7 @@ export type ProjectCreateWithoutCharacterImagesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -1246,6 +1420,7 @@ export type ProjectUncheckedCreateWithoutCharacterImagesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -1292,6 +1467,7 @@ export type ProjectUpdateWithoutCharacterImagesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -1322,6 +1498,7 @@ export type ProjectUncheckedUpdateWithoutCharacterImagesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -1352,6 +1529,7 @@ export type ProjectCreateWithoutTomesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   chapters?: Prisma.ChapterCreateNestedManyWithoutProjectInput
@@ -1382,6 +1560,7 @@ export type ProjectUncheckedCreateWithoutTomesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   chapters?: Prisma.ChapterUncheckedCreateNestedManyWithoutProjectInput
@@ -1428,6 +1607,7 @@ export type ProjectUpdateWithoutTomesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   chapters?: Prisma.ChapterUpdateManyWithoutProjectNestedInput
@@ -1458,6 +1638,7 @@ export type ProjectUncheckedUpdateWithoutTomesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   chapters?: Prisma.ChapterUncheckedUpdateManyWithoutProjectNestedInput
@@ -1488,6 +1669,7 @@ export type ProjectCreateWithoutChaptersInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -1518,6 +1700,7 @@ export type ProjectUncheckedCreateWithoutChaptersInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -1564,6 +1747,7 @@ export type ProjectUpdateWithoutChaptersInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -1594,6 +1778,7 @@ export type ProjectUncheckedUpdateWithoutChaptersInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -1624,6 +1809,7 @@ export type ProjectCreateWithoutScenesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -1654,6 +1840,7 @@ export type ProjectUncheckedCreateWithoutScenesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -1700,6 +1887,7 @@ export type ProjectUpdateWithoutScenesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -1730,6 +1918,7 @@ export type ProjectUncheckedUpdateWithoutScenesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -1760,6 +1949,7 @@ export type ProjectCreateWithoutStoryReferencesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -1790,6 +1980,7 @@ export type ProjectUncheckedCreateWithoutStoryReferencesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -1836,6 +2027,7 @@ export type ProjectUpdateWithoutStoryReferencesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -1866,6 +2058,7 @@ export type ProjectUncheckedUpdateWithoutStoryReferencesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -1896,6 +2089,7 @@ export type ProjectCreateWithoutAssetsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -1926,6 +2120,7 @@ export type ProjectUncheckedCreateWithoutAssetsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -1972,6 +2167,7 @@ export type ProjectUpdateWithoutAssetsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2002,6 +2198,7 @@ export type ProjectUncheckedUpdateWithoutAssetsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2032,6 +2229,7 @@ export type ProjectCreateWithoutAssetLinksInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2062,6 +2260,7 @@ export type ProjectUncheckedCreateWithoutAssetLinksInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2108,6 +2307,7 @@ export type ProjectUpdateWithoutAssetLinksInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2138,6 +2338,7 @@ export type ProjectUncheckedUpdateWithoutAssetLinksInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2168,6 +2369,7 @@ export type ProjectCreateWithoutGenerationJobsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2198,6 +2400,7 @@ export type ProjectUncheckedCreateWithoutGenerationJobsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2244,6 +2447,7 @@ export type ProjectUpdateWithoutGenerationJobsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2274,6 +2478,7 @@ export type ProjectUncheckedUpdateWithoutGenerationJobsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2304,6 +2509,7 @@ export type ProjectCreateWithoutGenerationBoardsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2334,6 +2540,7 @@ export type ProjectUncheckedCreateWithoutGenerationBoardsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2380,6 +2587,7 @@ export type ProjectUpdateWithoutGenerationBoardsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2410,6 +2618,7 @@ export type ProjectUncheckedUpdateWithoutGenerationBoardsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2440,6 +2649,7 @@ export type ProjectCreateWithoutSceneGenerationConfigsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2470,6 +2680,7 @@ export type ProjectUncheckedCreateWithoutSceneGenerationConfigsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2516,6 +2727,7 @@ export type ProjectUpdateWithoutSceneGenerationConfigsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2546,6 +2758,7 @@ export type ProjectUncheckedUpdateWithoutSceneGenerationConfigsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2576,6 +2789,7 @@ export type ProjectCreateWithoutSceneMangaPagesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2606,6 +2820,7 @@ export type ProjectUncheckedCreateWithoutSceneMangaPagesInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2652,6 +2867,7 @@ export type ProjectUpdateWithoutSceneMangaPagesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2682,6 +2898,7 @@ export type ProjectUncheckedUpdateWithoutSceneMangaPagesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2712,6 +2929,7 @@ export type ProjectCreateWithoutDramaVideosInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2742,6 +2960,7 @@ export type ProjectUncheckedCreateWithoutDramaVideosInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2788,6 +3007,7 @@ export type ProjectUpdateWithoutDramaVideosInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2818,6 +3038,7 @@ export type ProjectUncheckedUpdateWithoutDramaVideosInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2848,6 +3069,7 @@ export type ProjectCreateWithoutVersionsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -2878,6 +3100,7 @@ export type ProjectUncheckedCreateWithoutVersionsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -2924,6 +3147,7 @@ export type ProjectUpdateWithoutVersionsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -2954,6 +3178,7 @@ export type ProjectUncheckedUpdateWithoutVersionsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -2984,6 +3209,7 @@ export type ProjectCreateWithoutWarningsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -3014,6 +3240,7 @@ export type ProjectUncheckedCreateWithoutWarningsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -3060,6 +3287,7 @@ export type ProjectUpdateWithoutWarningsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -3090,6 +3318,7 @@ export type ProjectUncheckedUpdateWithoutWarningsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -3120,6 +3349,7 @@ export type ProjectCreateWithoutExportsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeCreateNestedManyWithoutProjectInput
@@ -3150,6 +3380,7 @@ export type ProjectUncheckedCreateWithoutExportsInput = {
   lastOpenedAt?: Date | string | null
   archivedAt?: Date | string | null
   characters?: Prisma.CharacterUncheckedCreateNestedManyWithoutProjectInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedCreateNestedManyWithoutProjectInput
   characterRelations?: Prisma.CharacterRelationUncheckedCreateNestedManyWithoutProjectInput
   voiceSamples?: Prisma.VoiceSampleUncheckedCreateNestedManyWithoutProjectInput
   tomes?: Prisma.TomeUncheckedCreateNestedManyWithoutProjectInput
@@ -3196,6 +3427,7 @@ export type ProjectUpdateWithoutExportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUpdateManyWithoutProjectNestedInput
@@ -3226,6 +3458,7 @@ export type ProjectUncheckedUpdateWithoutExportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   characters?: Prisma.CharacterUncheckedUpdateManyWithoutProjectNestedInput
+  narrativeRoles?: Prisma.NarrativeRoleUncheckedUpdateManyWithoutProjectNestedInput
   characterRelations?: Prisma.CharacterRelationUncheckedUpdateManyWithoutProjectNestedInput
   voiceSamples?: Prisma.VoiceSampleUncheckedUpdateManyWithoutProjectNestedInput
   tomes?: Prisma.TomeUncheckedUpdateManyWithoutProjectNestedInput
@@ -3251,6 +3484,7 @@ export type ProjectUncheckedUpdateWithoutExportsInput = {
 
 export type ProjectCountOutputType = {
   characters: number
+  narrativeRoles: number
   characterRelations: number
   voiceSamples: number
   tomes: number
@@ -3272,6 +3506,7 @@ export type ProjectCountOutputType = {
 
 export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   characters?: boolean | ProjectCountOutputTypeCountCharactersArgs
+  narrativeRoles?: boolean | ProjectCountOutputTypeCountNarrativeRolesArgs
   characterRelations?: boolean | ProjectCountOutputTypeCountCharacterRelationsArgs
   voiceSamples?: boolean | ProjectCountOutputTypeCountVoiceSamplesArgs
   tomes?: boolean | ProjectCountOutputTypeCountTomesArgs
@@ -3306,6 +3541,13 @@ export type ProjectCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type ProjectCountOutputTypeCountCharactersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CharacterWhereInput
+}
+
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountNarrativeRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NarrativeRoleWhereInput
 }
 
 /**
@@ -3440,6 +3682,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   lastOpenedAt?: boolean
   archivedAt?: boolean
   characters?: boolean | Prisma.Project$charactersArgs<ExtArgs>
+  narrativeRoles?: boolean | Prisma.Project$narrativeRolesArgs<ExtArgs>
   characterRelations?: boolean | Prisma.Project$characterRelationsArgs<ExtArgs>
   voiceSamples?: boolean | Prisma.Project$voiceSamplesArgs<ExtArgs>
   tomes?: boolean | Prisma.Project$tomesArgs<ExtArgs>
@@ -3502,6 +3745,7 @@ export type ProjectSelectScalar = {
 export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "status" | "rootPath" | "settingsJson" | "createdAt" | "updatedAt" | "lastOpenedAt" | "archivedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   characters?: boolean | Prisma.Project$charactersArgs<ExtArgs>
+  narrativeRoles?: boolean | Prisma.Project$narrativeRolesArgs<ExtArgs>
   characterRelations?: boolean | Prisma.Project$characterRelationsArgs<ExtArgs>
   voiceSamples?: boolean | Prisma.Project$voiceSamplesArgs<ExtArgs>
   tomes?: boolean | Prisma.Project$tomesArgs<ExtArgs>
@@ -3528,6 +3772,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Project"
   objects: {
     characters: Prisma.$CharacterPayload<ExtArgs>[]
+    narrativeRoles: Prisma.$NarrativeRolePayload<ExtArgs>[]
     characterRelations: Prisma.$CharacterRelationPayload<ExtArgs>[]
     voiceSamples: Prisma.$VoiceSamplePayload<ExtArgs>[]
     tomes: Prisma.$TomePayload<ExtArgs>[]
@@ -3952,6 +4197,7 @@ readonly fields: ProjectFieldRefs;
 export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   characters<T extends Prisma.Project$charactersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$charactersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CharacterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  narrativeRoles<T extends Prisma.Project$narrativeRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$narrativeRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NarrativeRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   characterRelations<T extends Prisma.Project$characterRelationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$characterRelationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CharacterRelationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   voiceSamples<T extends Prisma.Project$voiceSamplesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$voiceSamplesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VoiceSamplePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tomes<T extends Prisma.Project$tomesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$tomesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TomePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4422,6 +4668,30 @@ export type Project$charactersArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.CharacterScalarFieldEnum | Prisma.CharacterScalarFieldEnum[]
+}
+
+/**
+ * Project.narrativeRoles
+ */
+export type Project$narrativeRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NarrativeRole
+   */
+  select?: Prisma.NarrativeRoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NarrativeRole
+   */
+  omit?: Prisma.NarrativeRoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NarrativeRoleInclude<ExtArgs> | null
+  where?: Prisma.NarrativeRoleWhereInput
+  orderBy?: Prisma.NarrativeRoleOrderByWithRelationInput | Prisma.NarrativeRoleOrderByWithRelationInput[]
+  cursor?: Prisma.NarrativeRoleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NarrativeRoleScalarFieldEnum | Prisma.NarrativeRoleScalarFieldEnum[]
 }
 
 /**

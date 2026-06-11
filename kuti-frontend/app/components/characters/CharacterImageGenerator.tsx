@@ -28,9 +28,11 @@ interface CharacterImageGeneratorProps {
   projectId: string;
 }
 
+type Kind = "character_sheet" | "free_image";
 type Strategy = "portrait" | "full_body" | "concept";
 type Style = "realistic" | "anime" | "illustration" | "watercolor";
 
+const KINDS: Kind[] = ["character_sheet", "free_image"];
 const STRATEGIES: Strategy[] = ["portrait", "full_body", "concept"];
 const STYLES: Style[] = ["realistic", "anime", "illustration", "watercolor"];
 
@@ -76,6 +78,7 @@ export function CharacterImageGenerator({
 }: CharacterImageGeneratorProps) {
   const { t } = useTranslation("characters");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [kind, setKind] = useState<Kind>("character_sheet");
   const [strategy, setStrategy] = useState<Strategy>("portrait");
   const [style, setStyle] = useState<Style>("realistic");
   const [imageCount, setImageCount] = useState(2);
@@ -149,13 +152,19 @@ export function CharacterImageGenerator({
     const description =
       parts.join(", ") || t("generation.defaultPromptSubject");
 
+    if (kind === "character_sheet") {
+      return `${t("generation.sheetPrompt")}
+${description}
+${artistic}`;
+    }
+
     return `${base}, ${description}, ${artistic}`;
-  }, [character, strategy, style, t]);
+  }, [character, kind, strategy, style, t]);
 
   const handleGenerate = () => {
     generateMutation.mutate({
       path: { projectId, characterId: character.id },
-      query: { strategy, style, imageCount },
+      query: { kind, strategy, style, imageCount },
     });
     setIsModalOpen(false);
   };
@@ -174,6 +183,38 @@ export function CharacterImageGenerator({
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="grid gap-2 rounded-2xl border border-border bg-secondary/20 p-3">
+        <span className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          {t("generation.modeLabel")}
+        </span>
+        <div className="grid grid-cols-2 gap-2">
+          {KINDS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => {
+                setKind(value);
+                if (value === "character_sheet") {
+                  setImageCount(1);
+                }
+              }}
+              className={
+                kind === value
+                  ? "rounded-lg border border-primary bg-primary/10 px-3 py-2 text-left text-sm font-medium text-primary"
+                  : "rounded-lg border border-border bg-background/70 px-3 py-2 text-left text-sm text-muted-foreground"
+              }
+            >
+              <div>{t(`generation.kind.${value}`)}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {value === "character_sheet"
+                  ? t("generation.kind.sheetHint")
+                  : t("generation.kind.freeHint")}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Active generation progress */}
       {isGenerating && activeJob.data && (
         <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
@@ -213,9 +254,9 @@ export function CharacterImageGenerator({
         )}
         {isGenerating
           ? t("generation.generating")
-          : activeJob.data?.board?.panels?.length
-            ? t("generation.regenerate")
-            : t("generation.generatePortrait")}
+          : kind === "character_sheet"
+            ? t("generation.generateSheet")
+            : t("generation.generateFreeImages")}
       </Button>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -226,7 +267,9 @@ export function CharacterImageGenerator({
               {t("generation.modalTitle")}
             </DialogTitle>
             <DialogDescription>
-              {t("generation.modalDescription")}
+              {kind === "character_sheet"
+                ? t("generation.sheetModalDescription")
+                : t("generation.freeModalDescription")}
             </DialogDescription>
           </DialogHeader>
 
@@ -278,29 +321,38 @@ export function CharacterImageGenerator({
               </ToggleGroup>
             </div>
 
-            {/* Image count */}
-            <div>
-              <label className="mb-2 block text-sm text-muted-foreground">
-                {t("generation.imageCount")}
-              </label>
-              <ToggleGroup
-                type="single"
-                value={String(imageCount)}
-                onValueChange={(value) => value && setImageCount(Number(value))}
-                className="grid w-full grid-cols-3"
-              >
-                {[1, 2, 4].map((count) => (
-                  <ToggleGroupItem
-                    key={count}
-                    value={String(count)}
-                    className="w-full"
-                  >
-                    <ImageIcon />
-                    {count}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </div>
+            {kind === "free_image" && (
+              <div>
+                <label className="mb-2 block text-sm text-muted-foreground">
+                  {t("generation.imageCount")}
+                </label>
+                <ToggleGroup
+                  type="single"
+                  value={String(imageCount)}
+                  onValueChange={(value) =>
+                    value && setImageCount(Number(value))
+                  }
+                  className="grid w-full grid-cols-3"
+                >
+                  {[1, 2, 4].map((count) => (
+                    <ToggleGroupItem
+                      key={count}
+                      value={String(count)}
+                      className="w-full"
+                    >
+                      <ImageIcon />
+                      {count}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
+            )}
+
+            {kind === "character_sheet" && (
+              <p className="rounded-lg border border-border bg-secondary/20 p-3 text-xs leading-5 text-muted-foreground">
+                {t("generation.sheetHint")}
+              </p>
+            )}
 
             {/* Prompt preview */}
             <div>

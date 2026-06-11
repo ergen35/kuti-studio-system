@@ -129,6 +129,7 @@
     "title": "Title",
     "type": "Type",
     "location": "Location",
+    "targetPageCount": "Target pages",
     "summary": "Summary",
     "content": "Content",
     "characters": "Characters",
@@ -150,6 +151,8 @@
   },
   "editor": {
     "placeholder": "Write scene content... Use @ to reference",
+    "scriptGuideTitle": "Script reminder",
+    "scriptGuideDescription": "Write each line with DIALOGUE:, THOUGHT:, or NARRATION:. Keep @chara:slug inside typed lines.",
     "autocomplete": {
       "noResults": "No results",
       "loading": "Loading...",
@@ -188,6 +191,31 @@
       "scenes_plural": "{{count}} scenes"
     },
     "scenes": "Scenes",
+    "autoGenerate": {
+      "button": "Auto-generate",
+      "title": "Auto-generate scenes",
+      "description": "Write a detailed chapter summary, then choose how many scenes should be generated. The existing chapter will be replaced with the new version.",
+      "summaryLabel": "Chapter summary",
+      "summaryPlaceholder": "Write a long, coherent summary. You can use canonical references such as @chara:asha, @file:map, or @scene:chapter-1.",
+      "summaryHint": "The summary must contain at least 1000 characters and may include @ references to guide the model.",
+      "summaryCount": "{{count}} characters",
+      "referencesHint": "Typed references accepted",
+      "warningTitle": "Chapter replacement",
+      "warning": "The current scenes in this chapter will be deleted and replaced by the generated result.",
+      "sceneCountLabel": "Number of scenes",
+      "sceneCountHint": "Choose an integer between 1 and 8.",
+      "referencesTitle": "Canonical references",
+      "referencesBody": "Typed tokens in the summary are resolved by the backend before generation.",
+      "footerTitle": "Destructive action",
+      "footerDescription": "This will remove the current chapter scenes. Review the summary before launching generation.",
+      "footerCancel": "Cancel",
+      "footerSubmit": "Replace and generate",
+      "footerSubmitting": "Generating...",
+      "errors": {
+        "summary": "The summary must contain at least 1000 characters.",
+        "sceneCount": "The number of scenes must be between 1 and 8."
+      }
+    },
     "synopsis": "Synopsis",
     "navigation": {
       "title": "Chapters",
@@ -220,6 +248,7 @@
     "placeholders": {
       "type": "dialogue, action, reveal...",
       "location": "Rooftop, classroom, station...",
+      "targetPageCount": "1-10",
       "summary": "Scene summary...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romance, fight, reveal...",
@@ -284,5 +313,12 @@
   "meta": {
     "noLocation": "No location",
     "noCharacters": "No characters"
+  },
+  "chapterPreview": {
+    "title": "Manga Preview",
+    "empty": "No manga pages",
+    "emptyDescription": "Generate manga pages from scenes to preview them here.",
+    "totalPages": "{{count}} pages total",
+    "scene": "Scene"
   }
 }

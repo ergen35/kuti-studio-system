@@ -63,12 +63,20 @@ import {
   CharacterImageGallery,
   CharacterImageGenerator,
   CharacterRelationGraphDialog,
+  CharacterProfileGenerateDialog,
+  NarrativeRoleCombobox,
   ImageLightbox,
 } from "~/components/characters";
 import { apiErrorMessage } from "~/lib/errors";
 import { csv } from "~/lib/utils";
 import { invalidateWorkspace, queryClient } from "~/lib/query";
 import { invalidateQueriesById } from "~/lib/query";
+import { listNarrativeRoles } from "~/lib/narrative-roles-api";
+import {
+  mergeNarrativeRoleCatalog,
+  resolveNarrativeRoleLabel,
+} from "~/lib/narrative-roles";
+import { generateCharacterProfileDraft } from "~/lib/narrative-roles-api";
 import type {
   GetCharacterResponse,
   GetStorySummaryResponse,
@@ -88,6 +96,7 @@ import {
   createRelationMutation,
   createVoiceSampleMutation,
   deleteCharacterImageMutation,
+  setCharacterImageActiveMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
 import {
   characterSchema,
@@ -445,22 +454,26 @@ function CharacterSidePanel({
   characters,
   currentCharacterId,
   projectId,
+  narrativeRoleLabelsByCharacterId,
   relations,
   voiceSamples,
   images,
   imageLoading,
   onDeleteImage,
+  onSetActiveImage,
   onImageClick,
   relationMutation,
 }: {
   characters: CharacterFromList[];
   currentCharacterId: string;
   projectId: string;
+  narrativeRoleLabelsByCharacterId: Record<string, string>;
   relations: CharacterRelationFromSDK[];
   voiceSamples: VoiceSampleFromSDK[];
   images: CharacterImageFromList[];
   imageLoading: boolean;
   onDeleteImage?: (image: CharacterImageFromList) => void;
+  onSetActiveImage?: (image: CharacterImageFromList) => void;
   onImageClick: (image: CharacterImageFromList, index: number) => void;
   relationMutation: UseMutationResult<unknown, Error, RelationInput, unknown>;
 }) {
@@ -481,6 +494,10 @@ function CharacterSidePanel({
       result = result.filter(
         (c) =>
           c.name.toLowerCase().includes(query) ||
+          (narrativeRoleLabelsByCharacterId[c.id] &&
+            narrativeRoleLabelsByCharacterId[c.id]
+              .toLowerCase()
+              .includes(query)) ||
           (c.narrativeRole &&
             typeof c.narrativeRole === "string" &&
             c.narrativeRole.toLowerCase().includes(query)) ||
@@ -578,9 +595,7 @@ function CharacterSidePanel({
                     {char.name}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {typeof char.narrativeRole === "string"
-                      ? char.narrativeRole
-                      : char.slug}
+                    {narrativeRoleLabelsByCharacterId[char.id] || char.slug}
                   </p>
                 </div>
                 <ChevronRight size={14} className="text-muted-foreground" />
@@ -724,6 +739,7 @@ function CharacterSidePanel({
             characterId={currentCharacterId}
             onImageClick={onImageClick}
             onDelete={onDeleteImage}
+            onSetActive={onSetActiveImage}
           />
         ) : (
           <p className="py-4 text-center text-sm text-muted-foreground">
@@ -762,6 +778,42 @@ export default function CharacterRoute() {
     enabled: !!projectId,
     staleTime: 30_000,
   });
+
+  const narrativeRoles = useQuery({
+    queryKey: ["narrativeRoles", projectId],
+    queryFn: () => listNarrativeRoles(projectId),
+    enabled: !!projectId,
+  });
+
+  const narrativeRoleCatalog = useMemo(
+    () => mergeNarrativeRoleCatalog(narrativeRoles.data ?? []),
+    [narrativeRoles.data],
+  );
+
+  const narrativeRoleLabelByCharacterId = useMemo(() => {
+    const entries = (allCharacters.data ?? []).map((character) => [
+      character.id,
+      resolveNarrativeRoleLabel(
+        typeof character.narrativeRole === "string"
+          ? character.narrativeRole
+          : null,
+        narrativeRoleCatalog,
+      ),
+    ]);
+
+    return Object.fromEntries(entries);
+  }, [allCharacters.data, narrativeRoleCatalog]);
+
+  const currentNarrativeRoleLabel = useMemo(
+    () =>
+      resolveNarrativeRoleLabel(
+        typeof character.data?.narrativeRole === "string"
+          ? character.data.narrativeRole
+          : null,
+        narrativeRoleCatalog,
+      ),
+    [character.data?.narrativeRole, narrativeRoleCatalog],
+  );
 
   const characterData = character.data;
   const characterReferences = useMemo<CharacterUsageScene[]>(() => {
@@ -855,6 +907,15 @@ export default function CharacterRoute() {
   const deleteImageConfig = deleteCharacterImageMutation();
   const deleteImageMutation = useMutation({
     ...deleteImageConfig,
+    onSuccess: () => {
+      invalidateQueriesById(queryClient, "listCharacterImages");
+    },
+  });
+
+  // Set image as active mutation using SDK
+  const setActiveImageConfig = setCharacterImageActiveMutation();
+  const setActiveImageMutation = useMutation({
+    ...setActiveImageConfig,
     onSuccess: () => {
       invalidateQueriesById(queryClient, "listCharacterImages");
     },
@@ -1007,6 +1068,12 @@ export default function CharacterRoute() {
     }
   };
 
+  const handleSetActiveImage = (image: CharacterImageFromList) => {
+    setActiveImageMutation.mutate({
+      path: { projectId, characterId, imageId: image.id },
+    });
+  };
+
   if (character.isLoading || allCharacters.isLoading) {
     return (
       <AppShell>
@@ -1064,12 +1131,11 @@ export default function CharacterRoute() {
                 <Badge tone={characterData.status}>
                   {characterData.status}
                 </Badge>
-                {typeof characterData.narrativeRole === "string" &&
-                  characterData.narrativeRole && (
-                    <span className="text-xs text-muted-foreground">
-                      · {characterData.narrativeRole}
-                    </span>
-                  )}
+                {currentNarrativeRoleLabel && (
+                  <span className="text-xs text-muted-foreground">
+                    · {currentNarrativeRoleLabel}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -1116,11 +1182,13 @@ export default function CharacterRoute() {
             characters={allCharacters.data || []}
             currentCharacterId={characterId}
             projectId={projectId}
+            narrativeRoleLabelsByCharacterId={narrativeRoleLabelByCharacterId}
             relations={characterData.relations || []}
             voiceSamples={characterData.voiceSamples || []}
             images={imagesQuery.data || []}
             imageLoading={imagesQuery.isLoading}
             onDeleteImage={handleDeleteImage}
+            onSetActiveImage={handleSetActiveImage}
             onImageClick={handleImageClick}
             relationMutation={
               relation as unknown as UseMutationResult<
@@ -1141,8 +1209,6 @@ export default function CharacterRoute() {
           images={imagesQuery.data || []}
           currentIndex={selectedImageIndex ?? 0}
           onNavigate={handleLightboxNavigate}
-          projectId={projectId}
-          characterId={characterId}
         />
       </div>
 
@@ -1195,10 +1261,13 @@ function CharacterForm({
   deleting: boolean;
 }) {
   const { t } = useTranslation("characters");
+  const [isProfileDraftOpen, setIsProfileDraftOpen] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch,
+    setValue,
   } = useForm<CharacterInput>({
     resolver: zodResolver(characterSchema),
     defaultValues: {
@@ -1218,12 +1287,53 @@ function CharacterForm({
       tagsJson: toCsv(initialData.tagsJson),
     },
   });
+  const narrativeRole = watch("narrativeRole");
+
+  const profileDraftMutation = useMutation({
+    mutationFn: (descriptionMinimal: string) =>
+      generateCharacterProfileDraft(
+        initialData.projectId,
+        initialData.id,
+        descriptionMinimal,
+      ),
+    onSuccess: (draft) => {
+      setValue("description", draft.description, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("physicalDescription", draft.physicalDescription, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("keyTraitsJson", draft.keyTraitsJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("colorPaletteJson", draft.colorPaletteJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("costumeElementsJson", draft.costumeElementsJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("personality", draft.personality, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("tagsJson", draft.tagsJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setIsProfileDraftOpen(false);
+    },
+  });
 
   const onSubmit = (data: CharacterInput) =>
     onSave({
       name: data.name,
       alias: data.alias,
-      narrativeRole: data.narrativeRole,
+      narrativeRole: data.narrativeRole || undefined,
       description: data.description,
       physicalDescription: data.physicalDescription,
       keyTraitsJson: csv(data.keyTraitsJson),
@@ -1245,9 +1355,18 @@ function CharacterForm({
         </FormField>
       </div>
 
-      <FormField label={t("fields.narrativeRole")} error={errors.narrativeRole}>
-        <Input {...register("narrativeRole")} />
-      </FormField>
+      <NarrativeRoleCombobox
+        projectId={initialData.projectId}
+        value={narrativeRole || ""}
+        onValueChange={(role) =>
+          setValue("narrativeRole", role, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
+        }
+        error={errors.narrativeRole}
+        resetKey={isProfileDraftOpen ? `${initialData.id}-profile` : undefined}
+      />
 
       <FormField label={t("fields.description")} error={errors.description}>
         <Textarea {...register("description")} rows={3} />
@@ -1298,6 +1417,13 @@ function CharacterForm({
         <Button variant="primary" disabled={saving || isSubmitting}>
           <Save size={16} /> {t("actions.saveProfile")}
         </Button>
+        <Button
+          variant="secondary"
+          onClick={() => setIsProfileDraftOpen(true)}
+          type="button"
+        >
+          <UserRoundPlus size={15} /> {t("profileDraft.open")}
+        </Button>
         <Button variant="secondary" onClick={onDuplicate} type="button">
           <ChevronRight size={15} /> {t("actions.duplicate")}
         </Button>
@@ -1318,6 +1444,16 @@ function CharacterForm({
           <Trash2 size={15} /> {t("actions.delete")}
         </Button>
       </div>
+
+      <CharacterProfileGenerateDialog
+        open={isProfileDraftOpen}
+        onOpenChange={setIsProfileDraftOpen}
+        onGenerate={(descriptionMinimal) =>
+          profileDraftMutation.mutate(descriptionMinimal)
+        }
+        isGenerating={profileDraftMutation.isPending}
+        error={profileDraftMutation.error ? String(profileDraftMutation.error) : null}
+      />
     </form>
   );
 }

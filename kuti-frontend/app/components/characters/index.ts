@@ -4,4 +4,6 @@ export { CharacterCardGrid } from "./CharacterCardGrid";
 export { CharacterImageGenerator } from "./CharacterImageGenerator";
 export { CharacterImageGallery } from "./CharacterImageGallery";
 export { CharacterRelationGraphDialog } from "./CharacterRelationGraphDialog";
+export { CharacterProfileGenerateDialog } from "./CharacterProfileGenerateDialog";
+export { NarrativeRoleCombobox } from "./NarrativeRoleCombobox";
 export { ImageLightbox } from "./ImageLightbox";

@@ -7,6 +7,7 @@ import { config, resolveModelProvider } from "../config";
 import { db } from "../db";
 import type { GenerationJobStatus, GenerationStepStatus } from "../db/generated/enums";
 import { saveCharacterImage } from "../filesystem";
+import { buildCharacterImagePrompt, selectActiveCharacterSheet } from "../manga-prompts";
 import { inngest } from "./client";
 
 // ============================================================================
@@ -21,7 +22,16 @@ export const generateImageFunction = inngest.createFunction(
     triggers: [{ event: "kuti/generate-image" }],
   },
   async ({ event, step }) => {
-    const { projectId, characterId, jobId, strategy, style, imageCount, modelKey } = event.data;
+    const {
+      projectId,
+      characterId,
+      jobId,
+      kind,
+      strategy,
+      style,
+      imageCount,
+      modelKey,
+    } = event.data;
 
     // ============================================================================
     // Step 1: Récupérer les informations du job et du personnage
@@ -40,10 +50,17 @@ export const generateImageFunction = inngest.createFunction(
       if (!character) throw new Error(`Character ${characterId} not found`);
       if (!project) throw new Error(`Project ${projectId} not found`);
 
-      return { job, character, project };
+      const activeCharacterSheet =
+        selectActiveCharacterSheet(character.images);
+
+      return { job, character, project, activeCharacterSheet };
     });
 
-    const { job, character, project } = context;
+    const { job, character, project, activeCharacterSheet } = context;
+    void job;
+    void project;
+
+    const totalCount = kind === "character_sheet" ? 1 : Math.min(Math.max(imageCount || 4, 1), 12);
 
     // ============================================================================
     // Step 2: Mettre à jour le statut du job à "running"
@@ -62,21 +79,35 @@ export const generateImageFunction = inngest.createFunction(
     // Step 3: Créer les steps pour chaque image à générer
     // ============================================================================
     const steps: Array<{ id: string; index: number }> = [];
-    const count = imageCount || 4;
+    const promptPlans = Array.from({ length: totalCount }, (_, index) => ({
+      index,
+      prompt: buildCharacterImagePrompt({
+        character,
+        kind,
+        strategy,
+        style,
+        activeCharacterSheet,
+        variationIndex: index,
+        totalCount,
+      }),
+    }));
 
-    for (let i = 0; i < count; i++) {
-      const stepRecord = await step.run(`create-step-${i}`, async () => {
+    for (const plan of promptPlans) {
+      const stepRecord = await step.run(`create-step-${plan.index}`, async () => {
         return await db.generationJobStep.create({
           data: {
             jobId,
-            orderIndex: i,
-            title: `Variation ${i + 1}`,
+            orderIndex: plan.index,
+            title:
+              kind === "character_sheet"
+                ? "Character sheet"
+                : `Variation ${plan.index + 1}`,
             status: "pending" as GenerationStepStatus,
-            prompt: buildCharacterPrompt(character, strategy, style),
+            prompt: plan.prompt,
           },
         });
       });
-      steps.push({ id: stepRecord.id, index: i });
+      steps.push({ id: stepRecord.id, index: plan.index });
     }
 
     // ============================================================================
@@ -85,15 +116,26 @@ export const generateImageFunction = inngest.createFunction(
     const provider = resolveModelProvider(modelKey, "image");
     const generatedImages: Array<{
       stepId: string;
+      prompt: string;
       filePath: string;
       publicUrl: string;
       fileName: string;
       fileSize: number;
       variationIndex: number;
+      sourceImageId: string | null;
     }> = [];
 
     for (const { id: stepId, index } of steps) {
-      const result = await step.run(`generate-image-${index}`, async () => {
+      const result = await step.run(`generate-image-${index}`, async (): Promise<{
+        stepId: string;
+        prompt: string;
+        filePath: string;
+        publicUrl: string;
+        fileName: string;
+        fileSize: number;
+        variationIndex: number;
+        sourceImageId: string | null;
+      }> => {
         // Mettre à jour le step à "running"
         await db.generationJobStep.update({
           where: { id: stepId },
@@ -102,13 +144,26 @@ export const generateImageFunction = inngest.createFunction(
 
         try {
           // Construire le prompt
-          const prompt = buildCharacterPrompt(character, strategy, style);
+          const prompt = buildCharacterImagePrompt({
+            character,
+            kind,
+            strategy,
+            style,
+            activeCharacterSheet,
+            variationIndex: index,
+            totalCount,
+          });
 
           // Appeler l'API de génération d'images
           const imageData = await callImageGenerationAPI(provider, prompt, style);
 
           // Sauvegarder l'image
-          const saved = await saveCharacterImage(projectId, characterId, imageData, strategy, style, index);
+          const saved = await saveCharacterImage(projectId, characterId, imageData, {
+            kind,
+            strategy: kind === "character_sheet" ? "sheet" : strategy,
+            style,
+            variationIndex: kind === "character_sheet" ? undefined : index,
+          });
 
           // Mettre à jour le step à "ready"
           await db.generationJobStep.update({
@@ -123,11 +178,16 @@ export const generateImageFunction = inngest.createFunction(
 
           return {
             stepId,
+            prompt,
             filePath: saved.filePath,
             publicUrl: saved.publicUrl,
             fileName: saved.fileName,
             fileSize: saved.fileSize,
             variationIndex: index,
+            sourceImageId:
+              kind === "free_image" && activeCharacterSheet
+                ? activeCharacterSheet.id ?? null
+                : null,
           };
         } catch (error) {
           // Mettre à jour le step à "failed"
@@ -146,7 +206,7 @@ export const generateImageFunction = inngest.createFunction(
       generatedImages.push(result);
 
       // Mettre à jour la progression
-      const progress = 10 + Math.floor(((index + 1) / count) * 70);
+      const progress = 10 + Math.floor(((index + 1) / totalCount) * 70);
       await step.run(`update-progress-${index}`, async () => {
         await db.generationJob.update({
           where: { id: jobId },
@@ -159,23 +219,42 @@ export const generateImageFunction = inngest.createFunction(
     // Step 5: Créer les records CharacterImage
     // ============================================================================
     await step.run("create-character-images", async () => {
-      for (const img of generatedImages) {
-        await db.characterImage.create({
-          data: {
-            projectId,
-            characterId,
-            filePath: img.filePath,
-            publicUrl: img.publicUrl,
-            fileName: img.fileName,
-            fileSize: img.fileSize,
-            mimeType: "image/png",
-            prompt: buildCharacterPrompt(character, strategy, style),
-            strategy,
-            style,
-            variationIndex: img.variationIndex,
-          },
-        });
-      }
+      await db.$transaction(async (tx) => {
+        for (const img of generatedImages) {
+          const created = await tx.characterImage.create({
+            data: {
+              projectId,
+              characterId,
+              kind,
+              isActive: true,
+              sourceImageId: img.sourceImageId,
+              boardPanelId: null,
+              filePath: img.filePath,
+              publicUrl: img.publicUrl,
+              fileName: img.fileName,
+              fileSize: img.fileSize,
+              mimeType: "image/png",
+              prompt: img.prompt,
+              strategy: kind === "character_sheet" ? "sheet" : strategy,
+              style,
+              variationIndex: kind === "character_sheet" ? null : img.variationIndex,
+            },
+          });
+
+          if (kind === "character_sheet") {
+            await tx.characterImage.updateMany({
+              where: {
+                projectId,
+                characterId,
+                kind: "character_sheet",
+                isActive: true,
+                id: { not: created.id },
+              },
+              data: { isActive: false },
+            });
+          }
+        }
+      });
     });
 
     // ============================================================================
@@ -208,7 +287,10 @@ export const generateImageFunction = inngest.createFunction(
             status: "ready" as GenerationJobStatus,
             progress: 100,
             completedAt: new Date(),
-            summary: `Generated ${successSteps.length}/${count} images`,
+            summary:
+              kind === "character_sheet"
+                ? "Generated character sheet"
+                : `Generated ${successSteps.length}/${totalCount} free images`,
           },
         });
       }
@@ -230,83 +312,6 @@ export const generateImageFunction = inngest.createFunction(
 // ============================================================================
 // Helpers
 // ============================================================================
-
-function buildCharacterPrompt(
-  character: {
-    name: string;
-    alias?: string | null;
-    description: string;
-    physicalDescription: string;
-    personality: string;
-    colorPaletteJson: unknown;
-    costumeElementsJson: unknown;
-  },
-  strategy: string,
-  style?: string,
-): string {
-  const parts: string[] = [];
-
-  // Nom et identité
-  parts.push(`Character: ${character.name}`);
-  if (character.alias) {
-    parts.push(`Also known as: ${character.alias}`);
-  }
-
-  // Description
-  if (character.description) {
-    parts.push(`Description: ${character.description}`);
-  }
-
-  // Apparence physique
-  if (character.physicalDescription) {
-    parts.push(`Physical appearance: ${character.physicalDescription}`);
-  }
-
-  // Personnalité
-  if (character.personality) {
-    parts.push(`Personality: ${character.personality}`);
-  }
-
-  // Palette de couleurs
-  const colors = character.colorPaletteJson as string[];
-  if (colors && colors.length > 0) {
-    parts.push(`Color palette: ${colors.join(", ")}`);
-  }
-
-  // Éléments de costume
-  const costumeElements = character.costumeElementsJson as string[];
-  if (costumeElements && costumeElements.length > 0) {
-    parts.push(`Costume elements: ${costumeElements.join(", ")}`);
-  }
-
-  // Style spécifique
-  if (style) {
-    parts.push(`Style: ${style}`);
-  }
-
-  // Instructions selon la stratégie
-  switch (strategy) {
-    case "portrait":
-      parts.push("Generate a character portrait, head and shoulders, facing forward.");
-      break;
-    case "full_body":
-      parts.push("Generate a full body character illustration, standing pose.");
-      break;
-    case "expression":
-      parts.push("Generate an expressive close-up of the character face showing emotion.");
-      break;
-    case "action":
-      parts.push("Generate the character in an action pose, dynamic composition.");
-      break;
-    default:
-      parts.push("Generate a detailed character illustration.");
-  }
-
-  // Style manga
-  parts.push("Manga/anime art style, detailed, high quality.");
-
-  return parts.join("\n");
-}
 
 async function callImageGenerationAPI(
   provider: {

@@ -4,17 +4,40 @@ Plateforme de production narrative local-first pour créer des œuvres de type b
 
 ## Vue d'ensemble
 
-Kuti Studio centralise l'écriture, la conception des personnages, l'organisation des scènes, la génération d'images et la préparation des exports de publication.
+Kuti Studio est une plateforme local-first de production narrative construite autour d'un flux unique:
+`projet -> personnages -> images de personnages -> histoire -> scènes -> planches manga -> export`
+
+Tout le reste de l'application sert ce parcours: stabiliser le projet, verrouiller la cohérence visuelle des personnages, structurer l'histoire, puis transformer chaque scène en planches manga lisibles et cohérentes.
+
+## Flux principal
+
+1. L'utilisateur crée un projet et l'ouvre.
+2. Il crée les personnages du projet.
+3. Il génère les images de référence des personnages.
+4. Il va dans `Histoire`.
+5. Il structure son récit en tomes, chapitres et scènes.
+6. La scène est l'unité la plus détaillée. Elle doit en général tenir sur une page de style manga, sauf si l'utilisateur demande plus.
+7. Dans l'éditeur de scène, des facilitateurs d'autocomplete permettent de référencer des personnages, des scènes, des fichiers et d'autres entités du projet.
+8. À partir d'une scène validée, il peut générer une planche manga.
+9. Si un personnage référencé n'a pas encore de `character design sheet`, le système en génère une avant de lancer la planche.
+10. Le générateur analyse le script de scène, détecte les références et compose un prompt structuré qui réinjecte les character sheets pour maintenir une cohérence visuelle forte.
+11. Les bulles de dialogue sont intégrées au rendu, car il s'agit d'un manga.
+12. Une scène peut produire une ou plusieurs planches manga.
+13. Les planches d'un chapitre sont alignées selon l'ordre des scènes, puis celles d'un tome selon l'ordre des chapitres.
+
+Une planche manga est la sortie graphique directe d'une scène: une page, deux pages ou plus. Le script est analysé, les références sont détectées, les character sheets et les éléments de contexte sont injectés dans un prompt structuré, puis les bulles de dialogue sont conservées dans le rendu final.
+
+Le tout repose sur la cohérence des personnages et la continuité des scènes.
 
 ### Fonctionnalités principales
 
 - **Gestion de projets** - Création, organisation, archivage de projets narratifs
-- **Fiches personnages** - Création de personnages avec médias, relations et voix
+- **Personnages** - Création, rôles narratifs, character sheets et galerie d'images
 - **Storyline structurée** - Organisation en tomes, chapitres et scènes
-- **Système de références** - Mentions typées `@chara:`, `@environment:` dans le texte
-- **Génération IA** - Génération d'images de personnages et de planches manga
+- **Références de scène** - Autocomplete et mentions typées `@chara:`, `@environment:`
+- **Génération IA** - Character sheets, images de personnages et planches manga
 - **Assets Library** - Import, archivage et gestion des médias
-- **Warnings de cohérence** - Détection d'incohérences narrative
+- **Warnings de cohérence** - Détection d'incohérences narratives
 - **Versioning** - Historique et branches de versions
 - **Exports** - Export travail (JSON/ZIP) et publication (PDF/CBZ)
 

@@ -69,6 +69,15 @@ export const updateChapterBodySchema = z.object({
   orderIndex: z.number().optional(),
 });
 
+export const chapterAutoGenerateBodySchema = z.object({
+  chapterSummary: z.string().trim().min(1000),
+  sceneCount: z.number().int().min(1).max(8),
+});
+
+export const chapterAutoGenerateResponseSchema = z.object({
+  jobId: z.string(),
+});
+
 // Scene
 export const sceneResponseSchema = z.object({
   id: z.string(),
@@ -85,6 +94,7 @@ export const sceneResponseSchema = z.object({
   charactersJson: z.array(z.string()),
   tagsJson: z.array(z.string()),
   metadataJson: sceneMetadataSchema,
+  targetPageCount: z.number().nullable(),
   status: storyStatusSchema,
   orderIndex: z.number(),
   createdAt: z.iso.datetime(),
@@ -103,6 +113,7 @@ export const createSceneBodySchema = z.object({
   charactersJson: z.array(z.string()).optional(),
   tagsJson: z.array(z.string()).optional(),
   metadataJson: sceneMetadataSchema.optional(),
+  targetPageCount: z.number().int().min(1).max(10).nullable().optional(),
   status: storyStatusSchema.optional(),
   orderIndex: z.number().optional(),
 });
@@ -119,6 +130,7 @@ export const updateSceneBodySchema = z.object({
   charactersJson: z.array(z.string()).optional(),
   tagsJson: z.array(z.string()).optional(),
   metadataJson: sceneMetadataSchema.optional(),
+  targetPageCount: z.number().int().min(1).max(10).nullable().optional(),
   status: storyStatusSchema.optional(),
   orderIndex: z.number().optional(),
 });
@@ -187,6 +199,33 @@ export const completeStoryFieldResponseSchema = z.object({
 // Alias pour compatibilité
 export const StorySummaryResponse = storySummaryResponseSchema;
 
+// Chapter manga pages preview
+export const chapterMangaPageResponseSchema = z.object({
+  id: z.string(),
+  projectId: z.string(),
+  sceneId: z.string(),
+  sceneTitle: z.string(),
+  sceneOrderIndex: z.number(),
+  tomeId: z.string(),
+  chapterId: z.string(),
+  jobId: z.string(),
+  boardId: z.string(),
+  panelId: z.string(),
+  pageNumber: z.number(),
+  label: z.string(),
+  status: z.string(),
+  imageUrl: z.string().nullable(),
+  caption: z.string().nullable(),
+  prompt: z.string().nullable(),
+  metadataJson: z.record(z.string(), z.unknown()),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
+export const chapterMangaPagesResponseSchema = z.array(chapterMangaPageResponseSchema);
+
+export type ChapterMangaPageResponse = z.infer<typeof chapterMangaPageResponseSchema>;
+
 // List types
 export type TomeResponse = z.infer<typeof tomeResponseSchema>;
 export type ChapterResponse = z.infer<typeof chapterResponseSchema>;
@@ -195,6 +234,8 @@ export type CreateTomeBody = z.infer<typeof createTomeBodySchema>;
 export type UpdateTomeBody = z.infer<typeof updateTomeBodySchema>;
 export type CreateChapterBody = z.infer<typeof createChapterBodySchema>;
 export type UpdateChapterBody = z.infer<typeof updateChapterBodySchema>;
+export type ChapterAutoGenerateBody = z.infer<typeof chapterAutoGenerateBodySchema>;
+export type ChapterAutoGenerateResponse = z.infer<typeof chapterAutoGenerateResponseSchema>;
 export type CreateSceneBody = z.infer<typeof createSceneBodySchema>;
 export type UpdateSceneBody = z.infer<typeof updateSceneBodySchema>;
 export type CompleteStoryFieldBody = z.infer<typeof completeStoryFieldBodySchema>;

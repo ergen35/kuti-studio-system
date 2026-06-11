@@ -126,6 +126,10 @@ export const characterImageResponseSchema = z.object({
   id: z.string(),
   projectId: z.string(),
   characterId: z.string(),
+  kind: z.enum(["character_sheet", "free_image"]),
+  isActive: z.boolean(),
+  sourceImageId: z.string().nullable(),
+  boardPanelId: z.string().nullable(),
   filePath: z.string(),
   publicUrl: z.string(),
   fileName: z.string(),
@@ -174,6 +178,7 @@ export type CreateVoiceSampleBody = z.infer<typeof createVoiceSampleBodySchema>;
 
 // Generate image
 export const generateCharacterImageQuerySchema = z.object({
+  kind: z.enum(["character_sheet", "free_image"]).default("character_sheet"),
   strategy: z.string().default("portrait"),
   style: z.string().default("realistic"),
   imageCount: z.coerce.number().min(1).max(4).default(1),
@@ -181,6 +186,27 @@ export const generateCharacterImageQuerySchema = z.object({
 });
 
 export type GenerateCharacterImageQuery = z.infer<typeof generateCharacterImageQuerySchema>;
+
+export const generateCharacterProfileBodySchema = z.object({
+  descriptionMinimal: z.string().min(1).max(2000),
+  modelKey: z.string().optional(),
+});
+
+export type GenerateCharacterProfileBody = z.infer<typeof generateCharacterProfileBodySchema>;
+
+export const generatedCharacterDraftResponseSchema = z.object({
+  description: z.string(),
+  physicalDescription: z.string(),
+  keyTraitsJson: z.array(z.string()),
+  colorPaletteJson: z.array(z.string()),
+  costumeElementsJson: z.array(z.string()),
+  personality: z.string(),
+  tagsJson: z.array(z.string()),
+  sourceModelKey: z.string().nullable(),
+  usedFallback: z.boolean(),
+});
+
+export type GeneratedCharacterDraftResponse = z.infer<typeof generatedCharacterDraftResponseSchema>;
 
 // Character detail (with relations)
 export const characterDetailResponseSchema = characterResponseSchema.extend({

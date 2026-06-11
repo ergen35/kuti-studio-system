@@ -56,6 +56,7 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   Project: 'Project',
+  NarrativeRole: 'NarrativeRole',
   Character: 'Character',
   CharacterRelation: 'CharacterRelation',
   VoiceSample: 'VoiceSample',
@@ -173,6 +174,18 @@ export const ProjectScalarFieldEnum = {
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
+export const NarrativeRoleScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  code: 'code',
+  label: 'label',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NarrativeRoleScalarFieldEnum = (typeof NarrativeRoleScalarFieldEnum)[keyof typeof NarrativeRoleScalarFieldEnum]
+
+
 export const CharacterScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -230,6 +243,9 @@ export const CharacterImageScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   characterId: 'characterId',
+  kind: 'kind',
+  isActive: 'isActive',
+  sourceImageId: 'sourceImageId',
   boardPanelId: 'boardPanelId',
   filePath: 'filePath',
   publicUrl: 'publicUrl',
@@ -292,6 +308,7 @@ export const SceneScalarFieldEnum = {
   charactersJson: 'charactersJson',
   tagsJson: 'tagsJson',
   metadataJson: 'metadataJson',
+  targetPageCount: 'targetPageCount',
   status: 'status',
   orderIndex: 'orderIndex',
   createdAt: 'createdAt',

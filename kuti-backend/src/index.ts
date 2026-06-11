@@ -19,6 +19,7 @@ import { exportsModule } from "@modules/exports";
 import { generationModule } from "@modules/generation";
 import { healthModule } from "@modules/health";
 import { inngestModule } from "@modules/inngest";
+import { narrativeRolesModule } from "@modules/narrative-roles";
 import { projectsModule } from "@modules/projects";
 import { sceneGenerationModule } from "@modules/scene-generation";
 import { storyModule } from "@modules/story";
@@ -88,6 +89,7 @@ export const app = new Elysia({
   .use(authModule)
   .use(healthModule)
   .use(projectsModule)
+  .use(narrativeRolesModule)
   .use(charactersModule)
   .use(storyModule)
   .use(generationModule)

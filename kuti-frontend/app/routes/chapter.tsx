@@ -1,61 +1,68 @@
-import { useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams, Link, useNavigate } from "react-router";
 import { clsx } from "clsx";
 import {
+  AlertTriangle,
   ArrowLeft,
   BookOpen,
+  Check,
+  ChevronRight,
   FileText,
   Film,
-  ChevronRight,
-  Pencil,
-  X,
-  Check,
-  Plus,
+  Image as ImageIcon,
+  Loader2,
   MapPin,
+  Pencil,
+  Plus,
+  Sparkles,
+  X,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate, useParams } from "react-router";
 import { z } from "zod";
-import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
+import { ChapterMangaPreview, StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
+import { ReorderControls } from "~/components/story/ReorderControls";
 import {
   Badge,
   Button,
   EmptyState,
   ErrorState,
+  Field,
   LoadingState,
   Panel,
   SectionTitle,
-  Field,
 } from "~/components/ui";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import { apiErrorMessage } from "~/lib/errors";
-import { invalidateWorkspace } from "~/lib/query";
-import { StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
-import { ReorderControls } from "~/components/story/ReorderControls";
-import {
-  createSceneMutation,
-  getStorySummaryOptions,
-  updateChapterMutation,
-  updateSceneMutation,
-} from "~/lib/backend/@tanstack/react-query.gen";
-import { getOrderSwap } from "~/lib/story-order";
+import { useTranslation } from "~/hooks/useTranslation";
 import type {
+  AutoGenerateChapterScenesData,
   CreateSceneData,
   GetStorySummaryResponse,
   Options,
   UpdateChapterData,
   UpdateSceneData,
 } from "~/lib/backend";
+import {
+  autoGenerateChapterScenesMutation,
+  createSceneMutation,
+  getStorySummaryOptions,
+  updateChapterMutation,
+  updateSceneMutation,
+} from "~/lib/backend/@tanstack/react-query.gen";
+import { apiErrorMessage } from "~/lib/errors";
+import { invalidateWorkspace } from "~/lib/query";
+import { getOrderSwap } from "~/lib/story-order";
 
 const editChapterSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -71,6 +78,11 @@ const createSceneSchema = z.object({
 });
 
 type CreateSceneInput = z.infer<typeof createSceneSchema>;
+
+type AutoGenerateChapterInput = {
+  chapterSummary: string;
+  sceneCount: number;
+};
 
 // Create Scene Modal
 interface CreateSceneModalProps {
@@ -156,6 +168,235 @@ function CreateSceneModal({
               {isLoading ? t("actions.creating") : t("actions.create")}
             </Button>
           </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface AutoGenerateChapterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: AutoGenerateChapterInput) => void;
+  isLoading: boolean;
+  errorMessage?: string | null;
+}
+
+function AutoGenerateChapterModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+  errorMessage,
+}: AutoGenerateChapterModalProps) {
+  const { t } = useTranslation("story");
+  const schema = useMemo(
+    () =>
+      z.object({
+        chapterSummary: z
+          .string()
+          .trim()
+          .min(1000, t("chapter.autoGenerate.errors.summary")),
+        sceneCount: z
+          .number()
+          .int(t("chapter.autoGenerate.errors.sceneCount"))
+          .min(1, t("chapter.autoGenerate.errors.sceneCount"))
+          .max(8, t("chapter.autoGenerate.errors.sceneCount")),
+      }),
+    [t],
+  );
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<AutoGenerateChapterInput>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      chapterSummary: "",
+      sceneCount: 4,
+    },
+  });
+
+  const chapterSummary = watch("chapterSummary") || "";
+  const sceneCount = watch("sceneCount");
+  const summaryLength = chapterSummary.trim().length;
+  const canSubmit =
+    summaryLength >= 1000 &&
+    Number.isInteger(sceneCount) &&
+    sceneCount >= 1 &&
+    sceneCount <= 8 &&
+    !isLoading;
+
+  const handleFormSubmit = (data: AutoGenerateChapterInput) => {
+    onSubmit(data);
+    reset({ chapterSummary: "", sceneCount: 4 });
+  };
+
+  const handleClose = () => {
+    reset({ chapterSummary: "", sceneCount: 4 });
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="w-full overflow-hidden p-0">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="flex max-h-[92vh] flex-col"
+        >
+          <DialogHeader className="border-b border-border bg-secondary/20 px-6 py-5">
+            <div className="flex items-start gap-3">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                <Sparkles size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-xl">
+                  {t("chapter.autoGenerate.title")}
+                </DialogTitle>
+                <DialogDescription className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  {t("chapter.autoGenerate.description")}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="grid flex-1 gap-6 overflow-y-auto px-6 py-5">
+            <div className="flex flex-col gap-4">
+              <Field label={t("chapter.autoGenerate.summaryLabel")}>
+                <Textarea
+                  {...register("chapterSummary")}
+                  autoFocus
+                  rows={18}
+                  placeholder={t("chapter.autoGenerate.summaryPlaceholder")}
+                  disabled={isLoading}
+                  className="min-h-80 resize-y leading-6"
+                />
+              </Field>
+              {errors.chapterSummary ? (
+                <span className="text-xs text-danger">
+                  {errors.chapterSummary.message}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  {t("chapter.autoGenerate.summaryHint")}
+                </span>
+              )}
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="rounded-full border border-border bg-secondary/40 px-2.5 py-1">
+                  {t("chapter.autoGenerate.summaryCount", {
+                    count: summaryLength,
+                  })}
+                </span>
+                <span className="rounded-full border border-border bg-secondary/40 px-2.5 py-1">
+                  {t("chapter.autoGenerate.referencesHint")}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="rounded-2xl border border-warning/30 bg-warning/10 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={18} className="mt-0.5 text-warning" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {t("chapter.autoGenerate.warningTitle")}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {t("chapter.autoGenerate.warning")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Field label={t("chapter.autoGenerate.sceneCountLabel")}>
+                <Input
+                  {...register("sceneCount", { valueAsNumber: true })}
+                  type="number"
+                  min={1}
+                  max={8}
+                  step={1}
+                  disabled={isLoading}
+                  className="w-28"
+                />
+              </Field>
+              {errors.sceneCount ? (
+                <span className="text-xs text-danger">
+                  {errors.sceneCount.message}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  {t("chapter.autoGenerate.sceneCountHint")}
+                </span>
+              )}
+
+              <div className="rounded-2xl border border-border bg-secondary/30 p-4">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t("chapter.autoGenerate.referencesTitle")}
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("chapter.autoGenerate.referencesBody")}
+                </p>
+                <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+                  <li>@chara:slug</li>
+                  <li>@file:slug</li>
+                  <li>@scene:slug</li>
+                  <li>@chapter:slug</li>
+                  <li>@tome:slug</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {errorMessage ? (
+            <div className="mx-6 mb-4 rounded-2xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+              {errorMessage}
+            </div>
+          ) : null}
+
+          <div className="border-t border-border bg-muted/35 px-6 py-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <AlertTriangle size={18} className="mt-0.5 text-warning" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {t("chapter.autoGenerate.footerTitle")}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {t("chapter.autoGenerate.footerDescription")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={handleClose}
+                  disabled={isLoading}
+                >
+                  {t("chapter.autoGenerate.footerCancel")}
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="gap-2"
+                >
+                  {isLoading ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={16} />
+                  )}
+                  {isLoading
+                    ? t("chapter.autoGenerate.footerSubmitting")
+                    : t("chapter.autoGenerate.footerSubmit")}
+                </Button>
+              </div>
+            </div>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
@@ -277,6 +518,7 @@ export default function ChapterRoute() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAutoGenerateModalOpen, setIsAutoGenerateModalOpen] = useState(false);
 
   // Fetch story data
   const story = useQuery({
@@ -357,6 +599,14 @@ export default function ChapterRoute() {
       setIsCreateModalOpen(false);
       // Navigate to scene editor
       navigate(`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`);
+    },
+  });
+
+  const autoGenerateChapterMut = useMutation({
+    ...autoGenerateChapterScenesMutation(),
+    onSuccess: () => {
+      invalidateWorkspace(projectId);
+      handleCloseAutoGenerateModal();
     },
   });
 
@@ -448,6 +698,21 @@ export default function ChapterRoute() {
         orderIndex: maxOrderIndex + 1,
       } as CreateSceneData["body"],
     });
+  };
+
+  const handleAutoGenerateChapter = (data: AutoGenerateChapterInput) => {
+    autoGenerateChapterMut.mutate({
+      path: { projectId, chapterId },
+      body: {
+        chapterSummary: data.chapterSummary,
+        sceneCount: data.sceneCount,
+      },
+    } as unknown as Options<AutoGenerateChapterScenesData>);
+  };
+
+  const handleCloseAutoGenerateModal = () => {
+    autoGenerateChapterMut.reset();
+    setIsAutoGenerateModalOpen(false);
   };
 
   if (story.isLoading) {
@@ -650,15 +915,26 @@ export default function ChapterRoute() {
               title={t("chapter.scenes")}
               meta={`${scenes.length}`}
               actions={
-                <Button
-                  variant="primary"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="h-8 gap-1.5 px-2.5"
-                  title={t("scenes.add")}
-                >
-                  <Plus size={18} />
-                  {t("actions.addScene")}
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setIsAutoGenerateModalOpen(true)}
+                    className="h-8 gap-1.5 px-2.5"
+                    title={t("chapter.autoGenerate.button")}
+                  >
+                    <Sparkles size={16} />
+                    {t("chapter.autoGenerate.button")}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="h-8 gap-1.5 px-2.5"
+                    title={t("scenes.add")}
+                  >
+                    <Plus size={18} />
+                    {t("actions.addScene")}
+                  </Button>
+                </div>
               }
             />
 
@@ -718,6 +994,14 @@ export default function ChapterRoute() {
               )}
             </div>
           </Panel>
+
+          {/* Manga Preview */}
+          <Panel>
+            <SectionTitle title={t("chapterPreview.title")} />
+            <div className="mt-3">
+              <ChapterMangaPreview projectId={projectId} chapterId={chapterId} />
+            </div>
+          </Panel>
         </div>
 
         {/* Side panel */}
@@ -743,6 +1027,18 @@ export default function ChapterRoute() {
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateScene}
         isLoading={createSceneMut.isPending}
+      />
+
+      <AutoGenerateChapterModal
+        isOpen={isAutoGenerateModalOpen}
+        onClose={handleCloseAutoGenerateModal}
+        onSubmit={handleAutoGenerateChapter}
+        isLoading={autoGenerateChapterMut.isPending}
+        errorMessage={
+          autoGenerateChapterMut.error
+            ? apiErrorMessage(autoGenerateChapterMut.error)
+            : null
+        }
       />
     </AppShell>
   );

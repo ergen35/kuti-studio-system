@@ -1,15 +1,13 @@
 import { useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { ListCharacterImagesResponse } from "~/lib/backend";
 import { Button } from "~/components/ui";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Badge } from "~/components/ui/badge";
 import { useTranslation } from "~/hooks/useTranslation";
 import {
   characterImageUrlFromData,
@@ -23,8 +21,6 @@ interface ImageLightboxProps {
   images?: ListCharacterImagesResponse[number][];
   currentIndex?: number;
   onNavigate?: (index: number) => void;
-  projectId: string;
-  characterId: string;
 }
 
 export function ImageLightbox({
@@ -34,8 +30,6 @@ export function ImageLightbox({
   images = [],
   currentIndex = 0,
   onNavigate,
-  projectId,
-  characterId,
 }: ImageLightboxProps) {
   const { t } = useTranslation("characters");
   // Handle keyboard navigation
@@ -73,37 +67,6 @@ export function ImageLightbox({
   const getImageUrl = (img: CharacterImageWithUrl) =>
     characterImageUrlFromData(img);
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Download image
-  const handleDownload = async () => {
-    if (!image) return;
-
-    try {
-      const response = await fetch(getImageUrl(image));
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = image.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Failed to download image:", error);
-    }
-  };
-
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < images.length - 1;
 
@@ -114,117 +77,67 @@ export function ImageLightbox({
     >
       {image && (
         <DialogContent
-          className="max-h-[92vh] max-w-[min(96vw,1200px)] overflow-hidden bg-ink text-white"
+          className="grid h-[calc(100vh-1rem)] w-[calc(100vw-1rem)] max-w-none gap-0 overflow-hidden rounded-none border border-white/10 bg-zinc-950 p-0 text-white shadow-2xl sm:h-[calc(100vh-1.5rem)] sm:w-[calc(100vw-1.5rem)] sm:rounded-3xl lg:h-[calc(100vh-0.5rem)] lg:w-[calc(100vw-0.5rem)] xl:h-[calc(100vh-0.25rem)] xl:w-[calc(100vw-0.25rem)]"
           showCloseButton={false}
         >
           <DialogHeader className="sr-only">
             <DialogTitle>{t("generation.lightbox.title")}</DialogTitle>
-            <DialogDescription>
-              {t("generation.lightbox.description")}
-            </DialogDescription>
           </DialogHeader>
 
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-            className="absolute top-4 right-4 text-white hover:bg-white/10"
-            title={t("generation.lightbox.close")}
-          >
-            <X />
-          </Button>
+          <div className="relative flex h-full min-h-0 items-center justify-center bg-black">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.05),_transparent_55%)]" />
 
-          {/* Navigation - Previous */}
-          {hasPrev && onNavigate && (
             <Button
               type="button"
               variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNavigate(currentIndex - 1);
-              }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/10"
-              title={t("generation.lightbox.previous")}
+              onClick={onClose}
+              className="absolute right-3 top-3 z-20 rounded-full border border-white/10 bg-black/45 text-white backdrop-blur-sm hover:bg-black/65 sm:right-4 sm:top-4"
+              title={t("generation.lightbox.close")}
             >
-              <ChevronLeft />
+              <X />
             </Button>
-          )}
 
-          {/* Navigation - Next */}
-          {hasNext && onNavigate && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNavigate(currentIndex + 1);
-              }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/10"
-              title={t("generation.lightbox.next")}
-            >
-              <ChevronRight />
-            </Button>
-          )}
+            {hasPrev && onNavigate && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigate(currentIndex - 1);
+                }}
+                className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/10 bg-black/45 text-white backdrop-blur-sm hover:bg-black/65 sm:left-4"
+                title={t("generation.lightbox.previous")}
+              >
+                <ChevronLeft />
+              </Button>
+            )}
 
-          <div className="flex max-h-[86vh] flex-col items-center">
+            {hasNext && onNavigate && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigate(currentIndex + 1);
+                }}
+                className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/10 bg-black/45 text-white backdrop-blur-sm hover:bg-black/65 sm:right-4"
+                title={t("generation.lightbox.next")}
+              >
+                <ChevronRight />
+              </Button>
+            )}
+
             <img
               src={getImageUrl(image)}
               alt={image.fileName}
-              className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
+              className="relative z-10 h-full w-full max-h-full max-w-full object-contain p-1 sm:p-2 lg:p-1"
             />
 
-            {/* Info panel */}
-            <div className="mt-4 max-w-2xl px-4 text-center">
-              <p className="text-sm text-white/60 mb-2">
-                {formatDate(image.createdAt)}
-              </p>
-
-              {(!!image.strategy || !!image.style) && (
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  {!!image.strategy && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-white/10 text-white"
-                    >
-                      {String(image.strategy)}
-                    </Badge>
-                  )}
-                  {!!image.style && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-white/10 text-white"
-                    >
-                      {String(image.style)}
-                    </Badge>
-                  )}
-                </div>
-              )}
-
-              {image.prompt && (
-                <p className="text-sm text-white/80 line-clamp-3">
-                  {image.prompt}
-                </p>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={handleDownload}
-                  className="text-white hover:bg-white/10"
-                >
-                  <Download />
-                  {t("generation.download")}
-                </Button>
-
-                {images.length > 1 && (
-                  <span className="text-sm text-white/60">
-                    {currentIndex + 1} / {images.length}
-                  </span>
-                )}
-              </div>
-            </div>
+            {images.length > 1 && (
+              <span className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs text-white/80 backdrop-blur-sm">
+                {currentIndex + 1} / {images.length}
+              </span>
+            )}
           </div>
         </DialogContent>
       )}

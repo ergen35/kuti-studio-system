@@ -273,6 +273,13 @@ export type IntWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntFilter<$PrismaModel>
 }
 
+export type EnumCharacterImageKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.CharacterImageKind | Prisma.EnumCharacterImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCharacterImageKindFilter<$PrismaModel> | $Enums.CharacterImageKind
+}
+
 export type IntNullableFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -282,6 +289,16 @@ export type IntNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
+export type EnumCharacterImageKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CharacterImageKind | Prisma.EnumCharacterImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCharacterImageKindWithAggregatesFilter<$PrismaModel> | $Enums.CharacterImageKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCharacterImageKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCharacterImageKindFilter<$PrismaModel>
 }
 
 export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -883,6 +900,23 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type NestedEnumCharacterImageKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.CharacterImageKind | Prisma.EnumCharacterImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCharacterImageKindFilter<$PrismaModel> | $Enums.CharacterImageKind
+}
+
+export type NestedEnumCharacterImageKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CharacterImageKind | Prisma.EnumCharacterImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CharacterImageKind[] | Prisma.ListEnumCharacterImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCharacterImageKindWithAggregatesFilter<$PrismaModel> | $Enums.CharacterImageKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCharacterImageKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCharacterImageKindFilter<$PrismaModel>
 }
 
 export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {

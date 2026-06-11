@@ -28,6 +28,14 @@ export const CharacterStatus = {
 export type CharacterStatus = (typeof CharacterStatus)[keyof typeof CharacterStatus]
 
 
+export const CharacterImageKind = {
+  character_sheet: 'character_sheet',
+  free_image: 'free_image'
+} as const
+
+export type CharacterImageKind = (typeof CharacterImageKind)[keyof typeof CharacterImageKind]
+
+
 export const StoryStatus = {
   active: 'active',
   draft: 'draft',

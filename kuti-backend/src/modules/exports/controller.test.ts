@@ -66,6 +66,9 @@ const projectFindUnique = createAsyncSpy<[unknown], { id: string } | null>();
 const exportRecordCreate = createAsyncSpy<[any], any>();
 const sendExportProjectEvent = createAsyncSpy<[any], void>();
 const sendDeleteProjectEvent = createAsyncSpy<[any], void>();
+const sendGenerateSceneMangaEvent = createAsyncSpy<[any], void>();
+const sendGenerateDramaVideoEvent = createAsyncSpy<[any], void>();
+const sendGenerateChapterScenesEvent = createAsyncSpy<[any], void>();
 const captureVersionSnapshot = createAsyncSpy<[string], unknown>();
 const summarizeVersionSnapshot = createSyncSpy<[unknown], unknown>();
 
@@ -91,6 +94,9 @@ mock.module("@lib/db", () => ({
 mock.module("@lib/inngest", () => ({
   sendExportProjectEvent,
   sendDeleteProjectEvent,
+  sendGenerateSceneMangaEvent,
+  sendGenerateDramaVideoEvent,
+  sendGenerateChapterScenesEvent,
 }));
 
 mock.module("@lib/version-snapshot", () => ({
@@ -129,6 +135,9 @@ describe("createExport", () => {
     exportRecordCreate.mockReset();
     sendExportProjectEvent.mockReset();
     sendDeleteProjectEvent.mockReset();
+    sendGenerateSceneMangaEvent.mockReset();
+    sendGenerateDramaVideoEvent.mockReset();
+    sendGenerateChapterScenesEvent.mockReset();
     captureVersionSnapshot.mockReset();
     summarizeVersionSnapshot.mockReset();
   });

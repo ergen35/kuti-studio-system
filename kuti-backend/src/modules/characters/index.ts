@@ -12,10 +12,12 @@ import {
   deleteRelation,
   deleteCharacterImage,
   generateCharacterImage,
+  generateCharacterProfileDraft,
   getAllProjectCharacterImages,
   getCharacter,
   listCharacterImages,
   listCharacters,
+  setCharacterImageActive,
   updateRelation,
   updateCharacter
 } from "./controller";
@@ -23,12 +25,15 @@ import {
   characterDetailResponseSchema,
   characterIdParamsSchema,
   characterImageListResponseSchema,
+  characterImageResponseSchema,
   characterListResponseSchema,
   characterRelationResponseSchema,
   characterResponseSchema,
   createCharacterBodySchema,
   createRelationBodySchema,
   createVoiceSampleBodySchema,
+  generateCharacterProfileBodySchema,
+  generatedCharacterDraftResponseSchema,
   generateCharacterImageQuerySchema,
   imageIdParamsSchema,
   projectCharacterImagesResponseSchema,
@@ -164,6 +169,18 @@ export const charactersModule = new Elysia({
     detail: { operationId: "generateCharacterImage", summary: "Generate character images" },
   })
 
+  // Generate character profile draft
+  .post("/:characterId/generate-profile", async ({ params: { projectId, characterId }, body }) => {
+    const result = await generateCharacterProfileDraft(projectId, characterId, body);
+    if (!result) throw new Error("Character not found");
+    return result;
+  }, {
+    params: characterIdParamsSchema,
+    body: generateCharacterProfileBodySchema,
+    response: generatedCharacterDraftResponseSchema,
+    detail: { operationId: "generateCharacterProfileDraft", summary: "Generate a character profile draft" },
+  })
+
   // List character images
   .get("/:characterId/images", ({ params: { projectId, characterId } }) => {
     return listCharacterImages(projectId, characterId);
@@ -181,4 +198,15 @@ export const charactersModule = new Elysia({
   }, {
     params: imageIdParamsSchema,
     detail: { operationId: "deleteCharacterImage", summary: "Delete a character image" },
+  })
+
+  // Set character image as active (only for character_sheet)
+  .patch("/:characterId/images/:imageId/set-active", async ({ params: { projectId, characterId, imageId } }) => {
+    const image = await setCharacterImageActive(projectId, characterId, imageId);
+    if (!image) throw new Error("Image not found");
+    return image;
+  }, {
+    params: imageIdParamsSchema,
+    response: characterImageResponseSchema,
+    detail: { operationId: "setCharacterImageActive", summary: "Set a character sheet as active" },
   });

@@ -2,14 +2,26 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, Eye, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Sparkles,
+  Eye,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  WandSparkles,
+} from "lucide-react";
 import { useTranslation } from "~/hooks/useTranslation";
-import { Button, Badge, ErrorState, LoadingState } from "~/components/ui";
+import {
+  Button,
+  Badge,
+  ErrorState,
+  LoadingState,
+  Panel,
+} from "~/components/ui";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
@@ -22,16 +34,10 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
-import { CharacterImageSelector } from "./CharacterImageSelector";
 import type {
-  ListCharactersResponse,
-  GetProjectCharacterImagesResponse,
   GetStorySummaryResponse,
   ListModelsResponse,
 } from "~/lib/backend/types.gen";
-
-type Character = ListCharactersResponse[number];
-type Scene = GetStorySummaryResponse["scenes"][number];
 import {
   listSceneConfigsOptions,
   generateSceneMangaMutation,
@@ -45,11 +51,11 @@ import { apiErrorMessage } from "~/lib/errors";
 import { invalidateWorkspace } from "~/lib/query";
 import { client } from "~/lib/backend-client";
 
+type Scene = GetStorySummaryResponse["scenes"][number];
+
 interface SceneGenerationModalProps {
   projectId: string;
   scene: Scene;
-  characters: Character[];
-  characterImages: GetProjectCharacterImagesResponse;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -57,8 +63,6 @@ interface SceneGenerationModalProps {
 export function SceneGenerationModal({
   projectId,
   scene,
-  characters,
-  characterImages,
   isOpen,
   onClose,
 }: SceneGenerationModalProps) {
@@ -69,11 +73,11 @@ export function SceneGenerationModal({
   const [selectedConfigId, setSelectedConfigId] = useState<string>("");
   const [selectedModelKey, setSelectedModelKey] = useState<string>("");
   const [imageCount, setImageCount] = useState(6);
-  const [selectedCharacterImages, setSelectedCharacterImages] = useState<
-    Record<string, string>
-  >({});
   const [additionalContext, setAdditionalContext] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const hasSceneContent = scene.content.trim().length > 0;
+  const contentRequiredMessage = t("generation.contentRequired");
+  const scenePath = scene.title;
 
   // Fetch configs
   const configs = useQuery({
@@ -121,17 +125,10 @@ export function SceneGenerationModal({
       path: { projectId, sceneId: scene.id },
       body: {
         ...(selectedConfigId ? { configId: selectedConfigId } : {}),
-        characterImageRefs: selectedCharacterImages,
         panelCount: imageCount,
       },
     }),
-    [
-      projectId,
-      scene.id,
-      selectedConfigId,
-      selectedCharacterImages,
-      imageCount,
-    ],
+    [projectId, scene.id, selectedConfigId, imageCount],
   );
 
   // Preview mutation config
@@ -152,7 +149,6 @@ export function SceneGenerationModal({
         ...(selectedConfigId ? { configId: selectedConfigId } : {}),
         ...(activeModelKey ? { modelKey: activeModelKey } : {}),
         imageCount,
-        characterImageRefs: selectedCharacterImages,
         additionalContext,
       },
     }),
@@ -162,7 +158,6 @@ export function SceneGenerationModal({
       selectedConfigId,
       activeModelKey,
       imageCount,
-      selectedCharacterImages,
       additionalContext,
     ],
   );
@@ -192,45 +187,56 @@ export function SceneGenerationModal({
     },
   });
 
-  // Handle character image selection
-  const handleCharacterImageSelect = (
-    characterId: string,
-    imageId: string | null,
-  ) => {
-    setSelectedCharacterImages((prev) => {
-      const next = { ...prev };
-      if (imageId) {
-        next[characterId] = imageId;
-      } else {
-        delete next[characterId];
-      }
-      return next;
-    });
-  };
-
   // Handle preview toggle
   const handlePreviewToggle = useCallback(() => {
+    if (!hasSceneContent) {
+      return;
+    }
+
     const newShowPreview = !showPreview;
     setShowPreview(newShowPreview);
     if (!showPreview) {
+      preview.reset();
       preview.mutate(previewOptions);
     }
-  }, [showPreview, preview, previewOptions]);
+  }, [hasSceneContent, showPreview, preview, previewOptions]);
 
   // Handle generate
   const handleGenerate = useCallback(() => {
+    if (!hasSceneContent) {
+      return;
+    }
+
     generate.mutate(generateOptions);
-  }, [generate, generateOptions]);
+  }, [generate, generateOptions, hasSceneContent]);
+
+  useEffect(() => {
+    if (!hasSceneContent) {
+      setShowPreview(false);
+    }
+  }, [hasSceneContent]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowPreview(false);
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden sm:max-w-2xl">
+      <DialogContent className="flex max-h-[92vh] flex-col overflow-hidden sm:max-w-4xl lg:max-w-5xl">
         <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="text-accent" />
             {t("generation.title")}
           </DialogTitle>
           <DialogDescription>{t("generation.description")}</DialogDescription>
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+            <Badge tone="info">{scenePath || scene.title}</Badge>
+            <Badge tone="info">
+              {t("generation.autoCharacterSheetsBadge")}
+            </Badge>
+          </div>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-1 flex flex-col gap-4">
@@ -349,21 +355,24 @@ export function SceneGenerationModal({
                 </div>
               </div>
 
-              {/* Character References */}
-              {characters.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-ink">
-                    {t("generation.characterRefs")}
-                  </label>
-                  <CharacterImageSelector
-                    projectId={projectId}
-                    characters={characters}
-                    characterImages={characterImages}
-                    selectedImages={selectedCharacterImages}
-                    onSelect={handleCharacterImageSelect}
-                  />
+              <Panel className="border border-line/70 bg-gradient-to-br from-accent/10 via-surface/90 to-surface-2/80">
+                <div className="flex items-start gap-3">
+                  <div className="grid size-10 shrink-0 place-items-center rounded-2xl border border-accent/20 bg-accent/10 text-accent">
+                    <Sparkles size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-[0.24em] text-muted">
+                      {t("generation.autoCharacterSheetsTitle")}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-ink">
+                      {t("generation.autoCharacterSheetsBadge")}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-muted">
+                      {t("generation.autoCharacterSheetsDescription")}
+                    </p>
+                  </div>
                 </div>
-              )}
+              </Panel>
 
               {/* Additional Context */}
               <div className="flex flex-col gap-2">
@@ -384,7 +393,9 @@ export function SceneGenerationModal({
                   type="button"
                   variant="ghost"
                   onClick={handlePreviewToggle}
+                  disabled={!hasSceneContent}
                   className="w-full justify-between p-3"
+                  title={!hasSceneContent ? contentRequiredMessage : undefined}
                 >
                   <div className="flex items-center gap-2">
                     <Eye size={16} className="text-muted" />
@@ -399,83 +410,119 @@ export function SceneGenerationModal({
                   )}
                 </Button>
 
-                {showPreview && (
-                  <div className="p-3 border-t border-line bg-surface-2/20">
-                    {preview.isPending && (
-                      <LoadingState label={t("generation.loadingPreview")} />
-                    )}
-                    {preview.error && (
-                      <ErrorState message={apiErrorMessage(preview.error)} />
-                    )}
-                    {preview.data && (
-                      <div className="space-y-3">
-                        <div className="text-xs text-muted mb-2">
-                          {t("generation.styleLabel")}:{" "}
-                          {preview.data.styleDescription}
-                        </div>
-                        {preview.data.prompts.map((promptItem, i) => (
-                          <div
-                            key={i}
-                            className="border border-line rounded p-2"
-                          >
-                            <div className="text-xs font-medium text-ink">
-                              {promptItem.title}
-                            </div>
-                            <div className="text-xs text-muted">
-                              {promptItem.caption}
-                            </div>
-                          </div>
-                        ))}
-                        <details className="text-xs">
-                          <summary className="cursor-pointer text-muted hover:text-ink">
-                            {t("generation.viewSystemPrompt", {
-                              count: preview.data.systemPrompt.length,
-                            })}
-                          </summary>
-                          <pre className="mt-2 p-2 bg-ink/5 rounded text-[10px] whitespace-pre-wrap max-h-40 overflow-y-auto">
-                            {preview.data.systemPrompt}
-                          </pre>
-                        </details>
-                      </div>
-                    )}
+                {!hasSceneContent ? (
+                  <div className="border-t border-line bg-surface-2/20 p-3 text-xs text-muted">
+                    {contentRequiredMessage}
                   </div>
+                ) : (
+                  showPreview && (
+                    <div className="p-3 border-t border-line bg-surface-2/20">
+                      {preview.isPending && (
+                        <LoadingState label={t("generation.loadingPreview")} />
+                      )}
+                      {preview.error && (
+                        <ErrorState message={apiErrorMessage(preview.error)} />
+                      )}
+                      {preview.data && (
+                        <div className="space-y-3">
+                          <div className="text-xs text-muted mb-2">
+                            {t("generation.styleLabel")}:{" "}
+                            {preview.data.styleDescription}
+                          </div>
+                          {preview.data.prompts.map((promptItem, i) => (
+                            <div
+                              key={i}
+                              className="border border-line rounded p-2"
+                            >
+                              <div className="text-xs font-medium text-ink">
+                                {promptItem.title}
+                              </div>
+                              <div className="text-xs text-muted">
+                                {promptItem.caption}
+                              </div>
+                            </div>
+                          ))}
+                          <details className="text-xs">
+                            <summary className="cursor-pointer text-muted hover:text-ink">
+                              {t("generation.viewSystemPrompt", {
+                                count: preview.data.systemPrompt.length,
+                              })}
+                            </summary>
+                            <pre className="mt-2 p-2 bg-ink/5 rounded text-[10px] whitespace-pre-wrap max-h-40 overflow-y-auto">
+                              {preview.data.systemPrompt}
+                            </pre>
+                          </details>
+                        </div>
+                      )}
+                    </div>
+                  )
                 )}
               </div>
             </>
           )}
         </div>
 
-        <DialogFooter className="shrink-0">
-          <Button
-            variant="ghost"
-            onClick={onClose}
-            disabled={generate.isPending}
-          >
-            {t("actions.cancel")}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleGenerate}
-            disabled={generate.isPending}
-          >
-            {generate.isPending ? (
-              <>
-                <Loader2 className="animate-spin" />
-                {t("generation.generating")}
-              </>
-            ) : (
-              <>
-                <Sparkles />
-                {t(
-                  imageCount > 1
-                    ? "generation.generateMany"
-                    : "generation.generateOne",
-                  { count: imageCount },
+        <div className="shrink-0 rounded-2xl border border-line/70 bg-gradient-to-br from-surface/95 via-surface/90 to-surface-2/85 p-4 shadow-[0_-18px_40px_-30px_rgba(0,0,0,0.45)] backdrop-blur">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.26em] text-muted">
+                <WandSparkles size={12} className="text-accent" />
+                {t("generation.footerEyebrow")}
+              </div>
+              <p className="max-w-2xl text-sm leading-6 text-muted">
+                {t("generation.footerNote")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Badge tone="info">
+                  {selectedConfig
+                    ? selectedConfig.name
+                    : t("generation.implicitConfig")}
+                </Badge>
+                <Badge tone="default">
+                  {t("generation.pageCount")}: {imageCount}
+                </Badge>
+                <Badge tone="info">
+                  {t("generation.autoCharacterSheetsBadge")}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+              <Button
+                variant="ghost"
+                onClick={onClose}
+                disabled={generate.isPending}
+                className="justify-center"
+              >
+                {t("actions.cancel")}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleGenerate}
+                disabled={generate.isPending || !hasSceneContent}
+                title={!hasSceneContent ? contentRequiredMessage : undefined}
+                className="justify-center sm:min-w-52"
+              >
+                {generate.isPending ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                    {t("generation.generating")}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles />
+                    {t(
+                      imageCount > 1
+                        ? "generation.generateMany"
+                        : "generation.generateOne",
+                      { count: imageCount },
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </Button>
-        </DialogFooter>
+              </Button>
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

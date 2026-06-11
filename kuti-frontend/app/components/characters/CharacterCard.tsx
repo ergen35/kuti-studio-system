@@ -13,6 +13,7 @@ type CharacterImage = ListCharacterImagesResponse[number];
 interface CharacterCardProps {
   character: Character;
   image?: CharacterImage | null;
+  narrativeRoleLabel?: string;
   onClick?: () => void;
   className?: string;
 }
@@ -30,14 +31,12 @@ function imageUrl(image: CharacterImage) {
 export function CharacterCard({
   character,
   image,
+  narrativeRoleLabel,
   onClick,
   className = "",
 }: CharacterCardProps) {
   const { t } = useTranslation("characters");
-  const roleText =
-    (character.narrativeRole as string | undefined) ||
-    (character.alias as string | undefined) ||
-    t("cards.noRole");
+  const roleText = narrativeRoleLabel || (character.narrativeRole as string | undefined) || t("cards.noRole");
 
   return (
     <Button

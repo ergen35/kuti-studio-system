@@ -389,6 +389,7 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   Project: 'Project',
+  NarrativeRole: 'NarrativeRole',
   Character: 'Character',
   CharacterRelation: 'CharacterRelation',
   VoiceSample: 'VoiceSample',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "project" | "character" | "characterRelation" | "voiceSample" | "characterImage" | "tome" | "chapter" | "scene" | "storyReference" | "asset" | "assetLink" | "generationJob" | "generationJobStep" | "generationBoard" | "generationBoardPanel" | "sceneGenerationConfig" | "sceneMangaPage" | "dramaVideo" | "version" | "warning" | "exportRecord"
+    modelProps: "user" | "session" | "account" | "verification" | "project" | "narrativeRole" | "character" | "characterRelation" | "voiceSample" | "characterImage" | "tome" | "chapter" | "scene" | "storyReference" | "asset" | "assetLink" | "generationJob" | "generationJobStep" | "generationBoard" | "generationBoardPanel" | "sceneGenerationConfig" | "sceneMangaPage" | "dramaVideo" | "version" | "warning" | "exportRecord"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -795,6 +796,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProjectCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProjectCountAggregateOutputType> | number
+        }
+      }
+    }
+    NarrativeRole: {
+      payload: Prisma.$NarrativeRolePayload<ExtArgs>
+      fields: Prisma.NarrativeRoleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NarrativeRoleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NarrativeRoleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>
+        }
+        findFirst: {
+          args: Prisma.NarrativeRoleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NarrativeRoleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>
+        }
+        findMany: {
+          args: Prisma.NarrativeRoleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>[]
+        }
+        create: {
+          args: Prisma.NarrativeRoleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>
+        }
+        createMany: {
+          args: Prisma.NarrativeRoleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NarrativeRoleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>[]
+        }
+        delete: {
+          args: Prisma.NarrativeRoleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>
+        }
+        update: {
+          args: Prisma.NarrativeRoleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>
+        }
+        deleteMany: {
+          args: Prisma.NarrativeRoleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NarrativeRoleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NarrativeRoleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>[]
+        }
+        upsert: {
+          args: Prisma.NarrativeRoleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NarrativeRolePayload>
+        }
+        aggregate: {
+          args: Prisma.NarrativeRoleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNarrativeRole>
+        }
+        groupBy: {
+          args: Prisma.NarrativeRoleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NarrativeRoleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NarrativeRoleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NarrativeRoleCountAggregateOutputType> | number
         }
       }
     }
@@ -2396,6 +2471,18 @@ export const ProjectScalarFieldEnum = {
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
+export const NarrativeRoleScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  code: 'code',
+  label: 'label',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NarrativeRoleScalarFieldEnum = (typeof NarrativeRoleScalarFieldEnum)[keyof typeof NarrativeRoleScalarFieldEnum]
+
+
 export const CharacterScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -2453,6 +2540,9 @@ export const CharacterImageScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   characterId: 'characterId',
+  kind: 'kind',
+  isActive: 'isActive',
+  sourceImageId: 'sourceImageId',
   boardPanelId: 'boardPanelId',
   filePath: 'filePath',
   publicUrl: 'publicUrl',
@@ -2515,6 +2605,7 @@ export const SceneScalarFieldEnum = {
   charactersJson: 'charactersJson',
   tagsJson: 'tagsJson',
   metadataJson: 'metadataJson',
+  targetPageCount: 'targetPageCount',
   status: 'status',
   orderIndex: 'orderIndex',
   createdAt: 'createdAt',
@@ -2923,6 +3014,20 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'CharacterImageKind'
+ */
+export type EnumCharacterImageKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CharacterImageKind'>
+    
+
+
+/**
+ * Reference to a field of type 'CharacterImageKind[]'
+ */
+export type ListEnumCharacterImageKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CharacterImageKind[]'>
+    
+
+
+/**
  * Reference to a field of type 'StoryStatus'
  */
 export type EnumStoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StoryStatus'>
@@ -3288,6 +3393,7 @@ export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   verification?: Prisma.VerificationOmit
   project?: Prisma.ProjectOmit
+  narrativeRole?: Prisma.NarrativeRoleOmit
   character?: Prisma.CharacterOmit
   characterRelation?: Prisma.CharacterRelationOmit
   voiceSample?: Prisma.VoiceSampleOmit

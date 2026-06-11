@@ -6,10 +6,15 @@ import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
 import { readFile } from "node:fs/promises";
 import { prisma } from "@lib/db";
+import { generateCharacterDraft } from "@lib/character-drafts";
 import { runCoherenceScanIfEnabled } from "@lib/coherence-scan";
 import {
   sendGenerateImageEvent,
 } from "@lib/inngest";
+import {
+  isPredefinedNarrativeRoleCode,
+  normalizeNarrativeRoleCode,
+} from "@lib/narrative-roles";
 import type {
   CreateCharacterBody,
   UpdateCharacterBody,
@@ -21,6 +26,8 @@ import type {
   VoiceSampleResponse,
   CharacterImageResponse,
   GenerateCharacterImageQuery,
+  GenerateCharacterProfileBody,
+  GeneratedCharacterDraftResponse,
 } from "./dto";
 
 // ============================================================================
@@ -40,6 +47,47 @@ async function generateUniqueSlug(projectId: string, name: string): Promise<stri
   }
 
   return candidate;
+}
+
+async function resolveNarrativeRoleCode(
+  projectId: string,
+  narrativeRole?: string | null,
+): Promise<string | null | undefined> {
+  const rawValue = narrativeRole?.trim();
+  if (rawValue === undefined) {
+    return undefined;
+  }
+
+  if (!rawValue) {
+    return null;
+  }
+
+  const code = normalizeNarrativeRoleCode(rawValue);
+
+  if (isPredefinedNarrativeRoleCode(code)) {
+    return code;
+  }
+
+  const existing = await prisma.narrativeRole.findUnique({
+    where: { projectId_code: { projectId, code } },
+  });
+
+  if (existing) {
+    return existing.code;
+  }
+
+  await prisma.narrativeRole.create({
+    data: {
+      id: randomUUIDv7(),
+      projectId,
+      code,
+      label: rawValue,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
+
+  return code;
 }
 
 function serializeCharacter(char: {
@@ -134,6 +182,10 @@ function serializeImage(img: {
   id: string;
   projectId: string;
   characterId: string;
+  kind: string;
+  isActive: boolean;
+  sourceImageId: string | null;
+  boardPanelId: string | null;
   filePath: string;
   publicUrl: string;
   fileName: string;
@@ -149,6 +201,10 @@ function serializeImage(img: {
     id: img.id,
     projectId: img.projectId,
     characterId: img.characterId,
+    kind: img.kind as "character_sheet" | "free_image",
+    isActive: img.isActive,
+    sourceImageId: img.sourceImageId,
+    boardPanelId: img.boardPanelId,
     filePath: img.filePath,
     publicUrl: img.publicUrl,
     fileName: img.fileName,
@@ -209,6 +265,7 @@ export async function createCharacter(
 ): Promise<CharacterResponse> {
   const slug = await generateUniqueSlug(projectId, data.name);
   const now = new Date();
+  const narrativeRole = await resolveNarrativeRoleCode(projectId, data.narrativeRole);
 
   const char = await prisma.character.create({
     data: {
@@ -217,7 +274,7 @@ export async function createCharacter(
       slug,
       name: data.name,
       alias: data.alias ?? null,
-      narrativeRole: data.narrativeRole ?? null,
+      narrativeRole: narrativeRole ?? null,
       description: data.description ?? "",
       physicalDescription: data.physicalDescription ?? "",
       colorPaletteJson: data.colorPaletteJson ?? [],
@@ -248,23 +305,30 @@ export async function updateCharacter(
 
   if (!char) return null;
 
+  const narrativeRole = await resolveNarrativeRoleCode(projectId, data.narrativeRole);
+
+  const updateData: Parameters<typeof prisma.character.update>[0]["data"] = {
+    name: data.name,
+    alias: data.alias,
+    description: data.description,
+    physicalDescription: data.physicalDescription,
+    colorPaletteJson: data.colorPaletteJson,
+    costumeElementsJson: data.costumeElementsJson,
+    keyTraitsJson: data.keyTraitsJson,
+    personality: data.personality,
+    narrativeArc: data.narrativeArc,
+    tagsJson: data.tagsJson,
+    status: data.status,
+    updatedAt: new Date(),
+  };
+
+  if (narrativeRole !== undefined) {
+    updateData.narrativeRole = narrativeRole;
+  }
+
   const updated = await prisma.character.update({
     where: { id: characterId },
-    data: {
-      name: data.name,
-      alias: data.alias,
-      narrativeRole: data.narrativeRole,
-      description: data.description,
-      physicalDescription: data.physicalDescription,
-      colorPaletteJson: data.colorPaletteJson,
-      costumeElementsJson: data.costumeElementsJson,
-      keyTraitsJson: data.keyTraitsJson,
-      personality: data.personality,
-      narrativeArc: data.narrativeArc,
-      tagsJson: data.tagsJson,
-      status: data.status,
-      updatedAt: new Date(),
-    },
+    data: updateData,
   });
 
   await runCoherenceScanIfEnabled(projectId);
@@ -474,7 +538,7 @@ export async function listCharacterImages(
 ): Promise<CharacterImageResponse[]> {
   const images = await prisma.characterImage.findMany({
     where: { projectId, characterId },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ kind: "asc" }, { isActive: "desc" }, { createdAt: "desc" }],
   });
 
   return images.map(serializeImage);
@@ -485,7 +549,7 @@ export async function getAllProjectCharacterImages(
 ): Promise<Record<string, CharacterImageResponse[]>> {
   const images = await prisma.characterImage.findMany({
     where: { projectId },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ kind: "asc" }, { isActive: "desc" }, { createdAt: "desc" }],
   });
 
   const result: Record<string, CharacterImageResponse[]> = {};
@@ -525,6 +589,46 @@ export async function deleteCharacterImage(
   return true;
 }
 
+export async function setCharacterImageActive(
+  projectId: string,
+  characterId: string,
+  imageId: string
+): Promise<CharacterImageResponse | null> {
+  const image = await prisma.characterImage.findFirst({
+    where: { id: imageId, projectId, characterId },
+  });
+
+  if (!image) return null;
+
+  // Only character_sheet images can be set as active
+  if (image.kind !== "character_sheet") {
+    throw new Error("only_character_sheet_can_be_active");
+  }
+
+  // Transaction: deactivate all other character_sheets, activate this one
+  const updated = await prisma.$transaction(async (tx) => {
+    // Deactivate all other character_sheets for this character
+    await tx.characterImage.updateMany({
+      where: {
+        projectId,
+        characterId,
+        kind: "character_sheet",
+        isActive: true,
+        id: { not: imageId },
+      },
+      data: { isActive: false },
+    });
+
+    // Activate this one
+    return tx.characterImage.update({
+      where: { id: imageId },
+      data: { isActive: true },
+    });
+  });
+
+  return serializeImage(updated);
+}
+
 // ============================================================================
 // Image Generation (via Inngest)
 // ============================================================================
@@ -542,6 +646,7 @@ export async function generateCharacterImage(
 
   // Créer un GenerationJob
   const jobId = randomUUIDv7();
+  const imageCount = query.kind === "character_sheet" ? 1 : Math.min(Math.max(query.imageCount, 1), 12);
 
   await prisma.generationJob.create({
     data: {
@@ -553,13 +658,18 @@ export async function generateCharacterImage(
       strategy: "direct",
       status: "pending",
       progress: 0,
-      title: `Generate images for ${char.name}`,
-      prompt: `Generate ${query.strategy} images for character ${char.name}`,
+      title: query.kind === "character_sheet"
+        ? `Generate character sheet for ${char.name}`
+        : `Generate free images for ${char.name}`,
+      prompt: query.kind === "character_sheet"
+        ? `Generate a character sheet for ${char.name}`
+        : `Generate free images for ${char.name}`,
       metadataJson: {
         characterId,
+        kind: query.kind,
         strategy: query.strategy,
         style: query.style,
-        imageCount: Math.min(Math.max(query.imageCount, 1), 4),
+        imageCount,
         modelKey: query.modelKey,
       },
       createdAt: new Date(),
@@ -572,9 +682,10 @@ export async function generateCharacterImage(
     projectId,
     characterId,
     jobId,
+    kind: query.kind,
     strategy: query.strategy,
     style: query.style,
-    imageCount: Math.min(Math.max(query.imageCount, 1), 4),
+    imageCount,
     modelKey: query.modelKey,
   });
 
@@ -582,5 +693,40 @@ export async function generateCharacterImage(
     jobId,
     status: "pending",
     message: "Image generation job created",
+  };
+}
+
+// ============================================================================
+// Character Draft Generation
+// ============================================================================
+
+export async function generateCharacterProfileDraft(
+  projectId: string,
+  characterId: string,
+  data: GenerateCharacterProfileBody,
+): Promise<GeneratedCharacterDraftResponse | null> {
+  const char = await prisma.character.findFirst({
+    where: { id: characterId, projectId },
+  });
+
+  if (!char) return null;
+
+  const draft = await generateCharacterDraft({
+    name: char.name,
+    narrativeRole: char.narrativeRole,
+    descriptionMinimal: data.descriptionMinimal,
+    modelKey: data.modelKey,
+  });
+
+  return {
+    description: draft.description,
+    physicalDescription: draft.physicalDescription,
+    keyTraitsJson: draft.keyTraitsJson,
+    colorPaletteJson: draft.colorPaletteJson,
+    costumeElementsJson: draft.costumeElementsJson,
+    personality: draft.personality,
+    tagsJson: draft.tagsJson,
+    sourceModelKey: draft.sourceModelKey,
+    usedFallback: draft.usedFallback,
   };
 }

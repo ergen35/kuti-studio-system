@@ -40,6 +40,9 @@ export type CharacterImageMinAggregateOutputType = {
   id: string | null
   projectId: string | null
   characterId: string | null
+  kind: $Enums.CharacterImageKind | null
+  isActive: boolean | null
+  sourceImageId: string | null
   boardPanelId: string | null
   filePath: string | null
   publicUrl: string | null
@@ -57,6 +60,9 @@ export type CharacterImageMaxAggregateOutputType = {
   id: string | null
   projectId: string | null
   characterId: string | null
+  kind: $Enums.CharacterImageKind | null
+  isActive: boolean | null
+  sourceImageId: string | null
   boardPanelId: string | null
   filePath: string | null
   publicUrl: string | null
@@ -74,6 +80,9 @@ export type CharacterImageCountAggregateOutputType = {
   id: number
   projectId: number
   characterId: number
+  kind: number
+  isActive: number
+  sourceImageId: number
   boardPanelId: number
   filePath: number
   publicUrl: number
@@ -103,6 +112,9 @@ export type CharacterImageMinAggregateInputType = {
   id?: true
   projectId?: true
   characterId?: true
+  kind?: true
+  isActive?: true
+  sourceImageId?: true
   boardPanelId?: true
   filePath?: true
   publicUrl?: true
@@ -120,6 +132,9 @@ export type CharacterImageMaxAggregateInputType = {
   id?: true
   projectId?: true
   characterId?: true
+  kind?: true
+  isActive?: true
+  sourceImageId?: true
   boardPanelId?: true
   filePath?: true
   publicUrl?: true
@@ -137,6 +152,9 @@ export type CharacterImageCountAggregateInputType = {
   id?: true
   projectId?: true
   characterId?: true
+  kind?: true
+  isActive?: true
+  sourceImageId?: true
   boardPanelId?: true
   filePath?: true
   publicUrl?: true
@@ -241,6 +259,9 @@ export type CharacterImageGroupByOutputType = {
   id: string
   projectId: string
   characterId: string
+  kind: $Enums.CharacterImageKind
+  isActive: boolean
+  sourceImageId: string | null
   boardPanelId: string | null
   filePath: string
   publicUrl: string
@@ -281,6 +302,9 @@ export type CharacterImageWhereInput = {
   id?: Prisma.StringFilter<"CharacterImage"> | string
   projectId?: Prisma.StringFilter<"CharacterImage"> | string
   characterId?: Prisma.StringFilter<"CharacterImage"> | string
+  kind?: Prisma.EnumCharacterImageKindFilter<"CharacterImage"> | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFilter<"CharacterImage"> | boolean
+  sourceImageId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   boardPanelId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringFilter<"CharacterImage"> | string
   publicUrl?: Prisma.StringFilter<"CharacterImage"> | string
@@ -294,12 +318,17 @@ export type CharacterImageWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"CharacterImage"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   character?: Prisma.XOR<Prisma.CharacterScalarRelationFilter, Prisma.CharacterWhereInput>
+  sourceImage?: Prisma.XOR<Prisma.CharacterImageNullableScalarRelationFilter, Prisma.CharacterImageWhereInput> | null
+  derivedImages?: Prisma.CharacterImageListRelationFilter
 }
 
 export type CharacterImageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   characterId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  sourceImageId?: Prisma.SortOrderInput | Prisma.SortOrder
   boardPanelId?: Prisma.SortOrderInput | Prisma.SortOrder
   filePath?: Prisma.SortOrder
   publicUrl?: Prisma.SortOrder
@@ -313,6 +342,8 @@ export type CharacterImageOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
   character?: Prisma.CharacterOrderByWithRelationInput
+  sourceImage?: Prisma.CharacterImageOrderByWithRelationInput
+  derivedImages?: Prisma.CharacterImageOrderByRelationAggregateInput
 }
 
 export type CharacterImageWhereUniqueInput = Prisma.AtLeast<{
@@ -323,6 +354,9 @@ export type CharacterImageWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CharacterImageWhereInput | Prisma.CharacterImageWhereInput[]
   projectId?: Prisma.StringFilter<"CharacterImage"> | string
   characterId?: Prisma.StringFilter<"CharacterImage"> | string
+  kind?: Prisma.EnumCharacterImageKindFilter<"CharacterImage"> | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFilter<"CharacterImage"> | boolean
+  sourceImageId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   boardPanelId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringFilter<"CharacterImage"> | string
   publicUrl?: Prisma.StringFilter<"CharacterImage"> | string
@@ -336,12 +370,17 @@ export type CharacterImageWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"CharacterImage"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   character?: Prisma.XOR<Prisma.CharacterScalarRelationFilter, Prisma.CharacterWhereInput>
+  sourceImage?: Prisma.XOR<Prisma.CharacterImageNullableScalarRelationFilter, Prisma.CharacterImageWhereInput> | null
+  derivedImages?: Prisma.CharacterImageListRelationFilter
 }, "id" | "characterId_fileName">
 
 export type CharacterImageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   characterId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  sourceImageId?: Prisma.SortOrderInput | Prisma.SortOrder
   boardPanelId?: Prisma.SortOrderInput | Prisma.SortOrder
   filePath?: Prisma.SortOrder
   publicUrl?: Prisma.SortOrder
@@ -367,6 +406,9 @@ export type CharacterImageScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
   projectId?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
   characterId?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
+  kind?: Prisma.EnumCharacterImageKindWithAggregatesFilter<"CharacterImage"> | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolWithAggregatesFilter<"CharacterImage"> | boolean
+  sourceImageId?: Prisma.StringNullableWithAggregatesFilter<"CharacterImage"> | string | null
   boardPanelId?: Prisma.StringNullableWithAggregatesFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
   publicUrl?: Prisma.StringWithAggregatesFilter<"CharacterImage"> | string
@@ -382,6 +424,8 @@ export type CharacterImageScalarWhereWithAggregatesInput = {
 
 export type CharacterImageCreateInput = {
   id?: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -395,12 +439,17 @@ export type CharacterImageCreateInput = {
   createdAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutCharacterImagesInput
   character: Prisma.CharacterCreateNestedOneWithoutImagesInput
+  sourceImage?: Prisma.CharacterImageCreateNestedOneWithoutDerivedImagesInput
+  derivedImages?: Prisma.CharacterImageCreateNestedManyWithoutSourceImageInput
 }
 
 export type CharacterImageUncheckedCreateInput = {
   id?: string
   projectId: string
   characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -412,10 +461,13 @@ export type CharacterImageUncheckedCreateInput = {
   style?: string | null
   variationIndex?: number | null
   createdAt?: Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutSourceImageInput
 }
 
 export type CharacterImageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -429,12 +481,17 @@ export type CharacterImageUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutCharacterImagesNestedInput
   character?: Prisma.CharacterUpdateOneRequiredWithoutImagesNestedInput
+  sourceImage?: Prisma.CharacterImageUpdateOneWithoutDerivedImagesNestedInput
+  derivedImages?: Prisma.CharacterImageUpdateManyWithoutSourceImageNestedInput
 }
 
 export type CharacterImageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -446,12 +503,16 @@ export type CharacterImageUncheckedUpdateInput = {
   style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutSourceImageNestedInput
 }
 
 export type CharacterImageCreateManyInput = {
   id?: string
   projectId: string
   characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -467,6 +528,8 @@ export type CharacterImageCreateManyInput = {
 
 export type CharacterImageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -484,6 +547,9 @@ export type CharacterImageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -507,6 +573,11 @@ export type CharacterImageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type CharacterImageNullableScalarRelationFilter = {
+  is?: Prisma.CharacterImageWhereInput | null
+  isNot?: Prisma.CharacterImageWhereInput | null
+}
+
 export type CharacterImageCharacterIdFileNameCompoundUniqueInput = {
   characterId: string
   fileName: string
@@ -516,6 +587,9 @@ export type CharacterImageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   characterId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  sourceImageId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   publicUrl?: Prisma.SortOrder
@@ -538,6 +612,9 @@ export type CharacterImageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   characterId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  sourceImageId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   publicUrl?: Prisma.SortOrder
@@ -555,6 +632,9 @@ export type CharacterImageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   characterId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  sourceImageId?: Prisma.SortOrder
   boardPanelId?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   publicUrl?: Prisma.SortOrder
@@ -657,6 +737,30 @@ export type CharacterImageUncheckedUpdateManyWithoutCharacterNestedInput = {
   deleteMany?: Prisma.CharacterImageScalarWhereInput | Prisma.CharacterImageScalarWhereInput[]
 }
 
+export type CharacterImageCreateNestedOneWithoutDerivedImagesInput = {
+  create?: Prisma.XOR<Prisma.CharacterImageCreateWithoutDerivedImagesInput, Prisma.CharacterImageUncheckedCreateWithoutDerivedImagesInput>
+  connectOrCreate?: Prisma.CharacterImageCreateOrConnectWithoutDerivedImagesInput
+  connect?: Prisma.CharacterImageWhereUniqueInput
+}
+
+export type CharacterImageCreateNestedManyWithoutSourceImageInput = {
+  create?: Prisma.XOR<Prisma.CharacterImageCreateWithoutSourceImageInput, Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput> | Prisma.CharacterImageCreateWithoutSourceImageInput[] | Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput[]
+  connectOrCreate?: Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput | Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput[]
+  createMany?: Prisma.CharacterImageCreateManySourceImageInputEnvelope
+  connect?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+}
+
+export type CharacterImageUncheckedCreateNestedManyWithoutSourceImageInput = {
+  create?: Prisma.XOR<Prisma.CharacterImageCreateWithoutSourceImageInput, Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput> | Prisma.CharacterImageCreateWithoutSourceImageInput[] | Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput[]
+  connectOrCreate?: Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput | Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput[]
+  createMany?: Prisma.CharacterImageCreateManySourceImageInputEnvelope
+  connect?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+}
+
+export type EnumCharacterImageKindFieldUpdateOperationsInput = {
+  set?: $Enums.CharacterImageKind
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -665,8 +769,48 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type CharacterImageUpdateOneWithoutDerivedImagesNestedInput = {
+  create?: Prisma.XOR<Prisma.CharacterImageCreateWithoutDerivedImagesInput, Prisma.CharacterImageUncheckedCreateWithoutDerivedImagesInput>
+  connectOrCreate?: Prisma.CharacterImageCreateOrConnectWithoutDerivedImagesInput
+  upsert?: Prisma.CharacterImageUpsertWithoutDerivedImagesInput
+  disconnect?: Prisma.CharacterImageWhereInput | boolean
+  delete?: Prisma.CharacterImageWhereInput | boolean
+  connect?: Prisma.CharacterImageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CharacterImageUpdateToOneWithWhereWithoutDerivedImagesInput, Prisma.CharacterImageUpdateWithoutDerivedImagesInput>, Prisma.CharacterImageUncheckedUpdateWithoutDerivedImagesInput>
+}
+
+export type CharacterImageUpdateManyWithoutSourceImageNestedInput = {
+  create?: Prisma.XOR<Prisma.CharacterImageCreateWithoutSourceImageInput, Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput> | Prisma.CharacterImageCreateWithoutSourceImageInput[] | Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput[]
+  connectOrCreate?: Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput | Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput[]
+  upsert?: Prisma.CharacterImageUpsertWithWhereUniqueWithoutSourceImageInput | Prisma.CharacterImageUpsertWithWhereUniqueWithoutSourceImageInput[]
+  createMany?: Prisma.CharacterImageCreateManySourceImageInputEnvelope
+  set?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  disconnect?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  delete?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  connect?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  update?: Prisma.CharacterImageUpdateWithWhereUniqueWithoutSourceImageInput | Prisma.CharacterImageUpdateWithWhereUniqueWithoutSourceImageInput[]
+  updateMany?: Prisma.CharacterImageUpdateManyWithWhereWithoutSourceImageInput | Prisma.CharacterImageUpdateManyWithWhereWithoutSourceImageInput[]
+  deleteMany?: Prisma.CharacterImageScalarWhereInput | Prisma.CharacterImageScalarWhereInput[]
+}
+
+export type CharacterImageUncheckedUpdateManyWithoutSourceImageNestedInput = {
+  create?: Prisma.XOR<Prisma.CharacterImageCreateWithoutSourceImageInput, Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput> | Prisma.CharacterImageCreateWithoutSourceImageInput[] | Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput[]
+  connectOrCreate?: Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput | Prisma.CharacterImageCreateOrConnectWithoutSourceImageInput[]
+  upsert?: Prisma.CharacterImageUpsertWithWhereUniqueWithoutSourceImageInput | Prisma.CharacterImageUpsertWithWhereUniqueWithoutSourceImageInput[]
+  createMany?: Prisma.CharacterImageCreateManySourceImageInputEnvelope
+  set?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  disconnect?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  delete?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  connect?: Prisma.CharacterImageWhereUniqueInput | Prisma.CharacterImageWhereUniqueInput[]
+  update?: Prisma.CharacterImageUpdateWithWhereUniqueWithoutSourceImageInput | Prisma.CharacterImageUpdateWithWhereUniqueWithoutSourceImageInput[]
+  updateMany?: Prisma.CharacterImageUpdateManyWithWhereWithoutSourceImageInput | Prisma.CharacterImageUpdateManyWithWhereWithoutSourceImageInput[]
+  deleteMany?: Prisma.CharacterImageScalarWhereInput | Prisma.CharacterImageScalarWhereInput[]
+}
+
 export type CharacterImageCreateWithoutProjectInput = {
   id?: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -679,11 +823,16 @@ export type CharacterImageCreateWithoutProjectInput = {
   variationIndex?: number | null
   createdAt?: Date | string
   character: Prisma.CharacterCreateNestedOneWithoutImagesInput
+  sourceImage?: Prisma.CharacterImageCreateNestedOneWithoutDerivedImagesInput
+  derivedImages?: Prisma.CharacterImageCreateNestedManyWithoutSourceImageInput
 }
 
 export type CharacterImageUncheckedCreateWithoutProjectInput = {
   id?: string
   characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -695,6 +844,7 @@ export type CharacterImageUncheckedCreateWithoutProjectInput = {
   style?: string | null
   variationIndex?: number | null
   createdAt?: Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutSourceImageInput
 }
 
 export type CharacterImageCreateOrConnectWithoutProjectInput = {
@@ -730,6 +880,9 @@ export type CharacterImageScalarWhereInput = {
   id?: Prisma.StringFilter<"CharacterImage"> | string
   projectId?: Prisma.StringFilter<"CharacterImage"> | string
   characterId?: Prisma.StringFilter<"CharacterImage"> | string
+  kind?: Prisma.EnumCharacterImageKindFilter<"CharacterImage"> | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFilter<"CharacterImage"> | boolean
+  sourceImageId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   boardPanelId?: Prisma.StringNullableFilter<"CharacterImage"> | string | null
   filePath?: Prisma.StringFilter<"CharacterImage"> | string
   publicUrl?: Prisma.StringFilter<"CharacterImage"> | string
@@ -745,6 +898,8 @@ export type CharacterImageScalarWhereInput = {
 
 export type CharacterImageCreateWithoutCharacterInput = {
   id?: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -757,11 +912,16 @@ export type CharacterImageCreateWithoutCharacterInput = {
   variationIndex?: number | null
   createdAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutCharacterImagesInput
+  sourceImage?: Prisma.CharacterImageCreateNestedOneWithoutDerivedImagesInput
+  derivedImages?: Prisma.CharacterImageCreateNestedManyWithoutSourceImageInput
 }
 
 export type CharacterImageUncheckedCreateWithoutCharacterInput = {
   id?: string
   projectId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -773,6 +933,7 @@ export type CharacterImageUncheckedCreateWithoutCharacterInput = {
   style?: string | null
   variationIndex?: number | null
   createdAt?: Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutSourceImageInput
 }
 
 export type CharacterImageCreateOrConnectWithoutCharacterInput = {
@@ -801,9 +962,174 @@ export type CharacterImageUpdateManyWithWhereWithoutCharacterInput = {
   data: Prisma.XOR<Prisma.CharacterImageUpdateManyMutationInput, Prisma.CharacterImageUncheckedUpdateManyWithoutCharacterInput>
 }
 
+export type CharacterImageCreateWithoutDerivedImagesInput = {
+  id?: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  boardPanelId?: string | null
+  filePath: string
+  publicUrl?: string
+  fileName: string
+  fileSize?: number | null
+  mimeType?: string
+  prompt?: string
+  strategy?: string | null
+  style?: string | null
+  variationIndex?: number | null
+  createdAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutCharacterImagesInput
+  character: Prisma.CharacterCreateNestedOneWithoutImagesInput
+  sourceImage?: Prisma.CharacterImageCreateNestedOneWithoutDerivedImagesInput
+}
+
+export type CharacterImageUncheckedCreateWithoutDerivedImagesInput = {
+  id?: string
+  projectId: string
+  characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
+  boardPanelId?: string | null
+  filePath: string
+  publicUrl?: string
+  fileName: string
+  fileSize?: number | null
+  mimeType?: string
+  prompt?: string
+  strategy?: string | null
+  style?: string | null
+  variationIndex?: number | null
+  createdAt?: Date | string
+}
+
+export type CharacterImageCreateOrConnectWithoutDerivedImagesInput = {
+  where: Prisma.CharacterImageWhereUniqueInput
+  create: Prisma.XOR<Prisma.CharacterImageCreateWithoutDerivedImagesInput, Prisma.CharacterImageUncheckedCreateWithoutDerivedImagesInput>
+}
+
+export type CharacterImageCreateWithoutSourceImageInput = {
+  id?: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  boardPanelId?: string | null
+  filePath: string
+  publicUrl?: string
+  fileName: string
+  fileSize?: number | null
+  mimeType?: string
+  prompt?: string
+  strategy?: string | null
+  style?: string | null
+  variationIndex?: number | null
+  createdAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutCharacterImagesInput
+  character: Prisma.CharacterCreateNestedOneWithoutImagesInput
+  derivedImages?: Prisma.CharacterImageCreateNestedManyWithoutSourceImageInput
+}
+
+export type CharacterImageUncheckedCreateWithoutSourceImageInput = {
+  id?: string
+  projectId: string
+  characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  boardPanelId?: string | null
+  filePath: string
+  publicUrl?: string
+  fileName: string
+  fileSize?: number | null
+  mimeType?: string
+  prompt?: string
+  strategy?: string | null
+  style?: string | null
+  variationIndex?: number | null
+  createdAt?: Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedCreateNestedManyWithoutSourceImageInput
+}
+
+export type CharacterImageCreateOrConnectWithoutSourceImageInput = {
+  where: Prisma.CharacterImageWhereUniqueInput
+  create: Prisma.XOR<Prisma.CharacterImageCreateWithoutSourceImageInput, Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput>
+}
+
+export type CharacterImageCreateManySourceImageInputEnvelope = {
+  data: Prisma.CharacterImageCreateManySourceImageInput | Prisma.CharacterImageCreateManySourceImageInput[]
+  skipDuplicates?: boolean
+}
+
+export type CharacterImageUpsertWithoutDerivedImagesInput = {
+  update: Prisma.XOR<Prisma.CharacterImageUpdateWithoutDerivedImagesInput, Prisma.CharacterImageUncheckedUpdateWithoutDerivedImagesInput>
+  create: Prisma.XOR<Prisma.CharacterImageCreateWithoutDerivedImagesInput, Prisma.CharacterImageUncheckedCreateWithoutDerivedImagesInput>
+  where?: Prisma.CharacterImageWhereInput
+}
+
+export type CharacterImageUpdateToOneWithWhereWithoutDerivedImagesInput = {
+  where?: Prisma.CharacterImageWhereInput
+  data: Prisma.XOR<Prisma.CharacterImageUpdateWithoutDerivedImagesInput, Prisma.CharacterImageUncheckedUpdateWithoutDerivedImagesInput>
+}
+
+export type CharacterImageUpdateWithoutDerivedImagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  strategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutCharacterImagesNestedInput
+  character?: Prisma.CharacterUpdateOneRequiredWithoutImagesNestedInput
+  sourceImage?: Prisma.CharacterImageUpdateOneWithoutDerivedImagesNestedInput
+}
+
+export type CharacterImageUncheckedUpdateWithoutDerivedImagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  strategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CharacterImageUpsertWithWhereUniqueWithoutSourceImageInput = {
+  where: Prisma.CharacterImageWhereUniqueInput
+  update: Prisma.XOR<Prisma.CharacterImageUpdateWithoutSourceImageInput, Prisma.CharacterImageUncheckedUpdateWithoutSourceImageInput>
+  create: Prisma.XOR<Prisma.CharacterImageCreateWithoutSourceImageInput, Prisma.CharacterImageUncheckedCreateWithoutSourceImageInput>
+}
+
+export type CharacterImageUpdateWithWhereUniqueWithoutSourceImageInput = {
+  where: Prisma.CharacterImageWhereUniqueInput
+  data: Prisma.XOR<Prisma.CharacterImageUpdateWithoutSourceImageInput, Prisma.CharacterImageUncheckedUpdateWithoutSourceImageInput>
+}
+
+export type CharacterImageUpdateManyWithWhereWithoutSourceImageInput = {
+  where: Prisma.CharacterImageScalarWhereInput
+  data: Prisma.XOR<Prisma.CharacterImageUpdateManyMutationInput, Prisma.CharacterImageUncheckedUpdateManyWithoutSourceImageInput>
+}
+
 export type CharacterImageCreateManyProjectInput = {
   id?: string
   characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -819,6 +1145,8 @@ export type CharacterImageCreateManyProjectInput = {
 
 export type CharacterImageUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -831,11 +1159,16 @@ export type CharacterImageUpdateWithoutProjectInput = {
   variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   character?: Prisma.CharacterUpdateOneRequiredWithoutImagesNestedInput
+  sourceImage?: Prisma.CharacterImageUpdateOneWithoutDerivedImagesNestedInput
+  derivedImages?: Prisma.CharacterImageUpdateManyWithoutSourceImageNestedInput
 }
 
 export type CharacterImageUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -847,11 +1180,15 @@ export type CharacterImageUncheckedUpdateWithoutProjectInput = {
   style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutSourceImageNestedInput
 }
 
 export type CharacterImageUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -868,6 +1205,9 @@ export type CharacterImageUncheckedUpdateManyWithoutProjectInput = {
 export type CharacterImageCreateManyCharacterInput = {
   id?: string
   projectId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  sourceImageId?: string | null
   boardPanelId?: string | null
   filePath: string
   publicUrl?: string
@@ -883,6 +1223,8 @@ export type CharacterImageCreateManyCharacterInput = {
 
 export type CharacterImageUpdateWithoutCharacterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -895,11 +1237,16 @@ export type CharacterImageUpdateWithoutCharacterInput = {
   variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutCharacterImagesNestedInput
+  sourceImage?: Prisma.CharacterImageUpdateOneWithoutDerivedImagesNestedInput
+  derivedImages?: Prisma.CharacterImageUpdateManyWithoutSourceImageNestedInput
 }
 
 export type CharacterImageUncheckedUpdateWithoutCharacterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -911,11 +1258,15 @@ export type CharacterImageUncheckedUpdateWithoutCharacterInput = {
   style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutSourceImageNestedInput
 }
 
 export type CharacterImageUncheckedUpdateManyWithoutCharacterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceImageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
@@ -929,12 +1280,122 @@ export type CharacterImageUncheckedUpdateManyWithoutCharacterInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type CharacterImageCreateManySourceImageInput = {
+  id?: string
+  projectId: string
+  characterId: string
+  kind?: $Enums.CharacterImageKind
+  isActive?: boolean
+  boardPanelId?: string | null
+  filePath: string
+  publicUrl?: string
+  fileName: string
+  fileSize?: number | null
+  mimeType?: string
+  prompt?: string
+  strategy?: string | null
+  style?: string | null
+  variationIndex?: number | null
+  createdAt?: Date | string
+}
+
+export type CharacterImageUpdateWithoutSourceImageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  strategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutCharacterImagesNestedInput
+  character?: Prisma.CharacterUpdateOneRequiredWithoutImagesNestedInput
+  derivedImages?: Prisma.CharacterImageUpdateManyWithoutSourceImageNestedInput
+}
+
+export type CharacterImageUncheckedUpdateWithoutSourceImageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  strategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  derivedImages?: Prisma.CharacterImageUncheckedUpdateManyWithoutSourceImageNestedInput
+}
+
+export type CharacterImageUncheckedUpdateManyWithoutSourceImageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  characterId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCharacterImageKindFieldUpdateOperationsInput | $Enums.CharacterImageKind
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  boardPanelId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  strategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variationIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type CharacterImageCountOutputType
+ */
+
+export type CharacterImageCountOutputType = {
+  derivedImages: number
+}
+
+export type CharacterImageCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  derivedImages?: boolean | CharacterImageCountOutputTypeCountDerivedImagesArgs
+}
+
+/**
+ * CharacterImageCountOutputType without action
+ */
+export type CharacterImageCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CharacterImageCountOutputType
+   */
+  select?: Prisma.CharacterImageCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * CharacterImageCountOutputType without action
+ */
+export type CharacterImageCountOutputTypeCountDerivedImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CharacterImageWhereInput
+}
 
 
 export type CharacterImageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   projectId?: boolean
   characterId?: boolean
+  kind?: boolean
+  isActive?: boolean
+  sourceImageId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
   publicUrl?: boolean
@@ -948,12 +1409,18 @@ export type CharacterImageSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
+  sourceImage?: boolean | Prisma.CharacterImage$sourceImageArgs<ExtArgs>
+  derivedImages?: boolean | Prisma.CharacterImage$derivedImagesArgs<ExtArgs>
+  _count?: boolean | Prisma.CharacterImageCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["characterImage"]>
 
 export type CharacterImageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   projectId?: boolean
   characterId?: boolean
+  kind?: boolean
+  isActive?: boolean
+  sourceImageId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
   publicUrl?: boolean
@@ -967,12 +1434,16 @@ export type CharacterImageSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
+  sourceImage?: boolean | Prisma.CharacterImage$sourceImageArgs<ExtArgs>
 }, ExtArgs["result"]["characterImage"]>
 
 export type CharacterImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   projectId?: boolean
   characterId?: boolean
+  kind?: boolean
+  isActive?: boolean
+  sourceImageId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
   publicUrl?: boolean
@@ -986,12 +1457,16 @@ export type CharacterImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   createdAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
+  sourceImage?: boolean | Prisma.CharacterImage$sourceImageArgs<ExtArgs>
 }, ExtArgs["result"]["characterImage"]>
 
 export type CharacterImageSelectScalar = {
   id?: boolean
   projectId?: boolean
   characterId?: boolean
+  kind?: boolean
+  isActive?: boolean
+  sourceImageId?: boolean
   boardPanelId?: boolean
   filePath?: boolean
   publicUrl?: boolean
@@ -1005,18 +1480,23 @@ export type CharacterImageSelectScalar = {
   createdAt?: boolean
 }
 
-export type CharacterImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "characterId" | "boardPanelId" | "filePath" | "publicUrl" | "fileName" | "fileSize" | "mimeType" | "prompt" | "strategy" | "style" | "variationIndex" | "createdAt", ExtArgs["result"]["characterImage"]>
+export type CharacterImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "characterId" | "kind" | "isActive" | "sourceImageId" | "boardPanelId" | "filePath" | "publicUrl" | "fileName" | "fileSize" | "mimeType" | "prompt" | "strategy" | "style" | "variationIndex" | "createdAt", ExtArgs["result"]["characterImage"]>
 export type CharacterImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
+  sourceImage?: boolean | Prisma.CharacterImage$sourceImageArgs<ExtArgs>
+  derivedImages?: boolean | Prisma.CharacterImage$derivedImagesArgs<ExtArgs>
+  _count?: boolean | Prisma.CharacterImageCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CharacterImageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
+  sourceImage?: boolean | Prisma.CharacterImage$sourceImageArgs<ExtArgs>
 }
 export type CharacterImageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   character?: boolean | Prisma.CharacterDefaultArgs<ExtArgs>
+  sourceImage?: boolean | Prisma.CharacterImage$sourceImageArgs<ExtArgs>
 }
 
 export type $CharacterImagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1024,11 +1504,16 @@ export type $CharacterImagePayload<ExtArgs extends runtime.Types.Extensions.Inte
   objects: {
     project: Prisma.$ProjectPayload<ExtArgs>
     character: Prisma.$CharacterPayload<ExtArgs>
+    sourceImage: Prisma.$CharacterImagePayload<ExtArgs> | null
+    derivedImages: Prisma.$CharacterImagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     projectId: string
     characterId: string
+    kind: $Enums.CharacterImageKind
+    isActive: boolean
+    sourceImageId: string | null
     boardPanelId: string | null
     filePath: string
     publicUrl: string
@@ -1436,6 +1921,8 @@ export interface Prisma__CharacterImageClient<T, Null = never, ExtArgs extends r
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   character<T extends Prisma.CharacterDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CharacterDefaultArgs<ExtArgs>>): Prisma.Prisma__CharacterClient<runtime.Types.Result.GetResult<Prisma.$CharacterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  sourceImage<T extends Prisma.CharacterImage$sourceImageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CharacterImage$sourceImageArgs<ExtArgs>>): Prisma.Prisma__CharacterImageClient<runtime.Types.Result.GetResult<Prisma.$CharacterImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  derivedImages<T extends Prisma.CharacterImage$derivedImagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CharacterImage$derivedImagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CharacterImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1468,6 +1955,9 @@ export interface CharacterImageFieldRefs {
   readonly id: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly projectId: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly characterId: Prisma.FieldRef<"CharacterImage", 'String'>
+  readonly kind: Prisma.FieldRef<"CharacterImage", 'CharacterImageKind'>
+  readonly isActive: Prisma.FieldRef<"CharacterImage", 'Boolean'>
+  readonly sourceImageId: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly boardPanelId: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly filePath: Prisma.FieldRef<"CharacterImage", 'String'>
   readonly publicUrl: Prisma.FieldRef<"CharacterImage", 'String'>
@@ -1877,6 +2367,49 @@ export type CharacterImageDeleteManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many CharacterImages to delete.
    */
   limit?: number
+}
+
+/**
+ * CharacterImage.sourceImage
+ */
+export type CharacterImage$sourceImageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CharacterImage
+   */
+  select?: Prisma.CharacterImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CharacterImage
+   */
+  omit?: Prisma.CharacterImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CharacterImageInclude<ExtArgs> | null
+  where?: Prisma.CharacterImageWhereInput
+}
+
+/**
+ * CharacterImage.derivedImages
+ */
+export type CharacterImage$derivedImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CharacterImage
+   */
+  select?: Prisma.CharacterImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CharacterImage
+   */
+  omit?: Prisma.CharacterImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CharacterImageInclude<ExtArgs> | null
+  where?: Prisma.CharacterImageWhereInput
+  orderBy?: Prisma.CharacterImageOrderByWithRelationInput | Prisma.CharacterImageOrderByWithRelationInput[]
+  cursor?: Prisma.CharacterImageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CharacterImageScalarFieldEnum | Prisma.CharacterImageScalarFieldEnum[]
 }
 
 /**

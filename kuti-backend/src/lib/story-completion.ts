@@ -49,8 +49,32 @@ function allowedModels(): string[] {
     : [config.storyCompletionDefaultModel];
 }
 
+function isSceneSummaryCompletion(input: StoryCompletionInput): boolean {
+  return input.targetKind === "scene" && input.field === "summary";
+}
+
+function isSceneContentCompletion(input: StoryCompletionInput): boolean {
+  return input.targetKind === "scene" && input.field === "content";
+}
+
+function buildSceneCharacterInventory(context: Record<string, unknown>): string[] {
+  const rawCharacters = context["characters"];
+  if (!Array.isArray(rawCharacters)) return [];
+
+  return rawCharacters.flatMap((candidate) => {
+    if (!candidate || typeof candidate !== "object") return [];
+
+    const character = candidate as Record<string, unknown>;
+    const slug = typeof character.slug === "string" ? character.slug.trim() : "";
+    if (!slug) return [];
+
+    const name = typeof character.name === "string" && character.name.trim() ? character.name.trim() : slug;
+    return [`${name} -> @chara:${slug}`];
+  });
+}
+
 function buildPrompt(input: StoryCompletionInput): string {
-  return [
+  const lines = [
     "Tu es l'assistant narratif de Kuti Studio.",
     "Complete uniquement le champ demande en respectant le contexte existant.",
     "Le resultat doit etre directement exploitable dans le champ, sans markdown explicatif ni preambule.",
@@ -62,9 +86,45 @@ function buildPrompt(input: StoryCompletionInput): string {
     `Champ cible: ${input.field}`,
     `Valeur actuelle: ${input.currentValue?.trim() || "(vide)"}`,
     input.instruction?.trim() ? `Instruction utilisateur: ${input.instruction.trim()}` : "",
-    "Contexte JSON:",
-    JSON.stringify(input.context, null, 2),
-  ].filter(Boolean).join("\n");
+  ];
+
+  if (isSceneSummaryCompletion(input)) {
+    lines.push(
+      "",
+      "Pour le champ scene.summary:",
+      "Ecris un resume en prose fluide et concise.",
+      "N'utilise aucun prefixe de script comme DIALOGUE:, THOUGHT: ou NARRATION:.",
+      "Garde le style narratif naturel du resume, sans structure de scenario ligne par ligne.",
+    );
+  }
+
+  if (isSceneContentCompletion(input)) {
+    const inventory = buildSceneCharacterInventory(input.context);
+
+    lines.push(
+      "",
+      "Pour le champ scene.content:",
+      "Ecris un script de scene ligne par ligne avec la syntaxe canonique suivante:",
+      "- DIALOGUE: pour une bulle de dialogue avec pointeur.",
+      "- THOUGHT: pour une bulle nuageuse de pensee interieure.",
+      "- NARRATION: pour un rectangle de narration dans un coin.",
+      "Ne convertis pas un type de ligne en un autre, ne fusionne pas les lignes et ne paraphrase pas leur ordre.",
+      "Preserve exactement les lignes deja prefixees dans la valeur actuelle, y compris leur type et leur ordre.",
+      "Quand un personnage apparait dans une ligne typée, conserve ou ajoute la syntaxe canonique `@chara:<slug>` dans cette ligne.",
+      inventory.length > 0
+        ? "Inventaire des personnages disponibles dans le contexte:"
+        : "Inventaire des personnages disponibles dans le contexte: aucun personnage disponible.",
+      ...inventory.map((entry) => `- ${entry}`),
+      "Exemples:",
+      "- DIALOGUE: @chara:asha On y va.",
+      "- THOUGHT: @chara:kairo Je dois rester calme.",
+      "- NARRATION: Le vent se leve sur le quai.",
+    );
+  }
+
+  lines.push("Contexte JSON:", JSON.stringify(input.context, null, 2));
+
+  return lines.filter(Boolean).join("\n");
 }
 
 function extractText(payload: unknown): string | null {

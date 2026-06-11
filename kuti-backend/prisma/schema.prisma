@@ -106,6 +106,7 @@ model Project {
 
   // Relations
   characters    Character[]
+  narrativeRoles NarrativeRole[]
   characterRelations CharacterRelation[]
   voiceSamples  VoiceSample[]
   tomes         Tome[]
@@ -137,6 +138,28 @@ enum CharacterStatus {
   archived
 
   @@map("character_status")
+}
+
+enum CharacterImageKind {
+  character_sheet
+  free_image
+
+  @@map("character_image_kind")
+}
+
+model NarrativeRole {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  code      String
+  label     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, code])
+  @@index([projectId])
+  @@map("narrative_roles")
 }
 
 model Character {
@@ -215,29 +238,36 @@ model VoiceSample {
 }
 
 model CharacterImage {
-  id              String    @id @default(uuid())
-  projectId       String    @map("project_id")
-  characterId     String    @map("character_id")
-  boardPanelId    String?   @map("board_panel_id")
-  filePath        String    @map("file_path")
-  publicUrl       String    @default("") @map("public_url")
-  fileName        String    @map("file_name")
-  fileSize        Int?      @map("file_size")
-  mimeType        String    @default("image/png") @map("mime_type")
-  prompt          String    @default("")
+  id              String             @id @default(uuid())
+  projectId       String             @map("project_id")
+  characterId     String             @map("character_id")
+  kind            CharacterImageKind  @default(free_image)
+  isActive        Boolean            @default(true) @map("is_active")
+  sourceImageId   String?            @map("source_image_id")
+  boardPanelId    String?            @map("board_panel_id")
+  filePath        String             @map("file_path")
+  publicUrl       String             @default("") @map("public_url")
+  fileName        String             @map("file_name")
+  fileSize        Int?               @map("file_size")
+  mimeType        String             @default("image/png") @map("mime_type")
+  prompt          String             @default("")
   strategy        String?
   style           String?
-  variationIndex  Int?      @map("variation_index")
-  createdAt       DateTime  @default(now()) @map("created_at")
+  variationIndex  Int?               @map("variation_index")
+  createdAt       DateTime           @default(now()) @map("created_at")
 
   // Relations
-  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  character       Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  character       Character          @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  sourceImage     CharacterImage?    @relation("CharacterImageSource", fields: [sourceImageId], references: [id], onDelete: SetNull)
+  derivedImages   CharacterImage[]   @relation("CharacterImageSource")
 
   @@unique([characterId, fileName])
   @@index([projectId])
   @@index([characterId])
+  @@index([characterId, kind, isActive])
   @@index([boardPanelId])
+  @@index([sourceImageId])
   @@map("character_images")
 }
 
@@ -298,24 +328,25 @@ model Chapter {
 }
 
 model Scene {
-  id            String      @id @default(uuid())
-  projectId     String      @map("project_id")
-  tomeId        String      @map("tome_id")
-  chapterId     String      @map("chapter_id")
-  title         String
-  slug          String
-  sceneType     String      @default("") @map("scene_type")
-  location      String      @default("")
-  summary       String      @default("")
-  content       String      @default("")
-  notes         String      @default("")
-  charactersJson Json       @default("[]") @map("characters_json")
-  tagsJson      Json        @default("[]") @map("tags_json")
-  metadataJson  Json        @default("{}") @map("metadata_json")
-  status        StoryStatus @default(draft)
-  orderIndex    Int         @default(0) @map("order_index")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  id              String      @id @default(uuid())
+  projectId       String      @map("project_id")
+  tomeId          String      @map("tome_id")
+  chapterId       String      @map("chapter_id")
+  title           String
+  slug            String
+  sceneType       String      @default("") @map("scene_type")
+  location        String      @default("")
+  summary         String      @default("")
+  content         String      @default("")
+  notes           String      @default("")
+  charactersJson  Json        @default("[]") @map("characters_json")
+  tagsJson        Json        @default("[]") @map("tags_json")
+  metadataJson    Json        @default("{}") @map("metadata_json")
+  targetPageCount Int?        @map("target_page_count")
+  status          StoryStatus @default(draft)
+  orderIndex      Int         @default(0) @map("order_index")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
 
   // Relations
   project       Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)

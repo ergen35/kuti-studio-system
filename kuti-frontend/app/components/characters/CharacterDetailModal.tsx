@@ -1,9 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "~/hooks/useTranslation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Save, Archive, Trash2, UserRoundPlus } from "lucide-react";
 import { CharacterAvatar } from "./CharacterAvatar";
+import { NarrativeRoleCombobox } from "./NarrativeRoleCombobox";
+import { CharacterProfileGenerateDialog } from "./CharacterProfileGenerateDialog";
 import { FormField } from "~/components/FormField";
 import { Button, Panel, SectionTitle, Badge, toCsv } from "~/components/ui";
 import {
@@ -35,6 +38,7 @@ import type {
   ListCharactersResponse,
   GetCharacterResponse,
 } from "~/lib/backend";
+import { generateCharacterProfileDraft } from "~/lib/narrative-roles-api";
 
 type Character = ListCharactersResponse[number];
 type CharacterDetail = GetCharacterResponse;
@@ -67,12 +71,15 @@ export function CharacterDetailModal({
   saving,
 }: CharacterDetailModalProps) {
   const { t } = useTranslation("characters");
+  const [isProfileDraftOpen, setIsProfileDraftOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    watch,
+    setValue,
   } = useForm<CharacterInput>({
     resolver: zodResolver(characterSchema),
     defaultValues: {
@@ -87,6 +94,47 @@ export function CharacterDetailModal({
       personality: character.personality,
       narrativeArc: character.narrativeArc,
       tagsJson: toCsv(character.tagsJson),
+    },
+  });
+  const narrativeRole = watch("narrativeRole");
+
+  const profileDraftMutation = useMutation({
+    mutationFn: (descriptionMinimal: string) =>
+      generateCharacterProfileDraft(
+        character.projectId,
+        character.id,
+        descriptionMinimal,
+      ),
+    onSuccess: (draft) => {
+      setValue("description", draft.description, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("physicalDescription", draft.physicalDescription, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("keyTraitsJson", draft.keyTraitsJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("colorPaletteJson", draft.colorPaletteJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("costumeElementsJson", draft.costumeElementsJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("personality", draft.personality, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("tagsJson", draft.tagsJson.join(", "), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setIsProfileDraftOpen(false);
     },
   });
 
@@ -111,7 +159,7 @@ export function CharacterDetailModal({
     onSave({
       name: data.name,
       alias: data.alias,
-      narrativeRole: data.narrativeRole,
+      narrativeRole: data.narrativeRole || undefined,
       description: data.description,
       physicalDescription: data.physicalDescription,
       keyTraitsJson: csv(data.keyTraitsJson),
@@ -151,12 +199,18 @@ export function CharacterDetailModal({
                 </FormField>
               </div>
 
-              <FormField
-                label={t("fields.narrativeRole")}
+              <NarrativeRoleCombobox
+                projectId={character.projectId}
+                value={narrativeRole || ""}
+                onValueChange={(role) =>
+                  setValue("narrativeRole", role, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
                 error={errors.narrativeRole}
-              >
-                <Input {...register("narrativeRole")} />
-              </FormField>
+                resetKey={isOpen ? `${character.id}-detail` : undefined}
+              />
 
               <FormField
                 label={t("fields.description")}
@@ -221,6 +275,13 @@ export function CharacterDetailModal({
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="primary" disabled={saving || isSubmitting}>
                   <Save size={16} /> {t("actions.saveProfile")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setIsProfileDraftOpen(true)}
+                  type="button"
+                >
+                  <UserRoundPlus size={15} /> {t("profileDraft.open")}
                 </Button>
                 <Button variant="ghost" onClick={onArchive} type="button">
                   <Archive size={15} /> {t("actions.archive")}
@@ -316,6 +377,20 @@ export function CharacterDetailModal({
             </div>
           </div>
         </div>
+
+        <CharacterProfileGenerateDialog
+          open={isProfileDraftOpen}
+          onOpenChange={setIsProfileDraftOpen}
+          onGenerate={(descriptionMinimal) =>
+            profileDraftMutation.mutate(descriptionMinimal)
+          }
+          isGenerating={profileDraftMutation.isPending}
+          error={
+            profileDraftMutation.error
+              ? String(profileDraftMutation.error)
+              : null
+          }
+        />
       </DialogContent>
     </Dialog>
   );

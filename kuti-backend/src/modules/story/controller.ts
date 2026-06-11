@@ -10,7 +10,9 @@ import {
   getStoryCompletionModels,
 } from "@lib/story-completion";
 import { runCoherenceScanIfEnabled } from "@lib/coherence-scan";
+import { sendGenerateChapterScenesEvent } from "@lib/inngest";
 import { normalizeReferenceKind, syncSceneReferences } from "@lib/story-references";
+import { createSceneRecord, resolveChapterSceneGenerationReferences } from "./chapter-auto-generation";
 import type {
   ReferenceSuggestion,
   TomeResponse,
@@ -24,6 +26,7 @@ import type {
   UpdateSceneBody,
   CompleteStoryFieldBody,
 } from "./dto";
+import { chapterAutoGenerateBodySchema } from "./dto";
 
 // ============================================================================
 // Helpers
@@ -155,6 +158,7 @@ function serializeScene(s: {
   charactersJson: unknown;
   tagsJson: unknown;
   metadataJson: unknown;
+  targetPageCount: number | null;
   status: string;
   orderIndex: number;
   createdAt: Date;
@@ -195,6 +199,7 @@ function serializeScene(s: {
     charactersJson: characters,
     tagsJson: tags,
     metadataJson: readSceneMetadata(s.metadataJson),
+    targetPageCount: s.targetPageCount,
     status: s.status as "active" | "draft" | "archived",
     orderIndex: s.orderIndex,
     createdAt: s.createdAt.toISOString(),
@@ -474,6 +479,83 @@ export async function deleteChapter(projectId: string, chapterId: string): Promi
   return true;
 }
 
+export async function autoGenerateChapterScenes(
+  projectId: string,
+  chapterId: string,
+  body: unknown,
+): Promise<{ jobId: string }> {
+  const payload = chapterAutoGenerateBodySchema.parse(body);
+
+  const chapter = await prisma.chapter.findFirst({
+    where: { id: chapterId, projectId },
+    include: { tome: true },
+  });
+
+  if (!chapter) {
+    throw new Error("chapter_not_found");
+  }
+
+  const availableModels = getStoryCompletionModels().filter(
+    (model) => model.enabled && model.configured,
+  );
+
+  if (availableModels.length === 0) {
+    throw new Error("chapter_auto_generation_not_configured");
+  }
+
+  const modelKey = availableModels[0]?.key;
+  if (!modelKey) {
+    throw new Error("chapter_auto_generation_not_configured");
+  }
+
+  const references = await resolveChapterSceneGenerationReferences(
+    projectId,
+    payload.chapterSummary,
+  );
+
+  const now = new Date();
+  const job = await prisma.generationJob.create({
+    data: {
+      id: randomUUIDv7(),
+      projectId,
+      sourceKind: "chapter",
+      sourceId: chapterId,
+      sourceLabel: `${chapter.tome?.title || "Tome"} > ${chapter.title}`,
+      sourceVersionId: null,
+      strategy: "direct",
+      entrypoint: modelKey,
+      title: `Auto-generate scenes: ${chapter.title}`,
+      prompt: "",
+      summary: `Queued auto-generation for ${payload.sceneCount} scene${payload.sceneCount > 1 ? "s" : ""}`,
+      status: "pending",
+      progress: 0,
+      metadataJson: {
+        jobKind: "chapter_auto_generation",
+        chapterId,
+        chapterTitle: chapter.title,
+        tomeId: chapter.tomeId,
+        tomeTitle: chapter.tome?.title ?? null,
+        chapterSummary: payload.chapterSummary,
+        chapterSummaryLength: payload.chapterSummary.trim().length,
+        sceneCount: payload.sceneCount,
+        modelKey,
+        references,
+        referenceCount: references.length,
+      },
+      createdAt: now,
+      updatedAt: now,
+    },
+  });
+
+  await sendGenerateChapterScenesEvent({
+    projectId,
+    chapterId,
+    jobId: job.id,
+  });
+
+  return { jobId: job.id };
+}
+
 // ============================================================================
 // Scenes
 // ============================================================================
@@ -506,36 +588,26 @@ export async function createScene(projectId: string, data: CreateSceneBody): Pro
   const now = new Date();
 
   const scene = await prisma.$transaction(async (tx) => {
-    const created = await tx.scene.create({
-      data: {
-        id: randomUUIDv7(),
-        projectId,
-        tomeId: data.tomeId,
-        chapterId: data.chapterId,
-        slug,
-        title: data.title,
-        sceneType: data.sceneType ?? "",
-        location: data.location ?? "",
-        summary: data.summary ?? "",
-        content: data.content ?? "",
-        notes: data.notes ?? "",
-        charactersJson: (data.charactersJson as string[]) ?? [],
-        tagsJson: (data.tagsJson as string[]) ?? [],
-        metadataJson: mergeSceneMetadata({}, data.metadataJson),
-        status: data.status ?? "draft",
-        orderIndex: data.orderIndex ?? 0,
-        createdAt: now,
-        updatedAt: now,
-      },
+    return await createSceneRecord(tx, {
+      projectId,
+      tomeId: data.tomeId,
+      chapterId: data.chapterId,
+      slug,
+      title: data.title,
+      sceneType: data.sceneType,
+      location: data.location,
+      summary: data.summary,
+      content: data.content,
+      notes: data.notes,
+      charactersJson: data.charactersJson,
+      tagsJson: data.tagsJson,
+      metadataJson: mergeSceneMetadata({}, data.metadataJson),
+      targetPageCount: data.targetPageCount,
+      status: data.status,
+      orderIndex: data.orderIndex,
+      createdAt: now,
+      updatedAt: now,
     });
-
-    await syncSceneReferences(created.id, projectId, {
-      summary: created.summary,
-      content: created.content,
-      notes: created.notes,
-    }, tx);
-
-    return created;
   });
 
   await runCoherenceScanIfEnabled(projectId);
@@ -578,6 +650,7 @@ export async function updateScene(
         charactersJson: data.charactersJson as string[],
         tagsJson: data.tagsJson as string[],
         metadataJson: mergeSceneMetadata(scene.metadataJson, data.metadataJson),
+        targetPageCount: data.targetPageCount,
         status: data.status,
         orderIndex: data.orderIndex,
         updatedAt: new Date(),
@@ -833,4 +906,100 @@ export async function completeStoryField(projectId: string, body: CompleteStoryF
     modelKey: result.modelKey,
     text: result.text,
   };
+}
+
+// ============================================================================
+// Chapter Manga Pages Preview
+// ============================================================================
+
+export interface ChapterMangaPageResponse {
+  id: string;
+  projectId: string;
+  sceneId: string;
+  sceneTitle: string;
+  sceneOrderIndex: number;
+  tomeId: string;
+  chapterId: string;
+  jobId: string;
+  boardId: string;
+  panelId: string;
+  pageNumber: number;
+  label: string;
+  status: string;
+  imageUrl: string | null;
+  caption: string | null;
+  prompt: string | null;
+  metadataJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function listChapterMangaPages(
+  projectId: string,
+  chapterId: string
+): Promise<ChapterMangaPageResponse[]> {
+  // Verify chapter exists and belongs to project
+  const chapter = await prisma.chapter.findFirst({
+    where: { id: chapterId, projectId },
+  });
+
+  if (!chapter) {
+    throw new Error("Chapter not found");
+  }
+
+  // Get all scenes of this chapter, ordered
+  const scenes = await prisma.scene.findMany({
+    where: { chapterId, projectId },
+    orderBy: { orderIndex: "asc" },
+    select: { id: true, title: true, orderIndex: true },
+  });
+
+  const sceneIds = scenes.map((s) => s.id);
+  const sceneMap = new Map(scenes.map((s) => [s.id, s]));
+
+  // Get all manga pages for these scenes
+  const pages = await prisma.sceneMangaPage.findMany({
+    where: {
+      projectId,
+      chapterId,
+      sceneId: { in: sceneIds },
+    },
+    orderBy: [{ pageNumber: "asc" }],
+  });
+
+  // Sort by scene order first, then by page number
+  const sortedPages = pages.sort((a, b) => {
+    const sceneA = sceneMap.get(a.sceneId);
+    const sceneB = sceneMap.get(b.sceneId);
+    const orderA = sceneA?.orderIndex ?? 0;
+    const orderB = sceneB?.orderIndex ?? 0;
+
+    if (orderA !== orderB) return orderA - orderB;
+    return a.pageNumber - b.pageNumber;
+  });
+
+  return sortedPages.map((page) => {
+    const scene = sceneMap.get(page.sceneId);
+    return {
+      id: page.id,
+      projectId: page.projectId,
+      sceneId: page.sceneId,
+      sceneTitle: scene?.title ?? "",
+      sceneOrderIndex: scene?.orderIndex ?? 0,
+      tomeId: page.tomeId,
+      chapterId: page.chapterId,
+      jobId: page.jobId,
+      boardId: page.boardId,
+      panelId: page.panelId,
+      pageNumber: page.pageNumber,
+      label: page.label,
+      status: page.status,
+      imageUrl: page.imageUrl,
+      caption: page.caption,
+      prompt: page.prompt,
+      metadataJson: page.metadataJson as Record<string, unknown>,
+      createdAt: page.createdAt.toISOString(),
+      updatedAt: page.updatedAt.toISOString(),
+    };
+  });
 }

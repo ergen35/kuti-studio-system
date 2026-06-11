@@ -4,18 +4,41 @@
  */
 
 import { randomUUIDv7 } from "bun";
+import slugify from "slugify";
 import { db } from "../db";
 import type { GenerationJobStatus, GenerationSourceKind, GenerationStepStatus } from "../db/generated/enums";
-import { getFileStats, writeFile } from "../filesystem";
+import { getFileStats, saveCharacterImage, writeFile } from "../filesystem";
 import { generateImage } from "../model-providers";
 import { getProjectDir } from "../paths";
+import {
+  buildCharacterImagePrompt,
+  buildScenePanelPrompt,
+  buildSceneStoryboardPrompt,
+  buildStyleDescription,
+  type PromptCharacterAnchor,
+  type PromptImageAnchor,
+  type PromptReferenceAnchor,
+  selectActiveCharacterSheet,
+} from "../manga-prompts";
+import { normalizeReferenceKind } from "../story-references";
+import { parseSceneContentBeats, requireSceneContent } from "../../modules/scene-generation/content";
 import { inngest } from "./client";
 
 type CharacterForPrompt = {
   id: string;
+  slug: string;
   name: string;
+  alias: string | null;
+  narrativeRole: string | null;
   description: string;
-  images?: Array<{ filePath: string; publicUrl: string; fileName: string }>;
+  physicalDescription: string;
+  personality: string;
+  narrativeArc: string;
+  keyTraitsJson: unknown;
+  colorPaletteJson: unknown;
+  costumeElementsJson: unknown;
+  tagsJson: unknown;
+  images: PromptImageAnchor[];
 };
 
 type SelectedImageForPrompt = {
@@ -24,6 +47,12 @@ type SelectedImageForPrompt = {
   filePath: string;
   publicUrl: string;
   fileName: string;
+  prompt: string;
+  kind: string;
+  isActive: boolean;
+  style: string | null;
+  strategy: string | null;
+  variationIndex: number | null;
 };
 
 // ============================================================================
@@ -44,7 +73,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
     // Step 1: Récupérer le contexte (scène, projet, config)
     // ============================================================================
     const context = await step.run("fetch-context", async () => {
-      const [scene, project, sceneConfig] = await Promise.all([
+      const [scene, project, sceneConfig, sceneReferences, projectSceneLocations] = await Promise.all([
         db.scene.findUnique({
           where: { id: sceneId },
           include: {
@@ -58,6 +87,14 @@ export const generateSceneMangaFunction = inngest.createFunction(
           : db.sceneGenerationConfig.findFirst({
               where: { projectId, isDefault: true },
             }),
+        db.storyReference.findMany({
+          where: { projectId, sceneId },
+          orderBy: { createdAt: "asc" },
+        }),
+        db.scene.findMany({
+          where: { projectId },
+          select: { location: true },
+        }),
       ]);
 
       if (!scene) throw new Error(`Scene ${sceneId} not found`);
@@ -68,7 +105,10 @@ export const generateSceneMangaFunction = inngest.createFunction(
       const selectedImageIds = Object.values(characterImageRefs ?? {}).filter(
         (value): value is string => typeof value === "string" && value.trim().length > 0,
       );
-      const characterLookupValues = Array.from(new Set([...sceneCharacterRefs, ...selectedCharacterIds]));
+      const referenceCharacterSlugs = sceneReferences
+        .map((reference) => normalizeReferenceKind(reference.referenceKind) === "character" ? reference.targetSlug : null)
+        .filter((value): value is string => Boolean(value));
+      const characterLookupValues = Array.from(new Set([...sceneCharacterRefs, ...selectedCharacterIds, ...referenceCharacterSlugs]));
 
       const characterDetails: CharacterForPrompt[] = characterLookupValues.length > 0
         ? await db.character.findMany({
@@ -82,21 +122,356 @@ export const generateSceneMangaFunction = inngest.createFunction(
             },
             include: {
               images: {
-                take: 1,
-                orderBy: { createdAt: "desc" },
+                take: 6,
+                orderBy: [
+                  { kind: "asc" },
+                  { isActive: "desc" },
+                  { createdAt: "desc" },
+                ],
               },
             },
           })
         : [];
 
       const selectedImages: SelectedImageForPrompt[] = selectedImageIds.length > 0
-        ? await db.characterImage.findMany({ where: { projectId, id: { in: selectedImageIds } } })
+        ? await db.characterImage.findMany({
+            where: { projectId, id: { in: selectedImageIds } },
+            select: {
+              id: true,
+              characterId: true,
+              filePath: true,
+              publicUrl: true,
+              fileName: true,
+              prompt: true,
+              kind: true,
+              isActive: true,
+              style: true,
+              strategy: true,
+              variationIndex: true,
+            },
+          })
         : [];
 
-      return { scene, project, sceneConfig, characterDetails, selectedImages };
+      const referencedSceneSlugs = sceneReferences
+        .map((reference) => normalizeReferenceKind(reference.referenceKind) === "scene" ? reference.targetSlug : null)
+        .filter((value): value is string => Boolean(value));
+      const referencedChapterSlugs = sceneReferences
+        .map((reference) => normalizeReferenceKind(reference.referenceKind) === "chapter" ? reference.targetSlug : null)
+        .filter((value): value is string => Boolean(value));
+      const referencedTomeSlugs = sceneReferences
+        .map((reference) => normalizeReferenceKind(reference.referenceKind) === "tome" ? reference.targetSlug : null)
+        .filter((value): value is string => Boolean(value));
+      const referencedAssetSlugs = sceneReferences
+        .map((reference) => normalizeReferenceKind(reference.referenceKind) === "asset" ? reference.targetSlug : null)
+        .filter((value): value is string => Boolean(value));
+
+      const [referencedScenes, referencedChapters, referencedTomes, referencedAssets] = await Promise.all([
+        referencedSceneSlugs.length > 0
+          ? db.scene.findMany({
+              where: { projectId, slug: { in: referencedSceneSlugs } },
+              select: { slug: true, title: true },
+            })
+          : Promise.resolve([]),
+        referencedChapterSlugs.length > 0
+          ? db.chapter.findMany({
+              where: { projectId, slug: { in: referencedChapterSlugs } },
+              select: { slug: true, title: true },
+            })
+          : Promise.resolve([]),
+        referencedTomeSlugs.length > 0
+          ? db.tome.findMany({
+              where: { projectId, slug: { in: referencedTomeSlugs } },
+              select: { slug: true, title: true },
+            })
+          : Promise.resolve([]),
+        referencedAssetSlugs.length > 0
+          ? db.asset.findMany({
+              where: { projectId, slug: { in: referencedAssetSlugs } },
+              select: { slug: true, name: true },
+            })
+          : Promise.resolve([]),
+      ]);
+
+      const sceneLocationMap = new Map<string, string>();
+      const projectLocations = Array.isArray((project.settingsJson as Record<string, unknown> | null)?.locationsJson)
+        ? ((project.settingsJson as Record<string, unknown>).locationsJson as string[])
+        : [];
+
+      for (const location of [...projectLocations, ...projectSceneLocations.map((entry) => entry.location)]) {
+        const trimmed = typeof location === "string" ? location.trim() : "";
+        if (!trimmed) continue;
+        sceneLocationMap.set(normalizeLocationSlug(trimmed), trimmed);
+      }
+
+      const characterBySlug = new Map(characterDetails.map((character) => [character.slug, character]));
+      const sceneBySlug = new Map(referencedScenes.map((entry) => [entry.slug, entry]));
+      const chapterBySlug = new Map(referencedChapters.map((entry) => [entry.slug, entry]));
+      const tomeBySlug = new Map(referencedTomes.map((entry) => [entry.slug, entry]));
+      const assetBySlug = new Map(referencedAssets.map((entry) => [entry.slug, entry]));
+      const selectedImageByCharacterId = new Map(selectedImages.map((image) => [image.characterId, image]));
+      const generatedCharacterSheetAnchors = new Map<string, PromptImageAnchor>();
+      const sceneStyleDescription = buildStyleDescription(
+        sceneConfig?.stylePreset || "generic",
+        sceneConfig?.colorMode || "bw",
+      );
+
+      for (const character of characterDetails) {
+        const existingSheet = selectActiveCharacterSheet(character.images);
+        if (existingSheet) continue;
+
+        const referenceImage = selectedImageByCharacterId.get(character.id) ?? null;
+        const sheetPrompt = buildCharacterImagePrompt({
+          character: {
+            name: character.name,
+            alias: character.alias,
+            narrativeRole: character.narrativeRole,
+            description: character.description,
+            physicalDescription: character.physicalDescription,
+            personality: character.personality,
+            narrativeArc: character.narrativeArc,
+            keyTraitsJson: character.keyTraitsJson,
+            colorPaletteJson: character.colorPaletteJson,
+            costumeElementsJson: character.costumeElementsJson,
+            tagsJson: character.tagsJson,
+          },
+          kind: "character_sheet",
+          strategy: "sheet",
+          style: sceneStyleDescription,
+          activeCharacterSheet: null,
+          referenceImage,
+          variationIndex: 0,
+          totalCount: 1,
+        });
+
+        const generatedSheet = await generateImage(sheetPrompt, {
+          modelKey,
+          size: "1024x1024",
+          timeoutSeconds: 180,
+        });
+
+        const savedSheet = await saveCharacterImage(projectId, character.id, generatedSheet.content, {
+          kind: "character_sheet",
+          strategy: "sheet",
+          style: sceneStyleDescription,
+        });
+
+        const createdSheet = await db.characterImage.create({
+          data: {
+            projectId,
+            characterId: character.id,
+            kind: "character_sheet",
+            isActive: true,
+            sourceImageId: referenceImage?.id ?? null,
+            boardPanelId: null,
+            filePath: savedSheet.filePath,
+            publicUrl: savedSheet.publicUrl,
+            fileName: savedSheet.fileName,
+            fileSize: savedSheet.fileSize,
+            mimeType: generatedSheet.mimeType,
+            prompt: sheetPrompt,
+            strategy: "sheet",
+            style: sceneStyleDescription,
+            variationIndex: null,
+          },
+        });
+
+        await db.characterImage.updateMany({
+          where: {
+            projectId,
+            characterId: character.id,
+            kind: "character_sheet",
+            isActive: true,
+            id: { not: createdSheet.id },
+          },
+          data: { isActive: false },
+        });
+
+        generatedCharacterSheetAnchors.set(character.id, {
+          id: createdSheet.id,
+          fileName: savedSheet.fileName,
+          publicUrl: savedSheet.publicUrl,
+          prompt: sheetPrompt,
+          style: sceneStyleDescription,
+          strategy: "sheet",
+          variationIndex: null,
+          kind: "character_sheet",
+          isActive: true,
+        });
+      }
+
+      const characterAnchors: PromptCharacterAnchor[] = characterDetails.map((character) => {
+        const activeSheet = selectActiveCharacterSheet(character.images) ?? generatedCharacterSheetAnchors.get(character.id) ?? null;
+        const selectedImage = selectedImageByCharacterId.get(character.id);
+
+        return {
+          name: character.name,
+          alias: character.alias,
+          narrativeRole: character.narrativeRole,
+          description: character.description,
+          physicalDescription: character.physicalDescription,
+          personality: character.personality,
+          narrativeArc: character.narrativeArc,
+          keyTraitsJson: character.keyTraitsJson,
+          colorPaletteJson: character.colorPaletteJson,
+          costumeElementsJson: character.costumeElementsJson,
+          tagsJson: character.tagsJson,
+          activeSheet: activeSheet
+            ? {
+                id: activeSheet.id,
+                fileName: activeSheet.fileName,
+                publicUrl: activeSheet.publicUrl,
+                prompt: activeSheet.prompt,
+                style: activeSheet.style,
+                strategy: activeSheet.strategy,
+                variationIndex: activeSheet.variationIndex,
+                kind: activeSheet.kind,
+                isActive: activeSheet.isActive,
+              }
+            : null,
+          selectedImage: selectedImage
+            ? {
+                id: selectedImage.id,
+                fileName: selectedImage.fileName,
+                publicUrl: selectedImage.publicUrl,
+                prompt: selectedImage.prompt,
+                style: selectedImage.style,
+                strategy: selectedImage.strategy,
+                variationIndex: selectedImage.variationIndex,
+                kind: selectedImage.kind,
+                isActive: selectedImage.isActive,
+              }
+            : null,
+        };
+      });
+
+      const referenceAnchors: PromptReferenceAnchor[] = sceneReferences.map((reference) => {
+        const canonicalKind = normalizeReferenceKind(reference.referenceKind);
+
+        switch (canonicalKind) {
+          case "character": {
+            const character = characterBySlug.get(reference.targetSlug);
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: character?.slug ?? null,
+              resolvedLabel: character?.name ?? null,
+              description: character ? "character" : "missing character",
+              isBroken: !character,
+            };
+          }
+          case "scene": {
+            const target = sceneBySlug.get(reference.targetSlug);
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: target?.slug ?? null,
+              resolvedLabel: target?.title ?? null,
+              description: target ? "scene" : "missing scene",
+              isBroken: !target,
+            };
+          }
+          case "chapter": {
+            const target = chapterBySlug.get(reference.targetSlug);
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: target?.slug ?? null,
+              resolvedLabel: target?.title ?? null,
+              description: target ? "chapter" : "missing chapter",
+              isBroken: !target,
+            };
+          }
+          case "tome": {
+            const target = tomeBySlug.get(reference.targetSlug);
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: target?.slug ?? null,
+              resolvedLabel: target?.title ?? null,
+              description: target ? "tome" : "missing tome",
+              isBroken: !target,
+            };
+          }
+          case "asset": {
+            const target = assetBySlug.get(reference.targetSlug);
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: target?.slug ?? null,
+              resolvedLabel: target?.name ?? null,
+              description: target ? "asset" : "missing asset",
+              isBroken: !target,
+            };
+          }
+          case "environment": {
+            const targetLabel = sceneLocationMap.get(reference.targetSlug) ?? null;
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: targetLabel ?? reference.targetSlug,
+              resolvedLabel: targetLabel,
+              description: targetLabel ? "environment" : "missing environment",
+              isBroken: !targetLabel,
+            };
+          }
+          default:
+            return {
+              referenceKind: reference.referenceKind,
+              targetSlug: reference.targetSlug,
+              rawToken: reference.rawToken,
+              label: reference.targetSlug,
+              resolvedLabel: null,
+              description: "unsupported reference kind",
+              isBroken: true,
+            };
+        }
+      });
+
+      const brokenCharacterReferences = referenceAnchors.filter((reference) => (
+        normalizeReferenceKind(reference.referenceKind) === "character" && reference.isBroken
+      ));
+
+      if (brokenCharacterReferences.length > 0) {
+        const brokenLabels = brokenCharacterReferences.map((reference) => reference.rawToken || reference.targetSlug).join(", ");
+        throw new Error(`Scene contains unresolved character references: ${brokenLabels}`);
+      }
+
+      const sceneContext = {
+        title: scene.title,
+        location: scene.location,
+        content: requireSceneContent(
+          scene.content,
+          "Scene content is required before manga generation",
+        ),
+        notes: scene.notes,
+        tomeTitle: scene.tome?.title ?? null,
+        chapterTitle: scene.chapter?.title ?? null,
+      };
+
+      return {
+        scene,
+        project,
+        sceneConfig,
+        characterDetails: characterAnchors,
+        referenceAnchors,
+        sceneContext,
+        generatedCharacterSheetCount: generatedCharacterSheetAnchors.size,
+      };
     });
 
-    const { scene, project, sceneConfig, characterDetails, selectedImages } = context;
+    const { scene, project, sceneConfig, characterDetails, referenceAnchors, sceneContext, generatedCharacterSheetCount } = context;
+    const styleContext = {
+      systemPrompt: sceneConfig?.systemPrompt,
+      stylePreset: sceneConfig?.stylePreset,
+      colorMode: sceneConfig?.colorMode,
+      allowMultiPage: sceneConfig?.allowMultiPage,
+    };
 
     // ============================================================================
     // Step 2: Utiliser le job créé par l'API
@@ -113,7 +488,13 @@ export const generateSceneMangaFunction = inngest.createFunction(
           strategy: "intermediate",
           entrypoint: modelKey || "gpt_images_2",
           title: `Manga: ${scene.title}`,
-          prompt: buildScenePrompt(scene, characterDetails, additionalContext),
+          prompt: buildSceneStoryboardPrompt({
+            style: styleContext,
+            context: sceneContext,
+            characters: characterDetails,
+            references: referenceAnchors,
+            additionalContext,
+          }),
           summary: "",
           status: "running" as GenerationJobStatus,
           progress: 5,
@@ -123,6 +504,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
             configId: sceneConfig?.id,
             modelKey,
             characterCount: characterDetails.length,
+            preflightGeneratedCharacterSheetCount: generatedCharacterSheetCount,
           },
         },
       });
@@ -134,7 +516,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
     const storyboard = await step.run("generate-storyboard", async () => {
       // Simuler un storyboard basé sur le contenu de la scène
       // Dans une vraie implémentation, on pourrait appeler une API LLM
-      const panels = generatePanelsFromContent(scene.content || scene.summary, imageCount || 6, scene.title);
+      const panels = generatePanelsFromContent(sceneContext.content, imageCount || 6, scene.title);
 
       await db.generationJob.update({
         where: { id: job.id },
@@ -143,6 +525,20 @@ export const generateSceneMangaFunction = inngest.createFunction(
 
       return panels;
     });
+
+    const storyboardWithPrompts = storyboard.map((panel, index) => ({
+      ...panel,
+      prompt: buildScenePanelPrompt({
+        style: styleContext,
+        context: sceneContext,
+        characters: characterDetails,
+        references: referenceAnchors,
+        panelIndex: index,
+        panelCount: storyboard.length,
+        beat: panel.description,
+        additionalContext,
+      }),
+    }));
 
     // ============================================================================
     // Step 4: Créer le board et les steps
@@ -166,8 +562,8 @@ export const generateSceneMangaFunction = inngest.createFunction(
       });
 
       // Créer les panels du board
-      for (let i = 0; i < storyboard.length; i++) {
-        const panel = storyboard[i];
+      for (let i = 0; i < storyboardWithPrompts.length; i++) {
+        const panel = storyboardWithPrompts[i];
         await db.generationBoardPanel.create({
           data: {
             boardId: newBoard.id,
@@ -186,14 +582,14 @@ export const generateSceneMangaFunction = inngest.createFunction(
       }
 
       // Créer les steps du job
-      for (let i = 0; i < storyboard.length; i++) {
+      for (let i = 0; i < storyboardWithPrompts.length; i++) {
         await db.generationJobStep.create({
           data: {
             jobId: job.id,
             orderIndex: i,
-            title: `Panel ${i + 1}: ${storyboard[i].title}`,
+            title: `Panel ${i + 1}: ${storyboardWithPrompts[i].title}`,
             status: "pending" as GenerationStepStatus,
-            prompt: storyboard[i].prompt,
+            prompt: storyboardWithPrompts[i].prompt,
           },
         });
       }
@@ -226,10 +622,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
         }
 
         try {
-          // Construire le prompt amélioré avec les refs de personnages
-          const prompt = buildPanelPrompt(panel.prompt, characterDetails, characterImageRefs, selectedImages, sceneConfig);
-
-          const generatedImage = await generateImage(prompt, {
+          const generatedImage = await generateImage(panel.prompt, {
             modelKey,
             size: "1024x1536",
             timeoutSeconds: 180,
@@ -382,119 +775,17 @@ export const generateSceneMangaFunction = inngest.createFunction(
   },
 );
 
-// ============================================================================
-// Helpers
-// ============================================================================
-
-function buildScenePrompt(
-  scene: {
-    title: string;
-    content: string;
-    summary: string;
-    location: string;
-  },
-  characters: Array<{ name: string; description: string }>,
-  additionalContext?: string,
-): string {
-  const parts: string[] = [];
-
-  parts.push(`Scene: ${scene.title}`);
-
-  if (scene.summary) {
-    parts.push(`Summary: ${scene.summary}`);
-  }
-
-  if (scene.location) {
-    parts.push(`Location: ${scene.location}`);
-  }
-
-  if (characters.length > 0) {
-    parts.push(`Characters: ${characters.map((c) => `${c.name}${c.description ? ` (${c.description})` : ""}`).join(", ")}`);
-  }
-
-  if (scene.content) {
-    parts.push(`Content:\n${scene.content.substring(0, 2000)}`);
-  }
-
-  if (additionalContext) {
-    parts.push(`Additional context: ${additionalContext}`);
-  }
-
-  return parts.join("\n\n");
-}
-
 function jsonStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
 }
 
-function buildPanelPrompt(
-  basePrompt: string,
-  characters: Array<{
-    id: string;
-    name: string;
-    description: string;
-    images?: Array<{ filePath: string; publicUrl: string; fileName: string }>;
-  }>,
-  characterImageRefs?: Record<string, string>,
-  selectedImages?: Array<{ id: string; characterId: string; filePath: string; publicUrl: string; fileName: string }>,
-  config?: {
-    systemPrompt?: string;
-    stylePreset?: string;
-    colorMode?: string;
-  } | null,
-): string {
-  const parts: string[] = [];
-
-  // System prompt si configuré
-  if (config?.systemPrompt) {
-    parts.push(config.systemPrompt);
-  }
-
-  // Instructions de style manga
-  parts.push("Manga panel illustration, professional quality.");
-
-  // Mode couleur
-  if (config?.colorMode === "bw") {
-    parts.push("Black and white ink style, manga screentone.");
-  } else if (config?.colorMode === "color") {
-    parts.push("Full color illustration, vibrant.");
-  } else if (config?.colorMode === "spot_color") {
-    parts.push("Spot color style, limited palette.");
-  }
-
-  // Style preset
-  switch (config?.stylePreset) {
-    case "shonen":
-      parts.push("Shonen manga style, dynamic action lines.");
-      break;
-    case "shojo":
-      parts.push("Shojo manga style, elegant and emotional.");
-      break;
-    case "seinen":
-      parts.push("Seinen manga style, detailed and mature.");
-      break;
-    default:
-      parts.push("Generic manga style.");
-  }
-
-  // Références des personnages (si disponibles)
-  const selectedImageById = new Map((selectedImages ?? []).map((image) => [image.id, image]));
-  if (characters.length > 0) {
-    parts.push("Character references:");
-    for (const char of characters) {
-      const selectedImageId = characterImageRefs?.[char.id];
-      const selectedImage = selectedImageId ? selectedImageById.get(selectedImageId) : null;
-      const fallbackImage = char.images?.[0] ?? null;
-      const imageRef = selectedImage?.publicUrl || selectedImage?.filePath || fallbackImage?.publicUrl || fallbackImage?.filePath || "no visual reference selected";
-      parts.push(`- ${char.name}${char.description ? ` (${char.description})` : ""}: ${imageRef}`);
-    }
-  }
-
-  // Prompt principal
-  parts.push(`\nScene description: ${basePrompt}`);
-
-  return parts.join("\n");
+function normalizeLocationSlug(value: string): string {
+  return slugify(value.trim(), {
+    lower: true,
+    strict: true,
+    replacement: "-",
+  });
 }
 
 interface PanelDefinition {
@@ -505,73 +796,21 @@ interface PanelDefinition {
 }
 
 function generatePanelsFromContent(content: string, targetCount: number, sceneTitle = "Scene"): PanelDefinition[] {
-  const beats = extractVisualBeats(content, sceneTitle);
+  const beats = parseSceneContentBeats(content, sceneTitle);
 
   const panels: PanelDefinition[] = [];
+  const fallbackBeat = beats[0] ?? parseSceneContentBeats(null, sceneTitle)[0]!;
   const count = Math.max(1, targetCount);
 
   for (let i = 0; i < count; i++) {
-    const beat = beats[i] || beats[i % beats.length] || `${sceneTitle} - visual beat ${i + 1}`;
+    const beat = beats[i] || beats[i % beats.length] || fallbackBeat;
     panels.push({
       title: `Panel ${i + 1}`,
-      caption: beat.substring(0, 140),
-      prompt: `Illustrate this manga story beat: ${beat}`,
-      description: beat,
+      caption: beat.promptLine.substring(0, 140),
+      prompt: `Illustrate this manga story beat: ${beat.promptLine}`,
+      description: beat.promptLine,
     });
   }
 
   return panels;
-}
-
-function extractVisualBeats(content: string, fallbackTitle: string): string[] {
-  const source = content.replace(/\r/g, "").trim();
-  if (!source) return [`${fallbackTitle} - visual beat 1`];
-
-  const lineBeats = source
-    .split(/\n+/)
-    .map(cleanVisualBeat)
-    .filter((line) => line.length >= 18 && !isDialogueOnly(line) && !isSoundOnly(line));
-
-  if (lineBeats.length >= 2) return uniqueBeats(lineBeats);
-
-  const paragraphBeats = source
-    .split(/\n\s*\n+/)
-    .flatMap((paragraph) => paragraph.split(/(?<=[.!?。！？])\s+/))
-    .map(cleanVisualBeat)
-    .filter((beat) => beat.length >= 18 && !isDialogueOnly(beat) && !isSoundOnly(beat));
-
-  const beats = uniqueBeats([...lineBeats, ...paragraphBeats]);
-  return beats.length > 0 ? beats : [`${fallbackTitle} - visual beat 1`];
-}
-
-function cleanVisualBeat(value: string): string {
-  return value
-    .replace(/^[-*•]\s+/, "")
-    .replace(/^\[(.+?)\]\s*[-—:]?\s*/u, "$1. ")
-    .replace(/[\[\]]/g, "")
-    .replace(/\.\s*([.!?])/g, "$1")
-    .replace(/([.!?])\1+/g, "$1")
-    .replace(/\s+/g, " ")
-    .replace(/\s+([,.!?;:])/g, "$1")
-    .trim();
-}
-
-function isDialogueOnly(value: string): boolean {
-  return /^[A-ZÀ-ÖØ-Þ0-9 _'’.-]{2,}\s*[:：]/.test(value) && value.length < 160;
-}
-
-function isSoundOnly(value: string): boolean {
-  return /^Son\s*[—:-]/i.test(value) || /^SFX\s*[—:-]/i.test(value);
-}
-
-function uniqueBeats(beats: string[]): string[] {
-  const seen = new Set<string>();
-  const result: string[] = [];
-  for (const beat of beats) {
-    const key = beat.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push(beat);
-  }
-  return result;
 }

@@ -22,10 +22,12 @@
     "duplicate": "Dupliquer",
     "openGraph": "Graphe relationnel",
     "saveProfile": "Enregistrer le profil",
+    "generateProfile": "Générer une fiche personnage",
     "backToGrid": "Retour aux personnages",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "creating": "Création..."
+    "creating": "Création...",
+    "setActive": "Définir comme actif"
   },
   "fields": {
     "name": "Nom",
@@ -163,6 +165,14 @@
     "namePlaceholder": "Ex: Jean Valjean",
     "rolePlaceholder": "Ex: Protagoniste"
   },
+  "profileDraft": {
+    "title": "Générer une fiche personnage",
+    "description": "Décris le personnage en une ou deux phrases. Le brouillon remplira automatiquement les champs principaux sans écraser manuellement la fiche.",
+    "fieldLabel": "Description minimale",
+    "placeholder": "Ex: Une apprentie espionne calme, experte en infiltration, avec un manteau bleu nuit et un sens de l'humour sec.",
+    "submit": "Générer",
+    "open": "Générer une fiche personnage"
+  },
   "filters": {
     "all": "Tous"
   },
@@ -178,15 +188,25 @@
     }
   },
   "generation": {
+    "modeLabel": "Mode de génération",
     "generatePortrait": "Générer un portrait",
+    "generateSheet": "Générer une planche",
+    "generateFreeImages": "Générer des images libres",
     "generate": "Générer",
     "generating": "Génération...",
     "regenerate": "Regénérer",
     "panelCount": "{{count}} image",
     "panelCount_plural": "{{count}} images",
     "modalTitle": "Générer une image",
-    "modalDescription": "Choisissez le cadrage, le style et le nombre de variantes à produire.",
+    "sheetModalDescription": "Génère la planche de character design active, avec turnaround et palette de référence.",
+    "freeModalDescription": "Génère une ou plusieurs images libres à partir de la planche active ou des données textuelles.",
     "defaultPromptSubject": "Un personnage",
+    "sheetPrompt": "Une planche de character design complete, style concept art AAA, avec turnaround (face/profil/dos), expressions faciales, decomposition de l'equipement, palette de couleurs, poses de reference et aperçu de l'univers.",
+    "sheetHint": "La planche de character design remplace toujours la précédente planche active.",
+    "kind": {
+      "character_sheet": "Planche de character design",
+      "free_image": "Image libre"
+    },
     "results": "Résultats",
     "preview": "Aperçu du prompt",
     "download": "Télécharger",

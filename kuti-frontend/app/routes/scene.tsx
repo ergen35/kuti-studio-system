@@ -50,7 +50,6 @@ import { getOrderSwap } from "~/lib/story-order";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  getProjectCharacterImagesOptions,
   getProjectOptions,
   getStorySummaryOptions,
   updateSceneMutation,
@@ -790,6 +789,7 @@ const sceneSchema = z.object({
   title: z.string().min(1, "titleRequired"),
   sceneType: z.string().optional(),
   location: z.string().optional(),
+  targetPageCount: z.coerce.number().int().min(1).max(10).nullable().optional(),
   summary: z.string().optional(),
   content: z.string().optional(),
   charactersJson: z.string().optional(),
@@ -950,11 +950,6 @@ export default function SceneRoute() {
     enabled: !!projectId && !!sceneId,
   });
 
-  const characterImages = useQuery({
-    ...getProjectCharacterImagesOptions({ path: { projectId } }),
-    enabled: !!projectId,
-  });
-
   const storyData = story.data;
 
   const projectLocations = useMemo(
@@ -1075,6 +1070,7 @@ export default function SceneRoute() {
       title: "",
       sceneType: "",
       location: "",
+      targetPageCount: null,
       summary: "",
       content: "",
       charactersJson: "",
@@ -1098,6 +1094,7 @@ export default function SceneRoute() {
         title: scene.title ?? "",
         sceneType: scene.sceneType ?? "",
         location: scene.location ?? "",
+        targetPageCount: typeof scene.targetPageCount === "number" ? scene.targetPageCount : null,
         summary: scene.summary ?? "",
         content: scene.content ?? "",
         charactersJson: toCsv(scene.charactersJson) ?? "",
@@ -1138,6 +1135,7 @@ export default function SceneRoute() {
           title: data.title,
           sceneType: data.sceneType,
           location: data.location,
+          targetPageCount: data.targetPageCount ?? null,
           summary: data.summary,
           content: data.content,
           charactersJson: csv(data.charactersJson || ""),
@@ -1456,6 +1454,18 @@ export default function SceneRoute() {
                   </div>
                 </div>
 
+                {/* Target page count */}
+                <div className="grid gap-1.5 text-xs text-muted-foreground max-w-48">
+                  <span>{t("fields.targetPageCount")}</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={10}
+                    {...register("targetPageCount", { valueAsNumber: true })}
+                    placeholder={t("scene.placeholders.targetPageCount")}
+                  />
+                </div>
+
                 <div className="grid gap-1.5 text-xs text-muted-foreground">
                   <div className="flex items-center justify-between gap-2">
                     <span id={SCENE_FIELD_LABEL_IDS.summary}>
@@ -1500,15 +1510,25 @@ export default function SceneRoute() {
                     name="content"
                     control={control}
                     render={({ field }) => (
-                      <LexicalEditor
-                        key={`${sceneId}-${editorVersion}`}
-                        initialValue={field.value || ""}
-                        onChange={field.onChange}
-                        placeholder={t("editor.placeholder")}
-                        minHeight="600px"
-                        referenceProjectId={projectId}
-                        referenceUrlResolver={resolveReferenceUrl}
-                      />
+                      <div>
+                        <LexicalEditor
+                          key={`${sceneId}-${editorVersion}`}
+                          initialValue={field.value || ""}
+                          onChange={field.onChange}
+                          placeholder={t("editor.placeholder")}
+                          minHeight="600px"
+                          referenceProjectId={projectId}
+                          referenceUrlResolver={resolveReferenceUrl}
+                        />
+                        <div className="mt-2 rounded-lg border border-dashed border-border/70 bg-secondary/20 px-3 py-2 text-xs text-muted-foreground">
+                          <p className="font-medium text-foreground">
+                            {t("editor.scriptGuideTitle")}
+                          </p>
+                          <p className="mt-1 leading-5">
+                            {t("editor.scriptGuideDescription")}
+                          </p>
+                        </div>
+                      </div>
                     )}
                   />
                 </div>
@@ -1759,8 +1779,6 @@ export default function SceneRoute() {
       <SceneGenerationModal
         projectId={projectId}
         scene={scene}
-        characters={characters.data || []}
-        characterImages={characterImages.data || {}}
         isOpen={isGenerationModalOpen}
         onClose={() => setIsGenerationModalOpen(false)}
       />

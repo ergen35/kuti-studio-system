@@ -129,6 +129,7 @@
     "title": "Titre",
     "type": "Type",
     "location": "Lieu",
+    "targetPageCount": "Pages cibles",
     "summary": "Résumé",
     "content": "Contenu",
     "characters": "Personnages",
@@ -150,6 +151,8 @@
   },
   "editor": {
     "placeholder": "Écrivez le contenu de la scène... Utilisez @ pour référencer",
+    "scriptGuideTitle": "Rappel de script",
+    "scriptGuideDescription": "Écrivez chaque ligne avec DIALOGUE:, THOUGHT: ou NARRATION:. Gardez @chara:slug dans les lignes typées.",
     "autocomplete": {
       "noResults": "Aucun résultat",
       "loading": "Chargement...",
@@ -188,6 +191,31 @@
       "scenes_plural": "{{count}} scènes"
     },
     "scenes": "Scènes",
+    "autoGenerate": {
+      "button": "Auto-générer",
+      "title": "Auto-générer des scènes",
+      "description": "Décrivez le chapitre en détail, puis choisissez combien de scènes doivent être générées. Le chapitre existant sera remplacé par la nouvelle version.",
+      "summaryLabel": "Résumé du chapitre",
+      "summaryPlaceholder": "Rédige un résumé long et cohérent. Tu peux utiliser des références canoniques comme @chara:asha, @file:map ou @scene:chapitre-1.",
+      "summaryHint": "Le résumé doit contenir au moins 1000 caractères et peut inclure des références @ pour guider le modèle.",
+      "summaryCount": "{{count}} caractères",
+      "referencesHint": "Références typées acceptées",
+      "warningTitle": "Remplacement du chapitre",
+      "warning": "Les scènes existantes de ce chapitre seront supprimées puis remplacées par le résultat généré.",
+      "sceneCountLabel": "Nombre de scènes",
+      "sceneCountHint": "Choisis un nombre entier entre 1 et 8.",
+      "referencesTitle": "Références canoniques",
+      "referencesBody": "Les tokens typés du résumé sont résolus par le backend avant la génération.",
+      "footerTitle": "Opération destructive",
+      "footerDescription": "Cette action efface les scènes actuelles du chapitre. Vérifie le résumé avant de lancer la génération.",
+      "footerCancel": "Annuler",
+      "footerSubmit": "Remplacer et générer",
+      "footerSubmitting": "Génération en cours...",
+      "errors": {
+        "summary": "Le résumé doit contenir au moins 1000 caractères.",
+        "sceneCount": "Le nombre de scènes doit être compris entre 1 et 8."
+      }
+    },
     "synopsis": "Synopsis",
     "navigation": {
       "title": "Chapitres",
@@ -220,6 +248,7 @@
     "placeholders": {
       "type": "dialogue, action, révélation...",
       "location": "Toit, salle de classe, gare...",
+      "targetPageCount": "1-10",
       "summary": "Résumé de la scène...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romantique, combat, révélation...",
@@ -284,5 +313,12 @@
   "meta": {
     "noLocation": "Aucun lieu",
     "noCharacters": "Aucun personnage"
+  },
+  "chapterPreview": {
+    "title": "Aperçu Manga",
+    "empty": "Aucune planche manga",
+    "emptyDescription": "Générez des planches manga depuis les scènes pour les prévisualiser ici.",
+    "totalPages": "{{count}} pages au total",
+    "scene": "Scène"
   }
 }

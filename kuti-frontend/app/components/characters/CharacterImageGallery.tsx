@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { clsx } from "clsx";
-import { Image, Trash2 } from "lucide-react";
+import { Image, Trash2, Star } from "lucide-react";
 import {
   characterImageUrlFromData,
   type CharacterImageWithUrl,
@@ -18,6 +18,7 @@ interface CharacterImageGalleryProps {
   characterId: string;
   onImageClick: (image: CharacterImage, index: number) => void;
   onDelete?: (image: CharacterImage) => void;
+  onSetActive?: (image: CharacterImage) => void;
 }
 
 export function CharacterImageGallery({
@@ -26,6 +27,7 @@ export function CharacterImageGallery({
   characterId,
   onImageClick,
   onDelete,
+  onSetActive,
 }: CharacterImageGalleryProps) {
   const { t } = useTranslation("characters");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -43,6 +45,15 @@ export function CharacterImageGallery({
       concept: t("generation.strategy.concept"),
     };
     return labels[strategy] || strategy;
+  };
+
+  const getKindLabel = (kind: string) => {
+    const labels: Record<string, string> = {
+      character_sheet: t("generation.kind.character_sheet"),
+      free_image: t("generation.kind.free_image"),
+    };
+
+    return labels[kind] || kind;
   };
 
   // Get readable style name
@@ -87,10 +98,25 @@ export function CharacterImageGallery({
             loading="lazy"
           />
 
+          {/* Active badge for character sheets - always visible */}
+          {image.kind === "character_sheet" && image.isActive && (
+            <Badge
+              variant="default"
+              className="absolute top-2 left-2 bg-emerald-500 text-white text-xs"
+            >
+              {t("status.active")}
+            </Badge>
+          )}
+
           {/* Hover overlay with metadata */}
           {hoveredId === image.id && (
             <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm flex flex-col justify-end p-2">
               <div className="flex items-center gap-1 flex-wrap">
+                {typeof image.kind === "string" && (
+                  <Badge variant="secondary" className="bg-white/10 text-white">
+                    {getKindLabel(image.kind)}
+                  </Badge>
+                )}
                 {typeof image.strategy === "string" && (
                   <Badge variant="secondary" className="bg-white/10 text-white">
                     {getStrategyLabel(image.strategy)}
@@ -102,20 +128,38 @@ export function CharacterImageGallery({
                   </Badge>
                 )}
               </div>
-              {onDelete && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(image);
-                  }}
-                  className="absolute top-2 right-2 bg-surface/90 text-danger hover:bg-danger hover:text-white"
-                  aria-label={t("actions.delete")}
-                >
-                  <Trash2 size={12} />
-                </Button>
-              )}
+              <div className="absolute top-2 right-2 flex gap-1">
+                {/* Set as active button - only for non-active character sheets */}
+                {onSetActive && image.kind === "character_sheet" && !image.isActive && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSetActive(image);
+                    }}
+                    className="bg-surface/90 text-amber-500 hover:bg-amber-500 hover:text-white"
+                    aria-label={t("actions.setActive")}
+                    title={t("actions.setActive")}
+                  >
+                    <Star size={12} />
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(image);
+                    }}
+                    className="bg-surface/90 text-danger hover:bg-danger hover:text-white"
+                    aria-label={t("actions.delete")}
+                  >
+                    <Trash2 size={12} />
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </div>

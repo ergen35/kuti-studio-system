@@ -22,10 +22,12 @@
     "duplicate": "Duplicate",
     "openGraph": "Relation graph",
     "saveProfile": "Save profile",
+    "generateProfile": "Generate character profile",
     "backToGrid": "Back to characters",
     "cancel": "Cancel",
     "save": "Save",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "setActive": "Set as active"
   },
   "fields": {
     "name": "Name",
@@ -163,6 +165,14 @@
     "namePlaceholder": "e.g. Jean Valjean",
     "rolePlaceholder": "e.g. Protagonist"
   },
+  "profileDraft": {
+    "title": "Generate character profile",
+    "description": "Describe the character in one or two sentences. The draft will fill the main fields without silently overwriting the current form.",
+    "fieldLabel": "Minimal description",
+    "placeholder": "e.g. A calm apprentice spy, expert in infiltration, wearing a midnight-blue coat and a dry sense of humor.",
+    "submit": "Generate",
+    "open": "Generate character profile"
+  },
   "filters": {
     "all": "All"
   },
@@ -178,15 +188,25 @@
     }
   },
   "generation": {
+    "modeLabel": "Generation mode",
     "generatePortrait": "Generate portrait",
+    "generateSheet": "Generate sheet",
+    "generateFreeImages": "Generate free images",
     "generate": "Generate",
     "generating": "Generating...",
     "regenerate": "Regenerate",
     "panelCount": "{{count}} image",
     "panelCount_plural": "{{count}} images",
     "modalTitle": "Generate character image",
-    "modalDescription": "Choose framing, style and the number of variations to generate.",
+    "sheetModalDescription": "Generate the active character design sheet, with turnaround and reference palette.",
+    "freeModalDescription": "Generate one or more free images from the active sheet or from text-only data.",
     "defaultPromptSubject": "A character",
+    "sheetPrompt": "A complete character design sheet, AAA concept art style, with turnaround (front/side/back), facial expressions, equipment breakdown, color palette, reference poses and world overview.",
+    "sheetHint": "The character design sheet always replaces the previous active sheet.",
+    "kind": {
+      "character_sheet": "Character design sheet",
+      "free_image": "Free image"
+    },
     "results": "Results",
     "preview": "Prompt preview",
     "download": "Download",
