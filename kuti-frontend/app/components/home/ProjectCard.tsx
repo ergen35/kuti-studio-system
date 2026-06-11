@@ -65,16 +65,16 @@ export function ProjectCard({
   return (
     <div
       className={clsx(
-        "group relative overflow-hidden rounded-lg border border-border bg-card transition-colors",
-        "hover:border-primary/50 hover:shadow-card",
-        isGrid ? "p-4" : "flex items-center gap-4 p-3",
+        "group relative overflow-hidden rounded-xl border border-line/50 bg-surface shadow-card transition-all duration-200",
+        "hover:-translate-y-1 hover:border-accent/40 hover:shadow-elevated",
+        isGrid ? "p-5" : "flex items-center gap-4 p-4",
       )}
     >
       <div
         className={clsx(
-          "absolute inset-y-0 left-0 w-1",
+          "absolute inset-y-0 left-0 w-1 rounded-l-xl transition-all duration-200",
           project.status === "active"
-            ? "bg-success"
+            ? "bg-success group-hover:w-1.5"
             : project.status === "draft"
               ? "bg-draft"
               : "bg-muted",
@@ -204,9 +204,9 @@ function Metric({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-1.5 text-muted" title={label}>
-      <Icon size={12} className="text-primary/70" />
-      <span className="font-medium text-ink">{value}</span>
+    <div className="flex items-center gap-1.5 text-muted transition-colors duration-150 group-hover:text-ink" title={label}>
+      <Icon size={12} className="text-accent/70 transition-transform duration-200 group-hover:scale-110" />
+      <span className="font-medium text-ink tabular-nums">{value}</span>
       <span className="hidden sm:inline opacity-60">{label}</span>
     </div>
   );

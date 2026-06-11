@@ -5,21 +5,21 @@ import { Slot } from "radix-ui";
 import { cn } from "~/lib/utils";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[background-color,border-color,color,box-shadow,transform] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/35 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent text-sm font-medium whitespace-nowrap outline-none select-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg]:transition-transform [&_svg]:duration-150",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[0_1px_1px_rgb(0_0_0/0.10)] hover:bg-primary/90 hover:shadow-[0_2px_8px_rgb(0_0_0/0.16)]",
+          "bg-accent text-accent-ink shadow-sm hover:bg-accent/90 hover:shadow-md active:bg-accent/85 active:shadow-sm",
         outline:
-          "border-border bg-card hover:border-primary/35 hover:bg-primary/8 hover:text-foreground aria-expanded:border-primary/35 aria-expanded:bg-primary/10 aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-primary/15",
+          "border-line bg-transparent hover:bg-accent-subtle hover:border-accent/40 hover:shadow-sm aria-expanded:bg-accent-subtle aria-expanded:border-accent/40",
         secondary:
-          "border-border bg-secondary text-secondary-foreground hover:border-primary/30 hover:bg-primary/8 aria-expanded:border-primary/35 aria-expanded:bg-primary/10 aria-expanded:text-secondary-foreground",
+          "border-line bg-surface-2 text-ink hover:bg-surface-3 hover:border-line/80 hover:shadow-sm aria-expanded:bg-surface-3",
         ghost:
-          "hover:bg-primary/8 hover:text-foreground aria-expanded:bg-primary/10 aria-expanded:text-foreground dark:hover:bg-primary/15",
+          "hover:bg-accent-subtle aria-expanded:bg-accent-subtle",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-danger/10 text-danger hover:bg-danger/15 focus-visible:ring-danger/30 active:bg-danger/20",
+        link: "text-accent underline-offset-4 hover:underline hover:translate-y-0",
       },
       size: {
         default:

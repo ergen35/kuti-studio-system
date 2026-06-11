@@ -170,48 +170,58 @@ export default function ProjectRoute() {
             })}
             actions={<Badge>{project.data.status}</Badge>}
           />
-          <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Stat value={getCharactersCount()} label={t("stats.characters")} />
+          <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat
+              value={getCharactersCount()}
+              label={t("stats.characters")}
+              icon={<UsersRound size={16} />}
+            />
             <Stat
               value={story.data?.scenes?.length ?? "-"}
               label={t("stats.scenes")}
+              icon={<BookOpen size={16} />}
             />
-            <Stat value={openWarningCount ?? "-"} label={t("stats.warnings")} />
-            <Stat value={versionCount ?? "-"} label={t("stats.versions")} />
+            <Stat
+              value={openWarningCount ?? "-"}
+              label={t("stats.warnings")}
+              icon={<AlertTriangle size={16} />}
+            />
+            <Stat
+              value={versionCount ?? "-"}
+              label={t("stats.versions")}
+              icon={<Clock3 size={16} />}
+            />
           </div>
-          <div className="grid gap-3 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {workspaces.map(({ key, title, desc, icon: Icon }) => (
-              <Card
-                key={key}
-                className="group hover:border-primary/45 hover:bg-secondary/35"
-              >
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-md border border-border bg-secondary text-primary">
-                    <Icon size={17} />
+              <Card key={key} className="group">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                    <Icon size={18} />
                   </div>
                   <Badge tone={key}>{key}</Badge>
                 </div>
-                <h2 className="text-sm font-semibold text-foreground">
+                <h2 className="text-sm font-semibold tracking-tight text-ink">
                   {title}
                 </h2>
-                <p className="mt-1 min-h-10 text-xs leading-5 text-muted-foreground">
+                <p className="mt-1.5 min-h-10 text-xs leading-relaxed text-muted">
                   {desc}
                 </p>
                 <RouterLinkButton
-                  className="mt-4 justify-between"
+                  className="mt-4 w-full justify-between"
                   to={`/projects/${projectId}/${key === "storyline" ? "story" : key === "dramaVideos" ? "drama-videos" : key}`}
                 >
                   {t("common:workspace.open", { name: title })}
                   <ArrowRight
                     size={14}
-                    className="opacity-60 transition-transform group-hover:translate-x-0.5"
+                    className="opacity-50 transition-transform group-hover:translate-x-1"
                   />
                 </RouterLinkButton>
               </Card>
             ))}
           </div>
-          <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            <Card>
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <Card elevated>
               <SectionTitle
                 title={t("recent.warnings.title")}
                 meta={
@@ -235,13 +245,13 @@ export default function ProjectRoute() {
                 <div className="grid gap-2">
                   {warningItems.slice(0, 5).map((warning) => (
                     <div
-                      className="grid gap-1 rounded-lg border border-border bg-secondary/35 p-3"
+                      className="grid gap-1.5 rounded-xl border border-line/50 bg-surface-2/50 p-3"
                       key={warning.id}
                     >
-                      <strong className="text-sm text-foreground">
+                      <strong className="text-sm text-ink">
                         {warning.title}
                       </strong>
-                      <small className="text-xs text-muted-foreground">
+                      <small className="text-xs text-muted">
                         {warning.message}
                       </small>
                     </div>
@@ -249,19 +259,19 @@ export default function ProjectRoute() {
                 </div>
               )}
             </Card>
-            <Card>
+            <Card elevated>
               <SectionTitle
                 title={t("recent.production.title")}
                 meta={`${jobCount ?? "-"} ${t("recent.production.jobs")} · ${exportCount ?? "-"} ${t("recent.production.exports")}`}
               />
-              <div className="grid gap-2 text-xs leading-5 text-muted-foreground">
+              <div className="grid gap-3 text-sm leading-relaxed text-muted">
                 <p>
                   {t("common:meta.updated")}{" "}
-                  {dateLabel(getProjectUpdatedAt(project.data))}
+                  <span className="text-ink">{dateLabel(getProjectUpdatedAt(project.data))}</span>
                 </p>
                 <p>
                   {t("meta.lastOpened")}{" "}
-                  {dateLabel(getProjectLastOpenedAt(project.data))}
+                  <span className="text-ink">{dateLabel(getProjectLastOpenedAt(project.data))}</span>
                 </p>
               </div>
             </Card>

@@ -31,24 +31,24 @@ export function HeroSection({
   };
 
   return (
-    <section className="relative overflow-hidden rounded-lg border border-border bg-card shadow-card">
-      <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:p-8">
+    <section className="relative overflow-hidden rounded-2xl border border-line/50 bg-surface shadow-elevated">
+      <div className="grid gap-8 p-8 md:grid-cols-[1fr_auto] md:p-10">
         <div className="min-w-0">
-          <div className="mb-4 inline-flex size-10 items-center justify-center rounded-md border border-border bg-secondary text-primary">
-            <Sparkles size={20} />
+          <div className="mb-5 inline-flex size-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <Sparkles size={24} />
           </div>
-          <h1 className="text-4xl font-semibold tracking-normal text-foreground md:text-5xl">
+          <h1 className="text-4xl font-bold tracking-tight text-ink md:text-5xl">
             Kuti Studio
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
             {t("hero.subtitle")}
           </p>
         </div>
 
-        <div className="min-w-0 md:w-[420px] md:self-end">
+        <div className="min-w-0 md:w-[440px] md:self-end">
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-2 sm:flex-row"
+            className="flex flex-col gap-3 sm:flex-row"
           >
             <label htmlFor="home-project-name" className="sr-only">
               {t("hero.projectNameLabel")}
@@ -59,14 +59,14 @@ export function HeroSection({
               value={projectName}
               onChange={(e) => onProjectNameChange(e.target.value)}
               placeholder={t("hero.placeholder")}
-              className="min-h-12 flex-1 px-4"
+              className="min-h-12 flex-1 rounded-xl px-4 text-base"
               disabled={isLoading}
             />
             <Button
               variant="primary"
               type="submit"
               disabled={isLoading || !projectName.trim()}
-              className="min-h-12 px-6"
+              className="min-h-12 rounded-xl px-6 text-base"
             >
               <Plus size={20} className="mr-2" />
               {isLoading ? t("hero.creating") : t("hero.create")}
@@ -74,12 +74,12 @@ export function HeroSection({
           </form>
 
           {onOpenExisting ? (
-            <div className="mt-3 flex items-center justify-end">
+            <div className="mt-4 flex items-center justify-end">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={onOpenExisting}
-                className="gap-2 text-xs text-muted-foreground hover:text-foreground"
+                className="gap-2 text-xs text-muted hover:text-ink"
               >
                 <FolderOpen size={14} />
                 {t("hero.openExisting")}
@@ -87,10 +87,11 @@ export function HeroSection({
             </div>
           ) : null}
 
-          {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+          {error && <p className="mt-4 text-sm text-danger">{error}</p>}
         </div>
       </div>
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
+      {/* Spectrum 2 style accent line */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
     </section>
   );
 }

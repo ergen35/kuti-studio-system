@@ -133,10 +133,11 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     clsx(
-      "flex min-h-9 items-center gap-2.5 rounded-md border px-2.5 py-2 text-sm font-medium transition-colors",
+      "group/nav-item relative flex min-h-9 items-center gap-2.5 rounded-lg border px-2.5 py-2 text-sm font-medium transition-all duration-150",
       isActive
-        ? "border-primary/30 bg-primary/10 text-primary"
-        : "border-transparent text-muted-foreground hover:border-primary/25 hover:bg-primary/8 hover:text-foreground",
+        ? "border-accent/30 bg-accent/10 text-accent"
+        : "border-transparent text-muted hover:border-accent/20 hover:bg-accent/8 hover:text-ink",
+      "[&_svg]:transition-transform [&_svg]:duration-150 hover:[&_svg]:scale-110",
     );
 
   // Handle click outside to close sidebar
@@ -333,8 +334,8 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
                 <Activity size={18} />
                 {runningTaskCount > 0 && (
                   <>
-                    <span className="absolute top-1 right-1 size-2 animate-pulse rounded-full bg-primary" />
-                    <span className="hidden rounded-md bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary sm:inline">
+                    <span className="absolute top-1 right-1 size-2 rounded-full bg-accent animate-[pulse-ring_1s_ease-out_infinite]" />
+                    <span className="hidden rounded-md bg-accent/10 px-1.5 py-0.5 text-xs font-medium text-accent sm:inline">
                       {runningTaskCount}
                     </span>
                   </>
@@ -351,7 +352,7 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
         </div>
 
         {/* Page content */}
-        <div className="mx-auto w-full max-w-[1500px] flex-1 p-4 sm:p-5 compact:p-3">
+        <div className="mx-auto w-full max-w-[1500px] flex-1 p-4 sm:p-5 compact:p-3 animate-[fade-in_200ms_ease-out]">
           {children ?? <Outlet />}
         </div>
       </main>

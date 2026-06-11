@@ -4,15 +4,18 @@ import { cn } from "~/lib/utils";
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & { size?: "default" | "sm" }
->(function Card({ className, size = "default", ...props }, ref) {
+  React.ComponentProps<"div"> & { size?: "default" | "sm"; elevated?: boolean }
+>(function Card({ className, size = "default", elevated = false, ...props }, ref) {
   return (
     <div
       ref={ref}
       data-slot="card"
       data-size={size}
+      data-elevated={elevated || undefined}
       className={cn(
-        "group/card flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-card py-4 text-sm text-card-foreground shadow-[0_1px_2px_rgb(19_22_30/0.05)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg",
+        "group/card flex flex-col gap-4 overflow-hidden rounded-xl border border-line/50 bg-surface py-4 text-sm text-ink shadow-card transition-all duration-200 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "hover:-translate-y-1 hover:shadow-elevated hover:border-line/70",
+        "data-[elevated]:shadow-elevated data-[elevated]:border-line/60 data-[elevated]:hover:-translate-y-0.5",
         className,
       )}
       {...props}
@@ -84,7 +87,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/card:p-3",
+        "flex items-center rounded-b-xl border-t border-line/40 bg-surface-2/50 p-4 group-data-[size=sm]/card:p-3",
         className,
       )}
       {...props}

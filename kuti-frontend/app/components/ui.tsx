@@ -68,17 +68,22 @@ export function LinkButton({
 }
 
 export const linkButtonClass =
-  "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-sm font-medium hover:border-primary/35 hover:bg-primary/8";
+  "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-line bg-surface px-2.5 text-sm font-medium hover:border-accent/30 hover:bg-accent-subtle";
 
 export function Panel({
   children,
   className,
+  elevated = false,
 }: {
   children: ReactNode;
   className?: string;
+  elevated?: boolean;
 }) {
   return (
-    <ShadcnCard className={cn("shadow-none", className)}>
+    <ShadcnCard
+      elevated={elevated}
+      className={cn(elevated ? "" : "shadow-none hover:shadow-none", className)}
+    >
       <CardContent className="p-4 compact:p-3">{children}</CardContent>
     </ShadcnCard>
   );
@@ -86,13 +91,10 @@ export function Panel({
 
 export const Card = forwardRef<
   HTMLDivElement,
-  { children: ReactNode; className?: string }
->(function Card({ children, className }, ref) {
+  { children: ReactNode; className?: string; elevated?: boolean }
+>(function Card({ children, className, elevated = false }, ref) {
   return (
-    <ShadcnCard
-      ref={ref}
-      className={cn("shadow-none transition-colors", className)}
-    >
+    <ShadcnCard ref={ref} elevated={elevated} className={className}>
       <CardContent className="p-4">{children}</CardContent>
     </ShadcnCard>
   );
@@ -108,19 +110,19 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-5 flex items-start justify-between gap-4 border-b border-border/70 pb-4 max-lg:grid">
+    <header className="mb-6 flex items-start justify-between gap-4 border-b border-line/50 pb-5 max-lg:grid">
       <div className="min-w-0">
-        <h1 className="m-0 text-[clamp(22px,2.4vw,32px)] font-semibold leading-tight text-foreground">
+        <h1 className="m-0 text-[clamp(24px,2.5vw,32px)] font-semibold leading-tight tracking-tight text-ink">
           {title}
         </h1>
         {description ? (
-          <p className="mt-1.5 max-w-3xl text-sm leading-6 text-muted-foreground">
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
             {description}
           </p>
         ) : null}
       </div>
       {actions ? (
-        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+        <div className="flex flex-wrap items-center gap-3">{actions}</div>
       ) : null}
     </header>
   );
@@ -136,13 +138,13 @@ export function SectionTitle({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="mb-4 flex items-center justify-between gap-3">
       <div className="min-w-0">
-        <h2 className="truncate text-[14px] font-semibold text-foreground">
+        <h2 className="truncate text-sm font-semibold tracking-tight text-ink">
           {title}
         </h2>
         {meta ? (
-          <p className="mt-0.5 text-xs text-muted-foreground">{meta}</p>
+          <p className="mt-0.5 text-xs text-muted">{meta}</p>
         ) : null}
       </div>
       {actions ? (
@@ -160,7 +162,7 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <label className="grid gap-1.5 text-xs text-muted-foreground [&_input]:min-h-8 [&_input]:w-full [&_select]:min-h-8 [&_select]:w-full [&_textarea]:min-h-24 [&_textarea]:w-full">
+    <label className="grid gap-2 text-xs font-medium text-muted [&_input]:min-h-8 [&_input]:w-full [&_select]:min-h-8 [&_select]:w-full [&_textarea]:min-h-24 [&_textarea]:w-full">
       <span>{label}</span>
       {children}
     </label>
@@ -217,20 +219,20 @@ export function Badge({
 }) {
   const key = (tone || String(children)).toLowerCase();
   const toneClass = destructiveTones.has(key)
-    ? "border-destructive/25 bg-destructive/10 text-destructive"
+    ? "bg-danger/12 text-danger"
     : successTones.has(key)
-      ? "border-success/25 bg-success/10 text-success"
+      ? "bg-success/12 text-success"
       : warningTones.has(key)
-        ? "border-warning/25 bg-warning/10 text-warning"
+        ? "bg-warning/12 text-warning"
         : infoTones.has(key)
-          ? "border-primary/20 bg-primary/10 text-primary"
-          : "border-border bg-secondary text-secondary-foreground";
+          ? "bg-accent/12 text-accent"
+          : "bg-surface-3 text-ink";
 
   return (
     <ShadcnBadge
-      variant="outline"
+      variant="secondary"
       className={cn(
-        "rounded-md px-1.5 py-0 text-[11px] font-medium uppercase tracking-normal",
+        "rounded-md px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide",
         toneClass,
         className,
       )}
@@ -250,17 +252,19 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <Alert className="border-border bg-secondary/25">
-      <AlertTitle>{title}</AlertTitle>
-      {description ? <AlertDescription>{description}</AlertDescription> : null}
-      {action ? <div className="mt-3">{action}</div> : null}
+    <Alert className="animate-[fade-in_200ms_ease-out] border-line/50 bg-surface-2/50">
+      <AlertTitle className="text-ink">{title}</AlertTitle>
+      {description ? (
+        <AlertDescription className="text-muted">{description}</AlertDescription>
+      ) : null}
+      {action ? <div className="mt-4">{action}</div> : null}
     </Alert>
   );
 }
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <Alert variant="destructive" role="alert">
+    <Alert variant="destructive" role="alert" className="animate-[shake_400ms_ease-out]">
       <AlertTitle>{message}</AlertTitle>
     </Alert>
   );
@@ -272,12 +276,12 @@ export function LoadingState({ label }: { label?: string }) {
 
   return (
     <div
-      className="grid gap-2.5 rounded-lg border border-dashed border-border bg-card p-5"
+      className="grid gap-3 rounded-xl border border-dashed border-line/60 bg-surface p-5 animate-[fade-in_200ms_ease-out]"
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
-      <strong className="text-sm text-foreground">{resolvedLabel}</strong>
+      <strong className="text-sm text-ink">{resolvedLabel}</strong>
       <Skeleton className="h-4 w-64 max-w-full" />
     </div>
   );
@@ -286,17 +290,24 @@ export function LoadingState({ label }: { label?: string }) {
 export function Stat({
   value,
   label,
+  icon,
 }: {
   value: number | string;
   label: string;
+  icon?: ReactNode;
 }) {
   return (
-    <ShadcnCard className="shadow-none">
+    <ShadcnCard className="group shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-elevated">
       <CardContent className="grid min-h-24 content-between gap-3 p-4">
-        <span className="block text-xs font-medium text-muted-foreground">
-          {label}
-        </span>
-        <b className="block text-2xl font-semibold leading-none text-foreground">
+        <div className="flex items-center justify-between">
+          <span className="block text-xs font-medium text-muted">
+            {label}
+          </span>
+          {icon ? (
+            <span className="text-muted transition-all duration-150 group-hover:text-accent group-hover:scale-110">{icon}</span>
+          ) : null}
+        </div>
+        <b className="block text-2xl font-semibold leading-none tracking-tight text-ink">
           {value}
         </b>
       </CardContent>
