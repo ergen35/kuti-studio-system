@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
+import { toast } from "sonner";
 import {
   ImageIcon,
   Download,
@@ -15,8 +16,6 @@ import {
   ChevronUp,
   ChevronDown,
   Maximize2,
-  Clapperboard,
-  Play,
 } from "lucide-react";
 import {
   Button,
@@ -31,32 +30,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "~/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { useTranslation } from "~/hooks/useTranslation";
 import type { UpdateSceneMangaPageData } from "~/lib/backend";
-import type {
-  ListAssetsResponse,
-  ListDramaVideosResponse,
-  ListModelsResponse,
-  ListSceneMangaPagesResponse,
-} from "~/lib/backend/types.gen";
+import type { ListSceneMangaPagesResponse } from "~/lib/backend/types.gen";
 
 import {
-  generateDramaVideoMutation,
-  listAssetsOptions,
-  listDramaVideosQueryKey,
-  listDramaVideosOptions,
-  listGenerationJobsQueryKey,
-  listProjectDramaVideosQueryKey,
-  listModelsOptions,
   listSceneMangaPagesQueryKey,
   listSceneMangaPagesOptions,
   updateSceneMangaPageMutation,
@@ -66,14 +45,8 @@ import { apiErrorMessage, backendUrl } from "~/lib/errors";
 import { invalidateWorkspace } from "~/lib/query";
 import { client } from "~/lib/backend-client";
 
-
 type SceneMangaPage = ListSceneMangaPagesResponse[number];
 type SceneMangaPageUpdateBody = UpdateSceneMangaPageData["body"];
-type ProjectAsset = ListAssetsResponse[number];
-
-function stringValue(value: unknown) {
-  return typeof value === "string" ? value : "";
-}
 
 function pageId(page: SceneMangaPage | undefined) {
   return typeof page?.id === "string" ? page.id : "";
@@ -81,24 +54,6 @@ function pageId(page: SceneMangaPage | undefined) {
 
 function readyForExport(page: SceneMangaPage | undefined) {
   return page?.metadataJson?.readyForExport === true;
-}
-
-function assetFileUrl(projectId: string, assetId: string) {
-  return `/api/projects/${projectId}/assets/${assetId}/file`;
-}
-
-function metadataRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
-
-function isLocalFallback(video: ListDramaVideosResponse[number]) {
-  return metadataRecord(video.metadata).localFallbackUsed === true;
-}
-
-function providerFailureMessage(video: ListDramaVideosResponse[number]) {
-  return stringValue(metadataRecord(video.metadata).providerFailureMessage);
 }
 
 interface SceneMangaGalleryProps {
@@ -114,10 +69,6 @@ export function SceneMangaGallery({
   const queryClient = useQueryClient();
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [replaceDialogOpen, setReplaceDialogOpen] = useState(false);
-  const [selectedReplacementAssetId, setSelectedReplacementAssetId] =
-    useState("");
-  const [selectedVideoModel, setSelectedVideoModel] = useState("");
 
   // Fetch pages using SDK
   const pagesQuery = useQuery({
@@ -128,28 +79,6 @@ export function SceneMangaGallery({
     refetchInterval: 10_000,
   });
 
-  const videosQuery = useQuery({
-    ...listDramaVideosOptions({
-      client,
-      path: { projectId, sceneId },
-    }),
-    refetchInterval: 10_000,
-  });
-
-  const modelsQuery = useQuery({
-    ...listModelsOptions({ client }),
-    staleTime: 60_000,
-  });
-
-  const assetsQuery = useQuery({
-    ...listAssetsOptions({
-      client,
-      path: { projectId },
-    }),
-    enabled: !!projectId,
-    staleTime: 60_000,
-  });
-
   // Update page mutation using SDK
   const updatePage = useMutation({
     ...updateSceneMangaPageMutation(),
@@ -158,6 +87,10 @@ export function SceneMangaGallery({
       void queryClient.invalidateQueries({
         queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId } }),
       });
+      toast.success(t("common:toast.saved"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -169,45 +102,20 @@ export function SceneMangaGallery({
       if (selectedPageId === deletedPageId) {
         setSelectedPageId(null);
         setLightboxOpen(false);
-        setReplaceDialogOpen(false);
       }
 
       invalidateWorkspace(projectId);
       void queryClient.invalidateQueries({
         queryKey: listSceneMangaPagesQueryKey({ path: { projectId, sceneId } }),
       });
-      void queryClient.invalidateQueries({
-        queryKey: listDramaVideosQueryKey({ path: { projectId, sceneId } }),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: listProjectDramaVideosQueryKey({ path: { projectId } }),
-      });
+      toast.success(t("common:toast.deleted"));
     },
-  });
-
-  const generateDrama = useMutation({
-    ...generateDramaVideoMutation(),
-    onSuccess: () => {
-      void videosQuery.refetch();
-      invalidateWorkspace(projectId);
-      void queryClient.invalidateQueries({
-        queryKey: listDramaVideosQueryKey({ path: { projectId, sceneId } }),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: listProjectDramaVideosQueryKey({ path: { projectId } }),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: listGenerationJobsQueryKey({ path: { projectId } }),
-      });
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
   const pages = (pagesQuery.data ?? []) as SceneMangaPage[];
-  const videos = (videosQuery.data ?? []) as ListDramaVideosResponse;
-  const imageAssets = useMemo(() => {
-    const items = (assetsQuery.data ?? []) as ProjectAsset[];
-    return items.filter((asset) => asset.mimeType.startsWith("image/"));
-  }, [assetsQuery.data]);
   const pageIndexById = useMemo(
     () => new Map(pages.map((page, index) => [page.id, index])),
     [pages],
@@ -218,38 +126,11 @@ export function SceneMangaGallery({
     ? deletePage.isPending &&
       deletePage.variables?.path.pageId === selectedPage.id
     : false;
-  const selectedPageVideos = selectedPage
-    ? videos.filter((video) => video.sourceMangaPageId === selectedPage.id)
-    : [];
-  const videoModels = useMemo(() => {
-    const items = (modelsQuery.data ?? []) as ListModelsResponse;
-    return items.filter(
-      (model) => model.kind === "video" && model.enabled && model.configured,
-    );
-  }, [modelsQuery.data]);
-  const selectedModelKey = selectedVideoModel || videoModels[0]?.key || "";
-
-  const selectedReplacementAsset =
-    imageAssets.find((asset) => asset.id === selectedReplacementAssetId) ??
-    null;
 
   useEffect(() => {
     setSelectedPageId(null);
     setLightboxOpen(false);
-    setReplaceDialogOpen(false);
   }, [sceneId]);
-
-  useEffect(() => {
-    if (!replaceDialogOpen || !selectedPage) {
-      return;
-    }
-
-    const currentAsset = imageAssets.find(
-      (asset) => assetFileUrl(projectId, asset.id) === selectedPage.imageUrl,
-    );
-    setSelectedReplacementAssetId(currentAsset?.id ?? imageAssets[0]?.id ?? "");
-  }, [imageAssets, projectId, replaceDialogOpen, selectedPage]);
-
 
   const openPage = (page: SceneMangaPage) => {
     setSelectedPageId(page.id);
@@ -273,18 +154,6 @@ export function SceneMangaGallery({
       const nextIndex = currentIndex + 1;
       setSelectedPageId(pageId(pages[nextIndex]));
     }
-  };
-
-  const replaceSelectedPage = () => {
-    if (!selectedPage || !selectedReplacementAsset) {
-      return;
-    }
-
-    updatePage.mutate({
-      path: { projectId, sceneId, pageId: selectedPage.id },
-      body: { imageUrl: assetFileUrl(projectId, selectedReplacementAsset.id) },
-    });
-    setReplaceDialogOpen(false);
   };
 
   const deleteMangaPage = (pageId: string) => {
@@ -376,10 +245,6 @@ export function SceneMangaGallery({
                   path: { projectId, sceneId, pageId: page.id },
                 })
               }
-              dramaCount={
-                videos.filter((video) => video.sourceMangaPageId === page.id)
-                  .length
-              }
               isUpdating={updatePage.isPending}
               isDeleting={
                 deletePage.isPending &&
@@ -427,11 +292,6 @@ export function SceneMangaGallery({
                 {selectedPageReadyForExport ? (
                   <Badge tone="ready">{t("mangaGallery.readyForExport")}</Badge>
                 ) : null}
-                {selectedPageVideos.length > 0 && (
-                  <Badge tone="info">
-                    {selectedPageVideos.length} {t("drama.videos")}
-                  </Badge>
-                )}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -560,19 +420,6 @@ export function SceneMangaGallery({
               <Button
                 variant="ghost"
                 className="text-white hover:bg-white/10"
-                onClick={() => setReplaceDialogOpen(true)}
-                disabled={
-                  imageAssets.length === 0 ||
-                  updatePage.isPending ||
-                  deletePage.isPending
-                }
-              >
-                <ImageIcon />
-                {t("mangaGallery.replace")}
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-white hover:bg-white/10"
                 onClick={() => deleteMangaPage(selectedPage.id)}
                 disabled={updatePage.isPending || deletePage.isPending}
               >
@@ -583,251 +430,8 @@ export function SceneMangaGallery({
                 )}
               </Button>
             </div>
-
-            <div className="grid gap-3 border-t border-white/10 pt-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-sm font-medium text-white">
-                    {t("drama.title")}
-                  </h3>
-                  <p className="text-xs text-white/55">
-                    {t("drama.description")}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {videoModels.length > 1 && (
-                    <Select
-                      value={selectedModelKey}
-                      onValueChange={setSelectedVideoModel}
-                    >
-                      <SelectTrigger
-                        size="sm"
-                        className="h-8 border-white/20 bg-white/10 text-white"
-                      >
-                        <SelectValue placeholder={t("drama.model")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {videoModels.map((model) => (
-                          <SelectItem key={model.key} value={model.key}>
-                            {model.displayName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="border border-white/15 bg-white/10 text-white hover:bg-white/15"
-                    disabled={
-                      generateDrama.isPending ||
-                      deletePage.isPending ||
-                      selectedPage.status !== "selected"
-                    }
-                    onClick={() =>
-                      generateDrama.mutate({
-                        path: { projectId, sceneId, pageId: selectedPage.id },
-                        body: { modelKey: selectedModelKey || undefined },
-                      })
-                    }
-                    title={
-                      selectedPage.status !== "selected"
-                        ? t("drama.selectFirst")
-                        : t("drama.generate")
-                    }
-                  >
-                    {generateDrama.isPending ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      <Clapperboard />
-                    )}
-                    {generateDrama.isPending
-                      ? t("drama.queued")
-                      : t("drama.generate")}
-                  </Button>
-                </div>
-              </div>
-
-              {selectedPageVideos.length > 0 ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {selectedPageVideos.map((video) => {
-                    const providerFailure = providerFailureMessage(video);
-                    return (
-                      <div
-                        key={video.id}
-                        className="rounded-lg border border-white/10 bg-white/[0.06] p-3"
-                      >
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                          <span className="truncate text-xs font-medium text-white">
-                            {video.title}
-                          </span>
-                          <div className="flex items-center gap-1">
-                            {isLocalFallback(video) ? (
-                              <Badge tone="warning">
-                                {t("drama.localFallback")}
-                              </Badge>
-                            ) : null}
-                            <Badge tone={video.status}>{video.status}</Badge>
-                          </div>
-                        </div>
-                        {backendUrl(video.videoUrl) &&
-                        video.status === "ready" ? (
-                          <video
-                            src={backendUrl(video.videoUrl)}
-                            controls
-                            className="aspect-video w-full rounded-md bg-black"
-                          />
-                        ) : (
-                          <div className="grid aspect-video place-items-center rounded-md border border-dashed border-white/15 bg-black/25 text-white/55">
-                            {video.status === "running" ||
-                            video.status === "queued" ? (
-                              <Loader2 className="animate-spin" />
-                            ) : (
-                              <Play />
-                            )}
-                          </div>
-                        )}
-                        {stringValue(video.errorMessage) ? (
-                          <p className="mt-2 text-xs text-danger">
-                            {stringValue(video.errorMessage)}
-                          </p>
-                        ) : null}
-                        {isLocalFallback(video) && providerFailure ? (
-                          <p className="mt-2 rounded-md border border-warning/30 bg-warning/10 p-2 text-xs text-warning">
-                            {t("drama.fallbackReason", {
-                              reason: providerFailure,
-                            })}
-                          </p>
-                        ) : null}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="rounded-lg border border-dashed border-white/10 bg-white/[0.04] p-3 text-xs text-white/55">
-                  {t("drama.empty")}
-                </p>
-              )}
-            </div>
           </DialogContent>
         )}
-      </Dialog>
-
-      <Dialog open={replaceDialogOpen} onOpenChange={setReplaceDialogOpen}>
-        <DialogContent className="sm:max-w-[720px]">
-          <DialogHeader>
-            <DialogTitle>{t("mangaGallery.replaceDialog.title")}</DialogTitle>
-            <DialogDescription>
-              {t("mangaGallery.replaceDialog.description")}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4">
-            {selectedPage ? (
-              <div className="grid gap-2 rounded-2xl border border-border bg-secondary/20 p-3">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {t("mangaGallery.replaceDialog.current")}
-                </p>
-                {backendUrl(selectedPage.imageUrl) ? (
-                  <img
-                    src={backendUrl(selectedPage.imageUrl)}
-                    alt={t("mangaGallery.pageAlt", {
-                      number: selectedPage.pageNumber,
-                    })}
-                    className="max-h-44 w-full rounded-xl border border-border bg-background object-contain"
-                  />
-                ) : (
-                  <div className="grid h-44 place-items-center rounded-xl border border-dashed border-border bg-background text-sm text-muted-foreground">
-                    {t("mangaGallery.replaceDialog.noCurrentImage")}
-                  </div>
-                )}
-              </div>
-            ) : null}
-
-            {assetsQuery.isLoading ? (
-              <p className="rounded-2xl border border-dashed border-border bg-secondary/10 p-4 text-sm text-muted-foreground">
-                {t("mangaGallery.replaceDialog.loading")}
-              </p>
-            ) : imageAssets.length > 0 ? (
-              <div className="grid gap-3">
-                <div className="grid gap-2">
-                  <label
-                    className="text-xs uppercase tracking-[0.18em] text-muted-foreground"
-                    htmlFor="manga-page-replace-asset"
-                  >
-                    {t("mangaGallery.replaceDialog.selectAsset")}
-                  </label>
-                  <Select
-                    value={selectedReplacementAssetId}
-                    onValueChange={setSelectedReplacementAssetId}
-                  >
-                    <SelectTrigger
-                      id="manga-page-replace-asset"
-                      className="w-full"
-                    >
-                      <SelectValue
-                        placeholder={t(
-                          "mangaGallery.replaceDialog.selectAssetPlaceholder",
-                        )}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {imageAssets.map((asset) => (
-                        <SelectItem key={asset.id} value={asset.id}>
-                          {asset.name} · {asset.originalFilename}
-                          {asset.status !== "active"
-                            ? ` · ${asset.status}`
-                            : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {selectedReplacementAsset ? (
-                  <div className="grid gap-2 rounded-2xl border border-border bg-secondary/20 p-3">
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                      {t("mangaGallery.replaceDialog.preview")}
-                    </p>
-                    <img
-                      src={backendUrl(
-                        assetFileUrl(projectId, selectedReplacementAsset.id),
-                      )}
-                      alt={selectedReplacementAsset.name}
-                      className="max-h-64 w-full rounded-xl border border-border bg-background object-contain"
-                    />
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <p className="rounded-2xl border border-dashed border-border bg-secondary/10 p-4 text-sm text-muted-foreground">
-                {t("mangaGallery.replaceDialog.empty")}
-              </p>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="ghost"
-              type="button"
-              onClick={() => setReplaceDialogOpen(false)}
-            >
-              {t("actions.cancel")}
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              disabled={
-                !selectedReplacementAsset ||
-                updatePage.isPending ||
-                assetsQuery.isLoading
-              }
-              onClick={replaceSelectedPage}
-            >
-              {t("mangaGallery.replaceDialog.confirm")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
       </Dialog>
     </div>
   );
@@ -844,14 +448,12 @@ interface PageThumbnailProps {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onDelete: () => void;
-  dramaCount: number;
   isUpdating: boolean;
   isDeleting: boolean;
 }
 
 function PageThumbnail({
   page,
-  index,
   onSelect,
   onUpdate,
   canMoveUp,
@@ -859,7 +461,6 @@ function PageThumbnail({
   onMoveUp,
   onMoveDown,
   onDelete,
-  dramaCount,
   isUpdating,
   isDeleting,
 }: PageThumbnailProps) {
@@ -914,92 +515,81 @@ function PageThumbnail({
         </span>
       </div>
 
-      {dramaCount > 0 && (
-        <div className="absolute bottom-2 left-2">
-          <span className="inline-flex items-center gap-1 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
-            <Clapperboard size={11} /> {dramaCount}
-          </span>
-        </div>
-      )}
+      {/* Hover Overlay */}
+      <div
+        className={clsx(
+          "absolute inset-0 flex flex-col justify-end transition-opacity duration-150",
+          showActions ? "opacity-100" : "opacity-0 pointer-events-none",
+        )}
+      >
+        {/* Dark overlay for contrast */}
+        <div className="absolute inset-0 bg-black/40" />
 
-      {/* Hover Actions */}
-      {showActions && (
-        <div className="absolute inset-0 bg-ink/60 flex flex-col items-center justify-center gap-2">
-          <Button variant="ghost" className="text-white" onClick={onSelect}>
-            <Maximize2 size={16} className="mr-1" />
+        {/* View button - centered */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Button
+            variant="ghost"
+            className="border-2 border-white bg-black/70 text-white shadow-xl hover:bg-black/90"
+            onClick={onSelect}
+          >
+            <Maximize2 size={16} className="mr-1.5" />
             {t("mangaGallery.view")}
           </Button>
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onMoveUp}
-              disabled={!canMoveUp || isUpdating}
-              title={t("mangaGallery.moveUp")}
-              aria-label={t("mangaGallery.moveUp")}
-              className="bg-white/20 text-white hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <ChevronUp size={14} />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onMoveDown}
-              disabled={!canMoveDown || isUpdating}
-              title={t("mangaGallery.moveDown")}
-              aria-label={t("mangaGallery.moveDown")}
-              className="bg-white/20 text-white hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <ChevronDown size={14} />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onUpdate({ status: "selected" })}
-              disabled={isUpdating}
-              className={clsx(
-                "text-white",
-                page.status === "selected"
-                  ? "bg-success text-success-ink"
-                  : "bg-white/20 text-white hover:bg-success/80",
-              )}
-            >
-              <Check size={14} />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onDelete}
-              disabled={isUpdating || isDeleting}
-              className={clsx(
-                "text-white",
-                page.status === "rejected"
-                  ? "bg-danger text-danger-ink"
-                  : "bg-white/20 text-white hover:bg-danger/80",
-              )}
-            >
-              {isDeleting ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <X size={14} />
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onDelete}
-              disabled={isUpdating || isDeleting}
-              className="bg-white/20 text-white hover:bg-danger/80"
-            >
-              {isDeleting ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Trash2 size={14} />
-              )}
-            </Button>
-          </div>
         </div>
-      )}
+
+        {/* Action buttons - bottom bar */}
+        <div className="relative flex items-center justify-center gap-2 p-3">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onMoveUp}
+            disabled={!canMoveUp || isUpdating}
+            title={t("mangaGallery.moveUp")}
+            aria-label={t("mangaGallery.moveUp")}
+            className="size-9 p-0 rounded-md border-2 border-white bg-black/70 text-white shadow-xl hover:bg-black/90 disabled:opacity-40"
+          >
+            <ChevronUp size={18} />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onMoveDown}
+            disabled={!canMoveDown || isUpdating}
+            title={t("mangaGallery.moveDown")}
+            aria-label={t("mangaGallery.moveDown")}
+            className="size-9 p-0 rounded-md border-2 border-white bg-black/70 text-white shadow-xl hover:bg-black/90 disabled:opacity-40"
+          >
+            <ChevronDown size={18} />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => onUpdate({ status: "selected" })}
+            disabled={isUpdating}
+            className={clsx(
+              "size-9 p-0 rounded-md border-2 shadow-xl",
+              page.status === "selected"
+                ? "border-success bg-success text-white hover:bg-success/90"
+                : "border-white bg-black/70 text-white hover:border-success hover:bg-success",
+            )}
+          >
+            <Check size={18} />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onDelete}
+            disabled={isUpdating || isDeleting}
+            className="size-9 p-0 rounded-md border-2 border-white bg-black/70 text-white shadow-xl hover:border-danger hover:bg-danger"
+          >
+            {isDeleting ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Trash2 size={18} />
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

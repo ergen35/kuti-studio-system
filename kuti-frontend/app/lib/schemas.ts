@@ -46,26 +46,12 @@ export const sceneSchema = z.object({
   stagingNotes: z.string().optional(),
 });
 
-// Asset import schema
-export const assetImportSchema = z.object({
-  sourcePath: z.string().min(1, "Source path is required"),
-  name: z.string(),
-  tags: z.string(),
-});
-
 // Generation job schema
 export const generationJobSchema = z.object({
   sourceKind: z.enum(["scene", "chapter", "tome"]),
   sourceId: z.string().min(1, "Source is required"),
   modelKey: z.string(),
   mode: z.enum(["separate", "grid"]),
-});
-
-// Version create schema
-export const versionCreateSchema = z.object({
-  branchName: z.string().min(1, "Branch is required"),
-  label: z.string().min(1, "Label is required"),
-  summary: z.string().max(1000),
 });
 
 // Export create schema
@@ -121,10 +107,6 @@ export const projectPreviewSettingsSchema = z.object({
   panelDensity: z.enum(["comfortable", "compact"]),
 });
 
-export const projectVersioningSettingsSchema = z.object({
-  retainedVersionsPerBranch: z.number().int().min(1).max(12),
-});
-
 export const projectExportsSettingsSchema = z.object({
   defaultKind: exportKindSchema,
   defaultFormats: z.array(exportFormatSchema).min(1),
@@ -132,11 +114,6 @@ export const projectExportsSettingsSchema = z.object({
 
 export const projectLanguageSettingsSchema = z.object({
   preferredLocale: z.enum(["en", "fr"]),
-});
-
-export const projectAssetSettingsSchema = z.object({
-  archiveOnDelete: z.boolean(),
-  showUsageHints: z.boolean(),
 });
 
 export const projectSettingsSchema = z.object({
@@ -148,20 +125,18 @@ export const projectSettingsSchema = z.object({
   coherenceAutomation: projectCoherenceAutomationSchema,
   generation: projectGenerationSettingsSchema,
   preview: projectPreviewSettingsSchema,
-  versioning: projectVersioningSettingsSchema,
   exports: projectExportsSettingsSchema,
   language: projectLanguageSettingsSchema,
-  assets: projectAssetSettingsSchema,
 });
+
+// Backward compatibility types (versioning and assets removed)
 
 // Types
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
 export type CharacterInput = z.infer<typeof characterSchema>;
 export type RelationInput = z.infer<typeof relationSchema>;
 export type SceneInput = z.infer<typeof sceneSchema>;
-export type AssetImportInput = z.infer<typeof assetImportSchema>;
 export type GenerationJobInput = z.infer<typeof generationJobSchema>;
-export type VersionCreateInput = z.infer<typeof versionCreateSchema>;
 export type ExportCreateInput = z.infer<typeof exportCreateSchema>;
 export type ProjectSettingsInput = z.infer<typeof projectSettingsSchema>;
 export type ProjectCoherenceSignalsInput = z.infer<

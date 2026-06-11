@@ -47,7 +47,6 @@ export type PersistedChapterScenesResult = {
   tomeId: string;
   deletedSceneIds: string[];
   deletedPageIds: string[];
-  archivedVideoIds: string[];
   createdSceneIds: string[];
 };
 
@@ -534,35 +533,9 @@ export async function replaceChapterScenesWithDrafts(
     : [];
 
   const deletedPageIds = existingPages.map((page) => page.id);
-  const existingVideos = deletedPageIds.length > 0
-    ? await prisma.dramaVideo.findMany({
-        where: { projectId, sourceMangaPageId: { in: deletedPageIds } },
-        select: { id: true, metadataJson: true },
-      })
-    : [];
-
-  const archivedVideoIds: string[] = [];
   const now = new Date();
 
   const createdSceneIds = await prisma.$transaction(async (tx) => {
-    for (const video of existingVideos) {
-      archivedVideoIds.push(video.id);
-      await tx.dramaVideo.update({
-        where: { id: video.id },
-        data: {
-          status: "archived",
-          updatedAt: now,
-          metadataJson: {
-            ...(video.metadataJson as Record<string, unknown>),
-            archivedFromChapterAutoGeneration: true,
-            archivedReason: options.archiveReason ?? "Chapter scenes replaced",
-            archivedAt: now.toISOString(),
-            replacedByJobId: options.jobId ?? null,
-          } as Prisma.InputJsonValue,
-        },
-      });
-    }
-
     if (deletedPageIds.length > 0) {
       await tx.sceneMangaPage.deleteMany({
         where: { projectId, id: { in: deletedPageIds } },
@@ -625,7 +598,6 @@ export async function replaceChapterScenesWithDrafts(
     tomeId: chapter.tomeId,
     deletedSceneIds,
     deletedPageIds,
-    archivedVideoIds,
     createdSceneIds,
   };
 }
@@ -650,7 +622,7 @@ export async function resolveChapterSceneGenerationReferences(
   const tomeSlugs = tomeReferences.map((reference) => reference.targetSlug);
   const assetSlugs = assetReferences.map((reference) => reference.targetSlug);
 
-  const [characters, scenes, chapters, tomes, assets, project, projectScenes] = await Promise.all([
+  const [characters, scenes, chapters, tomes, project, projectScenes] = await Promise.all([
     characterSlugs.length > 0
       ? prisma.character.findMany({
           where: { projectId, slug: { in: characterSlugs } },
@@ -675,12 +647,6 @@ export async function resolveChapterSceneGenerationReferences(
           select: { slug: true, title: true },
         })
       : Promise.resolve([]),
-    assetSlugs.length > 0
-      ? prisma.asset.findMany({
-          where: { projectId, slug: { in: assetSlugs } },
-          select: { slug: true, name: true },
-        })
-      : Promise.resolve([]),
     prisma.project.findFirst({
       where: { id: projectId },
       select: { settingsJson: true },
@@ -696,17 +662,19 @@ export async function resolveChapterSceneGenerationReferences(
     : [];
 
   const locationMap = new Map<string, string>();
-  for (const location of [...projectLocations, ...projectScenes.map((scene) => scene.location)]) {
+  for (const location of [...projectLocations, ...projectScenes.map((scene: { location: string }) => scene.location)]) {
     const trimmed = typeof location === "string" ? location.trim() : "";
     if (!trimmed) continue;
     locationMap.set(slugify(trimmed, { lower: true, strict: true, replacement: "-" }), trimmed);
   }
 
-  const characterMap = new Map(characters.map((entry) => [entry.slug, entry.name]));
-  const sceneMap = new Map(scenes.map((entry) => [entry.slug, entry.title]));
-  const chapterMap = new Map(chapters.map((entry) => [entry.slug, entry.title]));
-  const tomeMap = new Map(tomes.map((entry) => [entry.slug, entry.title]));
-  const assetMap = new Map(assets.map((entry) => [entry.slug, entry.name]));
+  const assets: Array<{ slug: string; name: string }> = [];
+
+  const characterMap = new Map(characters.map((entry: { slug: string; name: string }) => [entry.slug, entry.name]));
+  const sceneMap = new Map(scenes.map((entry: { slug: string; title: string }) => [entry.slug, entry.title]));
+  const chapterMap = new Map(chapters.map((entry: { slug: string; title: string }) => [entry.slug, entry.title]));
+  const tomeMap = new Map(tomes.map((entry: { slug: string; title: string }) => [entry.slug, entry.title]));
+  const assetMap = new Map(assets.map((entry: { slug: string; name: string }) => [entry.slug, entry.name]));
 
   const references: ChapterSceneGenerationReference[] = [];
 

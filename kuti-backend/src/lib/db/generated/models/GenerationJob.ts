@@ -40,7 +40,6 @@ export type GenerationJobMinAggregateOutputType = {
   sourceKind: $Enums.GenerationSourceKind | null
   sourceId: string | null
   sourceLabel: string | null
-  sourceVersionId: string | null
   strategy: $Enums.GenerationStrategy | null
   entrypoint: string | null
   title: string | null
@@ -61,7 +60,6 @@ export type GenerationJobMaxAggregateOutputType = {
   sourceKind: $Enums.GenerationSourceKind | null
   sourceId: string | null
   sourceLabel: string | null
-  sourceVersionId: string | null
   strategy: $Enums.GenerationStrategy | null
   entrypoint: string | null
   title: string | null
@@ -82,7 +80,6 @@ export type GenerationJobCountAggregateOutputType = {
   sourceKind: number
   sourceId: number
   sourceLabel: number
-  sourceVersionId: number
   strategy: number
   entrypoint: number
   title: number
@@ -114,7 +111,6 @@ export type GenerationJobMinAggregateInputType = {
   sourceKind?: true
   sourceId?: true
   sourceLabel?: true
-  sourceVersionId?: true
   strategy?: true
   entrypoint?: true
   title?: true
@@ -135,7 +131,6 @@ export type GenerationJobMaxAggregateInputType = {
   sourceKind?: true
   sourceId?: true
   sourceLabel?: true
-  sourceVersionId?: true
   strategy?: true
   entrypoint?: true
   title?: true
@@ -156,7 +151,6 @@ export type GenerationJobCountAggregateInputType = {
   sourceKind?: true
   sourceId?: true
   sourceLabel?: true
-  sourceVersionId?: true
   strategy?: true
   entrypoint?: true
   title?: true
@@ -265,7 +259,6 @@ export type GenerationJobGroupByOutputType = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint: string
   title: string
@@ -310,7 +303,6 @@ export type GenerationJobWhereInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFilter<"GenerationJob"> | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFilter<"GenerationJob"> | string
   sourceLabel?: Prisma.StringFilter<"GenerationJob"> | string
-  sourceVersionId?: Prisma.StringNullableFilter<"GenerationJob"> | string | null
   strategy?: Prisma.EnumGenerationStrategyFilter<"GenerationJob"> | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFilter<"GenerationJob"> | string
   title?: Prisma.StringFilter<"GenerationJob"> | string
@@ -335,7 +327,6 @@ export type GenerationJobOrderByWithRelationInput = {
   sourceKind?: Prisma.SortOrder
   sourceId?: Prisma.SortOrder
   sourceLabel?: Prisma.SortOrder
-  sourceVersionId?: Prisma.SortOrderInput | Prisma.SortOrder
   strategy?: Prisma.SortOrder
   entrypoint?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -363,7 +354,6 @@ export type GenerationJobWhereUniqueInput = Prisma.AtLeast<{
   sourceKind?: Prisma.EnumGenerationSourceKindFilter<"GenerationJob"> | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFilter<"GenerationJob"> | string
   sourceLabel?: Prisma.StringFilter<"GenerationJob"> | string
-  sourceVersionId?: Prisma.StringNullableFilter<"GenerationJob"> | string | null
   strategy?: Prisma.EnumGenerationStrategyFilter<"GenerationJob"> | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFilter<"GenerationJob"> | string
   title?: Prisma.StringFilter<"GenerationJob"> | string
@@ -388,7 +378,6 @@ export type GenerationJobOrderByWithAggregationInput = {
   sourceKind?: Prisma.SortOrder
   sourceId?: Prisma.SortOrder
   sourceLabel?: Prisma.SortOrder
-  sourceVersionId?: Prisma.SortOrderInput | Prisma.SortOrder
   strategy?: Prisma.SortOrder
   entrypoint?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -418,7 +407,6 @@ export type GenerationJobScalarWhereWithAggregatesInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindWithAggregatesFilter<"GenerationJob"> | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringWithAggregatesFilter<"GenerationJob"> | string
   sourceLabel?: Prisma.StringWithAggregatesFilter<"GenerationJob"> | string
-  sourceVersionId?: Prisma.StringNullableWithAggregatesFilter<"GenerationJob"> | string | null
   strategy?: Prisma.EnumGenerationStrategyWithAggregatesFilter<"GenerationJob"> | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringWithAggregatesFilter<"GenerationJob"> | string
   title?: Prisma.StringWithAggregatesFilter<"GenerationJob"> | string
@@ -439,7 +427,6 @@ export type GenerationJobCreateInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -464,7 +451,6 @@ export type GenerationJobUncheckedCreateInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -487,7 +473,6 @@ export type GenerationJobUpdateInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -512,7 +497,6 @@ export type GenerationJobUncheckedUpdateInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -536,7 +520,6 @@ export type GenerationJobCreateManyInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -557,7 +540,6 @@ export type GenerationJobUpdateManyMutationInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -579,7 +561,6 @@ export type GenerationJobUncheckedUpdateManyInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -611,7 +592,6 @@ export type GenerationJobCountOrderByAggregateInput = {
   sourceKind?: Prisma.SortOrder
   sourceId?: Prisma.SortOrder
   sourceLabel?: Prisma.SortOrder
-  sourceVersionId?: Prisma.SortOrder
   strategy?: Prisma.SortOrder
   entrypoint?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -637,7 +617,6 @@ export type GenerationJobMaxOrderByAggregateInput = {
   sourceKind?: Prisma.SortOrder
   sourceId?: Prisma.SortOrder
   sourceLabel?: Prisma.SortOrder
-  sourceVersionId?: Prisma.SortOrder
   strategy?: Prisma.SortOrder
   entrypoint?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -658,7 +637,6 @@ export type GenerationJobMinOrderByAggregateInput = {
   sourceKind?: Prisma.SortOrder
   sourceId?: Prisma.SortOrder
   sourceLabel?: Prisma.SortOrder
-  sourceVersionId?: Prisma.SortOrder
   strategy?: Prisma.SortOrder
   entrypoint?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -769,7 +747,6 @@ export type GenerationJobCreateWithoutProjectInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -792,7 +769,6 @@ export type GenerationJobUncheckedCreateWithoutProjectInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -845,7 +821,6 @@ export type GenerationJobScalarWhereInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFilter<"GenerationJob"> | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFilter<"GenerationJob"> | string
   sourceLabel?: Prisma.StringFilter<"GenerationJob"> | string
-  sourceVersionId?: Prisma.StringNullableFilter<"GenerationJob"> | string | null
   strategy?: Prisma.EnumGenerationStrategyFilter<"GenerationJob"> | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFilter<"GenerationJob"> | string
   title?: Prisma.StringFilter<"GenerationJob"> | string
@@ -866,7 +841,6 @@ export type GenerationJobCreateWithoutStepsInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -890,7 +864,6 @@ export type GenerationJobUncheckedCreateWithoutStepsInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -928,7 +901,6 @@ export type GenerationJobUpdateWithoutStepsInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -952,7 +924,6 @@ export type GenerationJobUncheckedUpdateWithoutStepsInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -974,7 +945,6 @@ export type GenerationJobCreateWithoutBoardInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -998,7 +968,6 @@ export type GenerationJobUncheckedCreateWithoutBoardInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -1036,7 +1005,6 @@ export type GenerationJobUpdateWithoutBoardInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1060,7 +1028,6 @@ export type GenerationJobUncheckedUpdateWithoutBoardInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1082,7 +1049,6 @@ export type GenerationJobCreateManyProjectInput = {
   sourceKind: $Enums.GenerationSourceKind
   sourceId: string
   sourceLabel: string
-  sourceVersionId?: string | null
   strategy: $Enums.GenerationStrategy
   entrypoint?: string
   title?: string
@@ -1103,7 +1069,6 @@ export type GenerationJobUpdateWithoutProjectInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1126,7 +1091,6 @@ export type GenerationJobUncheckedUpdateWithoutProjectInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1149,7 +1113,6 @@ export type GenerationJobUncheckedUpdateManyWithoutProjectInput = {
   sourceKind?: Prisma.EnumGenerationSourceKindFieldUpdateOperationsInput | $Enums.GenerationSourceKind
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceLabel?: Prisma.StringFieldUpdateOperationsInput | string
-  sourceVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   strategy?: Prisma.EnumGenerationStrategyFieldUpdateOperationsInput | $Enums.GenerationStrategy
   entrypoint?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1202,7 +1165,6 @@ export type GenerationJobSelect<ExtArgs extends runtime.Types.Extensions.Interna
   sourceKind?: boolean
   sourceId?: boolean
   sourceLabel?: boolean
-  sourceVersionId?: boolean
   strategy?: boolean
   entrypoint?: boolean
   title?: boolean
@@ -1228,7 +1190,6 @@ export type GenerationJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   sourceKind?: boolean
   sourceId?: boolean
   sourceLabel?: boolean
-  sourceVersionId?: boolean
   strategy?: boolean
   entrypoint?: boolean
   title?: boolean
@@ -1251,7 +1212,6 @@ export type GenerationJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   sourceKind?: boolean
   sourceId?: boolean
   sourceLabel?: boolean
-  sourceVersionId?: boolean
   strategy?: boolean
   entrypoint?: boolean
   title?: boolean
@@ -1274,7 +1234,6 @@ export type GenerationJobSelectScalar = {
   sourceKind?: boolean
   sourceId?: boolean
   sourceLabel?: boolean
-  sourceVersionId?: boolean
   strategy?: boolean
   entrypoint?: boolean
   title?: boolean
@@ -1290,7 +1249,7 @@ export type GenerationJobSelectScalar = {
   errorMessage?: boolean
 }
 
-export type GenerationJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sourceKind" | "sourceId" | "sourceLabel" | "sourceVersionId" | "strategy" | "entrypoint" | "title" | "prompt" | "summary" | "status" | "progress" | "metadataJson" | "createdAt" | "updatedAt" | "completedAt" | "failedAt" | "errorMessage", ExtArgs["result"]["generationJob"]>
+export type GenerationJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sourceKind" | "sourceId" | "sourceLabel" | "strategy" | "entrypoint" | "title" | "prompt" | "summary" | "status" | "progress" | "metadataJson" | "createdAt" | "updatedAt" | "completedAt" | "failedAt" | "errorMessage", ExtArgs["result"]["generationJob"]>
 export type GenerationJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   steps?: boolean | Prisma.GenerationJob$stepsArgs<ExtArgs>
@@ -1317,7 +1276,6 @@ export type $GenerationJobPayload<ExtArgs extends runtime.Types.Extensions.Inter
     sourceKind: $Enums.GenerationSourceKind
     sourceId: string
     sourceLabel: string
-    sourceVersionId: string | null
     strategy: $Enums.GenerationStrategy
     entrypoint: string
     title: string
@@ -1762,7 +1720,6 @@ export interface GenerationJobFieldRefs {
   readonly sourceKind: Prisma.FieldRef<"GenerationJob", 'GenerationSourceKind'>
   readonly sourceId: Prisma.FieldRef<"GenerationJob", 'String'>
   readonly sourceLabel: Prisma.FieldRef<"GenerationJob", 'String'>
-  readonly sourceVersionId: Prisma.FieldRef<"GenerationJob", 'String'>
   readonly strategy: Prisma.FieldRef<"GenerationJob", 'GenerationStrategy'>
   readonly entrypoint: Prisma.FieldRef<"GenerationJob", 'String'>
   readonly title: Prisma.FieldRef<"GenerationJob", 'String'>

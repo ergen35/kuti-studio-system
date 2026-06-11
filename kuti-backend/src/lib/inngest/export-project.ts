@@ -477,12 +477,6 @@ export const exportProjectFunction = inngest.createFunction(
               chapters: true,
               scenes: true,
               storyReferences: true,
-              assets: {
-                include: {
-                  links: true,
-                },
-              },
-              assetLinks: true,
               generationJobs: {
                 include: {
                   steps: true,
@@ -496,7 +490,6 @@ export const exportProjectFunction = inngest.createFunction(
               sceneGenerationConfigs: true,
               sceneMangaPages: true,
               warnings: true,
-              versions: true,
             },
           }),
           db.exportRecord.findUnique({ where: { id: exportId } }),
@@ -596,7 +589,6 @@ export const exportProjectFunction = inngest.createFunction(
                 tomes: project.tomes.length,
                 chapters: project.chapters.length,
                 scenes: project.scenes.length,
-                assets: project.assets.length,
               },
             },
           },

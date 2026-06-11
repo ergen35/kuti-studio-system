@@ -165,7 +165,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
         .map((reference) => normalizeReferenceKind(reference.referenceKind) === "asset" ? reference.targetSlug : null)
         .filter((value): value is string => Boolean(value));
 
-      const [referencedScenes, referencedChapters, referencedTomes, referencedAssets] = await Promise.all([
+      const [referencedScenes, referencedChapters, referencedTomes] = await Promise.all([
         referencedSceneSlugs.length > 0
           ? db.scene.findMany({
               where: { projectId, slug: { in: referencedSceneSlugs } },
@@ -184,13 +184,9 @@ export const generateSceneMangaFunction = inngest.createFunction(
               select: { slug: true, title: true },
             })
           : Promise.resolve([]),
-        referencedAssetSlugs.length > 0
-          ? db.asset.findMany({
-              where: { projectId, slug: { in: referencedAssetSlugs } },
-              select: { slug: true, name: true },
-            })
-          : Promise.resolve([]),
       ]);
+
+      const referencedAssets: Array<{ slug: string; name: string }> = [];
 
       const sceneLocationMap = new Map<string, string>();
       const projectLocations = Array.isArray((project.settingsJson as Record<string, unknown> | null)?.locationsJson)
@@ -204,10 +200,10 @@ export const generateSceneMangaFunction = inngest.createFunction(
       }
 
       const characterBySlug = new Map(characterDetails.map((character) => [character.slug, character]));
-      const sceneBySlug = new Map(referencedScenes.map((entry) => [entry.slug, entry]));
-      const chapterBySlug = new Map(referencedChapters.map((entry) => [entry.slug, entry]));
-      const tomeBySlug = new Map(referencedTomes.map((entry) => [entry.slug, entry]));
-      const assetBySlug = new Map(referencedAssets.map((entry) => [entry.slug, entry]));
+      const sceneBySlug = new Map(referencedScenes.map((entry: { slug: string; title: string }) => [entry.slug, entry]));
+      const chapterBySlug = new Map(referencedChapters.map((entry: { slug: string; title: string }) => [entry.slug, entry]));
+      const tomeBySlug = new Map(referencedTomes.map((entry: { slug: string; title: string }) => [entry.slug, entry]));
+      const assetBySlug = new Map(referencedAssets.map((entry: { slug: string; name: string }) => [entry.slug, entry]));
       const selectedImageByCharacterId = new Map(selectedImages.map((image) => [image.characterId, image]));
       const generatedCharacterSheetAnchors = new Map<string, PromptImageAnchor>();
       const sceneStyleDescription = buildStyleDescription(

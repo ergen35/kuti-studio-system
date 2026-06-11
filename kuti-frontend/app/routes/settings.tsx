@@ -8,6 +8,7 @@ import {
   useBeforeUnload,
   useBlocker,
 } from "react-router";
+import { toast } from "sonner";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "~/hooks/useTranslation";
@@ -317,6 +318,10 @@ export default function SettingsRoute() {
         reset(lastSubmittedValues.current);
       }
       invalidateQueriesById(queryClient, ["getProject", "listProjects"]);
+      toast.success(t("common:toast.saved"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -341,7 +346,11 @@ export default function SettingsRoute() {
     onSuccess: () => {
       // Invalidate projects list and redirect to home
       invalidateQueriesById(queryClient, "listProjects");
+      toast.success(t("common:toast.deleted"));
       navigate("/");
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -414,14 +423,9 @@ export default function SettingsRoute() {
     "";
   const previewReadingDirection = watch("preview.readingDirection");
   const previewPanelDensity = watch("preview.panelDensity");
-  const retainedVersionsPerBranch = watch(
-    "versioning.retainedVersionsPerBranch",
-  );
   const defaultExportKind = watch("exports.defaultKind");
   const defaultExportFormats = watch("exports.defaultFormats");
   const preferredLocale = watch("language.preferredLocale");
-  const assetArchiveOnDelete = watch("assets.archiveOnDelete");
-  const assetShowUsageHints = watch("assets.showUsageHints");
   const modelItems = (models.data as Model[] | undefined) ?? [];
   const modelsByKind = useMemo(
     () => ({
@@ -485,11 +489,6 @@ export default function SettingsRoute() {
       meta: t("sections.signals.meta"),
     },
     {
-      id: "versioning",
-      label: t("sections.versioning.title"),
-      meta: t("sections.versioning.meta"),
-    },
-    {
       id: "exports",
       label: t("sections.exports.title"),
       meta: t("sections.exports.meta"),
@@ -498,11 +497,6 @@ export default function SettingsRoute() {
       id: "language",
       label: t("sections.language.title"),
       meta: t("sections.language.meta"),
-    },
-    {
-      id: "assets",
-      label: t("sections.assets.title"),
-      meta: t("sections.assets.meta"),
     },
   ] as const;
   const highlightedLocation = useMemo(() => {
@@ -1072,35 +1066,6 @@ export default function SettingsRoute() {
                 </section>
 
                 <section
-                  id="versioning"
-                  className="grid gap-4 rounded-2xl border border-border/70 bg-background/85 p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] scroll-mt-24"
-                >
-                  <SectionTitle
-                    title={t("sections.versioning.title")}
-                    meta={t("sections.versioning.meta")}
-                  />
-                  <Alert className="border-sky-400/15 bg-sky-400/5 text-sm">
-                    <AlertDescription>
-                      {t("sections.versioning.helper")}
-                    </AlertDescription>
-                  </Alert>
-                  <FormField
-                    label={t("sections.versioning.retained.label")}
-                    error={errors.versioning?.retainedVersionsPerBranch}
-                  >
-                    <Input
-                      type="number"
-                      min={1}
-                      max={12}
-                      step={1}
-                      {...register("versioning.retainedVersionsPerBranch", {
-                        valueAsNumber: true,
-                      })}
-                    />
-                  </FormField>
-                </section>
-
-                <section
                   id="exports"
                   className="grid gap-4 rounded-2xl border border-border/70 bg-secondary/15 p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] scroll-mt-24"
                 >
@@ -1247,70 +1212,6 @@ export default function SettingsRoute() {
                   />
                 </section>
 
-                <section
-                  id="assets"
-                  className="grid gap-4 rounded-2xl border border-border/70 bg-secondary/15 p-4 md:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] scroll-mt-24"
-                >
-                  <SectionTitle
-                    title={t("sections.assets.title")}
-                    meta={t("sections.assets.meta")}
-                  />
-                  <Alert className="border-amber-400/15 bg-amber-400/5 text-sm">
-                    <AlertDescription>
-                      {t("sections.assets.helper")}
-                    </AlertDescription>
-                  </Alert>
-                  <div className="grid gap-3 lg:grid-cols-2">
-                    <Controller
-                      control={control}
-                      name="assets.archiveOnDelete"
-                      render={({ field }) => (
-                        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border/70 bg-background/80 p-4 transition-colors hover:border-primary/35 hover:bg-background">
-                          <Checkbox
-                            checked={!!field.value}
-                            onCheckedChange={(checked) =>
-                              field.onChange(Boolean(checked))
-                            }
-                            className="mt-1"
-                          />
-                          <span className="grid gap-1">
-                            <span className="text-sm font-semibold text-foreground">
-                              {t("sections.assets.archiveOnDelete.label")}
-                            </span>
-                            <span className="text-xs leading-5 text-muted-foreground">
-                              {t("sections.assets.archiveOnDelete.description")}
-                            </span>
-                          </span>
-                        </label>
-                      )}
-                    />
-
-                    <Controller
-                      control={control}
-                      name="assets.showUsageHints"
-                      render={({ field }) => (
-                        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border/70 bg-background/80 p-4 transition-colors hover:border-primary/35 hover:bg-background">
-                          <Checkbox
-                            checked={!!field.value}
-                            onCheckedChange={(checked) =>
-                              field.onChange(Boolean(checked))
-                            }
-                            className="mt-1"
-                          />
-                          <span className="grid gap-1">
-                            <span className="text-sm font-semibold text-foreground">
-                              {t("sections.assets.showUsageHints.label")}
-                            </span>
-                            <span className="text-xs leading-5 text-muted-foreground">
-                              {t("sections.assets.showUsageHints.description")}
-                            </span>
-                          </span>
-                        </label>
-                      )}
-                    />
-                  </div>
-                </section>
-
                 <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
                   <div className="flex items-center gap-2">
                     <Badge
@@ -1421,20 +1322,6 @@ export default function SettingsRoute() {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-border/70 bg-secondary/25 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                        {t("sections.summary.versioning.title")}
-                      </span>
-                      <Badge tone="info">{retainedVersionsPerBranch}</Badge>
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {t("sections.summary.versioning.description", {
-                        count: retainedVersionsPerBranch,
-                      })}
-                    </p>
-                  </div>
-
                   <div className="rounded-2xl border border-border/70 bg-secondary/20 p-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
@@ -1470,26 +1357,6 @@ export default function SettingsRoute() {
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {t("sections.summary.language.description")}
                     </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-border/70 bg-secondary/20 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                        {t("sections.summary.assets.title")}
-                      </span>
-                      <Badge tone={assetArchiveOnDelete ? "ready" : "warning"}>
-                        {assetArchiveOnDelete
-                          ? t("sections.assets.archiveOnDelete.enabled")
-                          : t("sections.assets.archiveOnDelete.disabled")}
-                      </Badge>
-                    </div>
-                    <div className="mt-2 text-xs text-muted-foreground">
-                      <p>
-                        {assetShowUsageHints
-                          ? t("sections.assets.showUsageHints.enabled")
-                          : t("sections.assets.showUsageHints.disabled")}
-                      </p>
-                    </div>
                   </div>
 
                   <div className="rounded-2xl border border-border/70 bg-secondary/25 p-3">

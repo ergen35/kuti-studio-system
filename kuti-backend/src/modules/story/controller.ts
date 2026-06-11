@@ -267,9 +267,8 @@ export async function getStorySummary(projectId: string) {
     prisma.storyReference.findMany({ where: { projectId }, orderBy: { createdAt: "asc" } }),
   ]);
 
-  const [characters, assets, project] = await Promise.all([
+  const [characters, project] = await Promise.all([
     prisma.character.findMany({ where: { projectId }, select: { slug: true } }),
-    prisma.asset.findMany({ where: { projectId }, select: { slug: true } }),
     prisma.project.findUnique({ where: { id: projectId }, select: { settingsJson: true } }),
   ]);
 
@@ -277,8 +276,7 @@ export async function getStorySummary(projectId: string) {
   const sceneSlugs = new Set(scenes.map(s => s.slug));
   const tomeSlugs = new Set(tomes.map(t => t.slug));
   const chapterSlugs = new Set(chapters.map(c => c.slug));
-  const charSlugs = new Set(characters.map((c) => c.slug));
-  const assetSlugs = new Set(assets.map((asset) => asset.slug));
+  const charSlugs = new Set(characters.map((c: { slug: string }) => c.slug));
   const settings = (project?.settingsJson as Record<string, unknown> | null) ?? {};
   const projectLocations = Array.isArray(settings.locationsJson)
     ? (settings.locationsJson as string[])
@@ -303,9 +301,6 @@ export async function getStorySummary(projectId: string) {
           break;
         case "tome":
           if (!tomeSlugs.has(ref.targetSlug)) reason = "Tome not found";
-          break;
-        case "asset":
-          if (!assetSlugs.has(ref.targetSlug)) reason = "Asset not found";
           break;
         case "environment":
           if (!locationSlugs.has(ref.targetSlug)) reason = "Location not found";
@@ -521,7 +516,6 @@ export async function autoGenerateChapterScenes(
       sourceKind: "chapter",
       sourceId: chapterId,
       sourceLabel: `${chapter.tome?.title || "Tome"} > ${chapter.title}`,
-      sourceVersionId: null,
       strategy: "direct",
       entrypoint: modelKey,
       title: `Auto-generate scenes: ${chapter.title}`,
@@ -753,23 +747,6 @@ export async function getReferenceSuggestions(
           entityId: tome.id,
           href: `/projects/${projectId}/story/${tome.id}`,
           description: "tome",
-        }));
-    }
-    case "asset": {
-      const assets = await prisma.asset.findMany({
-        where: { projectId },
-        orderBy: { name: "asc" },
-      });
-      return assets
-        .filter(a => a.slug.toLowerCase().includes(q) || a.name.toLowerCase().includes(q))
-        .slice(0, 10)
-        .map((asset) => buildReferenceSuggestion({
-          kind: "asset",
-          slug: asset.slug,
-          label: asset.name,
-          entityId: asset.id,
-          href: `/projects/${projectId}/assets?asset=${encodeURIComponent(asset.slug)}`,
-          description: "asset",
         }));
     }
     case "environment": {

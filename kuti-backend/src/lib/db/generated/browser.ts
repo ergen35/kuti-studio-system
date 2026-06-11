@@ -88,16 +88,6 @@ export type Scene = Prisma.SceneModel
  */
 export type StoryReference = Prisma.StoryReferenceModel
 /**
- * Model Asset
- * 
- */
-export type Asset = Prisma.AssetModel
-/**
- * Model AssetLink
- * 
- */
-export type AssetLink = Prisma.AssetLinkModel
-/**
  * Model GenerationJob
  * 
  */
@@ -127,16 +117,6 @@ export type SceneGenerationConfig = Prisma.SceneGenerationConfigModel
  * 
  */
 export type SceneMangaPage = Prisma.SceneMangaPageModel
-/**
- * Model DramaVideo
- * 
- */
-export type DramaVideo = Prisma.DramaVideoModel
-/**
- * Model Version
- * 
- */
-export type Version = Prisma.VersionModel
 /**
  * Model Warning
  * 

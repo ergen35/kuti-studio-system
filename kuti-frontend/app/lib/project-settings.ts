@@ -41,19 +41,12 @@ const DEFAULT_PROJECT_SETTINGS: ProjectSettingsInput = {
     readingDirection: "rtl",
     panelDensity: "comfortable",
   },
-  versioning: {
-    retainedVersionsPerBranch: 3,
-  },
   exports: {
     defaultKind: "publication",
     defaultFormats: ["paged_images", "pdf"],
   },
   language: {
     preferredLocale: "fr",
-  },
-  assets: {
-    archiveOnDelete: true,
-    showUsageHints: true,
   },
 };
 
@@ -226,10 +219,8 @@ export function readProjectSettings(
   const toneProfile = readRecord(coherenceSignals.toneProfileJson);
   const generation = readRecord(settings.generationSettingsJson);
   const preview = readRecord(settings.previewSettingsJson);
-  const versioning = readRecord(settings.versioningSettingsJson);
   const exportsSettings = readRecord(settings.exportSettingsJson);
   const language = readRecord(settings.languageSettingsJson);
-  const assets = readRecord(settings.assetSettingsJson);
   const coherenceAutomation = readRecord(settings.coherenceAutomationJson);
 
   return {
@@ -331,20 +322,6 @@ export function readProjectSettings(
         DEFAULT_PROJECT_SETTINGS.preview.panelDensity,
       ),
     },
-    versioning: {
-      retainedVersionsPerBranch: Math.max(
-        1,
-        Math.min(
-          12,
-          Math.floor(
-            readNumber(
-              versioning.retainedVersionsPerBranch,
-              DEFAULT_PROJECT_SETTINGS.versioning.retainedVersionsPerBranch,
-            ),
-          ),
-        ),
-      ),
-    },
     exports: {
       defaultKind: readEnum(
         readString(
@@ -368,16 +345,6 @@ export function readProjectSettings(
         ),
         ["en", "fr"],
         DEFAULT_PROJECT_SETTINGS.language.preferredLocale,
-      ),
-    },
-    assets: {
-      archiveOnDelete: readBoolean(
-        assets.archiveOnDelete,
-        DEFAULT_PROJECT_SETTINGS.assets.archiveOnDelete,
-      ),
-      showUsageHints: readBoolean(
-        assets.showUsageHints,
-        DEFAULT_PROJECT_SETTINGS.assets.showUsageHints,
       ),
     },
   };
@@ -418,10 +385,8 @@ export function composeProjectSettingsJson(
     coherenceAutomationJson: values.coherenceAutomation,
     generationSettingsJson: values.generation,
     previewSettingsJson: values.preview,
-    versioningSettingsJson: values.versioning,
     exportSettingsJson: values.exports,
     languageSettingsJson: values.language,
-    assetSettingsJson: values.assets,
   };
 }
 

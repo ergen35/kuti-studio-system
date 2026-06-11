@@ -180,7 +180,6 @@ export const generateChapterScenesFunction = inngest.createFunction(
               createdSceneIds: persisted.createdSceneIds,
               deletedSceneIds: persisted.deletedSceneIds,
               deletedPageIds: persisted.deletedPageIds,
-              archivedVideoIds: persisted.archivedVideoIds,
               coherenceScanTriggered,
             },
           },

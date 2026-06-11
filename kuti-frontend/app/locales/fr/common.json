@@ -18,7 +18,6 @@
     "archive": "Archiver",
     "open": "Ouvrir",
     "clone": "Cloner",
-    "close": "Fermer",
     "validate": "Valider",
     "resolve": "Résoudre",
     "scan": "Scanner",
@@ -31,7 +30,8 @@
     "light": "Clair",
     "dark": "Sombre",
     "comfortable": "Confortable",
-    "compact": "Compact"
+    "compact": "Compact",
+    "viewAll": "Voir tout"
   },
   "status": {
     "active": "Actif",
@@ -101,5 +101,18 @@
     "status": "Statut",
     "createdAt": "Créé le",
     "updatedAt": "Mis à jour le"
+  },
+  "toast": {
+    "saved": "Enregistré avec succès",
+    "created": "Créé avec succès",
+    "deleted": "Supprimé avec succès",
+    "updated": "Mis à jour avec succès",
+    "archived": "Archivé avec succès",
+    "restored": "Restauré avec succès",
+    "duplicated": "Dupliqué avec succès",
+    "imported": "Importé avec succès",
+    "exported": "Exporté avec succès",
+    "generated": "Génération lancée",
+    "error": "Une erreur est survenue"
   }
 }

@@ -122,26 +122,25 @@ function referenceTargetExists(kind: string, targetSlug: string, lookups: Refere
 }
 
 async function loadReferenceLookups(projectId: string): Promise<ReferenceLookups> {
-  const [project, characters, scenes, chapters, tomes, assets] = await Promise.all([
+  const [project, characters, scenes, chapters, tomes] = await Promise.all([
     loadProjectSettings(projectId),
     db.character.findMany({ where: { projectId }, select: { slug: true } }),
     db.scene.findMany({ where: { projectId }, select: { slug: true, location: true } }),
     db.chapter.findMany({ where: { projectId }, select: { slug: true } }),
     db.tome.findMany({ where: { projectId }, select: { slug: true } }),
-    db.asset.findMany({ where: { projectId }, select: { slug: true } }),
   ]);
 
   const projectLocations = readAllowedLocations(project);
 
   return {
-    characterSlugs: new Set(characters.map((character) => character.slug)),
-    sceneSlugs: new Set(scenes.map((scene) => scene.slug)),
-    chapterSlugs: new Set(chapters.map((chapter) => chapter.slug)),
-    tomeSlugs: new Set(tomes.map((tome) => tome.slug)),
-    assetSlugs: new Set(assets.map((asset) => asset.slug)),
+    characterSlugs: new Set(characters.map((character: { slug: string }) => character.slug)),
+    sceneSlugs: new Set(scenes.map((scene: { slug: string }) => scene.slug)),
+    chapterSlugs: new Set(chapters.map((chapter: { slug: string }) => chapter.slug)),
+    tomeSlugs: new Set(tomes.map((tome: { slug: string }) => tome.slug)),
+    assetSlugs: new Set<string>(),
     environmentSlugs: new Set([
       ...projectLocations.map(normalizeLocationSlug),
-      ...scenes.flatMap((scene) => scene.location ? [normalizeLocationSlug(scene.location)] : []),
+      ...scenes.flatMap((scene: { location: string }) => scene.location ? [normalizeLocationSlug(scene.location)] : []),
     ]),
   };
 }

@@ -1,15 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { clsx } from "clsx";
 import {
   AlertTriangle,
-  ArrowLeft,
   BookOpen,
   Check,
+  ChevronDown,
   ChevronRight,
   FileText,
-  Film,
-  Image as ImageIcon,
   Loader2,
   MapPin,
   Pencil,
@@ -17,9 +14,10 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 import { z } from "zod";
 import { AppShell } from "~/components/layout";
 import { ChapterMangaPreview, StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
@@ -31,13 +29,10 @@ import {
   ErrorState,
   Field,
   LoadingState,
-  Panel,
-  SectionTitle,
 } from "~/components/ui";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -71,7 +66,6 @@ const editChapterSchema = z.object({
 
 type EditChapterInput = z.infer<typeof editChapterSchema>;
 
-// Schema for creating a new scene
 const createSceneSchema = z.object({
   title: z.string().min(1, "Title is required"),
   location: z.string().optional(),
@@ -84,20 +78,19 @@ type AutoGenerateChapterInput = {
   sceneCount: number;
 };
 
-// Create Scene Modal
-interface CreateSceneModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: CreateSceneInput) => void;
-  isLoading: boolean;
-}
+type Scene = GetStorySummaryResponse["scenes"][number];
 
 function CreateSceneModal({
   isOpen,
   onClose,
   onSubmit,
   isLoading,
-}: CreateSceneModalProps) {
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: CreateSceneInput) => void;
+  isLoading: boolean;
+}) {
   const { t } = useTranslation("story");
   const {
     register,
@@ -125,10 +118,7 @@ function CreateSceneModal({
         <DialogHeader>
           <DialogTitle>{t("scenes.createTitle")}</DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
           <Field label={t("fields.title")}>
             <Input
               {...register("title")}
@@ -140,7 +130,6 @@ function CreateSceneModal({
           {errors.title && (
             <span className="text-danger text-xs">{errors.title.message}</span>
           )}
-
           <Field label={t("fields.location")}>
             <div className="relative">
               <MapPin
@@ -154,14 +143,8 @@ function CreateSceneModal({
               />
             </div>
           </Field>
-
           <DialogFooter>
-            <Button
-              variant="ghost"
-              type="button"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
+            <Button variant="ghost" type="button" onClick={handleClose} disabled={isLoading}>
               {t("actions.cancel")}
             </Button>
             <Button variant="primary" disabled={isLoading}>
@@ -174,29 +157,24 @@ function CreateSceneModal({
   );
 }
 
-interface AutoGenerateChapterModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: AutoGenerateChapterInput) => void;
-  isLoading: boolean;
-  errorMessage?: string | null;
-}
-
 function AutoGenerateChapterModal({
   isOpen,
   onClose,
   onSubmit,
   isLoading,
   errorMessage,
-}: AutoGenerateChapterModalProps) {
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: AutoGenerateChapterInput) => void;
+  isLoading: boolean;
+  errorMessage?: string | null;
+}) {
   const { t } = useTranslation("story");
   const schema = useMemo(
     () =>
       z.object({
-        chapterSummary: z
-          .string()
-          .trim()
-          .min(1000, t("chapter.autoGenerate.errors.summary")),
+        chapterSummary: z.string().trim().min(1000, t("chapter.autoGenerate.errors.summary")),
         sceneCount: z
           .number()
           .int(t("chapter.autoGenerate.errors.sceneCount"))
@@ -214,10 +192,7 @@ function AutoGenerateChapterModal({
     reset,
   } = useForm<AutoGenerateChapterInput>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      chapterSummary: "",
-      sceneCount: 4,
-    },
+    defaultValues: { chapterSummary: "", sceneCount: 4 },
   });
 
   const chapterSummary = watch("chapterSummary") || "";
@@ -243,22 +218,17 @@ function AutoGenerateChapterModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="w-full overflow-hidden p-0">
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className="flex max-h-[92vh] flex-col"
-        >
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex max-h-[92vh] flex-col">
           <DialogHeader className="border-b border-border bg-secondary/20 px-6 py-5">
             <div className="flex items-start gap-3">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
                 <Sparkles size={20} />
               </div>
               <div className="min-w-0 flex-1">
-                <DialogTitle className="text-xl">
-                  {t("chapter.autoGenerate.title")}
-                </DialogTitle>
-                <DialogDescription className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                <DialogTitle className="text-xl">{t("chapter.autoGenerate.title")}</DialogTitle>
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
                   {t("chapter.autoGenerate.description")}
-                </DialogDescription>
+                </p>
               </div>
             </div>
           </DialogHeader>
@@ -276,9 +246,7 @@ function AutoGenerateChapterModal({
                 />
               </Field>
               {errors.chapterSummary ? (
-                <span className="text-xs text-danger">
-                  {errors.chapterSummary.message}
-                </span>
+                <span className="text-xs text-danger">{errors.chapterSummary.message}</span>
               ) : (
                 <span className="text-xs text-muted-foreground">
                   {t("chapter.autoGenerate.summaryHint")}
@@ -286,9 +254,7 @@ function AutoGenerateChapterModal({
               )}
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="rounded-full border border-border bg-secondary/40 px-2.5 py-1">
-                  {t("chapter.autoGenerate.summaryCount", {
-                    count: summaryLength,
-                  })}
+                  {t("chapter.autoGenerate.summaryCount", { count: summaryLength })}
                 </span>
                 <span className="rounded-full border border-border bg-secondary/40 px-2.5 py-1">
                   {t("chapter.autoGenerate.referencesHint")}
@@ -323,9 +289,7 @@ function AutoGenerateChapterModal({
                 />
               </Field>
               {errors.sceneCount ? (
-                <span className="text-xs text-danger">
-                  {errors.sceneCount.message}
-                </span>
+                <span className="text-xs text-danger">{errors.sceneCount.message}</span>
               ) : (
                 <span className="text-xs text-muted-foreground">
                   {t("chapter.autoGenerate.sceneCountHint")}
@@ -369,22 +333,11 @@ function AutoGenerateChapterModal({
                   </p>
                 </div>
               </div>
-
               <div className="flex flex-col gap-2 sm:flex-row">
-                <Button
-                  variant="ghost"
-                  type="button"
-                  onClick={handleClose}
-                  disabled={isLoading}
-                >
+                <Button variant="ghost" type="button" onClick={handleClose} disabled={isLoading}>
                   {t("chapter.autoGenerate.footerCancel")}
                 </Button>
-                <Button
-                  variant="primary"
-                  type="submit"
-                  disabled={!canSubmit}
-                  className="gap-2"
-                >
+                <Button variant="primary" type="submit" disabled={!canSubmit} className="gap-2">
                   {isLoading ? (
                     <Loader2 size={16} className="animate-spin" />
                   ) : (
@@ -403,111 +356,63 @@ function AutoGenerateChapterModal({
   );
 }
 
-// SDK types from GetStorySummaryResponse
-type Tome = GetStorySummaryResponse["tomes"][number];
-type Chapter = GetStorySummaryResponse["chapters"][number];
-type Scene = GetStorySummaryResponse["scenes"][number];
-
-// Sidepanel with chapters in this tome
-function ChapterNavigationPanel({
-  chapters,
-  currentChapterId,
+function SceneRow({
+  scene,
+  sceneNumber,
   projectId,
   tomeId,
-  onMoveChapter,
-  reorderDisabled = false,
+  canMoveUp,
+  canMoveDown,
+  reorderDisabled,
+  onMoveUp,
+  onMoveDown,
 }: {
-  chapters: Chapter[];
-  currentChapterId: string;
+  scene: Scene;
+  sceneNumber: number;
   projectId: string;
   tomeId: string;
-  onMoveChapter?: (chapterId: string, direction: -1 | 1) => void;
-  reorderDisabled?: boolean;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  reorderDisabled: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }) {
-  const { t } = useTranslation("story");
-  const navigate = useNavigate();
-
-  // Sort chapters by orderIndex
-  const sortedChapters = [...chapters].sort(
-    (a, b) => a.orderIndex - b.orderIndex,
-  );
-
   return (
-    <Panel className="!p-3">
-      <SectionTitle
-        title={t("chapter.navigation.title")}
-        meta={String(sortedChapters.length)}
+    <div className="group flex items-stretch gap-2">
+      <Link
+        to={`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`}
+        className="flex min-h-12 flex-1 items-center gap-3 rounded-lg border border-line bg-surface p-3 transition-all hover:border-accent/40 hover:bg-accent/5"
+      >
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <FileText size={16} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-primary">S{sceneNumber}</span>
+            <span className="truncate font-medium text-ink">{scene.title}</span>
+          </div>
+          {scene.location && (
+            <p className="mt-0.5 truncate text-xs text-muted">{scene.location}</p>
+          )}
+        </div>
+        <Badge tone={scene.status} className="text-[10px]">
+          {scene.status}
+        </Badge>
+        <ChevronRight
+          size={16}
+          className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
+        />
+      </Link>
+      <ReorderControls
+        entityLabel={scene.title}
+        canMoveUp={canMoveUp}
+        canMoveDown={canMoveDown}
+        disabled={reorderDisabled}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
       />
-
-      <div className="mt-3 flex flex-col gap-2">
-        {sortedChapters.map((chapter, index) => {
-          const isCurrent = chapter.id === currentChapterId;
-          return (
-            <div key={chapter.id} className="group flex items-stretch gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() =>
-                  navigate(
-                    `/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`,
-                  )
-                }
-                className={clsx(
-                  "flex h-auto flex-1 items-center gap-3 rounded-lg border p-2.5 text-left transition-colors hover:text-foreground",
-                  isCurrent
-                    ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_3px_0_0_var(--primary)]"
-                    : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-primary/8",
-                )}
-              >
-                <span
-                  className={clsx(
-                    "text-xs font-semibold",
-                    isCurrent ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {t("chapter.shortNumber", { number: index + 1 })}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={clsx(
-                      "truncate text-sm",
-                      isCurrent
-                        ? "font-medium text-primary"
-                        : "text-foreground",
-                    )}
-                  >
-                    {chapter.title}
-                  </p>
-                </div>
-                {isCurrent && (
-                  <span className="size-2 rounded-full bg-primary" />
-                )}
-                {!isCurrent && (
-                  <ChevronRight size={14} className="text-muted-foreground" />
-                )}
-              </Button>
-              {onMoveChapter ? (
-                <ReorderControls
-                  entityLabel={chapter.title}
-                  canMoveUp={index > 0}
-                  canMoveDown={index < sortedChapters.length - 1}
-                  disabled={reorderDisabled}
-                  onMoveUp={() => onMoveChapter(chapter.id, -1)}
-                  onMoveDown={() => onMoveChapter(chapter.id, 1)}
-                  className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-                />
-              ) : null}
-            </div>
-          );
-        })}
-
-        {sortedChapters.length === 0 && (
-          <p className="py-4 text-center text-sm text-muted-foreground">
-            {t("chapter.navigation.empty")}
-          </p>
-        )}
-      </div>
-    </Panel>
+    </div>
   );
 }
 
@@ -520,67 +425,48 @@ export default function ChapterRoute() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAutoGenerateModalOpen, setIsAutoGenerateModalOpen] = useState(false);
 
-  // Fetch story data
   const story = useQuery({
     ...getStorySummaryOptions({ path: { projectId } }),
     enabled: !!projectId,
   });
 
-  // Get current chapter
   const chapter = useMemo(() => {
     return story.data?.chapters.find((c) => c.id === chapterId);
   }, [story.data, chapterId]);
 
-  // Get tome
   const tome = useMemo(() => {
     return story.data?.tomes.find((t) => t.id === tomeId);
   }, [story.data, tomeId]);
 
-  // Get chapter data
-  const chapterData = useMemo(() => {
-    if (!chapter || !story.data) return null;
-
-    const scenes = story.data.scenes
+  const scenes = useMemo(() => {
+    if (!chapter || !story.data) return [];
+    return story.data.scenes
       .filter((s) => s.chapterId === chapterId)
       .sort((a, b) => a.orderIndex - b.orderIndex);
+  }, [chapter, story.data, chapterId]);
 
-    const tomeChapters = story.data.chapters
-      .filter((c) => c.tomeId === tomeId)
-      .sort((a, b) => a.orderIndex - b.orderIndex);
-
-    return { chapter, scenes, tomeChapters };
-  }, [chapter, story.data, chapterId, tomeId]);
-
-  // Calculate chapter number
   const chapterNumber = useMemo(() => {
     if (!story.data || !chapter) return 0;
     const tomeChapters = story.data.chapters
       .filter((c) => c.tomeId === tomeId)
       .sort((a, b) => a.orderIndex - b.orderIndex);
-    const index = tomeChapters.findIndex((c) => c.id === chapterId);
-    return index + 1;
+    return tomeChapters.findIndex((c) => c.id === chapterId) + 1;
   }, [story.data, chapterId, tomeId, chapter]);
 
-  // Calculate tome number
   const tomeNumber = useMemo(() => {
     if (!story.data || !tome) return 0;
-    const index = story.data.tomes.findIndex((t) => t.id === tomeId);
-    return index + 1;
+    return story.data.tomes.findIndex((t) => t.id === tomeId) + 1;
   }, [story.data, tomeId, tome]);
 
-  // Update chapter mutation
   const updateChapterMut = useMutation({
     ...updateChapterMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
       setIsEditing(false);
+      toast.success(t("common:toast.saved"));
     },
-  });
-
-  const reorderChapterMut = useMutation({
-    ...updateChapterMutation(),
-    onSuccess: () => {
-      invalidateWorkspace(projectId);
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -589,16 +475,21 @@ export default function ChapterRoute() {
     onSuccess: () => {
       invalidateWorkspace(projectId);
     },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
+    },
   });
 
-  // Create scene mutation
   const createSceneMut = useMutation({
     ...createSceneMutation(),
     onSuccess: (scene) => {
       invalidateWorkspace(projectId);
       setIsCreateModalOpen(false);
-      // Navigate to scene editor
+      toast.success(t("common:toast.created"));
       navigate(`/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`);
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -607,45 +498,16 @@ export default function ChapterRoute() {
     onSuccess: () => {
       invalidateWorkspace(projectId);
       handleCloseAutoGenerateModal();
+      toast.success(t("common:toast.generated"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
-  const moveChapter = async (movingChapterId: string, direction: -1 | 1) => {
-    if (!chapterData) {
-      return;
-    }
-
-    const swap = getOrderSwap(
-      chapterData.tomeChapters,
-      movingChapterId,
-      direction,
-    );
-    if (!swap) {
-      return;
-    }
-
-    await Promise.all([
-      reorderChapterMut.mutateAsync({
-        path: { projectId, chapterId: swap.current.id },
-        body: { orderIndex: swap.target.orderIndex },
-      } as unknown as Options<UpdateChapterData>),
-      reorderChapterMut.mutateAsync({
-        path: { projectId, chapterId: swap.target.id },
-        body: { orderIndex: swap.current.orderIndex },
-      } as unknown as Options<UpdateChapterData>),
-    ]);
-  };
-
   const moveScene = async (movingSceneId: string, direction: -1 | 1) => {
-    if (!chapterData) {
-      return;
-    }
-
-    const swap = getOrderSwap(chapterData.scenes, movingSceneId, direction);
-    if (!swap) {
-      return;
-    }
-
+    const swap = getOrderSwap(scenes, movingSceneId, direction);
+    if (!swap) return;
     await Promise.all([
       reorderSceneMut.mutateAsync({
         path: { projectId, sceneId: swap.current.id },
@@ -663,14 +525,18 @@ export default function ChapterRoute() {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<EditChapterInput>({
     resolver: zodResolver(editChapterSchema),
-    defaultValues: {
-      title: chapter?.title || "",
-      synopsis: chapter?.synopsis || "",
-    },
+    defaultValues: { title: "", synopsis: "" },
   });
+
+  useEffect(() => {
+    if (chapter) {
+      reset({ title: chapter.title, synopsis: chapter.synopsis ?? "" });
+    }
+  }, [chapter, reset]);
 
   const onSubmit = (data: EditChapterInput) => {
     updateChapterMut.mutate({
@@ -680,14 +546,8 @@ export default function ChapterRoute() {
   };
 
   const handleCreateScene = (data: CreateSceneInput) => {
-    // Calculate orderIndex based on existing scenes in this chapter
-    const existingScenes =
-      story.data?.scenes.filter((s) => s.chapterId === chapterId) || [];
-    const maxOrderIndex = existingScenes.reduce(
-      (max, s) => Math.max(max, s.orderIndex),
-      0,
-    );
-
+    const existingScenes = story.data?.scenes.filter((s) => s.chapterId === chapterId) || [];
+    const maxOrderIndex = existingScenes.reduce((max, s) => Math.max(max, s.orderIndex), 0);
     createSceneMut.mutate({
       path: { projectId },
       body: {
@@ -703,10 +563,7 @@ export default function ChapterRoute() {
   const handleAutoGenerateChapter = (data: AutoGenerateChapterInput) => {
     autoGenerateChapterMut.mutate({
       path: { projectId, chapterId },
-      body: {
-        chapterSummary: data.chapterSummary,
-        sceneCount: data.sceneCount,
-      },
+      body: { chapterSummary: data.chapterSummary, sceneCount: data.sceneCount },
     } as unknown as Options<AutoGenerateChapterScenesData>);
   };
 
@@ -731,7 +588,7 @@ export default function ChapterRoute() {
     );
   }
 
-  if (!chapterData || !chapter || !tome) {
+  if (!chapter || !tome) {
     return (
       <AppShell>
         <EmptyState title={t("chapter.notFound")} />
@@ -739,11 +596,8 @@ export default function ChapterRoute() {
     );
   }
 
-  const { scenes, tomeChapters } = chapterData;
-
   return (
     <AppShell>
-      {/* Breadcrumb */}
       <StoryBreadcrumb
         projectId={projectId}
         tomes={story.data?.tomes || []}
@@ -754,274 +608,160 @@ export default function ChapterRoute() {
         chapterNumber={chapterNumber}
       />
 
-      {/* Back link - mobile only */}
-      <div className="mb-4 lg:hidden">
-        <Link
-          to={`/projects/${projectId}/story/${tomeId}`}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-        >
-          <ArrowLeft size={16} /> {t("chapter.backToTome")}
-        </Link>
-      </div>
-
-      <div className="grid items-start gap-4 lg:grid-cols-[1fr_280px]">
-        {/* Main content */}
-        <div className="flex flex-col gap-4">
-          {/* Chapter header */}
-          <Panel className="overflow-hidden">
-            <div className="-m-4 mb-4 flex items-start gap-4 border-b border-border bg-secondary/20 p-5 compact:-m-3 compact:mb-4 compact:p-4">
-              <div className="grid size-12 place-items-center rounded-lg bg-primary/10 text-primary">
-                <BookOpen size={24} />
-              </div>
-              <div className="min-w-0 flex-1">
-                {/* Mobile breadcrumb */}
-                <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground lg:hidden">
-                  <span>{t("tome.number", { number: tomeNumber })}</span>
-                  <span>/</span>
-                  <span className="text-primary">
-                    {t("chapter.number", { number: chapterNumber })}
-                  </span>
-                </div>
-
-                {isEditing ? (
-                  <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="mt-2 flex flex-col gap-2"
-                  >
-                    <div className="grid gap-1.5 text-xs text-muted-foreground">
-                      <div className="flex items-center justify-between gap-2">
-                        <span>{t("fields.title")}</span>
-                        <StoryCompletionButton
-                          projectId={projectId}
-                          targetKind="chapter"
-                          targetId={chapterId}
-                          field="title"
-                          currentValue={watch("title")}
-                          onComplete={(text) =>
-                            setValue("title", text, {
-                              shouldDirty: true,
-                              shouldValidate: true,
-                            })
-                          }
-                        />
-                      </div>
-                      <Input
-                        {...register("title")}
-                        autoFocus
-                        className="w-full text-lg font-semibold"
-                      />
-                    </div>
-                    {errors.title && (
-                      <span className="text-danger text-xs">
-                        {errors.title.message}
-                      </span>
-                    )}
-                    <div className="grid gap-1.5 text-xs text-muted-foreground">
-                      <div className="flex items-center justify-between gap-2">
-                        <span>{t("chapter.synopsis")}</span>
-                        <StoryCompletionButton
-                          projectId={projectId}
-                          targetKind="chapter"
-                          targetId={chapterId}
-                          field="synopsis"
-                          currentValue={watch("synopsis")}
-                          onComplete={(text) =>
-                            setValue("synopsis", text, { shouldDirty: true })
-                          }
-                        />
-                      </div>
-                      <Textarea
-                        {...register("synopsis")}
-                        rows={4}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        type="button"
-                        onClick={() => setIsEditing(false)}
-                        disabled={updateChapterMut.isPending}
-                        aria-label={t("actions.cancel")}
-                        title={t("actions.cancel")}
-                      >
-                        <X size={16} />
-                      </Button>
-                      <Button
-                        variant="primary"
-                        disabled={updateChapterMut.isPending}
-                        aria-label={t("actions.save")}
-                        title={t("actions.save")}
-                      >
-                        <Check size={16} />
-                      </Button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                          {t("chapter.number", { number: chapterNumber })}
-                        </span>
-                        <h1 className="mt-1 text-xl font-semibold text-foreground">
-                          {chapter.title}
-                        </h1>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        className="size-8 p-0 hover:bg-primary/8 hover:text-primary"
-                        onClick={() => setIsEditing(true)}
-                        aria-label={t("actions.edit")}
-                        title={t("actions.edit")}
-                      >
-                        <Pencil size={16} />
-                      </Button>
-                    </div>
-                    <p className="mt-0.5 font-mono text-sm text-muted-foreground">
-                      {chapter.slug}
-                    </p>
-                  </>
-                )}
-
-                <div className="flex flex-wrap items-center gap-4 mt-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Film size={14} className="text-primary" />
-                    <span>
-                      {scenes.length}{" "}
-                      {t("chapter.stats.scenes", { count: scenes.length })}
-                    </span>
-                  </div>
-                  <Badge tone={chapter.status}>{chapter.status}</Badge>
-                </div>
-              </div>
+      <div className="mx-auto max-w-4xl space-y-4">
+        {/* Compact Header */}
+        <div className="rounded-xl border border-line bg-surface p-4">
+          <div className="flex items-start gap-4">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <BookOpen size={20} />
             </div>
 
-            {chapter.synopsis && (
-              <div className="mb-4">
-                <h3 className="mb-2 text-sm font-medium text-foreground">
-                  {t("chapter.synopsis")}
-                </h3>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {chapter.synopsis}
-                </p>
-              </div>
-            )}
-          </Panel>
-
-          {/* Scenes list */}
-          <Panel>
-            <SectionTitle
-              title={t("chapter.scenes")}
-              meta={`${scenes.length}`}
-              actions={
-                <div className="flex flex-wrap items-center gap-2">
+            {isEditing ? (
+              <form onSubmit={handleSubmit(onSubmit)} className="min-w-0 flex-1 space-y-3">
+                <div className="grid gap-1.5">
+                  <div className="flex items-center justify-between text-xs text-muted">
+                    <span>{t("fields.title")}</span>
+                    <StoryCompletionButton
+                      projectId={projectId}
+                      targetKind="chapter"
+                      targetId={chapterId}
+                      field="title"
+                      currentValue={watch("title")}
+                      onComplete={(text) => setValue("title", text, { shouldDirty: true })}
+                    />
+                  </div>
+                  <Input {...register("title")} autoFocus className="text-lg font-semibold" />
+                  {errors.title && (
+                    <span className="text-danger text-xs">{errors.title.message}</span>
+                  )}
+                </div>
+                <div className="grid gap-1.5">
+                  <div className="flex items-center justify-between text-xs text-muted">
+                    <span>{t("chapter.synopsis")}</span>
+                    <StoryCompletionButton
+                      projectId={projectId}
+                      targetKind="chapter"
+                      targetId={chapterId}
+                      field="synopsis"
+                      currentValue={watch("synopsis")}
+                      onComplete={(text) => setValue("synopsis", text, { shouldDirty: true })}
+                    />
+                  </div>
+                  <Textarea {...register("synopsis")} rows={3} />
+                </div>
+                <div className="flex justify-end gap-2">
                   <Button
-                    variant="secondary"
-                    onClick={() => setIsAutoGenerateModalOpen(true)}
-                    className="h-8 gap-1.5 px-2.5"
-                    title={t("chapter.autoGenerate.button")}
+                    variant="ghost"
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    disabled={updateChapterMut.isPending}
+                    className="h-8 px-3"
                   >
-                    <Sparkles size={16} />
-                    {t("chapter.autoGenerate.button")}
+                    <X size={14} /> {t("actions.cancel")}
                   </Button>
                   <Button
                     variant="primary"
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="h-8 gap-1.5 px-2.5"
-                    title={t("scenes.add")}
+                    disabled={updateChapterMut.isPending}
+                    className="h-8 px-3"
                   >
-                    <Plus size={18} />
-                    {t("actions.addScene")}
+                    <Check size={14} /> {t("actions.save")}
                   </Button>
                 </div>
-              }
-            />
+              </form>
+            ) : (
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-primary">C{chapterNumber}</span>
+                  <h1 className="truncate text-lg font-semibold text-ink">{chapter.title}</h1>
+                  <Badge tone={chapter.status}>{chapter.status}</Badge>
+                </div>
+                <p className="mt-1 text-xs text-muted">
+                  {scenes.length} {t("chapter.stats.scenes", { count: scenes.length })} · T
+                  {tomeNumber}
+                </p>
+                {chapter.synopsis && (
+                  <p className="mt-2 line-clamp-2 text-sm text-muted">{chapter.synopsis}</p>
+                )}
+              </div>
+            )}
 
-            <div className="mt-3 flex flex-col gap-2">
-              {scenes.length > 0 ? (
-                scenes.map((scene, index) => (
-                  <div
-                    key={scene.id}
-                    className="group flex items-stretch gap-2"
-                  >
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() =>
-                        navigate(
-                          `/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`,
-                        )
-                      }
-                      className={clsx(
-                        "flex h-auto min-h-14 w-full flex-1 items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/35 hover:bg-primary/8 hover:text-foreground",
-                      )}
-                    >
-                      <span className="text-xs font-semibold text-primary">
-                        {t("scene.number", { number: index + 1 })}
-                      </span>
-                      <FileText size={14} className="text-muted-foreground" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-foreground">
-                          {scene.title}
-                        </p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {scene.slug}
-                        </p>
-                      </div>
-                      <Badge tone={scene.status}>{scene.status}</Badge>
-                      <ChevronRight
-                        size={14}
-                        className="text-muted-foreground"
-                      />
-                    </Button>
-                    <ReorderControls
-                      entityLabel={scene.title}
-                      canMoveUp={index > 0}
-                      canMoveDown={index < scenes.length - 1}
-                      disabled={reorderSceneMut.isPending}
-                      onMoveUp={() => moveScene(scene.id, -1)}
-                      onMoveDown={() => moveScene(scene.id, 1)}
-                      className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-                    />
-                  </div>
-                ))
-              ) : (
-                <EmptyState
-                  title={t("chapter.empty.noScenes.title")}
-                  description={t("chapter.empty.noScenes.description")}
-                />
-              )}
-            </div>
-          </Panel>
-
-          {/* Manga Preview */}
-          <Panel>
-            <SectionTitle title={t("chapterPreview.title")} />
-            <div className="mt-3">
-              <ChapterMangaPreview projectId={projectId} chapterId={chapterId} />
-            </div>
-          </Panel>
+            {!isEditing && (
+              <Button
+                variant="ghost"
+                className="size-8 shrink-0 p-0"
+                onClick={() => setIsEditing(true)}
+                title={t("actions.edit")}
+              >
+                <Pencil size={16} />
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* Side panel */}
-        <div className="flex flex-col gap-4">
-          {tomeChapters && (
-            <ChapterNavigationPanel
-              chapters={tomeChapters}
-              currentChapterId={chapterId}
-              projectId={projectId}
-              tomeId={tomeId}
-              onMoveChapter={moveChapter}
-              reorderDisabled={
-                updateChapterMut.isPending || reorderChapterMut.isPending
-              }
+        {/* Action chips */}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="primary"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="h-8 gap-1.5 px-3"
+          >
+            <Plus size={16} /> {t("actions.addScene")}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setIsAutoGenerateModalOpen(true)}
+            className="h-8 gap-1.5 px-3"
+          >
+            <Sparkles size={16} /> {t("chapter.autoGenerate.button")}
+          </Button>
+        </div>
+
+        {/* Scenes list */}
+        <div className="rounded-xl border border-line bg-surface p-4">
+          <h2 className="mb-3 text-sm font-semibold text-ink">
+            {t("chapter.scenes")} ({scenes.length})
+          </h2>
+
+          {scenes.length === 0 ? (
+            <EmptyState
+              title={t("chapter.empty.noScenes.title")}
+              description={t("chapter.empty.noScenes.description")}
             />
+          ) : (
+            <div className="space-y-2">
+              {scenes.map((scene, index) => (
+                <SceneRow
+                  key={scene.id}
+                  scene={scene}
+                  sceneNumber={index + 1}
+                  projectId={projectId}
+                  tomeId={tomeId}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < scenes.length - 1}
+                  reorderDisabled={reorderSceneMut.isPending}
+                  onMoveUp={() => moveScene(scene.id, -1)}
+                  onMoveDown={() => moveScene(scene.id, 1)}
+                />
+              ))}
+            </div>
           )}
         </div>
+
+        {/* Manga Preview - collapsible */}
+        <details className="group rounded-xl border border-line bg-surface">
+          <summary className="flex cursor-pointer items-center justify-between p-4 text-sm font-semibold text-ink">
+            {t("chapterPreview.title")}
+            <ChevronDown
+              size={16}
+              className="text-muted transition-transform group-open:rotate-180"
+            />
+          </summary>
+          <div className="px-4 pb-4">
+            <ChapterMangaPreview projectId={projectId} chapterId={chapterId} />
+          </div>
+        </details>
       </div>
 
-      {/* Create Scene Modal */}
       <CreateSceneModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -1035,9 +775,7 @@ export default function ChapterRoute() {
         onSubmit={handleAutoGenerateChapter}
         isLoading={autoGenerateChapterMut.isPending}
         errorMessage={
-          autoGenerateChapterMut.error
-            ? apiErrorMessage(autoGenerateChapterMut.error)
-            : null
+          autoGenerateChapterMut.error ? apiErrorMessage(autoGenerateChapterMut.error) : null
         }
       />
     </AppShell>

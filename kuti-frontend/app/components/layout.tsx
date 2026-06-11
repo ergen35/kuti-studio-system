@@ -3,11 +3,8 @@ import { clsx } from "clsx";
 import {
   Activity,
   BookOpen,
-  Boxes,
   Brush,
   ChevronLeft,
-  Clapperboard,
-  Clock3,
   FileArchive,
   FolderKanban,
   Menu,
@@ -122,12 +119,9 @@ export function AppShell({ children, reducedSidebar }: AppShellProps) {
     { to: "characters", label: t("sidebar.characters"), icon: UsersRound },
     { to: "story", label: t("sidebar.storyline"), icon: BookOpen },
     { to: "generation", label: t("sidebar.generation"), icon: Brush },
-    { to: "drama-videos", label: t("sidebar.dramaVideos"), icon: Clapperboard },
     { to: "tasks", label: t("sidebar.tasks"), icon: Activity },
-    { to: "assets", label: t("sidebar.assets"), icon: Boxes },
     { to: "exports", label: t("sidebar.exports"), icon: FileArchive },
     { to: "warnings", label: t("sidebar.warnings"), icon: ShieldAlert },
-    { to: "versions", label: t("sidebar.versions"), icon: Clock3 },
     { to: "settings", label: t("sidebar.settings"), icon: Settings },
   ];
 

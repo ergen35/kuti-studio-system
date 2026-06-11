@@ -11,7 +11,6 @@ import { z } from "zod";
 export const StylePresetSchema = z.enum(["shonen", "shojo", "seinen", "generic"]);
 export const ColorModeSchema = z.enum(["bw", "color", "spot_color"]);
 export const MangaPageStatusSchema = z.enum(["draft", "selected", "rejected"]);
-export const DramaVideoStatusSchema = z.enum(["draft", "queued", "running", "ready", "failed", "archived"]);
 export const MangaPageMetadataSchema = z.object({
   readyForExport: z.boolean().optional(),
 });
@@ -35,12 +34,6 @@ export const pageIdParamsSchema = z.object({
   projectId: z.string().uuid(),
   sceneId: z.string().uuid(),
   pageId: z.string().uuid(),
-});
-
-export const dramaVideoIdParamsSchema = z.object({
-  projectId: z.string().uuid(),
-  sceneId: z.string().uuid(),
-  dramaVideoId: z.string().uuid(),
 });
 
 // ============================================================================
@@ -93,12 +86,6 @@ export const updateMangaPageBodySchema = z.object({
   metadataJson: MangaPageMetadataSchema.optional(),
 });
 
-export const generateDramaVideoBodySchema = z.object({
-  modelKey: z.string().optional(),
-  prompt: z.string().max(4000).optional(),
-  title: z.string().max(255).optional(),
-});
-
 // ============================================================================
 // Response Schemas
 // ============================================================================
@@ -142,35 +129,6 @@ export const mangaPageResponseSchema = z.object({
 
 export const mangaPageListResponseSchema = z.array(mangaPageResponseSchema);
 
-export const dramaVideoResponseSchema = z.object({
-  id: z.string(),
-  projectId: z.string(),
-  sourceMangaPageId: z.string().nullable(),
-  jobId: z.string().nullable(),
-  title: z.string(),
-  prompt: z.string(),
-  modelKey: z.string(),
-  stylePreset: z.string(),
-  status: DramaVideoStatusSchema,
-  videoUrl: z.string().nullable(),
-  durationSeconds: z.number().nullable(),
-  metadata: z.record(z.string(), z.unknown()),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  completedAt: z.string().nullable(),
-  failedAt: z.string().nullable(),
-  errorMessage: z.string().nullable(),
-});
-
-export const dramaVideoListResponseSchema = z.array(dramaVideoResponseSchema);
-
-export const generateDramaVideoResponseSchema = z.object({
-  success: z.boolean(),
-  dramaVideoId: z.string(),
-  jobId: z.string(),
-  message: z.string(),
-});
-
 export const generateSceneMangaResponseSchema = z.object({
   success: z.boolean(),
   jobId: z.string(),
@@ -194,4 +152,3 @@ export type UpdateSceneConfigBody = z.infer<typeof updateSceneConfigBodySchema>;
 export type GenerateSceneMangaBody = z.infer<typeof generateSceneMangaBodySchema>;
 export type PreviewPromptBody = z.infer<typeof previewPromptBodySchema>;
 export type UpdateMangaPageBody = z.infer<typeof updateMangaPageBodySchema>;
-export type GenerateDramaVideoBody = z.infer<typeof generateDramaVideoBodySchema>;

@@ -5,10 +5,11 @@
     "updated": "Updated"
   },
   "stats": {
-    "characters": "Characters",
-    "scenes": "Scenes",
-    "warnings": "Open warnings",
-    "versions": "Versions"
+    "characters": "characters",
+    "scenes": "scenes",
+    "tomes": "tomes",
+    "chapters": "chapters",
+    "warnings": "Open warnings"
   },
   "workspaces": {
     "characters": {
@@ -23,25 +24,17 @@
       "title": "Generation",
       "description": "Launch image or video generation jobs from story sources."
     },
-    "dramaVideos": {
-      "title": "Drama videos",
-      "description": "Review Korean-drama-style videos generated from approved manga pages."
-    },
-    "assets": {
-      "title": "Assets",
-      "description": "Import local files and link them to project entities."
-    },
     "warnings": {
       "title": "Warnings",
       "description": "Scan and resolve continuity warnings."
     },
-    "versions": {
-      "title": "Versions",
-      "description": "Create checkpoints, compare branches and restore snapshots."
-    },
     "exports": {
       "title": "Exports",
       "description": "Generate work exports in JSON, tree or ZIP format."
+    },
+    "tasks": {
+      "title": "Tasks",
+      "description": "View running and completed generation tasks."
     },
     "settings": {
       "title": "Settings",
@@ -50,7 +43,7 @@
   },
   "recent": {
     "warnings": {
-      "title": "Recent warnings",
+      "title": "Warnings",
       "total": "{{count}} total",
       "empty": {
         "title": "No warnings",
@@ -58,9 +51,12 @@
       }
     },
     "production": {
-      "title": "Recent production",
+      "title": "Production",
       "jobs": "jobs",
       "exports": "exports"
+    },
+    "story": {
+      "title": "Story overview"
     }
   }
 }

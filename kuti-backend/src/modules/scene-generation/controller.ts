@@ -3,10 +3,8 @@
  */
 
 import { db } from "@lib/db";
-import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
-import { readFile } from "@lib/filesystem";
-import { sendGenerateDramaVideoEvent, sendGenerateSceneMangaEvent } from "@lib/inngest";
+import { sendGenerateSceneMangaEvent } from "@lib/inngest";
 import {
   buildScenePanelPrompt,
   buildSceneSystemPrompt,
@@ -23,7 +21,6 @@ import type {
   GenerateSceneMangaBody,
   PreviewPromptBody,
   UpdateMangaPageBody,
-  GenerateDramaVideoBody,
 } from "./dto";
 
 // ============================================================================
@@ -355,7 +352,7 @@ export async function previewPrompt(
     .map((reference) => normalizeReferenceKind(reference.referenceKind) === "asset" ? reference.targetSlug : null)
     .filter((value): value is string => Boolean(value));
 
-  const [referencedScenes, referencedChapters, referencedTomes, referencedAssets] = await Promise.all([
+  const [referencedScenes, referencedChapters, referencedTomes] = await Promise.all([
     referencedSceneSlugs.length > 0
       ? db.scene.findMany({
           where: { projectId, slug: { in: referencedSceneSlugs } },
@@ -374,13 +371,9 @@ export async function previewPrompt(
           select: { slug: true, title: true },
         })
       : Promise.resolve([]),
-    referencedAssetSlugs.length > 0
-      ? db.asset.findMany({
-          where: { projectId, slug: { in: referencedAssetSlugs } },
-          select: { slug: true, name: true },
-        })
-      : Promise.resolve([]),
   ]);
+
+  const referencedAssets: Array<{ slug: string; name: string }> = [];
 
   const sceneLocationMap = new Map<string, string>();
   const projectLocations = Array.isArray((project?.settingsJson as Record<string, unknown> | null)?.locationsJson)
@@ -394,10 +387,10 @@ export async function previewPrompt(
   }
 
   const characterBySlug = new Map(characterRecords.map((character) => [character.slug, character]));
-  const sceneBySlug = new Map(referencedScenes.map((entry) => [entry.slug, entry]));
-  const chapterBySlug = new Map(referencedChapters.map((entry) => [entry.slug, entry]));
-  const tomeBySlug = new Map(referencedTomes.map((entry) => [entry.slug, entry]));
-  const assetBySlug = new Map(referencedAssets.map((entry) => [entry.slug, entry]));
+  const sceneBySlug = new Map(referencedScenes.map((entry: { slug: string; title: string }) => [entry.slug, entry]));
+  const chapterBySlug = new Map(referencedChapters.map((entry: { slug: string; title: string }) => [entry.slug, entry]));
+  const tomeBySlug = new Map(referencedTomes.map((entry: { slug: string; title: string }) => [entry.slug, entry]));
+  const assetBySlug = new Map(referencedAssets.map((entry: { slug: string; name: string }) => [entry.slug, entry]));
   const selectedImageByCharacterId = new Map(selectedImages.map((image) => [image.characterId, image]));
 
   const characterAnchors: PromptCharacterAnchor[] = characterRecords.map((character) => {
@@ -729,218 +722,6 @@ export async function deleteSceneMangaPage(
   });
 
   return true;
-}
-
-// ============================================================================
-// Drama Videos
-// ============================================================================
-
-function serializeDramaVideo(video: Awaited<ReturnType<typeof db.dramaVideo.findFirst>> & {}) {
-  return {
-    id: video.id,
-    projectId: video.projectId,
-    sourceMangaPageId: video.sourceMangaPageId,
-    jobId: video.jobId,
-    title: video.title,
-    prompt: video.prompt,
-    modelKey: video.modelKey,
-    stylePreset: video.stylePreset,
-    status: video.status,
-    videoUrl: video.videoUrl,
-    durationSeconds: video.durationSeconds,
-    metadata: video.metadataJson as Record<string, unknown>,
-    createdAt: video.createdAt.toISOString(),
-    updatedAt: video.updatedAt.toISOString(),
-    completedAt: video.completedAt?.toISOString() ?? null,
-    failedAt: video.failedAt?.toISOString() ?? null,
-    errorMessage: video.errorMessage,
-  };
-}
-
-function metadataRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
-}
-
-function metadataString(metadata: Record<string, unknown>, key: string): string | null {
-  const value = metadata[key];
-  return typeof value === "string" && value.length > 0 ? value : null;
-}
-
-export async function listDramaVideos(projectId: string, sceneId: string) {
-  const scene = await db.scene.findFirst({ where: { id: sceneId, projectId } });
-  if (!scene) throw new Error("Scene not found");
-
-  const pageIds = await db.sceneMangaPage.findMany({
-    where: { projectId, sceneId },
-    select: { id: true },
-  });
-  const currentPageIds = pageIds.map((page) => page.id);
-
-  const videos = await db.dramaVideo.findMany({
-    where: {
-      projectId,
-      OR: [
-        { sourceMangaPageId: { in: currentPageIds } },
-        { metadataJson: { path: ["sceneId"], equals: sceneId } },
-      ],
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return videos.map(serializeDramaVideo);
-}
-
-export async function listMangaPageDramaVideos(projectId: string, sceneId: string, pageId: string) {
-  const page = await db.sceneMangaPage.findFirst({ where: { id: pageId, projectId, sceneId } });
-  if (!page) throw new Error("Page not found");
-
-  const videos = await db.dramaVideo.findMany({
-    where: { projectId, sourceMangaPageId: pageId },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return videos.map(serializeDramaVideo);
-}
-
-export async function generateDramaVideo(
-  projectId: string,
-  sceneId: string,
-  pageId: string,
-  data: GenerateDramaVideoBody,
-) {
-  const [page, scene] = await Promise.all([
-    db.sceneMangaPage.findFirst({ where: { id: pageId, projectId, sceneId } }),
-    db.scene.findFirst({ where: { id: sceneId, projectId }, include: { tome: true, chapter: true } }),
-  ]);
-
-  if (!page) throw new Error("Page not found");
-  if (!scene) throw new Error("Scene not found");
-  if (page.status !== "selected") throw new Error("Page must be selected before drama generation");
-
-  const prompt = data.prompt || buildDramaVideoPrompt(scene, page);
-  const title = data.title || `Drama: ${scene.title} - Page ${page.pageNumber}`;
-  const jobId = randomUUIDv7();
-
-  const job = await db.generationJob.create({
-    data: {
-      id: jobId,
-      projectId,
-      sourceKind: "manga_page",
-      sourceId: pageId,
-      sourceLabel: `${scene.tome?.title || "Tome"} > ${scene.chapter?.title || "Chapter"} > ${scene.title} > Page ${page.pageNumber}`,
-      strategy: "direct",
-      entrypoint: "korean-drama-video",
-      title,
-      prompt,
-      summary: "Queued Korean drama video generation",
-      status: "pending",
-      progress: 0,
-      metadataJson: {
-        sceneId,
-        pageId,
-        modelKey: data.modelKey,
-        stylePreset: "korean_drama",
-      },
-    },
-  });
-
-  const video = await db.dramaVideo.create({
-    data: {
-      projectId,
-      sourceMangaPageId: pageId,
-      jobId: job.id,
-      title,
-      prompt,
-      modelKey: data.modelKey ?? "",
-      stylePreset: "korean_drama",
-      status: "queued",
-      metadataJson: {
-        sceneId,
-        tomeId: scene.tomeId,
-        chapterId: scene.chapterId,
-        sourcePageId: pageId,
-        sourceMangaPageId: pageId,
-        sourceImageUrl: publicMangaPageImageUrl(projectId, page),
-        pageNumber: page.pageNumber,
-        pageLabel: page.label,
-        pageCaption: page.caption,
-        pagePrompt: page.prompt,
-        modelKey: data.modelKey,
-        stylePreset: "korean_drama",
-      },
-    },
-  });
-
-  await sendGenerateDramaVideoEvent({
-    projectId,
-    sceneId,
-    pageId,
-    dramaVideoId: video.id,
-    jobId: job.id,
-    modelKey: data.modelKey,
-    prompt,
-  });
-
-  return {
-    success: true,
-    dramaVideoId: video.id,
-    jobId: job.id,
-    message: "Drama video generation queued",
-  };
-}
-
-export async function getDramaVideoFile(projectId: string, sceneId: string, dramaVideoId: string) {
-  const video = await db.dramaVideo.findFirst({ where: { id: dramaVideoId, projectId } });
-  if (!video?.videoPath) return null;
-
-  const metadata = metadataRecord(video.metadataJson);
-  const sourcePage = video.sourceMangaPageId
-    ? await db.sceneMangaPage.findFirst({ where: { id: video.sourceMangaPageId, projectId, sceneId } })
-    : null;
-  const metadataSceneId = metadataString(metadata, "sceneId");
-  const metadataProjectId = metadataString(metadata, "projectId");
-  const belongsToRouteScene = Boolean(sourcePage) || metadataSceneId === sceneId;
-  const belongsToRouteProject = !metadataProjectId || metadataProjectId === projectId;
-  if (!belongsToRouteScene || !belongsToRouteProject) return null;
-
-  const content = await readFile(video.videoPath);
-  const mimeType = metadataString(metadata, "mimeType") ?? "video/mp4";
-  const fileName = metadataString(metadata, "fileName") ?? `${video.id}.mp4`;
-
-  return new Response(new Uint8Array(content), {
-    headers: {
-      "Content-Type": mimeType,
-      "Content-Disposition": `inline; filename=\"${fileName}\"`,
-    },
-  });
-}
-
-function buildDramaVideoPrompt(
-  scene: {
-    title: string;
-    summary: string;
-    content: string;
-    location: string;
-    tome?: { title: string } | null;
-    chapter?: { title: string } | null;
-  },
-  page: { label: string; caption: string | null; prompt: string | null; pageNumber: number },
-) {
-  return [
-    "Create a cinematic Korean drama style video from the selected manga page.",
-    "Use live-action drama aesthetics: emotional close-ups, natural skin tones, realistic wardrobe, soft urban or interior lighting, deliberate pauses, and subtle camera movement.",
-    "Preserve the story beat, composition, character emotion, and continuity from the manga page.",
-    "Avoid anime/cartoon rendering. The output should feel like a premium Korean television drama adaptation.",
-    `Tome: ${scene.tome?.title || "Unknown"}`,
-    `Chapter: ${scene.chapter?.title || "Unknown"}`,
-    `Scene: ${scene.title}`,
-    scene.location ? `Location: ${scene.location}` : "",
-    scene.summary ? `Summary: ${scene.summary}` : "",
-    scene.content ? `Scene content: ${scene.content.slice(0, 1500)}` : "",
-    `Manga page ${page.pageNumber}: ${page.label}`,
-    page.caption ? `Caption: ${page.caption}` : "",
-    page.prompt ? `Manga prompt: ${page.prompt}` : "",
-  ].filter(Boolean).join("\n");
 }
 
 function generatePanelPreviews({

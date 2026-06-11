@@ -5,15 +5,6 @@ const DEFAULT_GENERATION_SETTINGS = {
   defaultMode: "separate" as const,
 };
 
-const DEFAULT_VERSIONING_SETTINGS = {
-  retainedVersionsPerBranch: 3,
-};
-
-const DEFAULT_ASSET_SETTINGS = {
-  archiveOnDelete: true,
-  showUsageHints: true,
-};
-
 function readRecord(value: unknown): SettingsRecord {
   return value && typeof value === "object" && !Array.isArray(value)
     ? value as SettingsRecord
@@ -48,31 +39,3 @@ export function readProjectGenerationSettings(settingsJson: unknown) {
   };
 }
 
-export function readProjectVersioningSettings(settingsJson: unknown) {
-  const settings = readRecord(settingsJson);
-  const versioning = readRecord(settings.versioningSettingsJson);
-
-  return {
-    retainedVersionsPerBranch: Math.max(
-      1,
-      Math.min(
-        12,
-        Math.floor(readNumber(versioning.retainedVersionsPerBranch, DEFAULT_VERSIONING_SETTINGS.retainedVersionsPerBranch)),
-      ),
-    ),
-  };
-}
-
-export function readProjectAssetSettings(settingsJson: unknown) {
-  const settings = readRecord(settingsJson);
-  const assets = readRecord(settings.assetSettingsJson);
-
-  return {
-    archiveOnDelete: typeof assets.archiveOnDelete === "boolean"
-      ? assets.archiveOnDelete
-      : DEFAULT_ASSET_SETTINGS.archiveOnDelete,
-    showUsageHints: typeof assets.showUsageHints === "boolean"
-      ? assets.showUsageHints
-      : DEFAULT_ASSET_SETTINGS.showUsageHints,
-  };
-}

@@ -65,16 +65,12 @@ export const ModelName = {
   Chapter: 'Chapter',
   Scene: 'Scene',
   StoryReference: 'StoryReference',
-  Asset: 'Asset',
-  AssetLink: 'AssetLink',
   GenerationJob: 'GenerationJob',
   GenerationJobStep: 'GenerationJobStep',
   GenerationBoard: 'GenerationBoard',
   GenerationBoardPanel: 'GenerationBoardPanel',
   SceneGenerationConfig: 'SceneGenerationConfig',
   SceneMangaPage: 'SceneMangaPage',
-  DramaVideo: 'DramaVideo',
-  Version: 'Version',
   Warning: 'Warning',
   ExportRecord: 'ExportRecord'
 } as const
@@ -331,47 +327,12 @@ export const StoryReferenceScalarFieldEnum = {
 export type StoryReferenceScalarFieldEnum = (typeof StoryReferenceScalarFieldEnum)[keyof typeof StoryReferenceScalarFieldEnum]
 
 
-export const AssetScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  slug: 'slug',
-  name: 'name',
-  originalFilename: 'originalFilename',
-  mimeType: 'mimeType',
-  checksum: 'checksum',
-  sizeBytes: 'sizeBytes',
-  storagePath: 'storagePath',
-  description: 'description',
-  tagsJson: 'tagsJson',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  archivedAt: 'archivedAt'
-} as const
-
-export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
-
-
-export const AssetLinkScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  assetId: 'assetId',
-  targetKind: 'targetKind',
-  targetId: 'targetId',
-  note: 'note',
-  createdAt: 'createdAt'
-} as const
-
-export type AssetLinkScalarFieldEnum = (typeof AssetLinkScalarFieldEnum)[keyof typeof AssetLinkScalarFieldEnum]
-
-
 export const GenerationJobScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   sourceKind: 'sourceKind',
   sourceId: 'sourceId',
   sourceLabel: 'sourceLabel',
-  sourceVersionId: 'sourceVersionId',
   strategy: 'strategy',
   entrypoint: 'entrypoint',
   title: 'title',
@@ -491,44 +452,6 @@ export const SceneMangaPageScalarFieldEnum = {
 export type SceneMangaPageScalarFieldEnum = (typeof SceneMangaPageScalarFieldEnum)[keyof typeof SceneMangaPageScalarFieldEnum]
 
 
-export const DramaVideoScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  sourceMangaPageId: 'sourceMangaPageId',
-  jobId: 'jobId',
-  title: 'title',
-  prompt: 'prompt',
-  modelKey: 'modelKey',
-  stylePreset: 'stylePreset',
-  status: 'status',
-  videoPath: 'videoPath',
-  videoUrl: 'videoUrl',
-  durationSeconds: 'durationSeconds',
-  metadataJson: 'metadataJson',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  completedAt: 'completedAt',
-  failedAt: 'failedAt',
-  errorMessage: 'errorMessage'
-} as const
-
-export type DramaVideoScalarFieldEnum = (typeof DramaVideoScalarFieldEnum)[keyof typeof DramaVideoScalarFieldEnum]
-
-
-export const VersionScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  branchName: 'branchName',
-  versionIndex: 'versionIndex',
-  label: 'label',
-  summary: 'summary',
-  snapshotJson: 'snapshotJson',
-  createdAt: 'createdAt'
-} as const
-
-export type VersionScalarFieldEnum = (typeof VersionScalarFieldEnum)[keyof typeof VersionScalarFieldEnum]
-
-
 export const WarningScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -584,14 +507,6 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
-export const NullableJsonNullValueInput = {
-  DbNull: DbNull,
-  JsonNull: JsonNull
-} as const
-
-export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { useParams, Link, useNavigate, useLocation } from "react-router";
 import { clsx } from "clsx";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -869,6 +870,10 @@ export default function CharacterRoute() {
     ...updateConfig,
     onSuccess: () => {
       invalidateQueriesById(queryClient, "getCharacter");
+      toast.success(t("common:toast.saved"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -877,6 +882,10 @@ export default function CharacterRoute() {
     ...archiveConfig,
     onSuccess: () => {
       invalidateQueriesById(queryClient, "getCharacter");
+      toast.success(t("common:toast.archived"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -884,7 +893,11 @@ export default function CharacterRoute() {
   const remove = useMutation({
     ...deleteConfig,
     onSuccess: () => {
+      toast.success(t("common:toast.deleted"));
       navigate(`/projects/${projectId}/characters`);
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -893,6 +906,10 @@ export default function CharacterRoute() {
     ...relationConfig,
     onSuccess: () => {
       invalidateQueriesById(queryClient, "getCharacter");
+      toast.success(t("common:toast.created"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -909,6 +926,10 @@ export default function CharacterRoute() {
     ...deleteImageConfig,
     onSuccess: () => {
       invalidateQueriesById(queryClient, "listCharacterImages");
+      toast.success(t("common:toast.deleted"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -918,6 +939,10 @@ export default function CharacterRoute() {
     ...setActiveImageConfig,
     onSuccess: () => {
       invalidateQueriesById(queryClient, "listCharacterImages");
+      toast.success(t("common:toast.updated"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -1003,7 +1028,11 @@ export default function CharacterRoute() {
     onSuccess: async (duplicate) => {
       await invalidateWorkspace(projectId);
       setIsDuplicateModalOpen(false);
+      toast.success(t("common:toast.duplicated"));
       navigate(`/projects/${projectId}/characters/${duplicate.id}`);
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 

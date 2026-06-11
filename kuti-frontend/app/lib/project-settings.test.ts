@@ -28,12 +28,9 @@ describe("project settings helpers", () => {
     values.generation.defaultMode = "grid";
     values.preview.readingDirection = "ltr";
     values.preview.panelDensity = "compact";
-    values.versioning.retainedVersionsPerBranch = 5;
     values.exports.defaultKind = "publication";
     values.exports.defaultFormats = ["paged_images", "pdf"];
     values.language.preferredLocale = "en";
-    values.assets.archiveOnDelete = false;
-    values.assets.showUsageHints = false;
 
     const json = composeProjectSettingsJson(
       { keep: "value" },
@@ -120,10 +117,8 @@ describe("project settings helpers", () => {
     assert.deepEqual(restored.locations, "Moon Docks, Lower City");
     assert.deepEqual(restored.generation.defaultMode, "grid");
     assert.deepEqual(restored.preview.panelDensity, "compact");
-    assert.deepEqual(restored.versioning.retainedVersionsPerBranch, 5);
     assert.deepEqual(restored.exports.defaultFormats, ["paged_images", "pdf"]);
     assert.deepEqual(restored.language.preferredLocale, "en");
-    assert.deepEqual(restored.assets.archiveOnDelete, false);
   });
 
   test("ignores nullish legacy signal entries when reading project settings", () => {

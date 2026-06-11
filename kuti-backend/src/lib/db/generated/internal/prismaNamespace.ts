@@ -398,16 +398,12 @@ export const ModelName = {
   Chapter: 'Chapter',
   Scene: 'Scene',
   StoryReference: 'StoryReference',
-  Asset: 'Asset',
-  AssetLink: 'AssetLink',
   GenerationJob: 'GenerationJob',
   GenerationJobStep: 'GenerationJobStep',
   GenerationBoard: 'GenerationBoard',
   GenerationBoardPanel: 'GenerationBoardPanel',
   SceneGenerationConfig: 'SceneGenerationConfig',
   SceneMangaPage: 'SceneMangaPage',
-  DramaVideo: 'DramaVideo',
-  Version: 'Version',
   Warning: 'Warning',
   ExportRecord: 'ExportRecord'
 } as const
@@ -425,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "project" | "narrativeRole" | "character" | "characterRelation" | "voiceSample" | "characterImage" | "tome" | "chapter" | "scene" | "storyReference" | "asset" | "assetLink" | "generationJob" | "generationJobStep" | "generationBoard" | "generationBoardPanel" | "sceneGenerationConfig" | "sceneMangaPage" | "dramaVideo" | "version" | "warning" | "exportRecord"
+    modelProps: "user" | "session" | "account" | "verification" | "project" | "narrativeRole" | "character" | "characterRelation" | "voiceSample" | "characterImage" | "tome" | "chapter" | "scene" | "storyReference" | "generationJob" | "generationJobStep" | "generationBoard" | "generationBoardPanel" | "sceneGenerationConfig" | "sceneMangaPage" | "warning" | "exportRecord"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1465,154 +1461,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Asset: {
-      payload: Prisma.$AssetPayload<ExtArgs>
-      fields: Prisma.AssetFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AssetFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AssetFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>
-        }
-        findFirst: {
-          args: Prisma.AssetFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AssetFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>
-        }
-        findMany: {
-          args: Prisma.AssetFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>[]
-        }
-        create: {
-          args: Prisma.AssetCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>
-        }
-        createMany: {
-          args: Prisma.AssetCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AssetCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>[]
-        }
-        delete: {
-          args: Prisma.AssetDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>
-        }
-        update: {
-          args: Prisma.AssetUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>
-        }
-        deleteMany: {
-          args: Prisma.AssetDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AssetUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AssetUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>[]
-        }
-        upsert: {
-          args: Prisma.AssetUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetPayload>
-        }
-        aggregate: {
-          args: Prisma.AssetAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAsset>
-        }
-        groupBy: {
-          args: Prisma.AssetGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AssetGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AssetCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AssetCountAggregateOutputType> | number
-        }
-      }
-    }
-    AssetLink: {
-      payload: Prisma.$AssetLinkPayload<ExtArgs>
-      fields: Prisma.AssetLinkFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AssetLinkFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AssetLinkFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>
-        }
-        findFirst: {
-          args: Prisma.AssetLinkFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AssetLinkFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>
-        }
-        findMany: {
-          args: Prisma.AssetLinkFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>[]
-        }
-        create: {
-          args: Prisma.AssetLinkCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>
-        }
-        createMany: {
-          args: Prisma.AssetLinkCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AssetLinkCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>[]
-        }
-        delete: {
-          args: Prisma.AssetLinkDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>
-        }
-        update: {
-          args: Prisma.AssetLinkUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>
-        }
-        deleteMany: {
-          args: Prisma.AssetLinkDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AssetLinkUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AssetLinkUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>[]
-        }
-        upsert: {
-          args: Prisma.AssetLinkUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetLinkPayload>
-        }
-        aggregate: {
-          args: Prisma.AssetLinkAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAssetLink>
-        }
-        groupBy: {
-          args: Prisma.AssetLinkGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AssetLinkGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AssetLinkCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AssetLinkCountAggregateOutputType> | number
-        }
-      }
-    }
     GenerationJob: {
       payload: Prisma.$GenerationJobPayload<ExtArgs>
       fields: Prisma.GenerationJobFieldRefs
@@ -2057,154 +1905,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    DramaVideo: {
-      payload: Prisma.$DramaVideoPayload<ExtArgs>
-      fields: Prisma.DramaVideoFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.DramaVideoFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.DramaVideoFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
-        }
-        findFirst: {
-          args: Prisma.DramaVideoFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.DramaVideoFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
-        }
-        findMany: {
-          args: Prisma.DramaVideoFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>[]
-        }
-        create: {
-          args: Prisma.DramaVideoCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
-        }
-        createMany: {
-          args: Prisma.DramaVideoCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.DramaVideoCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>[]
-        }
-        delete: {
-          args: Prisma.DramaVideoDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
-        }
-        update: {
-          args: Prisma.DramaVideoUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
-        }
-        deleteMany: {
-          args: Prisma.DramaVideoDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.DramaVideoUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.DramaVideoUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>[]
-        }
-        upsert: {
-          args: Prisma.DramaVideoUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DramaVideoPayload>
-        }
-        aggregate: {
-          args: Prisma.DramaVideoAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateDramaVideo>
-        }
-        groupBy: {
-          args: Prisma.DramaVideoGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DramaVideoGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.DramaVideoCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DramaVideoCountAggregateOutputType> | number
-        }
-      }
-    }
-    Version: {
-      payload: Prisma.$VersionPayload<ExtArgs>
-      fields: Prisma.VersionFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.VersionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.VersionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>
-        }
-        findFirst: {
-          args: Prisma.VersionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.VersionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>
-        }
-        findMany: {
-          args: Prisma.VersionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>[]
-        }
-        create: {
-          args: Prisma.VersionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>
-        }
-        createMany: {
-          args: Prisma.VersionCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.VersionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>[]
-        }
-        delete: {
-          args: Prisma.VersionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>
-        }
-        update: {
-          args: Prisma.VersionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>
-        }
-        deleteMany: {
-          args: Prisma.VersionDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.VersionUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.VersionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>[]
-        }
-        upsert: {
-          args: Prisma.VersionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$VersionPayload>
-        }
-        aggregate: {
-          args: Prisma.VersionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateVersion>
-        }
-        groupBy: {
-          args: Prisma.VersionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.VersionGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.VersionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.VersionCountAggregateOutputType> | number
-        }
-      }
-    }
     Warning: {
       payload: Prisma.$WarningPayload<ExtArgs>
       fields: Prisma.WarningFieldRefs
@@ -2628,47 +2328,12 @@ export const StoryReferenceScalarFieldEnum = {
 export type StoryReferenceScalarFieldEnum = (typeof StoryReferenceScalarFieldEnum)[keyof typeof StoryReferenceScalarFieldEnum]
 
 
-export const AssetScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  slug: 'slug',
-  name: 'name',
-  originalFilename: 'originalFilename',
-  mimeType: 'mimeType',
-  checksum: 'checksum',
-  sizeBytes: 'sizeBytes',
-  storagePath: 'storagePath',
-  description: 'description',
-  tagsJson: 'tagsJson',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  archivedAt: 'archivedAt'
-} as const
-
-export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
-
-
-export const AssetLinkScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  assetId: 'assetId',
-  targetKind: 'targetKind',
-  targetId: 'targetId',
-  note: 'note',
-  createdAt: 'createdAt'
-} as const
-
-export type AssetLinkScalarFieldEnum = (typeof AssetLinkScalarFieldEnum)[keyof typeof AssetLinkScalarFieldEnum]
-
-
 export const GenerationJobScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   sourceKind: 'sourceKind',
   sourceId: 'sourceId',
   sourceLabel: 'sourceLabel',
-  sourceVersionId: 'sourceVersionId',
   strategy: 'strategy',
   entrypoint: 'entrypoint',
   title: 'title',
@@ -2788,44 +2453,6 @@ export const SceneMangaPageScalarFieldEnum = {
 export type SceneMangaPageScalarFieldEnum = (typeof SceneMangaPageScalarFieldEnum)[keyof typeof SceneMangaPageScalarFieldEnum]
 
 
-export const DramaVideoScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  sourceMangaPageId: 'sourceMangaPageId',
-  jobId: 'jobId',
-  title: 'title',
-  prompt: 'prompt',
-  modelKey: 'modelKey',
-  stylePreset: 'stylePreset',
-  status: 'status',
-  videoPath: 'videoPath',
-  videoUrl: 'videoUrl',
-  durationSeconds: 'durationSeconds',
-  metadataJson: 'metadataJson',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  completedAt: 'completedAt',
-  failedAt: 'failedAt',
-  errorMessage: 'errorMessage'
-} as const
-
-export type DramaVideoScalarFieldEnum = (typeof DramaVideoScalarFieldEnum)[keyof typeof DramaVideoScalarFieldEnum]
-
-
-export const VersionScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  branchName: 'branchName',
-  versionIndex: 'versionIndex',
-  label: 'label',
-  summary: 'summary',
-  snapshotJson: 'snapshotJson',
-  createdAt: 'createdAt'
-} as const
-
-export type VersionScalarFieldEnum = (typeof VersionScalarFieldEnum)[keyof typeof VersionScalarFieldEnum]
-
-
 export const WarningScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -2881,14 +2508,6 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
-export const NullableJsonNullValueInput = {
-  DbNull: DbNull,
-  JsonNull: JsonNull
-} as const
-
-export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -3042,20 +2661,6 @@ export type ListEnumStoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
- * Reference to a field of type 'AssetStatus'
- */
-export type EnumAssetStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssetStatus'>
-    
-
-
-/**
- * Reference to a field of type 'AssetStatus[]'
- */
-export type ListEnumAssetStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssetStatus[]'>
-    
-
-
-/**
  * Reference to a field of type 'GenerationSourceKind'
  */
 export type EnumGenerationSourceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GenerationSourceKind'>
@@ -3178,20 +2783,6 @@ export type EnumMangaPageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'MangaPageStatus[]'
  */
 export type ListEnumMangaPageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MangaPageStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'DramaVideoStatus'
- */
-export type EnumDramaVideoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DramaVideoStatus'>
-    
-
-
-/**
- * Reference to a field of type 'DramaVideoStatus[]'
- */
-export type ListEnumDramaVideoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DramaVideoStatus[]'>
     
 
 
@@ -3402,16 +2993,12 @@ export type GlobalOmitConfig = {
   chapter?: Prisma.ChapterOmit
   scene?: Prisma.SceneOmit
   storyReference?: Prisma.StoryReferenceOmit
-  asset?: Prisma.AssetOmit
-  assetLink?: Prisma.AssetLinkOmit
   generationJob?: Prisma.GenerationJobOmit
   generationJobStep?: Prisma.GenerationJobStepOmit
   generationBoard?: Prisma.GenerationBoardOmit
   generationBoardPanel?: Prisma.GenerationBoardPanelOmit
   sceneGenerationConfig?: Prisma.SceneGenerationConfigOmit
   sceneMangaPage?: Prisma.SceneMangaPageOmit
-  dramaVideo?: Prisma.DramaVideoOmit
-  version?: Prisma.VersionOmit
   warning?: Prisma.WarningOmit
   exportRecord?: Prisma.ExportRecordOmit
 }

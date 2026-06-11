@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -185,6 +186,10 @@ export default function CharactersRoute() {
     ...deleteCharacterImageMutation(),
     onSuccess: () => {
       invalidateQueriesById(queryClient, "getProjectCharacterImages");
+      toast.success(t("common:toast.deleted"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -206,8 +211,11 @@ export default function CharactersRoute() {
         onSuccess: (result: unknown) => {
           const character = result as { id: string };
           setIsModalOpen(false);
-          // Navigate to the new character's detail page
+          toast.success(t("common:toast.created"));
           navigate(`/projects/${projectId}/characters/${character.id}`);
+        },
+        onError: (error) => {
+          toast.error(apiErrorMessage(error));
         },
       },
     );

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ArchiveAssetData, ArchiveAssetResponses, ArchiveCharacterData, ArchiveCharacterResponses, ArchiveDramaVideoData, ArchiveDramaVideoResponses, ArchiveProjectData, ArchiveProjectResponses, AutoGenerateChapterScenesData, AutoGenerateChapterScenesResponses, CancelGenerationJobData, CancelGenerationJobResponses, CloneProjectData, CloneProjectResponses, CompareVersionsData, CompareVersionsResponses, CompleteStoryFieldData, CompleteStoryFieldResponses, CreateAssetLinkData, CreateAssetLinkResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateNarrativeRoleData, CreateNarrativeRoleResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVersionData, CreateVersionResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteAssetData, DeleteAssetLinkData, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponses, DeleteRelationData, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateCharacterProfileDraftData, GenerateCharacterProfileDraftResponses, GenerateDramaVideoData, GenerateDramaVideoResponses, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetAssetData, GetAssetFileData, GetAssetResponses, GetCharacterData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetData, GetDramaVideoFileData, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, GetVersionData, GetVersionResponses, ImportAssetData, ImportAssetResponses, ImportProjectData, ImportProjectResponses, ListAssetsData, ListAssetsResponses, ListBranchesData, ListBranchesResponses, ListChapterMangaPagesData, ListChapterMangaPagesResponses, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListDramaVideosData, ListDramaVideosResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListMangaPageDramaVideosData, ListMangaPageDramaVideosResponses, ListModelsData, ListModelsResponses, ListNarrativeRolesData, ListNarrativeRolesResponses, ListProjectDramaVideosData, ListProjectDramaVideosResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListStoryCompletionModelsData, ListStoryCompletionModelsResponses, ListTomesData, ListVersionsData, ListVersionsResponses, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RelaunchGenerationJobData, RelaunchGenerationJobResponses, RestoreVersionData, RestoreVersionResponses, ScanWarningsData, ScanWarningsResponses, SetCharacterImageActiveData, SetCharacterImageActiveResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateAssetData, UpdateAssetResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateRelationData, UpdateRelationResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
+import type { ArchiveCharacterData, ArchiveCharacterResponses, ArchiveProjectData, ArchiveProjectResponses, AutoGenerateChapterScenesData, AutoGenerateChapterScenesResponses, CancelGenerationJobData, CancelGenerationJobResponses, CloneProjectData, CloneProjectResponses, CompleteStoryFieldData, CompleteStoryFieldResponses, CreateChapterData, CreateChapterResponses, CreateCharacterData, CreateCharacterResponses, CreateExportData, CreateExportResponses, CreateGenerationJobData, CreateGenerationJobResponses, CreateNarrativeRoleData, CreateNarrativeRoleResponses, CreateProjectData, CreateProjectResponses, CreateRelationData, CreateRelationResponses, CreateSceneConfigData, CreateSceneConfigResponses, CreateSceneData, CreateSceneResponses, CreateTomeData, CreateTomeResponses, CreateVoiceSampleData, CreateVoiceSampleResponses, DeleteChapterData, DeleteCharacterData, DeleteCharacterImageData, DeleteProjectData, DeleteProjectResponses, DeleteRelationData, DeleteSceneConfigData, DeleteSceneData, DeleteSceneMangaPageData, DeleteTomeData, DownloadBoardArtifactData, DownloadExportData, ExportProjectData, GenerateCharacterImageData, GenerateCharacterProfileDraftData, GenerateCharacterProfileDraftResponses, GenerateSceneMangaData, GenerateSceneMangaResponses, GetApiInngestData, GetCharacterData, GetCharacterResponses, GetConfigData, GetConfigResponses, GetData, GetExportData, GetExportResponses, GetGenerationBoardData, GetGenerationBoardResponses, GetGenerationJobData, GetGenerationJobResponses, GetGenerationPanelImageData, GetHealthData, GetHealthResponses, GetHealthzData, GetIndexData, GetProjectCharacterImagesData, GetProjectCharacterImagesResponses, GetProjectData, GetProjectResponses, GetReferenceSuggestionsData, GetStorySummaryData, GetStorySummaryResponses, ImportProjectData, ImportProjectResponses, ListChapterMangaPagesData, ListChapterMangaPagesResponses, ListChaptersData, ListCharacterImagesData, ListCharacterImagesResponses, ListCharactersData, ListCharactersResponses, ListExportsData, ListExportsResponses, ListGenerationBoardsData, ListGenerationJobsData, ListModelsData, ListModelsResponses, ListNarrativeRolesData, ListNarrativeRolesResponses, ListProjectsData, ListProjectsResponses, ListSceneConfigsData, ListSceneConfigsResponses, ListSceneMangaPagesData, ListSceneMangaPagesResponses, ListScenesData, ListStoryCompletionModelsData, ListStoryCompletionModelsResponses, ListTomesData, ListWarningsData, ListWarningsResponses, OpenProjectData, OpenProjectResponses, PostApiInngestData, PreviewPromptData, PreviewPromptResponses, PutApiInngestData, RelaunchGenerationJobData, RelaunchGenerationJobResponses, ScanWarningsData, ScanWarningsResponses, SetCharacterImageActiveData, SetCharacterImageActiveResponses, SetDefaultConfigData, SetDefaultConfigResponses, UpdateChapterData, UpdateChapterResponses, UpdateCharacterData, UpdateCharacterResponses, UpdateGenerationPanelData, UpdateProjectData, UpdateProjectResponses, UpdateRelationData, UpdateRelationResponses, UpdateSceneConfigData, UpdateSceneConfigResponses, UpdateSceneData, UpdateSceneMangaPageData, UpdateSceneMangaPageResponses, UpdateSceneResponses, UpdateTomeData, UpdateTomeResponses, UpdateWarningData, UpdateWarningResponses, ValidateGenerationBoardData, ValidateGenerationBoardResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -491,82 +491,6 @@ export const cancelGenerationJob = <ThrowOnError extends boolean = false>(option
 export const relaunchGenerationJob = <ThrowOnError extends boolean = false>(options: Options<RelaunchGenerationJobData, ThrowOnError>) => (options.client ?? client).post<RelaunchGenerationJobResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/generation/jobs/{jobId}/relaunch', ...options });
 
 /**
- * List Korean drama videos for a project
- */
-export const listProjectDramaVideos = <ThrowOnError extends boolean = false>(options: Options<ListProjectDramaVideosData, ThrowOnError>) => (options.client ?? client).get<ListProjectDramaVideosResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/drama-videos/', ...options });
-
-/**
- * Archive a drama video
- */
-export const archiveDramaVideo = <ThrowOnError extends boolean = false>(options: Options<ArchiveDramaVideoData, ThrowOnError>) => (options.client ?? client).post<ArchiveDramaVideoResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/drama-videos/{dramaVideoId}/archive', ...options });
-
-/**
- * List all assets
- */
-export const listAssets = <ThrowOnError extends boolean = false>(options: Options<ListAssetsData, ThrowOnError>) => (options.client ?? client).get<ListAssetsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/', ...options });
-
-/**
- * Import an asset from local filesystem
- */
-export const importAsset = <ThrowOnError extends boolean = false>(options: Options<ImportAssetData, ThrowOnError>) => (options.client ?? client).post<ImportAssetResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/assets/import',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete an asset
- */
-export const deleteAsset = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}', ...options });
-
-/**
- * Get asset details
- */
-export const getAsset = <ThrowOnError extends boolean = false>(options: Options<GetAssetData, ThrowOnError>) => (options.client ?? client).get<GetAssetResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}', ...options });
-
-/**
- * Update an asset
- */
-export const updateAsset = <ThrowOnError extends boolean = false>(options: Options<UpdateAssetData, ThrowOnError>) => (options.client ?? client).patch<UpdateAssetResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/assets/{assetId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Archive an asset
- */
-export const archiveAsset = <ThrowOnError extends boolean = false>(options: Options<ArchiveAssetData, ThrowOnError>) => (options.client ?? client).post<ArchiveAssetResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}/archive', ...options });
-
-/**
- * Get asset file content
- */
-export const getAssetFile = <ThrowOnError extends boolean = false>(options: Options<GetAssetFileData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}/file', ...options });
-
-/**
- * Create an asset link
- */
-export const createAssetLink = <ThrowOnError extends boolean = false>(options: Options<CreateAssetLinkData, ThrowOnError>) => (options.client ?? client).post<CreateAssetLinkResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/assets/{assetId}/links',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete an asset link
- */
-export const deleteAssetLink = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetLinkData, ThrowOnError>) => (options.client ?? client).delete<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/assets/{assetId}/links/{linkId}', ...options });
-
-/**
  * List scene generation configs
  */
 export const listSceneConfigs = <ThrowOnError extends boolean = false>(options: Options<ListSceneConfigsData, ThrowOnError>) => (options.client ?? client).get<ListSceneConfigsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/generation-configs', ...options });
@@ -651,84 +575,6 @@ export const deleteSceneMangaPage = <ThrowOnError extends boolean = false>(optio
  */
 export const updateSceneMangaPage = <ThrowOnError extends boolean = false>(options: Options<UpdateSceneMangaPageData, ThrowOnError>) => (options.client ?? client).patch<UpdateSceneMangaPageResponses, unknown, ThrowOnError>({
     url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * List Korean drama videos for scene
- */
-export const listDramaVideos = <ThrowOnError extends boolean = false>(options: Options<ListDramaVideosData, ThrowOnError>) => (options.client ?? client).get<ListDramaVideosResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/drama-videos', ...options });
-
-/**
- * List Korean drama videos for a manga page
- */
-export const listMangaPageDramaVideos = <ThrowOnError extends boolean = false>(options: Options<ListMangaPageDramaVideosData, ThrowOnError>) => (options.client ?? client).get<ListMangaPageDramaVideosResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}/drama-videos', ...options });
-
-/**
- * Generate Korean drama video from a manga page
- */
-export const generateDramaVideo = <ThrowOnError extends boolean = false>(options: Options<GenerateDramaVideoData, ThrowOnError>) => (options.client ?? client).post<GenerateDramaVideoResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/story/scenes/{sceneId}/manga-pages/{pageId}/drama-videos',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Get drama video file
- */
-export const getDramaVideoFile = <ThrowOnError extends boolean = false>(options: Options<GetDramaVideoFileData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/story/scenes/{sceneId}/drama-videos/{dramaVideoId}/file', ...options });
-
-/**
- * List all versions
- */
-export const listVersions = <ThrowOnError extends boolean = false>(options: Options<ListVersionsData, ThrowOnError>) => (options.client ?? client).get<ListVersionsResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/versions/', ...options });
-
-/**
- * Create a version
- */
-export const createVersion = <ThrowOnError extends boolean = false>(options: Options<CreateVersionData, ThrowOnError>) => (options.client ?? client).post<CreateVersionResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/versions/',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * List version branches
- */
-export const listBranches = <ThrowOnError extends boolean = false>(options: Options<ListBranchesData, ThrowOnError>) => (options.client ?? client).get<ListBranchesResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/versions/branches', ...options });
-
-/**
- * Get version details
- */
-export const getVersion = <ThrowOnError extends boolean = false>(options: Options<GetVersionData, ThrowOnError>) => (options.client ?? client).get<GetVersionResponses, unknown, ThrowOnError>({ url: '/api/projects/{projectId}/versions/{versionId}', ...options });
-
-/**
- * Compare two versions
- */
-export const compareVersions = <ThrowOnError extends boolean = false>(options: Options<CompareVersionsData, ThrowOnError>) => (options.client ?? client).post<CompareVersionsResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/versions/compare',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Restore a version
- */
-export const restoreVersion = <ThrowOnError extends boolean = false>(options: Options<RestoreVersionData, ThrowOnError>) => (options.client ?? client).post<RestoreVersionResponses, unknown, ThrowOnError>({
-    url: '/api/projects/{projectId}/versions/{versionId}/restore',
     ...options,
     headers: {
         'Content-Type': 'application/json',

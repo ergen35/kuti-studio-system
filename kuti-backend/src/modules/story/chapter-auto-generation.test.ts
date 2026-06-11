@@ -33,13 +33,11 @@ const chapterFindFirst = createAsyncSpy<[unknown], any>();
 const generationJobCreate = createAsyncSpy<[unknown], any>();
 const sceneFindMany = createAsyncSpy<[unknown], any>();
 const sceneMangaPageFindMany = createAsyncSpy<[unknown], any>();
-const dramaVideoFindMany = createAsyncSpy<[unknown], any>();
 
 const txSceneFindUnique = createAsyncSpy<[unknown], any>();
 const txSceneCreate = createAsyncSpy<[unknown], any>();
 const txSceneDeleteMany = createAsyncSpy<[unknown], any>();
 const txSceneMangaPageDeleteMany = createAsyncSpy<[unknown], any>();
-const txDramaVideoUpdate = createAsyncSpy<[unknown], any>();
 const txChapterUpdate = createAsyncSpy<[unknown], any>();
 const txStoryReferenceDeleteMany = createAsyncSpy<[unknown], any>();
 const txStoryReferenceCreateMany = createAsyncSpy<[unknown], any>();
@@ -47,7 +45,6 @@ const transaction = createAsyncSpy<[unknown], any>();
 
 const sendGenerateChapterScenesEvent = createAsyncSpy<[unknown], void>();
 const sendGenerateSceneMangaEvent = createAsyncSpy<[unknown], void>();
-const sendGenerateDramaVideoEvent = createAsyncSpy<[unknown], void>();
 
 const transactionClient = {
   scene: {
@@ -57,9 +54,6 @@ const transactionClient = {
   },
   sceneMangaPage: {
     deleteMany: txSceneMangaPageDeleteMany,
-  },
-  dramaVideo: {
-    update: txDramaVideoUpdate,
   },
   chapter: {
     update: txChapterUpdate,
@@ -86,9 +80,6 @@ const mockDb = {
   sceneMangaPage: {
     findMany: sceneMangaPageFindMany,
   },
-  dramaVideo: {
-    findMany: dramaVideoFindMany,
-  },
   project: {
     findUnique: createAsyncSpy<[unknown], any>(),
   },
@@ -114,7 +105,6 @@ mock.module("@lib/db", () => ({
 mock.module("@lib/inngest", () => ({
   sendGenerateChapterScenesEvent,
   sendGenerateSceneMangaEvent,
-  sendGenerateDramaVideoEvent,
 }));
 
 const originalFetch = globalThis.fetch;
@@ -131,19 +121,16 @@ function resetBaseMocks() {
   generationJobCreate.mockReset();
   sceneFindMany.mockReset();
   sceneMangaPageFindMany.mockReset();
-  dramaVideoFindMany.mockReset();
   txSceneFindUnique.mockReset();
   txSceneCreate.mockReset();
   txSceneDeleteMany.mockReset();
   txSceneMangaPageDeleteMany.mockReset();
-  txDramaVideoUpdate.mockReset();
   txChapterUpdate.mockReset();
   txStoryReferenceDeleteMany.mockReset();
   txStoryReferenceCreateMany.mockReset();
   transaction.mockReset();
   sendGenerateChapterScenesEvent.mockReset();
   sendGenerateSceneMangaEvent.mockReset();
-  sendGenerateDramaVideoEvent.mockReset();
 
   transaction.mockImplementation(async (callback: any) => callback(transactionClient));
 }
@@ -172,7 +159,6 @@ describe("chapter auto-generation", () => {
 
     sceneFindMany.mockResolvedValue([]);
     sceneMangaPageFindMany.mockResolvedValue([]);
-    dramaVideoFindMany.mockResolvedValue([]);
 
     globalThis.fetch = mock(async () =>
       new Response(
@@ -358,9 +344,6 @@ describe("chapter auto-generation", () => {
       { id: "page-1" },
       { id: "page-2" },
     ]);
-    dramaVideoFindMany.mockResolvedValue([
-      { id: "video-1", metadataJson: { source: "old" } },
-    ]);
     txSceneFindUnique.mockResolvedValue(null);
     txSceneCreate.mockImplementation(async ({ data }: any) => ({
       id: `scene-${data.orderIndex + 1}`,
@@ -415,12 +398,8 @@ describe("chapter auto-generation", () => {
 
     expect(result.deletedSceneIds).toEqual(["scene-old-1", "scene-old-2"]);
     expect(result.deletedPageIds).toEqual(["page-1", "page-2"]);
-    expect(result.archivedVideoIds).toEqual(["video-1"]);
     expect(result.createdSceneIds).toEqual(["scene-1", "scene-2"]);
 
-    expect(txDramaVideoUpdate.mock.calls[0]?.[0]).toMatchObject({
-      where: { id: "video-1" },
-    });
     expect(txSceneMangaPageDeleteMany.mock.calls[0]?.[0]).toMatchObject({
       where: { projectId: "project-1", id: { in: ["page-1", "page-2"] } },
     });

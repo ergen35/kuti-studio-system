@@ -1,14 +1,15 @@
 {
   "meta": {
     "description": "Le projet {{slug}} se trouve à {{path}}.",
-    "lastOpened": "Dernier ouvert",
+    "lastOpened": "Dernier accès",
     "updated": "Mis à jour"
   },
   "stats": {
-    "characters": "Personnages",
-    "scenes": "Scènes",
-    "warnings": "Alertes ouvertes",
-    "versions": "Versions"
+    "characters": "personnages",
+    "scenes": "scènes",
+    "tomes": "tomes",
+    "chapters": "chapitres",
+    "warnings": "Alertes ouvertes"
   },
   "workspaces": {
     "characters": {
@@ -23,25 +24,17 @@
       "title": "Génération",
       "description": "Lancez des jobs de génération d'images ou vidéos depuis l'histoire."
     },
-    "dramaVideos": {
-      "title": "Vidéos drama",
-      "description": "Consultez les vidéos style drama coréen générées depuis les pages manga validées."
-    },
-    "assets": {
-      "title": "Ressources",
-      "description": "Importez des fichiers locaux et liez-aux aux entités."
-    },
     "warnings": {
       "title": "Alertes",
       "description": "Scannez et résolvez les avertissements de continuité."
     },
-    "versions": {
-      "title": "Versions",
-      "description": "Créez des sauvegardes, comparez les branches et restaurez."
-    },
     "exports": {
       "title": "Exports",
       "description": "Générez des exports JSON, arborescence ou ZIP."
+    },
+    "tasks": {
+      "title": "Tâches",
+      "description": "Consultez les tâches de génération en cours et terminées."
     },
     "settings": {
       "title": "Paramètres",
@@ -50,7 +43,7 @@
   },
   "recent": {
     "warnings": {
-      "title": "Alertes récentes",
+      "title": "Alertes",
       "total": "{{count}} total",
       "empty": {
         "title": "Aucune alerte",
@@ -58,9 +51,12 @@
       }
     },
     "production": {
-      "title": "Production récente",
+      "title": "Production",
       "jobs": "jobs",
       "exports": "exports"
+    },
+    "story": {
+      "title": "Aperçu de l'histoire"
     }
   }
 }

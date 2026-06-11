@@ -6,7 +6,6 @@
 import { randomUUIDv7 } from "bun";
 import { prisma } from "@lib/db";
 import { sendExportProjectEvent } from "@lib/inngest";
-import { captureVersionSnapshot, summarizeVersionSnapshot } from "@lib/version-snapshot";
 import type {
   CreateExportBody,
   ExportResponse,
@@ -125,8 +124,6 @@ export async function createExport(
     throw new Error(`unsupported export format: ${data.format}`);
   }
 
-  const sourceSnapshot = summarizeVersionSnapshot(await captureVersionSnapshot(projectId));
-
   const now = new Date();
   const label = data.label || `${data.kind} export (${data.format})`;
 
@@ -139,9 +136,7 @@ export async function createExport(
       status: "pending",
       label,
       summary: data.summary,
-      metadataJson: {
-        sourceSnapshot,
-      },
+      metadataJson: {},
       createdAt: now,
       updatedAt: now,
     },

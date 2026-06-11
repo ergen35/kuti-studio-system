@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Archive } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -228,6 +229,9 @@ function ProjectsSection() {
         navigate(`/projects/${project.id}`);
       }
     },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
+    },
   });
 
   const archive = useMutation({
@@ -235,6 +239,10 @@ function ProjectsSection() {
     onSuccess: () => {
       setArchiveTarget(null);
       invalidateQueriesById(queryClient, "listProjects");
+      toast.success(t("common:toast.archived"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -242,17 +250,27 @@ function ProjectsSection() {
     ...createExportMutation(),
     onSuccess: async (_exportRecord, variables) => {
       await invalidateQueriesById(queryClient, "listExports");
+      toast.success(t("common:toast.exported"));
 
       const projectId = variables?.path?.projectId;
       if (projectId) {
         navigate(`/projects/${projectId}/exports`);
       }
     },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
+    },
   });
 
   const clone = useMutation({
     ...cloneProjectMutation(),
-    onSuccess: () => invalidateQueriesById(queryClient, "listProjects"),
+    onSuccess: () => {
+      invalidateQueriesById(queryClient, "listProjects");
+      toast.success(t("common:toast.duplicated"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
+    },
   });
 
   const items: ProjectWithMetrics[] = useMemo(() => {
@@ -520,12 +538,17 @@ export default function HomeRoute() {
   const queryClient = useQueryClient();
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
+  const { t } = useTranslation("common");
   const create = useMutation({
     ...createProjectMutation(),
     onSuccess: async (data) => {
       await invalidateQueriesById(queryClient, "listProjects");
+      toast.success(t("toast.created"));
       const project = data as unknown as Project;
       navigate(`/projects/${project.id}`);
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -533,10 +556,14 @@ export default function HomeRoute() {
     ...importProjectMutation(),
     onSuccess: async (project) => {
       await invalidateQueriesById(queryClient, "listProjects");
+      toast.success(t("toast.imported"));
       setIsImportDialogOpen(false);
       if (project) {
         navigate(`/projects/${project.id}`);
       }
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 

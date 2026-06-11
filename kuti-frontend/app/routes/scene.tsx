@@ -1,16 +1,20 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { clsx } from "clsx";
+import { toast } from "sonner";
 import {
-  ArrowLeft,
   FileText,
   Save,
-  Clock,
   Trash2,
   Sparkles,
-  Layout,
   Monitor,
+  ChevronDown,
   ChevronRight,
+  Users,
+  Image as ImageIcon,
+  AlertTriangle,
+  Link2,
+  Layout,
 } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,8 +28,6 @@ import {
   ErrorState,
   LinkButton,
   LoadingState,
-  Panel,
-  SectionTitle,
   Field,
   toCsv,
 } from "~/components/ui";
@@ -37,7 +39,6 @@ import type { GetStorySummaryResponse } from "~/lib/backend";
 import { apiErrorMessage } from "~/lib/errors";
 import { csv } from "~/lib/utils";
 import { invalidateQueriesById } from "~/lib/query";
-import { ReorderControls } from "~/components/story/ReorderControls";
 import {
   buildReferenceToken,
   getReferenceSyntax,
@@ -46,7 +47,6 @@ import {
   type ReferenceKind,
   type ReferenceUrlResolver,
 } from "~/lib/references";
-import { getOrderSwap } from "~/lib/story-order";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -55,7 +55,6 @@ import {
   updateSceneMutation,
   deleteSceneMutation,
   listCharactersOptions,
-  listAssetsOptions,
   listWarningsOptions,
 } from "~/lib/backend/@tanstack/react-query.gen";
 import { StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
@@ -284,128 +283,6 @@ function resolveSceneReferenceDisplay(
   }
 }
 
-function SceneReferencePanel({
-  projectId,
-  sceneId,
-  references,
-  orphanReferences,
-  resolverData,
-}: {
-  projectId: string;
-  sceneId: string;
-  references: StoryReference[];
-  orphanReferences: Array<{ reference: StoryReference; reason: string }>;
-  resolverData: {
-    projectId: string;
-    tomes: Tome[];
-    chapters: Chapter[];
-    scenes: Scene[];
-    characters: Array<{ id: string; slug: string; name: string }>;
-    assets: Array<{ id: string; slug: string; name: string }>;
-    locations: string[];
-  };
-}) {
-  const { t } = useTranslation("story");
-
-  const sceneReferences = references.filter(
-    (reference) => reference.sceneId === sceneId,
-  );
-  const sceneOrphans = orphanReferences.filter(
-    (entry) => entry.reference.sceneId === sceneId,
-  );
-
-  return (
-    <Panel>
-      <div className="mb-3 flex items-center justify-between gap-3 border-b border-border pb-3">
-        <div>
-          <h3 className="text-sm font-medium text-foreground">
-            {t("panels.references.title")}
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            {t("panels.references.count", { count: sceneReferences.length })}
-          </p>
-        </div>
-        <Badge tone={sceneOrphans.length > 0 ? "warning" : "ready"}>
-          {sceneOrphans.length}
-        </Badge>
-      </div>
-
-      {sceneReferences.length === 0 ? (
-        <EmptyState
-          title={t("panels.references.empty.title")}
-          description={t("panels.references.empty.description")}
-        />
-      ) : (
-        <div className="grid gap-2">
-          {sceneReferences.map((reference) => {
-            const resolved = resolveSceneReferenceDisplay(
-              reference.referenceKind,
-              reference.targetSlug,
-              resolverData,
-            );
-            const isOrphan = sceneOrphans.some(
-              (entry) => entry.reference.id === reference.id,
-            );
-
-            return (
-              <div
-                key={reference.id}
-                className={clsx(
-                  "grid gap-2 rounded-xl border p-3 transition-colors",
-                  isOrphan
-                    ? "border-warning/25 bg-warning/8"
-                    : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-secondary/40",
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs text-primary">
-                        {buildReferenceToken(
-                          resolved.canonicalKind ?? "character",
-                          reference.targetSlug,
-                        )}
-                      </span>
-                      <Badge
-                        tone={resolved.canonicalKind ?? reference.referenceKind}
-                      >
-                        {resolved.syntax.replace("@", "")}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 truncate text-sm font-medium text-foreground">
-                      {resolved.label}
-                    </p>
-                  </div>
-                  <Badge tone={isOrphan ? "warning" : "ready"}>
-                    {isOrphan
-                      ? t("panels.references.orphan")
-                      : t("panels.references.resolved")}
-                  </Badge>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {resolved.href ? (
-                    <LinkButton className="h-8" href={resolved.href}>
-                      {t("panels.references.open")}
-                    </LinkButton>
-                  ) : null}
-                  {isOrphan ? (
-                    <LinkButton
-                      className="h-8"
-                      href={`/projects/${projectId}/warnings`}
-                    >
-                      {t("panels.references.fix")}
-                    </LinkButton>
-                  ) : null}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </Panel>
-  );
-}
 
 function SceneCharacterChips({
   projectId,
@@ -483,20 +360,22 @@ function SceneCharacterChips({
   );
 }
 
-function SceneContextPanel({
+function SceneSidebar({
   projectId,
   sceneId,
   scene,
   chapter,
   tome,
   sceneNumber,
+  tomeNumber,
+  chapterNumber,
   projectLocations,
   characters,
   references,
   warnings,
   warningsLoading,
-  warningsErrorMessage,
   referenceResolverData,
+  onOpenGenerationModal,
 }: {
   projectId: string;
   sceneId: string;
@@ -504,12 +383,13 @@ function SceneContextPanel({
   chapter: Chapter;
   tome: Tome;
   sceneNumber: number;
+  tomeNumber: number;
+  chapterNumber: number;
   projectLocations: string[];
   characters: SceneCharacter[];
   references: StoryReference[];
   warnings: SceneWarning[];
   warningsLoading: boolean;
-  warningsErrorMessage: string | null;
   referenceResolverData: {
     projectId: string;
     tomes: Tome[];
@@ -519,6 +399,7 @@ function SceneContextPanel({
     assets: Array<{ id: string; slug: string; name: string }>;
     locations: string[];
   };
+  onOpenGenerationModal: () => void;
 }) {
   const { t } = useTranslation(["story", "common"]);
 
@@ -526,262 +407,209 @@ function SceneContextPanel({
     () => resolveSceneLocation(scene.location, projectId, projectLocations),
     [projectId, projectLocations, scene.location],
   );
-  const sceneAssetReferences = useMemo(
-    () =>
-      references.filter(
-        (reference) =>
-          reference.sceneId === sceneId &&
-          normalizeReferenceKind(reference.referenceKind) === "asset",
-      ),
+  const sceneReferences = useMemo(
+    () => references.filter((r) => r.sceneId === sceneId),
     [references, sceneId],
   );
   const openWarnings = useMemo(
-    () => warnings.filter((warning) => warning.status === "open"),
+    () => warnings.filter((w) => w.status === "open"),
     [warnings],
   );
-  const limitedWarnings = useMemo(() => warnings.slice(0, 3), [warnings]);
 
   return (
-    <Panel className="overflow-hidden">
-      <div className="mb-3 flex items-center justify-between gap-3 border-b border-border pb-3">
-        <div>
-          <h3 className="text-sm font-medium text-foreground">
-            {t("panels.context.title")}
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            {t("panels.context.description")}
-          </p>
+    <div className="rounded-xl border border-line bg-surface">
+      {/* Fixed header */}
+      <div className="border-b border-line p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <FileText size={20} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-primary">S{sceneNumber}</span>
+              <span className="truncate font-medium text-ink">{scene.title}</span>
+            </div>
+            <p className="mt-0.5 text-xs text-muted">
+              T{tomeNumber} · C{chapterNumber}
+            </p>
+          </div>
+          <Badge tone={scene.status} className="text-[10px]">
+            {scene.status}
+          </Badge>
         </div>
-        <Badge tone={openWarnings.length > 0 ? "warning" : "ready"}>
-          {t("panels.context.openWarnings", { count: openWarnings.length })}
-        </Badge>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <Badge tone={scene.sceneType ? "info" : "warning"} className="text-[10px]">
+            {scene.sceneType || t("scene.placeholders.type")}
+          </Badge>
+          <Badge
+            tone={scene.location ? (sceneLocation.registered ? "ready" : "warning") : "warning"}
+            className="text-[10px]"
+          >
+            {scene.location || t("meta.noLocation")}
+          </Badge>
+        </div>
       </div>
 
-      <div className="grid gap-3">
-        <div className="rounded-xl border border-border bg-secondary/20 p-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                {t("panels.context.scene")}
-              </p>
-              <h4 className="mt-1 truncate text-sm font-semibold text-foreground">
-                {scene.title}
-              </h4>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t("panels.context.inChapter", {
-                  tome: tome.title,
-                  chapter: chapter.title,
-                })}
-              </p>
-            </div>
-            <Badge tone={scene.status}>{t(`status.${scene.status}`)}</Badge>
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Badge tone="info">
-              {t("scene.number", { number: sceneNumber })}
-            </Badge>
-            <Badge tone={scene.sceneType ? "ready" : "warning"}>
-              {scene.sceneType || t("scene.placeholders.type")}
-            </Badge>
-            <Badge
-              tone={
-                scene.location
-                  ? sceneLocation.registered
-                    ? "ready"
-                    : "warning"
-                  : "warning"
-              }
-            >
-              {scene.location || t("meta.noLocation")}
-            </Badge>
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            <LinkButton
-              className="h-8"
-              href={`/projects/${projectId}/story/${tome.id}`}
-            >
-              {t("panels.context.openTome")}
-            </LinkButton>
-            <LinkButton
-              className="h-8"
-              href={`/projects/${projectId}/story/${tome.id}/chapters/${chapter.id}`}
-            >
-              {t("panels.context.openChapter")}
-            </LinkButton>
-            <LinkButton
-              className="h-8"
-              href={
-                scene.location
-                  ? `/projects/${projectId}/settings?location=${encodeURIComponent(scene.location)}`
-                  : `/projects/${projectId}/settings`
-              }
-            >
-              {t("panels.context.openSettings")}
-            </LinkButton>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border bg-secondary/20 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {t("panels.context.location")}
-            </span>
-            <Badge tone={sceneLocation.registered ? "ready" : "warning"}>
-              {sceneLocation.registered
-                ? t("panels.context.locationLinked")
-                : t("panels.context.locationUnlinked")}
-            </Badge>
-          </div>
-          {scene.location ? (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {sceneLocation.href ? (
-                <LinkButton className="h-8" href={sceneLocation.href}>
-                  {sceneLocation.label}
-                </LinkButton>
-              ) : (
-                <Badge tone="warning">{sceneLocation.label}</Badge>
-              )}
-              <span className="text-xs text-muted-foreground">
-                {sceneLocation.registered
-                  ? t("panels.context.locationHint")
-                  : t("panels.context.locationHintFallback")}
-              </span>
-            </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("meta.noLocation")}
-            </p>
-          )}
-        </div>
-
-        <div className="rounded-xl border border-border bg-secondary/20 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      {/* Accordion sections */}
+      <div className="divide-y divide-line">
+        {/* Characters */}
+        <details className="group" open>
+          <summary className="flex cursor-pointer items-center justify-between p-3 text-sm font-medium text-ink">
+            <div className="flex items-center gap-2">
+              <Users size={14} className="text-primary" />
               {t("panels.context.characters")}
-            </span>
-            <Badge tone="info">{scene.charactersJson.length}</Badge>
-          </div>
-          <div className="mt-2">
+              <Badge tone="info" className="text-[10px]">
+                {scene.charactersJson.length}
+              </Badge>
+            </div>
+            <ChevronDown size={14} className="text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="px-3 pb-3">
             <SceneCharacterChips
               projectId={projectId}
               charactersValue={scene.charactersJson.join(", ")}
               characters={characters}
             />
           </div>
-        </div>
+        </details>
 
-        <div className="rounded-xl border border-border bg-secondary/20 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {t("panels.context.assets")}
-            </span>
-            <Badge tone="info">{sceneAssetReferences.length}</Badge>
-          </div>
-          {sceneAssetReferences.length > 0 ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {sceneAssetReferences.map((reference) => {
-                const resolved = resolveSceneReferenceDisplay(
-                  reference.referenceKind,
-                  reference.targetSlug,
-                  referenceResolverData,
-                );
-
-                if (resolved.href) {
-                  return (
-                    <LinkButton
-                      key={reference.id}
-                      className="h-8"
-                      href={resolved.href}
-                    >
-                      {resolved.label}
-                    </LinkButton>
-                  );
-                }
-
-                return (
-                  <Badge
-                    key={reference.id}
-                    tone="warning"
-                    className="capitalize"
-                  >
-                    {resolved.label}
-                  </Badge>
-                );
-              })}
+        {/* Manga boards */}
+        <details className="group" open>
+          <summary className="flex cursor-pointer items-center justify-between p-3 text-sm font-medium text-ink">
+            <div className="flex items-center gap-2">
+              <ImageIcon size={14} className="text-primary" />
+              {t("scene.mangaBoards")}
             </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("panels.context.emptyAssets")}
-            </p>
-          )}
-        </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                className="size-6 p-0 text-primary hover:bg-primary/10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenGenerationModal();
+                }}
+                title={t("scene.generateBoard")}
+              >
+                <Sparkles size={14} />
+              </Button>
+              <ChevronDown size={14} className="text-muted transition-transform group-open:rotate-180" />
+            </div>
+          </summary>
+          <div className="px-3 pb-3">
+            <SceneMangaGallery projectId={projectId} sceneId={sceneId} />
+          </div>
+        </details>
 
-        <div className="rounded-xl border border-border bg-secondary/20 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {t("panels.context.warnings")}
-            </span>
-            {warningsLoading && warnings.length === 0 ? (
-              <Badge tone="info">{t("states.loading", { ns: "common" })}</Badge>
-            ) : warningsErrorMessage && warnings.length === 0 ? (
-              <Badge tone="warning">
-                {t("states.error", { ns: "common" })}
+        {/* References */}
+        <details className="group">
+          <summary className="flex cursor-pointer items-center justify-between p-3 text-sm font-medium text-ink">
+            <div className="flex items-center gap-2">
+              <Link2 size={14} className="text-primary" />
+              {t("panels.references.title")}
+              <Badge tone="info" className="text-[10px]">
+                {sceneReferences.length}
               </Badge>
+            </div>
+            <ChevronDown size={14} className="text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="px-3 pb-3">
+            {sceneReferences.length === 0 ? (
+              <p className="text-xs text-muted">{t("panels.references.empty.title")}</p>
             ) : (
-              <Badge tone={openWarnings.length > 0 ? "warning" : "ready"}>
-                {openWarnings.length}
-              </Badge>
+              <div className="space-y-1.5">
+                {sceneReferences.slice(0, 5).map((ref) => {
+                  const resolved = resolveSceneReferenceDisplay(
+                    ref.referenceKind,
+                    ref.targetSlug,
+                    referenceResolverData,
+                  );
+                  return (
+                    <div key={ref.id} className="flex items-center gap-2 text-xs">
+                      <span className="font-mono text-primary">
+                        {buildReferenceToken(resolved.canonicalKind ?? "character", ref.targetSlug)}
+                      </span>
+                      {resolved.href ? (
+                        <Link to={resolved.href} className="truncate text-accent hover:underline">
+                          {resolved.label}
+                        </Link>
+                      ) : (
+                        <span className="truncate text-muted">{resolved.label}</span>
+                      )}
+                    </div>
+                  );
+                })}
+                {sceneReferences.length > 5 && (
+                  <p className="text-xs text-muted">+{sceneReferences.length - 5} more</p>
+                )}
+              </div>
             )}
           </div>
+        </details>
 
-          {warningsLoading && warnings.length === 0 ? (
-            <div className="mt-2">
-              <LoadingState />
+        {/* Warnings */}
+        <details className="group">
+          <summary className="flex cursor-pointer items-center justify-between p-3 text-sm font-medium text-ink">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={14} className={openWarnings.length > 0 ? "text-warning" : "text-primary"} />
+              {t("panels.context.warnings")}
+              <Badge tone={openWarnings.length > 0 ? "warning" : "ready"} className="text-[10px]">
+                {warningsLoading ? "..." : openWarnings.length}
+              </Badge>
             </div>
-          ) : warningsErrorMessage && warnings.length === 0 ? (
-            <div className="mt-2">
-              <ErrorState message={warningsErrorMessage} />
-            </div>
-          ) : warnings.length > 0 ? (
-            <div className="mt-2 grid gap-2">
-              {limitedWarnings.map((warning) => (
-                <div
-                  key={warning.id}
-                  className="grid gap-2 rounded-lg border border-border bg-card/80 p-2.5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {warning.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {warning.message}
-                      </p>
-                    </div>
-                    <Badge tone={warning.severity}>{warning.severity}</Badge>
+            <ChevronDown size={14} className="text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="px-3 pb-3">
+            {warnings.length === 0 ? (
+              <p className="text-xs text-muted">{t("panels.context.emptyWarnings")}</p>
+            ) : (
+              <div className="space-y-1.5">
+                {warnings.slice(0, 3).map((warning) => (
+                  <div key={warning.id} className="rounded-lg border border-line bg-surface-2/50 p-2">
+                    <p className="truncate text-xs font-medium text-ink">{warning.title}</p>
+                    <p className="mt-0.5 truncate text-[10px] text-muted">{warning.message}</p>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("panels.context.emptyWarnings")}
-            </p>
-          )}
-
-          <div className="mt-3 flex flex-wrap gap-2">
+                ))}
+              </div>
+            )}
             <LinkButton
-              className="h-8"
+              className="mt-2 h-7 text-xs"
               href={`/projects/${projectId}/warnings?entityKind=scene&entityId=${sceneId}`}
             >
               {t("panels.context.openWarningsCta")}
             </LinkButton>
           </div>
-        </div>
+        </details>
+
+        {/* Navigation */}
+        <details className="group">
+          <summary className="flex cursor-pointer items-center justify-between p-3 text-sm font-medium text-ink">
+            <div className="flex items-center gap-2">
+              <ChevronRight size={14} className="text-primary" />
+              {t("scene.navigation.title")}
+            </div>
+            <ChevronDown size={14} className="text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="px-3 pb-3 space-y-1.5">
+            <LinkButton className="h-7 w-full justify-start text-xs" href={`/projects/${projectId}/story/${tome.id}`}>
+              {t("panels.context.openTome")}
+            </LinkButton>
+            <LinkButton
+              className="h-7 w-full justify-start text-xs"
+              href={`/projects/${projectId}/story/${tome.id}/chapters/${chapter.id}`}
+            >
+              {t("panels.context.openChapter")}
+            </LinkButton>
+            <LinkButton
+              className="h-7 w-full justify-start text-xs"
+              href={`/projects/${projectId}/settings`}
+            >
+              {t("panels.context.openSettings")}
+            </LinkButton>
+          </div>
+        </details>
       </div>
-    </Panel>
+    </div>
   );
 }
 
@@ -805,107 +633,6 @@ const sceneSchema = z.object({
 
 type SceneInput = z.infer<typeof sceneSchema>;
 
-// Sidepanel with scenes in this chapter
-function SceneNavigationPanel({
-  scenes,
-  currentSceneId,
-  projectId,
-  tomeId,
-  chapterId,
-  onMoveScene,
-  reorderDisabled = false,
-}: {
-  scenes: Scene[];
-  currentSceneId: string;
-  projectId: string;
-  tomeId: string;
-  chapterId: string;
-  onMoveScene?: (sceneId: string, direction: -1 | 1) => void;
-  reorderDisabled?: boolean;
-}) {
-  const { t } = useTranslation("story");
-  const navigate = useNavigate();
-
-  const sortedScenes = [...scenes].sort((a, b) => a.orderIndex - b.orderIndex);
-
-  return (
-    <Panel className="!p-3">
-      <SectionTitle
-        title={t("scene.navigation.title")}
-        meta={String(sortedScenes.length)}
-      />
-
-      <div className="mt-3 flex flex-col gap-2">
-        {sortedScenes.map((scene, index) => {
-          const isCurrent = scene.id === currentSceneId;
-          return (
-            <div key={scene.id} className="group flex items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() =>
-                  navigate(
-                    `/projects/${projectId}/story/${tomeId}/scenes/${scene.id}`,
-                  )
-                }
-                className={clsx(
-                  "flex h-auto w-full flex-1 items-center gap-3 rounded-lg border p-2.5 text-left transition-colors hover:text-foreground",
-                  isCurrent
-                    ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_3px_0_0_var(--primary)]"
-                    : "border-border bg-secondary/25 hover:border-primary/35 hover:bg-primary/8",
-                )}
-              >
-                <span
-                  className={clsx(
-                    "text-xs font-semibold",
-                    isCurrent ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {t("scene.shortNumber", { number: index + 1 })}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={clsx(
-                      "truncate text-sm",
-                      isCurrent
-                        ? "font-medium text-primary"
-                        : "text-foreground",
-                    )}
-                  >
-                    {scene.title}
-                  </p>
-                </div>
-                {isCurrent && (
-                  <span className="size-2 rounded-full bg-primary" />
-                )}
-                {!isCurrent && (
-                  <ChevronRight size={14} className="text-muted-foreground" />
-                )}
-              </Button>
-              {onMoveScene ? (
-                <ReorderControls
-                  entityLabel={scene.title}
-                  canMoveUp={index > 0}
-                  canMoveDown={index < sortedScenes.length - 1}
-                  disabled={reorderDisabled}
-                  onMoveUp={() => onMoveScene(scene.id, -1)}
-                  onMoveDown={() => onMoveScene(scene.id, 1)}
-                  className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-                />
-              ) : null}
-            </div>
-          );
-        })}
-
-        {sortedScenes.length === 0 && (
-          <p className="py-4 text-center text-sm text-muted-foreground">
-            {t("scene.navigation.empty")}
-          </p>
-        )}
-      </div>
-    </Panel>
-  );
-}
 
 export default function SceneRoute() {
   const {
@@ -937,11 +664,6 @@ export default function SceneRoute() {
     enabled: !!projectId,
   });
 
-  const assets = useQuery({
-    ...listAssetsOptions({ path: { projectId } }),
-    enabled: !!projectId,
-  });
-
   const sceneWarnings = useQuery({
     ...listWarningsOptions({
       path: { projectId },
@@ -968,14 +690,14 @@ export default function SceneRoute() {
         slug: string;
         name: string;
       }>,
-      assets: (assets.data || []) as Array<{
+      assets: [] as Array<{
         id: string;
         slug: string;
         name: string;
       }>,
       locations: projectLocations,
     }),
-    [projectId, storyData, characters.data, assets.data, projectLocations],
+    [projectId, storyData, characters.data, projectLocations],
   );
 
   const resolveReferenceUrl = useCallback<ReferenceUrlResolver>(
@@ -1036,13 +758,11 @@ export default function SceneRoute() {
     onSuccess: () => {
       invalidateQueriesById(queryClient, "getStorySummary");
       setIsSaving(false);
+      toast.success(t("common:toast.saved"));
     },
-  });
-
-  const reorderScene = useMutation({
-    ...updateSceneMutation(),
-    onSuccess: () => {
-      invalidateQueriesById(queryClient, "getStorySummary");
+    onError: (error) => {
+      setIsSaving(false);
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -1050,9 +770,13 @@ export default function SceneRoute() {
     ...deleteSceneMutation(),
     onSuccess: () => {
       invalidateQueriesById(queryClient, "getStorySummary");
+      toast.success(t("common:toast.deleted"));
       navigate(
         `/projects/${projectId}/story/${tomeId}/chapters/${scene?.chapterId}`,
       );
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 
@@ -1153,35 +877,6 @@ export default function SceneRoute() {
       });
     },
     [updateScene, projectId, sceneId],
-  );
-
-  const moveScene = useCallback(
-    async (movingSceneId: string, direction: -1 | 1) => {
-      if (!context) {
-        return;
-      }
-
-      const swap = getOrderSwap(
-        context.chapterScenes,
-        movingSceneId,
-        direction,
-      );
-      if (!swap) {
-        return;
-      }
-
-      await Promise.all([
-        reorderScene.mutateAsync({
-          path: { projectId, sceneId: swap.current.id },
-          body: { orderIndex: swap.target.orderIndex },
-        }),
-        reorderScene.mutateAsync({
-          path: { projectId, sceneId: swap.target.id },
-          body: { orderIndex: swap.current.orderIndex },
-        }),
-      ]);
-    },
-    [context, projectId, reorderScene],
   );
 
   if (story.isLoading) {
@@ -1300,7 +995,6 @@ export default function SceneRoute() {
   // Classic Mode View
   return (
     <AppShell>
-      {/* Breadcrumb */}
       <StoryBreadcrumb
         projectId={projectId}
         tomes={storyData?.tomes || []}
@@ -1314,96 +1008,62 @@ export default function SceneRoute() {
         sceneNumber={sceneNumber}
       />
 
-      {/* Back link - mobile only */}
-      <div className="mb-4 lg:hidden">
-        <Link
-          to={`/projects/${projectId}/story/${tomeId}/chapters/${chapter.id}`}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-        >
-          <ArrowLeft size={16} /> {t("scene.backToChapter")}
-        </Link>
-      </div>
-
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid items-start gap-4 lg:grid-cols-[1fr_280px]">
+        <div className="grid items-start gap-4 lg:grid-cols-[1fr_300px]">
           {/* Main content */}
           <div className="flex flex-col gap-4">
-            {/* Scene header */}
-            <Panel className="overflow-hidden">
-              <div className="-m-4 mb-0 flex items-start gap-4 border-b border-border bg-secondary/20 p-5 compact:-m-3 compact:p-4">
-                <div className="grid size-12 place-items-center rounded-lg bg-primary/10 text-primary">
-                  <FileText size={24} />
+            {/* Compact header with title input */}
+            <div className="rounded-xl border border-line bg-surface p-4">
+              <div className="flex items-start gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <FileText size={20} />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                      {t("scene.number", { number: sceneNumber })}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={toggleOrchestra}
-                      className="h-8 gap-2 border border-primary/25 bg-primary/10 px-2.5 text-primary hover:bg-primary/15"
-                      title={t("scene.orchestra.switchToOrchestra")}
-                    >
-                      <Monitor size={16} />
-                      <span>{t("scene.orchestra.mode")}</span>
-                    </Button>
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-primary">S{sceneNumber}</span>
+                    <div className="flex items-center gap-2">
+                      <Badge tone={scene.status} className="text-[10px]">
+                        {scene.status}
+                      </Badge>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={toggleOrchestra}
+                        className="h-7 gap-1.5 border border-primary/25 bg-primary/10 px-2 text-xs text-primary hover:bg-primary/15"
+                        title={t("scene.orchestra.switchToOrchestra")}
+                      >
+                        <Monitor size={14} />
+                        {t("scene.orchestra.mode")}
+                      </Button>
+                    </div>
                   </div>
-
-                  <Field label={t("fields.title")}>
-                    <div className="grid gap-1.5">
-                      <div className="flex items-center justify-end">
-                        <StoryCompletionButton
-                          projectId={projectId}
-                          targetKind="scene"
-                          targetId={sceneId}
-                          field="title"
-                          currentValue={watch("title")}
-                          onComplete={(text) =>
-                            setValue("title", text, {
-                              shouldDirty: true,
-                              shouldValidate: true,
-                            })
-                          }
-                        />
-                      </div>
-                      <Input
-                        {...register("title")}
-                        className="text-lg font-semibold w-full"
+                  <div className="grid gap-1.5">
+                    <div className="flex items-center justify-between text-xs text-muted">
+                      <span>{t("fields.title")}</span>
+                      <StoryCompletionButton
+                        projectId={projectId}
+                        targetKind="scene"
+                        targetId={sceneId}
+                        field="title"
+                        currentValue={watch("title")}
+                        onComplete={(text) =>
+                          setValue("title", text, { shouldDirty: true, shouldValidate: true })
+                        }
                       />
                     </div>
-                  </Field>
-                  {errors.title && (
-                    <span className="text-danger text-xs">
-                      {errors.title.message}
-                    </span>
-                  )}
-
-                  <p className="mt-1 font-mono text-sm text-muted-foreground">
-                    {scene.slug}
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-3 mt-3">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Clock size={12} />
-                      <span>
-                        {t("scene.lastModified")}: {formattedDate}
-                      </span>
-                    </div>
-                    <Badge tone={scene.status}>
-                      {t(`status.${scene.status}`)}
-                    </Badge>
+                    <Input {...register("title")} className="text-lg font-semibold" />
+                    {errors.title && (
+                      <span className="text-danger text-xs">{errors.title.message}</span>
+                    )}
                   </div>
                 </div>
               </div>
-            </Panel>
+            </div>
 
             {/* Scene editor */}
-            <Panel>
-              <SectionTitle title={t("panels.sceneEditor.title")} />
-
-              <div className="mt-3 flex flex-col gap-4">
+            <div className="rounded-xl border border-line bg-surface p-4">
+              <h2 className="mb-3 text-sm font-semibold text-ink">{t("panels.sceneEditor.title")}</h2>
+              <div className="flex flex-col gap-4">
                 {/* Summary */}
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="grid gap-1.5 text-xs text-muted-foreground">
@@ -1615,61 +1275,56 @@ export default function SceneRoute() {
                   />
                 </div>
 
-                <div className="rounded-xl border border-border bg-secondary/20 p-4">
-                  <SectionTitle
-                    title={t("panels.metadata.title")}
-                    meta={t("panels.metadata.description")}
-                  />
-
-                  <div className="grid gap-4 lg:grid-cols-2">
+                {/* Metadata - collapsible */}
+                <details className="group rounded-lg border border-line">
+                  <summary className="flex cursor-pointer items-center justify-between p-3 text-sm font-medium text-ink">
+                    {t("panels.metadata.title")}
+                    <ChevronDown size={14} className="text-muted transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="grid gap-4 px-3 pb-3 lg:grid-cols-2">
                     <Field label={t("fields.narrativeIntent")}>
                       <Textarea
                         {...register("narrativeIntent")}
-                        rows={4}
+                        rows={3}
                         placeholder={t("scene.placeholders.narrativeIntent")}
                       />
                     </Field>
-
                     <Field label={t("fields.duration")}>
                       <Input
                         {...register("duration")}
                         placeholder={t("scene.placeholders.duration")}
                       />
                     </Field>
-
                     <Field label={t("fields.tone")}>
                       <Input
                         {...register("tone")}
                         placeholder={t("scene.placeholders.tone")}
                       />
                     </Field>
-
                     <Field label={t("fields.rhythm")}>
                       <Input
                         {...register("rhythm")}
                         placeholder={t("scene.placeholders.rhythm")}
                       />
                     </Field>
-
                     <Field label={t("fields.visualConstraints")}>
                       <Textarea
                         {...register("visualConstraints")}
-                        rows={4}
+                        rows={3}
                         placeholder={t("scene.placeholders.visualConstraints")}
                       />
                     </Field>
-
                     <Field label={t("fields.stagingNotes")}>
                       <Textarea
                         {...register("stagingNotes")}
-                        rows={4}
+                        rows={3}
                         placeholder={t("scene.placeholders.stagingNotes")}
                       />
                     </Field>
                   </div>
-                </div>
+                </details>
               </div>
-            </Panel>
+            </div>
 
             {/* Actions */}
             <div className="flex justify-between items-center">
@@ -1705,73 +1360,24 @@ export default function SceneRoute() {
             </div>
           </div>
 
-          {/* Side panel */}
-          <div className="flex flex-col gap-4">
-            <SceneContextPanel
-              projectId={projectId}
-              sceneId={sceneId}
-              scene={scene}
-              chapter={chapter}
-              tome={tome}
-              sceneNumber={sceneNumber}
-              projectLocations={projectLocations}
-              characters={(characters.data || []) as SceneCharacter[]}
-              references={(storyData?.references ?? []) as StoryReference[]}
-              warnings={(sceneWarnings.data ?? []) as SceneWarning[]}
-              warningsLoading={sceneWarnings.isLoading}
-              warningsErrorMessage={
-                sceneWarnings.error
-                  ? apiErrorMessage(sceneWarnings.error)
-                  : null
-              }
-              referenceResolverData={referenceResolverData}
-            />
-
-            {/* Manga Generation Section */}
-            <Panel>
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-medium text-foreground">
-                  {t("scene.mangaBoards")}
-                </h3>
-                <Button
-                  variant="ghost"
-                  className="size-8 border border-primary/25 bg-primary/10 p-0 text-primary hover:bg-primary/15"
-                  onClick={() => setIsGenerationModalOpen(true)}
-                  title={t("scene.generateBoard")}
-                >
-                  <Sparkles size={18} />
-                </Button>
-              </div>
-              <SceneMangaGallery projectId={projectId} sceneId={sceneId} />
-            </Panel>
-
-            <SceneReferencePanel
-              projectId={projectId}
-              sceneId={sceneId}
-              references={(storyData?.references ?? []) as StoryReference[]}
-              orphanReferences={
-                (storyData?.orphanReferences ?? []) as Array<{
-                  reference: StoryReference;
-                  reason: string;
-                }>
-              }
-              resolverData={referenceResolverData}
-            />
-
-            {chapterScenes && (
-              <SceneNavigationPanel
-                scenes={chapterScenes}
-                currentSceneId={sceneId}
-                projectId={projectId}
-                tomeId={tomeId}
-                chapterId={chapter.id}
-                onMoveScene={moveScene}
-                reorderDisabled={
-                  reorderScene.isPending || updateScene.isPending || isSaving
-                }
-              />
-            )}
-          </div>
+          {/* Consolidated sidebar */}
+          <SceneSidebar
+            projectId={projectId}
+            sceneId={sceneId}
+            scene={scene}
+            chapter={chapter}
+            tome={tome}
+            sceneNumber={sceneNumber}
+            tomeNumber={tomeNumber}
+            chapterNumber={chapterNumber}
+            projectLocations={projectLocations}
+            characters={(characters.data || []) as SceneCharacter[]}
+            references={(storyData?.references ?? []) as StoryReference[]}
+            warnings={(sceneWarnings.data ?? []) as SceneWarning[]}
+            warningsLoading={sceneWarnings.isLoading}
+            referenceResolverData={referenceResolverData}
+            onOpenGenerationModal={() => setIsGenerationModalOpen(true)}
+          />
         </div>
       </form>
 

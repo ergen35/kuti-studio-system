@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { BookOpen, ChevronRight, Film, Library, Plus } from "lucide-react";
 import {
   useDeferredValue,
   useMemo,
@@ -7,18 +7,19 @@ import {
   useCallback,
 } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams, useNavigate, useSearchParams } from "react-router";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "~/hooks/useTranslation";
 import { AppShell } from "~/components/layout";
 import {
+  Badge,
   Button,
+  EmptyState,
   ErrorState,
   LoadingState,
-  PageHeader,
-  Stat,
 } from "~/components/ui";
 import {
   Dialog,
@@ -29,25 +30,27 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { FormField } from "~/components/FormField";
-import { StorySearchPanel, TomeCardGrid } from "~/components/story";
+import { StorySearchPanel } from "~/components/story";
+import { ReorderControls } from "~/components/story/ReorderControls";
 import { apiErrorMessage } from "~/lib/errors";
 import { invalidateWorkspace } from "~/lib/query";
 import {
   getStorySummaryOptions,
   createTomeMutation,
+  updateTomeMutation,
 } from "~/lib/backend/@tanstack/react-query.gen";
-import { updateTomeMutation } from "~/lib/backend/@tanstack/react-query.gen";
 import { getOrderSwap } from "~/lib/story-order";
 import { buildStorySearchResults } from "~/lib/story-search";
+import type { GetStorySummaryResponse } from "~/lib/backend";
 
-// Schema for creating a new tome
+type Tome = GetStorySummaryResponse["tomes"][number];
+
 const createTomeSchema = z.object({
   title: z.string().min(1, "Title is required"),
 });
 
 type CreateTomeInput = z.infer<typeof createTomeSchema>;
 
-// Create Tome Modal
 function CreateTomeModal({
   isOpen,
   onClose,
@@ -70,16 +73,11 @@ function CreateTomeModal({
     defaultValues: { title: "" },
   });
 
-  // Reset form when opened
   useEffect(() => {
     if (isOpen) {
       reset({ title: "" });
     }
   }, [isOpen, reset]);
-
-  const handleFormSubmit = (data: CreateTomeInput) => {
-    onSubmit(data);
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -87,10 +85,7 @@ function CreateTomeModal({
         <DialogHeader>
           <DialogTitle>{t("createTome.title")}</DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <FormField label={t("fields.title")} error={errors.title}>
             <Input
               {...register("title")}
@@ -99,30 +94,88 @@ function CreateTomeModal({
               placeholder={t("createTome.titlePlaceholder")}
             />
           </FormField>
-
           <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={onClose}
-              disabled={isLoading}
-              type="button"
-            >
+            <Button variant="ghost" onClick={onClose} disabled={isLoading} type="button">
               {t("actions.cancel")}
             </Button>
             <Button variant="primary" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  {t("actions.creating")}
-                </>
-              ) : (
-                t("actions.save")
-              )}
+              {isLoading ? t("actions.creating") : t("actions.save")}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TomeRow({
+  tome,
+  tomeNumber,
+  projectId,
+  chapterCount,
+  sceneCount,
+  canMoveUp,
+  canMoveDown,
+  reorderDisabled,
+  onMoveUp,
+  onMoveDown,
+}: {
+  tome: Tome;
+  tomeNumber: number;
+  projectId: string;
+  chapterCount: number;
+  sceneCount: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  reorderDisabled: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const { t } = useTranslation("story");
+
+  return (
+    <div className="group flex items-stretch gap-2">
+      <Link
+        to={`/projects/${projectId}/story/${tome.id}`}
+        className="flex flex-1 items-center gap-4 rounded-lg border border-line bg-surface p-4 transition-all hover:border-accent/40 hover:bg-accent/5"
+      >
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Library size={20} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-primary">T{tomeNumber}</span>
+            <h3 className="truncate text-base font-semibold text-ink">{tome.title}</h3>
+            <Badge tone={tome.status} className="text-[10px]">
+              {t(`status.${tome.status}`)}
+            </Badge>
+          </div>
+          <div className="mt-1 flex items-center gap-4 text-xs text-muted">
+            <span className="flex items-center gap-1">
+              <BookOpen size={12} />
+              {chapterCount} {t("tome.stats.chapters", { count: chapterCount })}
+            </span>
+            <span className="flex items-center gap-1">
+              <Film size={12} />
+              {sceneCount} {t("tome.stats.scenes", { count: sceneCount })}
+            </span>
+          </div>
+        </div>
+        <ChevronRight
+          size={18}
+          className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
+        />
+      </Link>
+      <ReorderControls
+        entityLabel={tome.title}
+        canMoveUp={canMoveUp}
+        canMoveDown={canMoveDown}
+        disabled={reorderDisabled}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        className="self-center opacity-100 md:opacity-0 md:transition-opacity md:duration-150 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+      />
+    </div>
   );
 }
 
@@ -132,38 +185,37 @@ export default function StoryRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation(["story", "common"]);
 
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch story data
   const story = useQuery(getStorySummaryOptions({ path: { projectId } }));
   const searchQuery = searchParams.get("q") ?? "";
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
-  // Create tome mutation
   const createTome = useMutation({
     ...createTomeMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
+      toast.success(t("common:toast.created"));
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
+
   const updateTome = useMutation({
     ...updateTomeMutation(),
     onSuccess: () => {
       invalidateWorkspace(projectId);
     },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
+    },
   });
 
   const reorderTome = async (tomeId: string, direction: -1 | 1) => {
-    if (!story.data) {
-      return;
-    }
-
+    if (!story.data) return;
     const swap = getOrderSwap(story.data.tomes, tomeId, direction);
-    if (!swap) {
-      return;
-    }
-
+    if (!swap) return;
     await Promise.all([
       updateTome.mutateAsync({
         path: { projectId, tomeId: swap.current.id },
@@ -185,62 +237,31 @@ export default function StoryRoute() {
           orderIndex: story.data?.tomes?.length ?? 0,
         },
       },
-      {
-        onSuccess: () => {
-          setIsModalOpen(false);
-        },
-      },
+      { onSuccess: () => setIsModalOpen(false) },
     );
   };
 
-  // Calculate tome stats
   const tomeStats = useMemo(() => {
     if (!story.data) return [];
-
     const { tomes, chapters, scenes } = story.data;
-
     return tomes
-      .map((tome) => {
-        const tomeChapters = chapters.filter((c) => c.tomeId === tome.id);
-        const tomeScenes = scenes.filter((s) => s.tomeId === tome.id);
-
-        // Calculate last modified date
-        const lastSceneUpdate =
-          tomeScenes.length > 0
-            ? Math.max(
-                ...tomeScenes.map((s) => new Date(s.updatedAt).getTime()),
-              )
-            : new Date(tome.updatedAt).getTime();
-
-        return {
-          ...tome,
-          chapterCount: tomeChapters.length,
-          sceneCount: tomeScenes.length,
-          lastModified: new Date(lastSceneUpdate),
-        };
-      })
-      .sort((a, b) => a.orderIndex - b.orderIndex);
+      .map((tome) => ({
+        tome,
+        chapterCount: chapters.filter((c) => c.tomeId === tome.id).length,
+        sceneCount: scenes.filter((s) => s.tomeId === tome.id).length,
+      }))
+      .sort((a, b) => a.tome.orderIndex - b.tome.orderIndex);
   }, [story.data]);
-
-  const handleSelectTome = (tomeId: string) => {
-    navigate(`/projects/${projectId}/story/${tomeId}`);
-  };
-
-  const handleCreateClick = () => {
-    setIsModalOpen(true);
-  };
 
   const updateSearchQuery = useCallback(
     (value: string) => {
       const nextParams = new URLSearchParams(searchParams);
       const trimmed = value.trim();
-
       if (trimmed) {
         nextParams.set("q", value);
       } else {
         nextParams.delete("q");
       }
-
       setSearchParams(nextParams, { replace: true });
     },
     [searchParams, setSearchParams],
@@ -264,76 +285,94 @@ export default function StoryRoute() {
 
   return (
     <AppShell>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        actions={
-          <Button
-            variant="primary"
-            onClick={handleCreateClick}
-            className="shrink-0"
-          >
-            <Plus size={16} /> {t("actions.addTome")}
-          </Button>
-        }
-      />
-
-      {story.data ? (
-        <StorySearchPanel
-          query={searchQuery}
-          onQueryChange={updateSearchQuery}
-          results={searchResults}
-        />
-      ) : null}
-
-      {/* Error states */}
-      {createTome.error && (
-        <div className="mb-4">
-          <ErrorState message={apiErrorMessage(createTome.error)} />
-        </div>
-      )}
-
-      {/* Loading state */}
-      {story.isLoading && <LoadingState />}
-
-      {/* Error state */}
-      {story.error && <ErrorState message={apiErrorMessage(story.error)} />}
-
-      {/* Tome card grid */}
-      {story.data && (
-        <div className="grid gap-4">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Stat
-              value={story.data.tomes.length}
-              label={t("panels.outline.count", {
-                count: story.data.tomes.length,
-              })}
-            />
-            <Stat
-              value={story.data.chapters.length}
-              label={t("tome.stats.chapters", {
-                count: story.data.chapters.length,
-              })}
-            />
-            <Stat
-              value={story.data.scenes.length}
-              label={t("tome.stats.scenes", {
-                count: story.data.scenes.length,
-              })}
-            />
+      <div className="mx-auto max-w-4xl space-y-4">
+        {/* Compact header */}
+        <div className="rounded-xl border border-line bg-surface p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Library size={20} />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-ink">{t("title")}</h1>
+                <p className="mt-0.5 text-xs text-muted">{t("description")}</p>
+                {story.data && (
+                  <p className="mt-2 text-xs text-muted">
+                    <span className="font-medium text-ink">{story.data.tomes.length}</span>{" "}
+                    {t("panels.outline.count", { count: story.data.tomes.length })} ·{" "}
+                    <span className="font-medium text-ink">{story.data.chapters.length}</span>{" "}
+                    {t("tome.stats.chapters", { count: story.data.chapters.length })} ·{" "}
+                    <span className="font-medium text-ink">{story.data.scenes.length}</span>{" "}
+                    {t("tome.stats.scenes", { count: story.data.scenes.length })}
+                  </p>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              onClick={() => setIsModalOpen(true)}
+              className="h-8 gap-1.5 px-3 shrink-0"
+            >
+              <Plus size={16} /> {t("actions.addTome")}
+            </Button>
           </div>
-          <TomeCardGrid
-            tomes={tomeStats}
-            onSelect={handleSelectTome}
-            onCreate={handleCreateClick}
-            isLoading={story.isLoading}
-            onMoveTome={reorderTome}
-            reorderDisabled={updateTome.isPending}
-          />
         </div>
-      )}
 
-      {/* Create Tome Modal */}
+        {/* Search */}
+        {story.data && (
+          <StorySearchPanel
+            query={searchQuery}
+            onQueryChange={updateSearchQuery}
+            results={searchResults}
+          />
+        )}
+
+        {/* Error states */}
+        {createTome.error && (
+          <ErrorState message={apiErrorMessage(createTome.error)} />
+        )}
+
+        {/* Loading state */}
+        {story.isLoading && <LoadingState />}
+
+        {/* Error state */}
+        {story.error && <ErrorState message={apiErrorMessage(story.error)} />}
+
+        {/* Tome list */}
+        {story.data && (
+          <div className="rounded-xl border border-line bg-surface p-4">
+            <h2 className="mb-3 text-sm font-semibold text-ink">
+              {t("panels.outline.title")} ({tomeStats.length})
+            </h2>
+
+            {tomeStats.length === 0 ? (
+              <EmptyState
+                title={t("empty.noTome.title")}
+                description={t("empty.noTome.description")}
+              />
+            ) : (
+              <div className="space-y-2">
+                {tomeStats.map(({ tome, chapterCount, sceneCount }, index) => (
+                  <TomeRow
+                    key={tome.id}
+                    tome={tome}
+                    tomeNumber={index + 1}
+                    projectId={projectId}
+                    chapterCount={chapterCount}
+                    sceneCount={sceneCount}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < tomeStats.length - 1}
+                    reorderDisabled={updateTome.isPending}
+                    onMoveUp={() => reorderTome(tome.id, -1)}
+                    onMoveDown={() => reorderTome(tome.id, 1)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <CreateTomeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
