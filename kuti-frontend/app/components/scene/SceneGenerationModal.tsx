@@ -58,6 +58,7 @@ interface SceneGenerationModalProps {
   scene: Scene;
   isOpen: boolean;
   onClose: () => void;
+  targetPageCount?: number;
 }
 
 export function SceneGenerationModal({
@@ -65,6 +66,7 @@ export function SceneGenerationModal({
   scene,
   isOpen,
   onClose,
+  targetPageCount = 1,
 }: SceneGenerationModalProps) {
   const { t } = useTranslation("scene");
   const queryClient = useQueryClient();
@@ -72,7 +74,7 @@ export function SceneGenerationModal({
   // State
   const [selectedConfigId, setSelectedConfigId] = useState<string>("");
   const [selectedModelKey, setSelectedModelKey] = useState<string>("");
-  const [imageCount, setImageCount] = useState(6);
+  const [imageCount, setImageCount] = useState(targetPageCount);
   const [additionalContext, setAdditionalContext] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const hasSceneContent = scene.content.trim().length > 0;
@@ -100,9 +102,13 @@ export function SceneGenerationModal({
       const defaultConfig =
         configs.data.find((c) => c.isDefault) || configs.data[0];
       setSelectedConfigId(defaultConfig.id);
-      setImageCount(defaultConfig.defaultImageCount);
     }
   }, [configs.data, selectedConfigId]);
+
+  // Sync imageCount when targetPageCount prop changes
+  useEffect(() => {
+    setImageCount(targetPageCount);
+  }, [targetPageCount]);
 
   const configItems = configs.data ?? [];
   const hasConfigs = configItems.length > 0;

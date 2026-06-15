@@ -20,9 +20,7 @@ type SearchableScene = {
   title: string;
   sceneType: string;
   location: string;
-  summary: string;
   content: string;
-  notes: string;
   tagsJson: string[];
   slug: string;
 };
@@ -46,9 +44,7 @@ export type StorySearchResult = {
   matchedFields: Array<
     | "title"
     | "synopsis"
-    | "summary"
     | "content"
-    | "notes"
     | "tags"
     | "sceneType"
     | "location"
@@ -59,9 +55,7 @@ export type StorySearchResult = {
 const FIELD_WEIGHTS: Record<string, number> = {
   title: 90,
   synopsis: 60,
-  summary: 50,
   content: 42,
-  notes: 38,
   tags: 32,
   sceneType: 20,
   location: 20,
@@ -256,9 +250,7 @@ export function buildStorySearchResults(
           fields: {
             title,
             synopsis,
-            summary: "",
             content: "",
-            notes: "",
             tags: "",
             sceneType: "",
             location: "",
@@ -294,9 +286,7 @@ export function buildStorySearchResults(
           fields: {
             title,
             synopsis,
-            summary: "",
             content: "",
-            notes: "",
             tags: "",
             sceneType: "",
             location: "",
@@ -315,17 +305,13 @@ export function buildStorySearchResults(
     const chapter = chapterById.get(scene.chapterId);
     const tags = buildTagsExcerpt(scene.tagsJson ?? []);
     const title = scene.title ?? "";
-    const summary = scene.summary ?? "";
     const content = scene.content ?? "";
-    const notes = scene.notes ?? "";
     const sceneType = scene.sceneType ?? "";
     const location = scene.location ?? "";
     const searchable = normalizeSearchText(
       [
         title,
-        summary,
         content,
-        notes,
         tags,
         sceneType,
         location,
@@ -350,17 +336,13 @@ export function buildStorySearchResults(
           fields: {
             title,
             synopsis: "",
-            summary,
             content,
-            notes,
             tags,
             sceneType,
             location,
           },
           excerptFields: [
             "content",
-            "notes",
-            "summary",
             "tags",
             "title",
             "sceneType",

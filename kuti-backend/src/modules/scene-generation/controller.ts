@@ -531,7 +531,6 @@ export async function previewPrompt(
     title: scene.title,
     location: scene.location,
     content: sceneContent,
-    notes: scene.notes,
     tomeTitle: scene.tome?.title ?? null,
     chapterTitle: scene.chapter?.title ?? null,
   };
@@ -573,9 +572,18 @@ export async function previewPrompt(
 
 function publicMangaPageImageUrl(projectId: string, page: { imageUrl: string | null; boardId: string; panelId: string }) {
   if (!page.imageUrl) return null;
-  if (page.imageUrl.startsWith("http://") || page.imageUrl.startsWith("https://") || page.imageUrl.startsWith("/api/")) {
+
+  // Si c'est déjà une URL complète (http, https, /projects/, /api/)
+  if (
+    page.imageUrl.startsWith("http://") ||
+    page.imageUrl.startsWith("https://") ||
+    page.imageUrl.startsWith("/projects/") ||
+    page.imageUrl.startsWith("/api/")
+  ) {
     return page.imageUrl;
   }
+
+  // Fallback vers l'API pour les anciens panels (chemin kuti-data)
   return `/api/projects/${projectId}/generation/boards/${page.boardId}/panels/${page.panelId}/image`;
 }
 

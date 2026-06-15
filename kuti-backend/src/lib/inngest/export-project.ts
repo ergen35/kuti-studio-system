@@ -10,10 +10,10 @@ import slugify from "slugify";
 import { PDFDocument } from "pdf-lib";
 import { db } from "../db";
 import type { ExportStatus } from "../db/generated/enums";
-import { saveExportFile, writeFile } from "../filesystem";
+import { writeFile } from "../filesystem";
 import { inngest } from "./client";
 import { config } from "../config";
-import { getProjectDir } from "../paths";
+import { getExportsPublicDir, getExportPublicUrl, getProjectDir } from "../paths";
 
 type ZipWriterLike = {
   add(path: string, data: Buffer): void;
@@ -173,6 +173,26 @@ function safeStem(value: string): string {
   return slugify(value, { lower: true, strict: true, replacement: "_" }) || "export";
 }
 
+async function writeExportToPublic(
+  projectId: string,
+  fileName: string,
+  content: Buffer | string
+): Promise<{ filePath: string; publicUrl: string; fileName: string; fileSize: number }> {
+  const dir = getExportsPublicDir(projectId);
+  const fullPath = `${dir}/${fileName}`;
+  const data = typeof content === "string" ? Buffer.from(content) : content;
+
+  await writeFile(fullPath, data);
+  const stats = await stat(fullPath);
+
+  return {
+    filePath: `projects/${projectId}/exports/${fileName}`,
+    publicUrl: getExportPublicUrl(projectId, fileName),
+    fileName,
+    fileSize: stats.size,
+  };
+}
+
 function normalizedPath(value: string): string {
   return value.trim().replace(/\\/g, "/");
 }
@@ -217,8 +237,18 @@ async function readBinarySource(path: string): Promise<{ buffer: Buffer; mimeTyp
     };
   }
 
+  // Support des deux formats de chemins :
+  // - Ancien : chemin absolu vers kuti-data/
+  // - Nouveau : chemin relatif (projects/...) vers public/, ou URL statique (/projects/...)
+  let resolvedPath = path;
+  if (path.startsWith("/projects/")) {
+    resolvedPath = `public${path}`;
+  } else if (!path.startsWith("/") && !path.startsWith("./")) {
+    resolvedPath = `public/${path}`;
+  }
+
   return {
-    buffer: Buffer.from(await Bun.file(path).arrayBuffer()),
+    buffer: Buffer.from(await Bun.file(resolvedPath).arrayBuffer()),
     mimeType: mimeTypeFromPath(path),
   };
 }
@@ -519,49 +549,51 @@ export const exportProjectFunction = inngest.createFunction(
       // ============================================================================
       // Step 3: Générer l'export selon le format
       // ============================================================================
-      let result: { filePath: string; fileName: string; fileSize: number };
+      let result: { filePath: string; publicUrl: string; fileName: string; fileSize: number };
+
+      type ExportResult = { filePath: string; publicUrl: string; fileName: string; fileSize: number };
 
       switch (format) {
         case "json":
           result = await step.run("export-json", async () => {
             return await exportAsJson(project, exportRecord.label, kind, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         case "tree":
           result = await step.run("export-tree", async () => {
             return await exportAsTree(project, exportRecord.label, kind, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         case "zip":
           result = await step.run("export-zip", async () => {
             return await exportAsZip(project, exportRecord.label, kind, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         case "paged_images":
           result = await step.run("export-paged-images", async () => {
             return await exportPublicationAsPagedImages(project, exportRecord.label, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         case "pdf":
           result = await step.run("export-pdf", async () => {
             return await exportPublicationAsPdf(project, exportRecord.label, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         case "cbz":
           result = await step.run("export-cbz", async () => {
             return await exportPublicationAsCbz(project, exportRecord.label, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         case "epub":
           result = await step.run("export-epub", async () => {
             return await exportPublicationAsEpub(project, exportRecord.label, sourceSnapshot);
-          });
+          }) as ExportResult;
           break;
 
         default:
@@ -577,6 +609,7 @@ export const exportProjectFunction = inngest.createFunction(
           data: {
             status: "ready" as ExportStatus,
             artifactPath: result.filePath,
+            publicUrl: result.publicUrl,
             artifactName: result.fileName,
             sizeBytes: result.fileSize,
             completedAt: new Date(),
@@ -601,6 +634,7 @@ export const exportProjectFunction = inngest.createFunction(
         format,
         kind,
         filePath: result.filePath,
+        publicUrl: result.publicUrl,
         fileName: result.fileName,
         fileSize: result.fileSize,
       };
@@ -693,16 +727,8 @@ async function exportAsJson(
 
   const jsonContent = JSON.stringify(exportData, null, 2);
   const fileName = `export_${label.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}.json`;
-  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
 
-  await writeFile(filePath, jsonContent);
-  const stats = await stat(filePath);
-
-  return {
-    filePath,
-    fileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, fileName, jsonContent);
 }
 
 // ============================================================================
@@ -781,20 +807,12 @@ async function exportAsTree(
 
   // Créer un ZIP de l'arborescence
   const zipFileName = `export_tree_${label.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}.zip`;
-  const zipFilePath = `${getProjectDir(project.slug as string)}/exports/${zipFileName}`;
 
   const zip = new StoreZipWriter();
   await addDirectoryToZip(zip, exportDir, "");
   const zipBuffer = await zip.end();
-  await writeFile(zipFilePath, zipBuffer);
 
-  const stats = await stat(zipFilePath);
-
-  return {
-    filePath: zipFilePath,
-    fileName: zipFileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, zipFileName, zipBuffer);
 }
 
 // ============================================================================
@@ -808,7 +826,7 @@ async function exportAsZip(
   sourceSnapshot: ExportSourceSnapshot | null,
 ): Promise<{ filePath: string; fileName: string; fileSize: number }> {
   const zipFileName = `export_${label.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}.zip`;
-  const zipFilePath = `${getProjectDir(project.slug as string)}/exports/${zipFileName}`;
+  let zipBuffer: Buffer;
 
   if (kind === "work") {
     // Export travail: données JSON + assets
@@ -848,7 +866,6 @@ async function exportAsZip(
 
     // Ajouter les fichiers d'assets si disponibles
     const assets = project.assets as Array<Record<string, unknown>>;
-    await mkdir(`${getProjectDir(project.slug as string)}/exports`, { recursive: true });
 
     for (const asset of assets) {
       const storagePath = asset.storagePath as string;
@@ -867,10 +884,14 @@ async function exportAsZip(
     for (const char of characters) {
       const images = (char.images || []) as Array<Record<string, unknown>>;
       for (const image of images) {
-        const filePath = image.filePath as string;
-        if (filePath) {
+        const imagePath = image.filePath as string;
+        if (imagePath) {
           try {
-            const buffer = await Bun.file(filePath).arrayBuffer();
+            // Support des deux formats de chemins (ancien et nouveau)
+            const resolvedPath = imagePath.startsWith("/") || imagePath.startsWith("./")
+              ? imagePath
+              : `public/${imagePath}`;
+            const buffer = await Bun.file(resolvedPath).arrayBuffer();
             zip.add(`characters/${char.slug}/${image.fileName}`, Buffer.from(buffer));
           } catch {
             // Ignorer si le fichier n'existe pas
@@ -879,8 +900,7 @@ async function exportAsZip(
       }
     }
 
-    const zipBuffer = await zip.end();
-    await writeFile(zipFilePath, zipBuffer);
+    zipBuffer = await zip.end();
   } else {
     // Export publication: uniquement les pages manga en format lisible
     const publication = await collectPublicationAssets(project, label, sourceSnapshot);
@@ -905,17 +925,10 @@ async function exportAsZip(
       }
     }
 
-    const zipBuffer = await zip.end();
-    await writeFile(zipFilePath, zipBuffer);
+    zipBuffer = await zip.end();
   }
 
-  const stats = await stat(zipFilePath);
-
-  return {
-    filePath: zipFilePath,
-    fileName: zipFileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, zipFileName, zipBuffer);
 }
 
 // ============================================================================
@@ -975,16 +988,9 @@ async function exportPublicationAsPagedImages(
   }
 
   const fileName = `publication_${publication.labelStem}_${Date.now()}.zip`;
-  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
   const zipBuffer = await zip.end();
-  await writeFile(filePath, zipBuffer);
 
-  const stats = await stat(filePath);
-  return {
-    filePath,
-    fileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, fileName, zipBuffer);
 }
 
 async function exportPublicationAsCbz(
@@ -1031,16 +1037,9 @@ async function exportPublicationAsCbz(
   }
 
   const fileName = `publication_${publication.labelStem}_${Date.now()}.cbz`;
-  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
   const zipBuffer = await zip.end();
-  await writeFile(filePath, zipBuffer);
 
-  const stats = await stat(filePath);
-  return {
-    filePath,
-    fileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, fileName, zipBuffer);
 }
 
 async function exportPublicationAsPdf(
@@ -1071,16 +1070,9 @@ async function exportPublicationAsPdf(
   }
 
   const fileName = `publication_${publication.labelStem}_${Date.now()}.pdf`;
-  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
   const pdfBytes = await pdf.save();
-  await writeFile(filePath, Buffer.from(pdfBytes));
 
-  const stats = await stat(filePath);
-  return {
-    filePath,
-    fileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, fileName, Buffer.from(pdfBytes));
 }
 
 async function exportPublicationAsEpub(
@@ -1180,16 +1172,9 @@ ${publication.pages.map((page) => `    <itemref idref="${safeStem(page.sceneSlug
 img { display: block; width: 100%; height: auto; }`));
 
   const fileName = `publication_${publication.labelStem}_${Date.now()}.epub`;
-  const filePath = `${getProjectDir(project.slug as string)}/exports/${fileName}`;
   const epubBuffer = await zip.end();
-  await writeFile(filePath, epubBuffer);
 
-  const stats = await stat(filePath);
-  return {
-    filePath,
-    fileName,
-    fileSize: stats.size,
-  };
+  return await writeExportToPublic(project.id as string, fileName, epubBuffer);
 }
 
 // ============================================================================

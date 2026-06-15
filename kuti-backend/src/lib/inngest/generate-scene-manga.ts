@@ -3,13 +3,11 @@
  * Remplace le background thread de génération de scène du backend v1
  */
 
-import { randomUUIDv7 } from "bun";
 import slugify from "slugify";
 import { db } from "../db";
 import type { GenerationJobStatus, GenerationSourceKind, GenerationStepStatus } from "../db/generated/enums";
-import { getFileStats, saveCharacterImage, writeFile } from "../filesystem";
+import { saveCharacterImage, saveGenerationPanel } from "../filesystem";
 import { generateImage } from "../model-providers";
-import { getProjectDir } from "../paths";
 import {
   buildCharacterImagePrompt,
   buildScenePanelPrompt,
@@ -445,7 +443,6 @@ export const generateSceneMangaFunction = inngest.createFunction(
           scene.content,
           "Scene content is required before manga generation",
         ),
-        notes: scene.notes,
         tomeTitle: scene.tome?.title ?? null,
         chapterTitle: scene.chapter?.title ?? null,
       };
@@ -547,7 +544,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
           sourceKind: "scene" as GenerationSourceKind,
           strategy: "intermediate",
           title: `Manga: ${scene.title}`,
-          summary: scene.summary || "",
+          summary: "",
           status: "draft",
           metadataJson: {
             sceneId,
@@ -624,24 +621,26 @@ export const generateSceneMangaFunction = inngest.createFunction(
             timeoutSeconds: 180,
           });
 
-          // Sauvegarder l'image
-          const fileName = `panel-${panel.orderIndex}_${randomUUIDv7("base64url")}${generatedImage.fileExtension}`;
-          const filePath = `${getProjectDir(project.slug)}/generation/${job.id}/${fileName}`;
-
-          await writeFile(filePath, generatedImage.content);
-
-          const stats = await getFileStats(filePath);
+          // Sauvegarder l'image avec le nouveau système (public/)
+          const saved = await saveGenerationPanel(
+            project.id,
+            job.id,
+            panel.orderIndex,
+            generatedImage.content,
+            generatedImage.fileExtension
+          );
 
           // Mettre à jour le panel
           await db.generationBoardPanel.update({
             where: { id: panel.id },
             data: {
-              imagePath: filePath,
-              imageName: fileName,
+              imagePath: saved.filePath,
+              publicUrl: saved.publicUrl,
+              imageName: saved.fileName,
               metadataJson: {
                 ...(panel.metadataJson as Record<string, unknown>),
                 mimeType: generatedImage.mimeType,
-                sizeBytes: stats.size,
+                sizeBytes: saved.fileSize,
               },
             },
           });
@@ -652,12 +651,12 @@ export const generateSceneMangaFunction = inngest.createFunction(
               where: { id: stepRecord.id },
               data: {
                 status: "ready" as GenerationStepStatus,
-                artifactPath: filePath,
-                artifactName: fileName,
+                artifactPath: saved.filePath,
+                artifactName: saved.fileName,
                 metadataJson: {
                   ...(stepRecord.metadataJson as Record<string, unknown>),
                   mimeType: generatedImage.mimeType,
-                  sizeBytes: stats.size,
+                  sizeBytes: saved.fileSize,
                 },
                 completedAt: new Date(),
               },
@@ -703,7 +702,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
 
       for (let i = 0; i < updatedPanels.length; i++) {
         const panel = updatedPanels[i];
-        if (panel.imagePath) {
+        if (panel.imagePath || panel.publicUrl) {
           await db.sceneMangaPage.create({
             data: {
               projectId,
@@ -716,7 +715,7 @@ export const generateSceneMangaFunction = inngest.createFunction(
               pageNumber: i + 1,
               label: panel.title,
               status: "draft",
-              imageUrl: panel.imagePath,
+              imageUrl: panel.publicUrl ?? panel.imagePath,
               caption: panel.caption,
               prompt: panel.prompt,
               metadataJson: {

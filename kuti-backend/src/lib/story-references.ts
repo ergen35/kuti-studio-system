@@ -17,8 +17,6 @@ export type ParsedStoryReference = {
 
 type ReferenceSourceText = {
   content?: string | null;
-  summary?: string | null;
-  notes?: string | null;
 };
 
 const REFERENCE_KIND_ALIASES: Record<string, StoryReferenceKind> = {
@@ -86,16 +84,23 @@ export function parseSceneReferences(source: ReferenceSourceText): ParsedStoryRe
   const seen = new Set<string>();
   const references: ParsedStoryReference[] = [];
 
-  for (const text of [source.summary, source.content, source.notes]) {
-    for (const reference of parseStoryReferencesFromText(text ?? "")) {
-      const key = `${reference.referenceKind}::${reference.targetSlug}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      references.push(reference);
-    }
+  for (const reference of parseStoryReferencesFromText(source.content ?? "")) {
+    const key = `${reference.referenceKind}::${reference.targetSlug}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    references.push(reference);
   }
 
   return references;
+}
+
+export function extractCharacterSlugsFromText(text: string): string[] {
+  const refs = parseStoryReferencesFromText(text);
+  return [...new Set(
+    refs
+      .filter(r => r.referenceKind === "character")
+      .map(r => r.targetSlug)
+  )];
 }
 
 export async function syncSceneReferences(

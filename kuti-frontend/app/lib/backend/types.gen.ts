@@ -1058,20 +1058,15 @@ export type GetStorySummaryResponses = {
             slug: string;
             sceneType: string;
             location: string;
-            summary: string;
             content: string;
-            notes: string;
             charactersJson: Array<string>;
             tagsJson: Array<string>;
             metadataJson: {
                 narrativeIntent?: string;
-                duration?: string;
-                tone?: string;
-                rhythm?: string;
                 visualConstraints?: string;
                 stagingNotes?: string;
             };
-            targetPageCount: number | unknown;
+            targetPageCount: number;
             status: 'active' | 'draft' | 'archived';
             orderIndex: number;
             createdAt: string;
@@ -1103,6 +1098,30 @@ export type GetStorySummaryResponses = {
 
 export type GetStorySummaryResponse = GetStorySummaryResponses[keyof GetStorySummaryResponses];
 
+export type ListSceneTypesData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/story/scene-types';
+};
+
+export type ListSceneTypesResponses = {
+    /**
+     * Response for status 200
+     */
+    200: Array<{
+        value: string;
+        label: {
+            en: string;
+            fr: string;
+        };
+    }>;
+};
+
+export type ListSceneTypesResponse = ListSceneTypesResponses[keyof ListSceneTypesResponses];
+
 export type ListStoryCompletionModelsData = {
     body?: never;
     path: {
@@ -1130,7 +1149,7 @@ export type CompleteStoryFieldData = {
     body: {
         targetKind: 'tome' | 'chapter' | 'scene';
         targetId: string;
-        field: 'title' | 'sceneType' | 'location' | 'synopsis' | 'summary' | 'content' | 'notes' | 'charactersJson' | 'tagsJson';
+        field: 'title' | 'sceneType' | 'location' | 'synopsis' | 'content' | 'charactersJson' | 'tagsJson';
         currentValue?: string;
         instruction?: string;
         modelKey?: string;
@@ -1149,7 +1168,7 @@ export type CompleteStoryFieldResponses = {
     200: {
         targetKind: 'tome' | 'chapter' | 'scene';
         targetId: string;
-        field: 'title' | 'sceneType' | 'location' | 'synopsis' | 'summary' | 'content' | 'notes' | 'charactersJson' | 'tagsJson';
+        field: 'title' | 'sceneType' | 'location' | 'synopsis' | 'content' | 'charactersJson' | 'tagsJson';
         modelKey: string;
         text: string;
     };
@@ -1430,20 +1449,15 @@ export type CreateSceneData = {
         title: string;
         sceneType?: string;
         location?: string;
-        summary?: string;
         content?: string;
-        notes?: string;
         charactersJson?: Array<string>;
         tagsJson?: Array<string>;
         metadataJson?: {
             narrativeIntent?: string;
-            duration?: string;
-            tone?: string;
-            rhythm?: string;
             visualConstraints?: string;
             stagingNotes?: string;
         };
-        targetPageCount?: number | unknown;
+        targetPageCount?: number;
         status?: 'active' | 'draft' | 'archived';
         orderIndex?: number;
     };
@@ -1467,20 +1481,15 @@ export type CreateSceneResponses = {
         slug: string;
         sceneType: string;
         location: string;
-        summary: string;
         content: string;
-        notes: string;
         charactersJson: Array<string>;
         tagsJson: Array<string>;
         metadataJson: {
             narrativeIntent?: string;
-            duration?: string;
-            tone?: string;
-            rhythm?: string;
             visualConstraints?: string;
             stagingNotes?: string;
         };
-        targetPageCount: number | unknown;
+        targetPageCount: number;
         status: 'active' | 'draft' | 'archived';
         orderIndex: number;
         createdAt: string;
@@ -1507,20 +1516,15 @@ export type UpdateSceneData = {
         title?: string;
         sceneType?: string;
         location?: string;
-        summary?: string;
         content?: string;
-        notes?: string;
         charactersJson?: Array<string>;
         tagsJson?: Array<string>;
         metadataJson?: {
             narrativeIntent?: string;
-            duration?: string;
-            tone?: string;
-            rhythm?: string;
             visualConstraints?: string;
             stagingNotes?: string;
         };
-        targetPageCount?: number | unknown;
+        targetPageCount?: number;
         status?: 'active' | 'draft' | 'archived';
         orderIndex?: number;
     };
@@ -1545,20 +1549,15 @@ export type UpdateSceneResponses = {
         slug: string;
         sceneType: string;
         location: string;
-        summary: string;
         content: string;
-        notes: string;
         charactersJson: Array<string>;
         tagsJson: Array<string>;
         metadataJson: {
             narrativeIntent?: string;
-            duration?: string;
-            tone?: string;
-            rhythm?: string;
             visualConstraints?: string;
             stagingNotes?: string;
         };
-        targetPageCount: number | unknown;
+        targetPageCount: number;
         status: 'active' | 'draft' | 'archived';
         orderIndex: number;
         createdAt: string;

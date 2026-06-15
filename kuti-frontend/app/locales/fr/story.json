@@ -46,7 +46,7 @@
       "count_plural": "{{count}} références",
       "empty": {
         "title": "Aucune référence dans la scène",
-        "description": "Ajoutez des références typées dans le contenu, le résumé ou les notes pour les indexer."
+        "description": "Ajoutez des références typées dans le contenu pour les indexer."
       },
       "resolved": "Résolue",
       "orphan": "Orpheline",
@@ -55,7 +55,7 @@
     },
     "metadata": {
       "title": "Métadonnées",
-      "description": "Intention narrative, rythme, ton et notes de mise en scène associés à cette scène."
+      "description": "Intention narrative, contraintes visuelles et notes de mise en scène associées à cette scène."
     }
   },
   "tree": {
@@ -130,15 +130,10 @@
     "type": "Type",
     "location": "Lieu",
     "targetPageCount": "Pages cibles",
-    "summary": "Résumé",
     "content": "Contenu",
     "characters": "Personnages",
     "tags": "Tags",
-    "notes": "Notes",
     "narrativeIntent": "Intention narrative",
-    "duration": "Durée",
-    "tone": "Ton",
-    "rhythm": "Rythme",
     "visualConstraints": "Contraintes visuelles",
     "stagingNotes": "Notes de mise en scène"
   },
@@ -249,14 +244,9 @@
       "type": "dialogue, action, révélation...",
       "location": "Toit, salle de classe, gare...",
       "targetPageCount": "1-10",
-      "summary": "Résumé de la scène...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romantique, combat, révélation...",
-      "notes": "Notes internes...",
       "narrativeIntent": "Ce que cette scène doit accomplir...",
-      "duration": "Durée ou nombre de pages approximatif...",
-      "tone": "Tendu, calme, doux-amer...",
-      "rhythm": "Rapide, posé, fragmenté...",
       "visualConstraints": "Limites de caméra, cadre, continuité ou production...",
       "stagingNotes": "Déplacements, gestes, accessoires ou repères spatiaux..."
     },

@@ -5,9 +5,6 @@ export type StoryStatus = z.infer<typeof storyStatusSchema>;
 
 export const sceneMetadataSchema = z.object({
   narrativeIntent: z.string().optional(),
-  duration: z.string().optional(),
-  tone: z.string().optional(),
-  rhythm: z.string().optional(),
   visualConstraints: z.string().optional(),
   stagingNotes: z.string().optional(),
 });
@@ -88,13 +85,11 @@ export const sceneResponseSchema = z.object({
   slug: z.string(),
   sceneType: z.string(),
   location: z.string(),
-  summary: z.string(),
   content: z.string(),
-  notes: z.string(),
   charactersJson: z.array(z.string()),
   tagsJson: z.array(z.string()),
   metadataJson: sceneMetadataSchema,
-  targetPageCount: z.number().nullable(),
+  targetPageCount: z.number(),
   status: storyStatusSchema,
   orderIndex: z.number(),
   createdAt: z.iso.datetime(),
@@ -107,13 +102,11 @@ export const createSceneBodySchema = z.object({
   title: z.string().min(1),
   sceneType: z.string().optional(),
   location: z.string().optional(),
-  summary: z.string().optional(),
   content: z.string().optional(),
-  notes: z.string().optional(),
   charactersJson: z.array(z.string()).optional(),
   tagsJson: z.array(z.string()).optional(),
   metadataJson: sceneMetadataSchema.optional(),
-  targetPageCount: z.number().int().min(1).max(10).nullable().optional(),
+  targetPageCount: z.number().int().min(1).max(10).optional(),
   status: storyStatusSchema.optional(),
   orderIndex: z.number().optional(),
 });
@@ -124,13 +117,11 @@ export const updateSceneBodySchema = z.object({
   title: z.string().min(1).optional(),
   sceneType: z.string().optional(),
   location: z.string().optional(),
-  summary: z.string().optional(),
   content: z.string().optional(),
-  notes: z.string().optional(),
   charactersJson: z.array(z.string()).optional(),
   tagsJson: z.array(z.string()).optional(),
   metadataJson: sceneMetadataSchema.optional(),
-  targetPageCount: z.number().int().min(1).max(10).nullable().optional(),
+  targetPageCount: z.number().int().min(1).max(10).optional(),
   status: storyStatusSchema.optional(),
   orderIndex: z.number().optional(),
 });
@@ -170,7 +161,7 @@ export type ReferenceSuggestion = z.infer<typeof referenceSuggestionSchema>;
 
 // Story completion
 export const storyCompletionTargetKindSchema = z.enum(["tome", "chapter", "scene"]);
-export const storyCompletionFieldSchema = z.enum(["title", "sceneType", "location", "synopsis", "summary", "content", "notes", "charactersJson", "tagsJson"]);
+export const storyCompletionFieldSchema = z.enum(["title", "sceneType", "location", "synopsis", "content", "charactersJson", "tagsJson"]);
 
 export const storyCompletionModelSchema = z.object({
   key: z.string(),

@@ -43,6 +43,7 @@ export type ExportRecordMinAggregateOutputType = {
   label: string | null
   summary: string | null
   artifactPath: string | null
+  publicUrl: string | null
   artifactName: string | null
   sizeBytes: number | null
   createdAt: Date | null
@@ -61,6 +62,7 @@ export type ExportRecordMaxAggregateOutputType = {
   label: string | null
   summary: string | null
   artifactPath: string | null
+  publicUrl: string | null
   artifactName: string | null
   sizeBytes: number | null
   createdAt: Date | null
@@ -79,6 +81,7 @@ export type ExportRecordCountAggregateOutputType = {
   label: number
   summary: number
   artifactPath: number
+  publicUrl: number
   artifactName: number
   metadataJson: number
   sizeBytes: number
@@ -108,6 +111,7 @@ export type ExportRecordMinAggregateInputType = {
   label?: true
   summary?: true
   artifactPath?: true
+  publicUrl?: true
   artifactName?: true
   sizeBytes?: true
   createdAt?: true
@@ -126,6 +130,7 @@ export type ExportRecordMaxAggregateInputType = {
   label?: true
   summary?: true
   artifactPath?: true
+  publicUrl?: true
   artifactName?: true
   sizeBytes?: true
   createdAt?: true
@@ -144,6 +149,7 @@ export type ExportRecordCountAggregateInputType = {
   label?: true
   summary?: true
   artifactPath?: true
+  publicUrl?: true
   artifactName?: true
   metadataJson?: true
   sizeBytes?: true
@@ -250,6 +256,7 @@ export type ExportRecordGroupByOutputType = {
   label: string
   summary: string
   artifactPath: string | null
+  publicUrl: string | null
   artifactName: string | null
   metadataJson: runtime.JsonValue
   sizeBytes: number | null
@@ -292,6 +299,7 @@ export type ExportRecordWhereInput = {
   label?: Prisma.StringFilter<"ExportRecord"> | string
   summary?: Prisma.StringFilter<"ExportRecord"> | string
   artifactPath?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
   artifactName?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
   metadataJson?: Prisma.JsonFilter<"ExportRecord">
   sizeBytes?: Prisma.IntNullableFilter<"ExportRecord"> | number | null
@@ -312,6 +320,7 @@ export type ExportRecordOrderByWithRelationInput = {
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   artifactPath?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   artifactName?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -335,6 +344,7 @@ export type ExportRecordWhereUniqueInput = Prisma.AtLeast<{
   label?: Prisma.StringFilter<"ExportRecord"> | string
   summary?: Prisma.StringFilter<"ExportRecord"> | string
   artifactPath?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
   artifactName?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
   metadataJson?: Prisma.JsonFilter<"ExportRecord">
   sizeBytes?: Prisma.IntNullableFilter<"ExportRecord"> | number | null
@@ -355,6 +365,7 @@ export type ExportRecordOrderByWithAggregationInput = {
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   artifactPath?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   artifactName?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -382,6 +393,7 @@ export type ExportRecordScalarWhereWithAggregatesInput = {
   label?: Prisma.StringWithAggregatesFilter<"ExportRecord"> | string
   summary?: Prisma.StringWithAggregatesFilter<"ExportRecord"> | string
   artifactPath?: Prisma.StringNullableWithAggregatesFilter<"ExportRecord"> | string | null
+  publicUrl?: Prisma.StringNullableWithAggregatesFilter<"ExportRecord"> | string | null
   artifactName?: Prisma.StringNullableWithAggregatesFilter<"ExportRecord"> | string | null
   metadataJson?: Prisma.JsonWithAggregatesFilter<"ExportRecord">
   sizeBytes?: Prisma.IntNullableWithAggregatesFilter<"ExportRecord"> | number | null
@@ -400,6 +412,7 @@ export type ExportRecordCreateInput = {
   label: string
   summary?: string
   artifactPath?: string | null
+  publicUrl?: string | null
   artifactName?: string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: number | null
@@ -420,6 +433,7 @@ export type ExportRecordUncheckedCreateInput = {
   label: string
   summary?: string
   artifactPath?: string | null
+  publicUrl?: string | null
   artifactName?: string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: number | null
@@ -438,6 +452,7 @@ export type ExportRecordUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -458,6 +473,7 @@ export type ExportRecordUncheckedUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -477,6 +493,7 @@ export type ExportRecordCreateManyInput = {
   label: string
   summary?: string
   artifactPath?: string | null
+  publicUrl?: string | null
   artifactName?: string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: number | null
@@ -495,6 +512,7 @@ export type ExportRecordUpdateManyMutationInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -514,6 +532,7 @@ export type ExportRecordUncheckedUpdateManyInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -543,6 +562,7 @@ export type ExportRecordCountOrderByAggregateInput = {
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   artifactPath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   artifactName?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
@@ -566,6 +586,7 @@ export type ExportRecordMaxOrderByAggregateInput = {
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   artifactPath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   artifactName?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -584,6 +605,7 @@ export type ExportRecordMinOrderByAggregateInput = {
   label?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   artifactPath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   artifactName?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -659,6 +681,7 @@ export type ExportRecordCreateWithoutProjectInput = {
   label: string
   summary?: string
   artifactPath?: string | null
+  publicUrl?: string | null
   artifactName?: string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: number | null
@@ -677,6 +700,7 @@ export type ExportRecordUncheckedCreateWithoutProjectInput = {
   label: string
   summary?: string
   artifactPath?: string | null
+  publicUrl?: string | null
   artifactName?: string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: number | null
@@ -725,6 +749,7 @@ export type ExportRecordScalarWhereInput = {
   label?: Prisma.StringFilter<"ExportRecord"> | string
   summary?: Prisma.StringFilter<"ExportRecord"> | string
   artifactPath?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
   artifactName?: Prisma.StringNullableFilter<"ExportRecord"> | string | null
   metadataJson?: Prisma.JsonFilter<"ExportRecord">
   sizeBytes?: Prisma.IntNullableFilter<"ExportRecord"> | number | null
@@ -743,6 +768,7 @@ export type ExportRecordCreateManyProjectInput = {
   label: string
   summary?: string
   artifactPath?: string | null
+  publicUrl?: string | null
   artifactName?: string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: number | null
@@ -761,6 +787,7 @@ export type ExportRecordUpdateWithoutProjectInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -779,6 +806,7 @@ export type ExportRecordUncheckedUpdateWithoutProjectInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -797,6 +825,7 @@ export type ExportRecordUncheckedUpdateManyWithoutProjectInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   artifactPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   artifactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -818,6 +847,7 @@ export type ExportRecordSelect<ExtArgs extends runtime.Types.Extensions.Internal
   label?: boolean
   summary?: boolean
   artifactPath?: boolean
+  publicUrl?: boolean
   artifactName?: boolean
   metadataJson?: boolean
   sizeBytes?: boolean
@@ -838,6 +868,7 @@ export type ExportRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   label?: boolean
   summary?: boolean
   artifactPath?: boolean
+  publicUrl?: boolean
   artifactName?: boolean
   metadataJson?: boolean
   sizeBytes?: boolean
@@ -858,6 +889,7 @@ export type ExportRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   label?: boolean
   summary?: boolean
   artifactPath?: boolean
+  publicUrl?: boolean
   artifactName?: boolean
   metadataJson?: boolean
   sizeBytes?: boolean
@@ -878,6 +910,7 @@ export type ExportRecordSelectScalar = {
   label?: boolean
   summary?: boolean
   artifactPath?: boolean
+  publicUrl?: boolean
   artifactName?: boolean
   metadataJson?: boolean
   sizeBytes?: boolean
@@ -888,7 +921,7 @@ export type ExportRecordSelectScalar = {
   errorMessage?: boolean
 }
 
-export type ExportRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "kind" | "format" | "status" | "label" | "summary" | "artifactPath" | "artifactName" | "metadataJson" | "sizeBytes" | "createdAt" | "updatedAt" | "completedAt" | "failedAt" | "errorMessage", ExtArgs["result"]["exportRecord"]>
+export type ExportRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "kind" | "format" | "status" | "label" | "summary" | "artifactPath" | "publicUrl" | "artifactName" | "metadataJson" | "sizeBytes" | "createdAt" | "updatedAt" | "completedAt" | "failedAt" | "errorMessage", ExtArgs["result"]["exportRecord"]>
 export type ExportRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }
@@ -913,6 +946,7 @@ export type $ExportRecordPayload<ExtArgs extends runtime.Types.Extensions.Intern
     label: string
     summary: string
     artifactPath: string | null
+    publicUrl: string | null
     artifactName: string | null
     metadataJson: runtime.JsonValue
     sizeBytes: number | null
@@ -1353,6 +1387,7 @@ export interface ExportRecordFieldRefs {
   readonly label: Prisma.FieldRef<"ExportRecord", 'String'>
   readonly summary: Prisma.FieldRef<"ExportRecord", 'String'>
   readonly artifactPath: Prisma.FieldRef<"ExportRecord", 'String'>
+  readonly publicUrl: Prisma.FieldRef<"ExportRecord", 'String'>
   readonly artifactName: Prisma.FieldRef<"ExportRecord", 'String'>
   readonly metadataJson: Prisma.FieldRef<"ExportRecord", 'Json'>
   readonly sizeBytes: Prisma.FieldRef<"ExportRecord", 'Int'>

@@ -7,7 +7,6 @@ import {
   Save,
   Trash2,
   Sparkles,
-  Monitor,
   ChevronDown,
   ChevronRight,
   Users,
@@ -57,7 +56,7 @@ import {
   listCharactersOptions,
   listWarningsOptions,
 } from "~/lib/backend/@tanstack/react-query.gen";
-import { StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
+import { SceneTypeCombobox, StoryBreadcrumb, StoryCompletionButton } from "~/components/story";
 import { SceneGenerationModal, SceneMangaGallery } from "~/components/scene";
 import type {
   ListCharactersResponse,
@@ -144,20 +143,13 @@ function resolveSceneLocation(
 
 const DEFAULT_SCENE_METADATA = {
   narrativeIntent: "",
-  duration: "",
-  tone: "",
-  rhythm: "",
   visualConstraints: "",
   stagingNotes: "",
 };
 
 const SCENE_FIELD_LABEL_IDS = {
   type: "scene-type-label",
-  location: "scene-location-label",
-  summary: "scene-summary-label",
-  characters: "scene-characters-label",
   tags: "scene-tags-label",
-  notes: "scene-notes-label",
 } as const;
 
 function normalizeSceneMetadata(metadataJson?: SceneMetadata | null) {
@@ -617,16 +609,11 @@ const sceneSchema = z.object({
   title: z.string().min(1, "titleRequired"),
   sceneType: z.string().optional(),
   location: z.string().optional(),
-  targetPageCount: z.coerce.number().int().min(1).max(10).nullable().optional(),
-  summary: z.string().optional(),
+  targetPageCount: z.coerce.number().int().min(1).max(10).optional(),
   content: z.string().optional(),
   charactersJson: z.string().optional(),
   tagsJson: z.string().optional(),
-  notes: z.string().optional(),
   narrativeIntent: z.string().optional(),
-  duration: z.string().optional(),
-  tone: z.string().optional(),
-  rhythm: z.string().optional(),
   visualConstraints: z.string().optional(),
   stagingNotes: z.string().optional(),
 });
@@ -792,18 +779,13 @@ export default function SceneRoute() {
     resolver: zodResolver(sceneSchema),
     defaultValues: {
       title: "",
-      sceneType: "",
+      sceneType: "free",
       location: "",
-      targetPageCount: null,
-      summary: "",
+      targetPageCount: 1,
       content: "",
       charactersJson: "",
       tagsJson: "",
-      notes: "",
       narrativeIntent: "",
-      duration: "",
-      tone: "",
-      rhythm: "",
       visualConstraints: "",
       stagingNotes: "",
     },
@@ -816,25 +798,18 @@ export default function SceneRoute() {
 
       reset({
         title: scene.title ?? "",
-        sceneType: scene.sceneType ?? "",
+        sceneType: scene.sceneType ?? "free",
         location: scene.location ?? "",
-        targetPageCount: typeof scene.targetPageCount === "number" ? scene.targetPageCount : null,
-        summary: scene.summary ?? "",
+        targetPageCount: typeof scene.targetPageCount === "number" ? scene.targetPageCount : 1,
         content: scene.content ?? "",
         charactersJson: toCsv(scene.charactersJson) ?? "",
         tagsJson: toCsv(scene.tagsJson) ?? "",
-        notes: scene.notes ?? "",
         narrativeIntent: sceneMetadata.narrativeIntent,
-        duration: sceneMetadata.duration,
-        tone: sceneMetadata.tone,
-        rhythm: sceneMetadata.rhythm,
         visualConstraints: sceneMetadata.visualConstraints,
         stagingNotes: sceneMetadata.stagingNotes,
       });
     }
   }, [scene, reset]);
-
-  const charactersJsonValue = watch("charactersJson") ?? "";
 
   // Orchestra mode state
   const {
@@ -859,17 +834,12 @@ export default function SceneRoute() {
           title: data.title,
           sceneType: data.sceneType,
           location: data.location,
-          targetPageCount: data.targetPageCount ?? null,
-          summary: data.summary,
+          targetPageCount: data.targetPageCount ?? 1,
           content: data.content,
           charactersJson: csv(data.charactersJson || ""),
           tagsJson: csv(data.tagsJson || ""),
-          notes: data.notes,
           metadataJson: {
             narrativeIntent: data.narrativeIntent,
-            duration: data.duration,
-            tone: data.tone,
-            rhythm: data.rhythm,
             visualConstraints: data.visualConstraints,
             stagingNotes: data.stagingNotes,
           },
@@ -1021,21 +991,9 @@ export default function SceneRoute() {
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-primary">S{sceneNumber}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge tone={scene.status} className="text-[10px]">
+                    <Badge tone={scene.status} className="text-[10px]">
                         {scene.status}
                       </Badge>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={toggleOrchestra}
-                        className="h-7 gap-1.5 border border-primary/25 bg-primary/10 px-2 text-xs text-primary hover:bg-primary/15"
-                        title={t("scene.orchestra.switchToOrchestra")}
-                      >
-                        <Monitor size={14} />
-                        {t("scene.orchestra.mode")}
-                      </Button>
-                    </div>
                   </div>
                   <div className="grid gap-1.5">
                     <div className="flex items-center justify-between text-xs text-muted">
@@ -1065,53 +1023,24 @@ export default function SceneRoute() {
               <h2 className="mb-3 text-sm font-semibold text-ink">{t("panels.sceneEditor.title")}</h2>
               <div className="flex flex-col gap-4">
                 {/* Summary */}
-                <div className="grid gap-4 lg:grid-cols-2">
-                  <div className="grid gap-1.5 text-xs text-muted-foreground">
-                    <div className="flex items-center justify-between gap-2">
-                      <span id={SCENE_FIELD_LABEL_IDS.type}>
-                        {t("fields.type")}
-                      </span>
-                      <StoryCompletionButton
+                <div className="grid gap-1.5 text-xs text-muted-foreground max-w-xs">
+                  <span id={SCENE_FIELD_LABEL_IDS.type}>
+                    {t("fields.type")}
+                  </span>
+                  <Controller
+                    control={control}
+                    name="sceneType"
+                    render={({ field }) => (
+                      <SceneTypeCombobox
                         projectId={projectId}
-                        targetKind="scene"
-                        targetId={sceneId}
-                        field="sceneType"
-                        currentValue={watch("sceneType")}
-                        instruction="Return only a concise scene type such as dialogue, action, reveal, transition, confrontation, flashback, or quiet beat."
-                        onComplete={(text) =>
-                          setValue("sceneType", text, { shouldDirty: true })
-                        }
+                        value={field.value ?? "free"}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                        }}
+                        aria-labelledby={SCENE_FIELD_LABEL_IDS.type}
                       />
-                    </div>
-                    <Input
-                      {...register("sceneType")}
-                      placeholder={t("scene.placeholders.type")}
-                      aria-labelledby={SCENE_FIELD_LABEL_IDS.type}
-                    />
-                  </div>
-                  <div className="grid gap-1.5 text-xs text-muted-foreground">
-                    <div className="flex items-center justify-between gap-2">
-                      <span id={SCENE_FIELD_LABEL_IDS.location}>
-                        {t("fields.location")}
-                      </span>
-                      <StoryCompletionButton
-                        projectId={projectId}
-                        targetKind="scene"
-                        targetId={sceneId}
-                        field="location"
-                        currentValue={watch("location")}
-                        instruction="Return only a concise production-ready location name for this scene."
-                        onComplete={(text) =>
-                          setValue("location", text, { shouldDirty: true })
-                        }
-                      />
-                    </div>
-                    <Input
-                      {...register("location")}
-                      placeholder={t("scene.placeholders.location")}
-                      aria-labelledby={SCENE_FIELD_LABEL_IDS.location}
-                    />
-                  </div>
+                    )}
+                  />
                 </div>
 
                 {/* Target page count */}
@@ -1123,30 +1052,6 @@ export default function SceneRoute() {
                     max={10}
                     {...register("targetPageCount", { valueAsNumber: true })}
                     placeholder={t("scene.placeholders.targetPageCount")}
-                  />
-                </div>
-
-                <div className="grid gap-1.5 text-xs text-muted-foreground">
-                  <div className="flex items-center justify-between gap-2">
-                    <span id={SCENE_FIELD_LABEL_IDS.summary}>
-                      {t("fields.summary")}
-                    </span>
-                    <StoryCompletionButton
-                      projectId={projectId}
-                      targetKind="scene"
-                      targetId={sceneId}
-                      field="summary"
-                      currentValue={watch("summary")}
-                      onComplete={(text) =>
-                        setValue("summary", text, { shouldDirty: true })
-                      }
-                    />
-                  </div>
-                  <Textarea
-                    {...register("summary")}
-                    rows={3}
-                    placeholder={t("scene.placeholders.summary")}
-                    aria-labelledby={SCENE_FIELD_LABEL_IDS.summary}
                   />
                 </div>
 
@@ -1193,85 +1098,15 @@ export default function SceneRoute() {
                   />
                 </div>
 
-                {/* Characters & Tags */}
-                <div className="grid gap-4 lg:grid-cols-2">
-                  <div className="grid gap-1.5 text-xs text-muted-foreground">
-                    <div className="flex items-center justify-between gap-2">
-                      <span id={SCENE_FIELD_LABEL_IDS.characters}>
-                        {t("fields.characters")}
-                      </span>
-                      <StoryCompletionButton
-                        projectId={projectId}
-                        targetKind="scene"
-                        targetId={sceneId}
-                        field="charactersJson"
-                        currentValue={watch("charactersJson")}
-                        instruction="Return only a comma-separated list of relevant character names or slugs for this scene."
-                        onComplete={(text) =>
-                          setValue("charactersJson", text, {
-                            shouldDirty: true,
-                          })
-                        }
-                      />
-                    </div>
-                    <Input
-                      {...register("charactersJson")}
-                      placeholder={t("scene.placeholders.characters")}
-                      aria-labelledby={SCENE_FIELD_LABEL_IDS.characters}
-                    />
-                    <SceneCharacterChips
-                      projectId={projectId}
-                      charactersValue={charactersJsonValue}
-                      characters={(characters.data || []) as SceneCharacter[]}
-                    />
-                  </div>
-                  <div className="grid gap-1.5 text-xs text-muted-foreground">
-                    <div className="flex items-center justify-between gap-2">
-                      <span id={SCENE_FIELD_LABEL_IDS.tags}>
-                        {t("fields.tags")}
-                      </span>
-                      <StoryCompletionButton
-                        projectId={projectId}
-                        targetKind="scene"
-                        targetId={sceneId}
-                        field="tagsJson"
-                        currentValue={watch("tagsJson")}
-                        instruction="Return only a short comma-separated list of production and narrative tags for this scene."
-                        onComplete={(text) =>
-                          setValue("tagsJson", text, { shouldDirty: true })
-                        }
-                      />
-                    </div>
-                    <Input
-                      {...register("tagsJson")}
-                      placeholder={t("scene.placeholders.tags")}
-                      aria-labelledby={SCENE_FIELD_LABEL_IDS.tags}
-                    />
-                  </div>
-                </div>
-
-                {/* Notes */}
-                <div className="grid gap-1.5 text-xs text-muted-foreground">
-                  <div className="flex items-center justify-between gap-2">
-                    <span id={SCENE_FIELD_LABEL_IDS.notes}>
-                      {t("fields.notes")}
-                    </span>
-                    <StoryCompletionButton
-                      projectId={projectId}
-                      targetKind="scene"
-                      targetId={sceneId}
-                      field="notes"
-                      currentValue={watch("notes")}
-                      onComplete={(text) =>
-                        setValue("notes", text, { shouldDirty: true })
-                      }
-                    />
-                  </div>
-                  <Textarea
-                    {...register("notes")}
-                    rows={3}
-                    placeholder={t("scene.placeholders.notes")}
-                    aria-labelledby={SCENE_FIELD_LABEL_IDS.notes}
+                {/* Tags */}
+                <div className="grid gap-1.5 text-xs text-muted-foreground max-w-xs">
+                  <span id={SCENE_FIELD_LABEL_IDS.tags}>
+                    {t("fields.tags")}
+                  </span>
+                  <Input
+                    {...register("tagsJson")}
+                    placeholder={t("scene.placeholders.tags")}
+                    aria-labelledby={SCENE_FIELD_LABEL_IDS.tags}
                   />
                 </div>
 
@@ -1287,24 +1122,6 @@ export default function SceneRoute() {
                         {...register("narrativeIntent")}
                         rows={3}
                         placeholder={t("scene.placeholders.narrativeIntent")}
-                      />
-                    </Field>
-                    <Field label={t("fields.duration")}>
-                      <Input
-                        {...register("duration")}
-                        placeholder={t("scene.placeholders.duration")}
-                      />
-                    </Field>
-                    <Field label={t("fields.tone")}>
-                      <Input
-                        {...register("tone")}
-                        placeholder={t("scene.placeholders.tone")}
-                      />
-                    </Field>
-                    <Field label={t("fields.rhythm")}>
-                      <Input
-                        {...register("rhythm")}
-                        placeholder={t("scene.placeholders.rhythm")}
                       />
                     </Field>
                     <Field label={t("fields.visualConstraints")}>
@@ -1387,6 +1204,7 @@ export default function SceneRoute() {
         scene={scene}
         isOpen={isGenerationModalOpen}
         onClose={() => setIsGenerationModalOpen(false)}
+        targetPageCount={watch("targetPageCount") ?? 1}
       />
     </AppShell>
   );

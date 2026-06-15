@@ -5,13 +5,13 @@ CREATE TYPE "project_status" AS ENUM ('draft', 'active', 'archived', 'maintenanc
 CREATE TYPE "character_status" AS ENUM ('active', 'draft', 'archived');
 
 -- CreateEnum
+CREATE TYPE "character_image_kind" AS ENUM ('character_sheet', 'free_image');
+
+-- CreateEnum
 CREATE TYPE "story_status" AS ENUM ('active', 'draft', 'archived');
 
 -- CreateEnum
-CREATE TYPE "asset_status" AS ENUM ('active', 'archived');
-
--- CreateEnum
-CREATE TYPE "generation_source_kind" AS ENUM ('scene', 'chapter', 'tome', 'panel', 'custom');
+CREATE TYPE "generation_source_kind" AS ENUM ('scene', 'chapter', 'tome', 'panel', 'manga_page', 'custom');
 
 -- CreateEnum
 CREATE TYPE "generation_strategy" AS ENUM ('direct', 'intermediate');
@@ -44,13 +44,76 @@ CREATE TYPE "warning_severity" AS ENUM ('info', 'warning', 'critical');
 CREATE TYPE "warning_status" AS ENUM ('open', 'ignored', 'resolved');
 
 -- CreateEnum
-CREATE TYPE "export_format" AS ENUM ('json', 'tree', 'zip');
+CREATE TYPE "export_format" AS ENUM ('json', 'tree', 'zip', 'paged_images', 'pdf', 'cbz', 'epub');
 
 -- CreateEnum
 CREATE TYPE "export_kind" AS ENUM ('work', 'publication');
 
 -- CreateEnum
 CREATE TYPE "export_status" AS ENUM ('pending', 'ready', 'failed');
+
+-- CreateTable
+CREATE TABLE "user" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "image" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "role" TEXT,
+    "banned" BOOLEAN DEFAULT false,
+    "banReason" TEXT,
+    "banExpires" TIMESTAMP(3),
+
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "session" (
+    "id" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "ipAddress" TEXT,
+    "userAgent" TEXT,
+    "userId" TEXT NOT NULL,
+    "impersonatedBy" TEXT,
+
+    CONSTRAINT "session_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "account" (
+    "id" TEXT NOT NULL,
+    "accountId" TEXT NOT NULL,
+    "providerId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "accessToken" TEXT,
+    "refreshToken" TEXT,
+    "idToken" TEXT,
+    "accessTokenExpiresAt" TIMESTAMP(3),
+    "refreshTokenExpiresAt" TIMESTAMP(3),
+    "scope" TEXT,
+    "password" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "account_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "verification" (
+    "id" TEXT NOT NULL,
+    "identifier" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "verification_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "projects" (
@@ -66,6 +129,18 @@ CREATE TABLE "projects" (
     "archived_at" TIMESTAMP(3),
 
     CONSTRAINT "projects_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "narrative_roles" (
+    "id" TEXT NOT NULL,
+    "project_id" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "narrative_roles_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -126,8 +201,12 @@ CREATE TABLE "character_images" (
     "id" TEXT NOT NULL,
     "project_id" TEXT NOT NULL,
     "character_id" TEXT NOT NULL,
+    "kind" "character_image_kind" NOT NULL DEFAULT 'free_image',
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "source_image_id" TEXT,
     "board_panel_id" TEXT,
     "file_path" TEXT NOT NULL,
+    "public_url" TEXT NOT NULL DEFAULT '',
     "file_name" TEXT NOT NULL,
     "file_size" INTEGER,
     "mime_type" TEXT NOT NULL DEFAULT 'image/png',
@@ -179,13 +258,13 @@ CREATE TABLE "scenes" (
     "chapter_id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "scene_type" TEXT NOT NULL DEFAULT '',
+    "scene_type" TEXT NOT NULL DEFAULT 'free',
     "location" TEXT NOT NULL DEFAULT '',
-    "summary" TEXT NOT NULL DEFAULT '',
     "content" TEXT NOT NULL DEFAULT '',
-    "notes" TEXT NOT NULL DEFAULT '',
     "characters_json" JSONB NOT NULL DEFAULT '[]',
     "tags_json" JSONB NOT NULL DEFAULT '[]',
+    "metadata_json" JSONB NOT NULL DEFAULT '{}',
+    "target_page_count" INTEGER NOT NULL DEFAULT 1,
     "status" "story_status" NOT NULL DEFAULT 'draft',
     "order_index" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -208,49 +287,14 @@ CREATE TABLE "story_references" (
 );
 
 -- CreateTable
-CREATE TABLE "assets" (
-    "id" TEXT NOT NULL,
-    "project_id" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "original_filename" TEXT NOT NULL,
-    "mime_type" TEXT NOT NULL,
-    "checksum" TEXT NOT NULL,
-    "size_bytes" INTEGER NOT NULL,
-    "storage_path" TEXT NOT NULL,
-    "description" TEXT NOT NULL DEFAULT '',
-    "tags_json" JSONB NOT NULL DEFAULT '[]',
-    "status" "asset_status" NOT NULL DEFAULT 'active',
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "archived_at" TIMESTAMP(3),
-
-    CONSTRAINT "assets_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "asset_links" (
-    "id" TEXT NOT NULL,
-    "project_id" TEXT NOT NULL,
-    "asset_id" TEXT NOT NULL,
-    "target_kind" TEXT NOT NULL,
-    "target_id" TEXT NOT NULL,
-    "note" TEXT NOT NULL DEFAULT '',
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "asset_links_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "generation_jobs" (
     "id" TEXT NOT NULL,
     "project_id" TEXT NOT NULL,
     "source_kind" "generation_source_kind" NOT NULL,
     "source_id" TEXT NOT NULL,
     "source_label" TEXT NOT NULL,
-    "source_version_id" TEXT,
     "strategy" "generation_strategy" NOT NULL,
-    "entrypoint" TEXT NOT NULL DEFAULT 'gpt-2-images',
+    "entrypoint" TEXT NOT NULL DEFAULT 'gpt_images_2',
     "title" TEXT NOT NULL DEFAULT 'Generation job',
     "prompt" TEXT NOT NULL DEFAULT '',
     "summary" TEXT NOT NULL DEFAULT '',
@@ -318,6 +362,7 @@ CREATE TABLE "generation_board_panels" (
     "prompt" TEXT NOT NULL DEFAULT '',
     "status" "generation_panel_status" NOT NULL DEFAULT 'draft',
     "image_path" TEXT NOT NULL,
+    "public_url" TEXT,
     "image_name" TEXT NOT NULL,
     "metadata_json" JSONB NOT NULL DEFAULT '{}',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -360,23 +405,11 @@ CREATE TABLE "scene_manga_pages" (
     "image_url" TEXT,
     "caption" TEXT,
     "prompt" TEXT,
+    "metadata_json" JSONB NOT NULL DEFAULT '{}',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "scene_manga_pages_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "versions" (
-    "id" TEXT NOT NULL,
-    "project_id" TEXT NOT NULL,
-    "branch_name" TEXT NOT NULL,
-    "version_index" INTEGER NOT NULL,
-    "label" TEXT NOT NULL,
-    "summary" TEXT NOT NULL DEFAULT '',
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "versions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -409,6 +442,7 @@ CREATE TABLE "export_records" (
     "label" TEXT NOT NULL,
     "summary" TEXT NOT NULL DEFAULT '',
     "artifact_path" TEXT,
+    "public_url" TEXT,
     "artifact_name" TEXT,
     "metadata_json" JSONB NOT NULL DEFAULT '{}',
     "size_bytes" INTEGER,
@@ -422,7 +456,28 @@ CREATE TABLE "export_records" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE INDEX "session_userId_idx" ON "session"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
+
+-- CreateIndex
+CREATE INDEX "account_userId_idx" ON "account"("userId");
+
+-- CreateIndex
+CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "projects_slug_key" ON "projects"("slug");
+
+-- CreateIndex
+CREATE INDEX "narrative_roles_project_id_idx" ON "narrative_roles"("project_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "narrative_roles_project_id_code_key" ON "narrative_roles"("project_id", "code");
 
 -- CreateIndex
 CREATE INDEX "characters_project_id_idx" ON "characters"("project_id");
@@ -458,7 +513,13 @@ CREATE INDEX "character_images_project_id_idx" ON "character_images"("project_id
 CREATE INDEX "character_images_character_id_idx" ON "character_images"("character_id");
 
 -- CreateIndex
+CREATE INDEX "character_images_character_id_kind_is_active_idx" ON "character_images"("character_id", "kind", "is_active");
+
+-- CreateIndex
 CREATE INDEX "character_images_board_panel_id_idx" ON "character_images"("board_panel_id");
+
+-- CreateIndex
+CREATE INDEX "character_images_source_image_id_idx" ON "character_images"("source_image_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "character_images_character_id_file_name_key" ON "character_images"("character_id", "file_name");
@@ -497,21 +558,6 @@ CREATE INDEX "story_references_project_id_idx" ON "story_references"("project_id
 CREATE INDEX "story_references_scene_id_idx" ON "story_references"("scene_id");
 
 -- CreateIndex
-CREATE INDEX "assets_project_id_idx" ON "assets"("project_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "assets_project_id_slug_key" ON "assets"("project_id", "slug");
-
--- CreateIndex
-CREATE INDEX "asset_links_project_id_idx" ON "asset_links"("project_id");
-
--- CreateIndex
-CREATE INDEX "asset_links_asset_id_idx" ON "asset_links"("asset_id");
-
--- CreateIndex
-CREATE INDEX "asset_links_target_id_idx" ON "asset_links"("target_id");
-
--- CreateIndex
 CREATE INDEX "generation_jobs_project_id_idx" ON "generation_jobs"("project_id");
 
 -- CreateIndex
@@ -519,9 +565,6 @@ CREATE INDEX "generation_jobs_source_kind_idx" ON "generation_jobs"("source_kind
 
 -- CreateIndex
 CREATE INDEX "generation_jobs_source_id_idx" ON "generation_jobs"("source_id");
-
--- CreateIndex
-CREATE INDEX "generation_jobs_source_version_id_idx" ON "generation_jobs"("source_version_id");
 
 -- CreateIndex
 CREATE INDEX "generation_jobs_strategy_idx" ON "generation_jobs"("strategy");
@@ -581,12 +624,6 @@ CREATE INDEX "scene_manga_pages_job_id_idx" ON "scene_manga_pages"("job_id");
 CREATE INDEX "scene_manga_pages_board_id_idx" ON "scene_manga_pages"("board_id");
 
 -- CreateIndex
-CREATE INDEX "versions_project_id_idx" ON "versions"("project_id");
-
--- CreateIndex
-CREATE INDEX "versions_branch_name_idx" ON "versions"("branch_name");
-
--- CreateIndex
 CREATE INDEX "warnings_project_id_idx" ON "warnings"("project_id");
 
 -- CreateIndex
@@ -606,6 +643,15 @@ CREATE INDEX "export_records_project_id_idx" ON "export_records"("project_id");
 
 -- CreateIndex
 CREATE INDEX "export_records_status_idx" ON "export_records"("status");
+
+-- AddForeignKey
+ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "narrative_roles" ADD CONSTRAINT "narrative_roles_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "characters" ADD CONSTRAINT "characters_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -632,6 +678,9 @@ ALTER TABLE "character_images" ADD CONSTRAINT "character_images_project_id_fkey"
 ALTER TABLE "character_images" ADD CONSTRAINT "character_images_character_id_fkey" FOREIGN KEY ("character_id") REFERENCES "characters"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "character_images" ADD CONSTRAINT "character_images_source_image_id_fkey" FOREIGN KEY ("source_image_id") REFERENCES "character_images"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "tomes" ADD CONSTRAINT "tomes_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -656,15 +705,6 @@ ALTER TABLE "story_references" ADD CONSTRAINT "story_references_project_id_fkey"
 ALTER TABLE "story_references" ADD CONSTRAINT "story_references_scene_id_fkey" FOREIGN KEY ("scene_id") REFERENCES "scenes"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assets" ADD CONSTRAINT "assets_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "asset_links" ADD CONSTRAINT "asset_links_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "asset_links" ADD CONSTRAINT "asset_links_asset_id_fkey" FOREIGN KEY ("asset_id") REFERENCES "assets"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "generation_jobs" ADD CONSTRAINT "generation_jobs_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -684,9 +724,6 @@ ALTER TABLE "scene_generation_configs" ADD CONSTRAINT "scene_generation_configs_
 
 -- AddForeignKey
 ALTER TABLE "scene_manga_pages" ADD CONSTRAINT "scene_manga_pages_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "versions" ADD CONSTRAINT "versions_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "warnings" ADD CONSTRAINT "warnings_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;

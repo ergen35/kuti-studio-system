@@ -51,6 +51,7 @@ function serializePanel(panel: any) {
     prompt: panel.prompt,
     status: panel.status,
     imagePath: panel.imagePath,
+    publicUrl: panel.publicUrl,
     imageName: panel.imageName,
     metadataJson: panel.metadataJson as Record<string, unknown>,
     createdAt: panel.createdAt.toISOString(),
@@ -303,10 +304,19 @@ export async function getGenerationPanelImage(
     where: { id: panelId, boardId },
   });
 
-  if (!panel) return null;
+  if (!panel || !panel.imagePath) return null;
 
   const { readFile } = await import("@lib/filesystem");
-  const buffer = await readFile(panel.imagePath);
+
+  // Support des deux formats de chemins :
+  // - Ancien : chemin absolu vers kuti-data/
+  // - Nouveau : chemin relatif (projects/...) vers public/
+  let filePath = panel.imagePath;
+  if (!filePath.startsWith("/") && !filePath.startsWith("./")) {
+    filePath = `public/${filePath}`;
+  }
+
+  const buffer = await readFile(filePath);
 
   // Essayer de détecter le mime type depuis les metadata
   const metadata = panel.metadataJson as Record<string, unknown>;
@@ -334,7 +344,14 @@ export async function getBoardArtifact(
   if (!board || !board.artifactPath) return null;
 
   const { readFile } = await import("@lib/filesystem");
-  const buffer = await readFile(board.artifactPath);
+
+  // Support des deux formats de chemins
+  let filePath = board.artifactPath;
+  if (!filePath.startsWith("/") && !filePath.startsWith("./")) {
+    filePath = `public/${filePath}`;
+  }
+
+  const buffer = await readFile(filePath);
 
   return {
     buffer,

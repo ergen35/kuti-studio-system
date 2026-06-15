@@ -11,7 +11,7 @@ import {
 } from "@lib/story-completion";
 import { runCoherenceScanIfEnabled } from "@lib/coherence-scan";
 import { sendGenerateChapterScenesEvent } from "@lib/inngest";
-import { normalizeReferenceKind, syncSceneReferences } from "@lib/story-references";
+import { extractCharacterSlugsFromText, normalizeReferenceKind, syncSceneReferences } from "@lib/story-references";
 import { createSceneRecord, resolveChapterSceneGenerationReferences } from "./chapter-auto-generation";
 import type {
   ReferenceSuggestion,
@@ -34,18 +34,12 @@ import { chapterAutoGenerateBodySchema } from "./dto";
 
 type SceneMetadataRecord = {
   narrativeIntent: string;
-  duration: string;
-  tone: string;
-  rhythm: string;
   visualConstraints: string;
   stagingNotes: string;
 };
 
 const DEFAULT_SCENE_METADATA: SceneMetadataRecord = {
   narrativeIntent: "",
-  duration: "",
-  tone: "",
-  rhythm: "",
   visualConstraints: "",
   stagingNotes: "",
 };
@@ -63,9 +57,6 @@ function readSceneMetadata(metadataJson: unknown): SceneMetadataRecord {
 
   return {
     narrativeIntent: readSceneMetadataValue(metadata.narrativeIntent),
-    duration: readSceneMetadataValue(metadata.duration),
-    tone: readSceneMetadataValue(metadata.tone),
-    rhythm: readSceneMetadataValue(metadata.rhythm),
     visualConstraints: readSceneMetadataValue(metadata.visualConstraints),
     stagingNotes: readSceneMetadataValue(metadata.stagingNotes),
   };
@@ -76,9 +67,6 @@ function readSceneMetadataPatch(metadataJson: unknown): Partial<SceneMetadataRec
   const patch: Partial<SceneMetadataRecord> = {};
 
   if (typeof metadata.narrativeIntent === "string") patch.narrativeIntent = metadata.narrativeIntent;
-  if (typeof metadata.duration === "string") patch.duration = metadata.duration;
-  if (typeof metadata.tone === "string") patch.tone = metadata.tone;
-  if (typeof metadata.rhythm === "string") patch.rhythm = metadata.rhythm;
   if (typeof metadata.visualConstraints === "string") patch.visualConstraints = metadata.visualConstraints;
   if (typeof metadata.stagingNotes === "string") patch.stagingNotes = metadata.stagingNotes;
 
@@ -152,9 +140,7 @@ function serializeScene(s: {
   slug: string;
   sceneType: string;
   location: string;
-  summary: string;
   content: string;
-  notes: string;
   charactersJson: unknown;
   tagsJson: unknown;
   metadataJson: unknown;
@@ -193,13 +179,11 @@ function serializeScene(s: {
     slug: s.slug,
     sceneType: s.sceneType,
     location: s.location,
-    summary: s.summary,
     content: s.content,
-    notes: s.notes,
     charactersJson: characters,
     tagsJson: tags,
     metadataJson: readSceneMetadata(s.metadataJson),
-    targetPageCount: s.targetPageCount,
+    targetPageCount: s.targetPageCount ?? 1,
     status: s.status as "active" | "draft" | "archived",
     orderIndex: s.orderIndex,
     createdAt: s.createdAt.toISOString(),
@@ -581,6 +565,12 @@ export async function createScene(projectId: string, data: CreateSceneBody): Pro
   const slug = await generateUniqueSlug(projectId, data.title, "scene");
   const now = new Date();
 
+  // Extract characters from content automatically
+  const contentToAnalyze = data.content ?? "";
+  const extractedCharacters = extractCharacterSlugsFromText(contentToAnalyze);
+  const providedCharacters = Array.isArray(data.charactersJson) ? data.charactersJson : [];
+  const mergedCharacters = [...new Set([...providedCharacters, ...extractedCharacters])];
+
   const scene = await prisma.$transaction(async (tx) => {
     return await createSceneRecord(tx, {
       projectId,
@@ -588,15 +578,13 @@ export async function createScene(projectId: string, data: CreateSceneBody): Pro
       chapterId: data.chapterId,
       slug,
       title: data.title,
-      sceneType: data.sceneType,
+      sceneType: data.sceneType ?? "free",
       location: data.location,
-      summary: data.summary,
       content: data.content,
-      notes: data.notes,
-      charactersJson: data.charactersJson,
+      charactersJson: mergedCharacters,
       tagsJson: data.tagsJson,
       metadataJson: mergeSceneMetadata({}, data.metadataJson),
-      targetPageCount: data.targetPageCount,
+      targetPageCount: data.targetPageCount ?? 1,
       status: data.status,
       orderIndex: data.orderIndex,
       createdAt: now,
@@ -629,6 +617,12 @@ export async function updateScene(
   if (!chapter) throw new Error("scene_hierarchy_mismatch");
   }
 
+  // Extract characters from content automatically
+  const contentToAnalyze = data.content ?? scene.content ?? "";
+  const extractedCharacters = extractCharacterSlugsFromText(contentToAnalyze);
+  const providedCharacters = Array.isArray(data.charactersJson) ? data.charactersJson : [];
+  const mergedCharacters = [...new Set([...providedCharacters, ...extractedCharacters])];
+
   const updated = await prisma.$transaction(async (tx) => {
     const nextScene = await tx.scene.update({
       where: { id: sceneId },
@@ -638,10 +632,8 @@ export async function updateScene(
         title: data.title,
         sceneType: data.sceneType,
         location: data.location,
-        summary: data.summary,
         content: data.content,
-        notes: data.notes,
-        charactersJson: data.charactersJson as string[],
+        charactersJson: mergedCharacters,
         tagsJson: data.tagsJson as string[],
         metadataJson: mergeSceneMetadata(scene.metadataJson, data.metadataJson),
         targetPageCount: data.targetPageCount,
@@ -652,9 +644,7 @@ export async function updateScene(
     });
 
     await syncSceneReferences(nextScene.id, projectId, {
-      summary: nextScene.summary,
       content: nextScene.content,
-      notes: nextScene.notes,
     }, tx);
 
     return nextScene;

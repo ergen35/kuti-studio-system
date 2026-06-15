@@ -1,0 +1,1124 @@
+╭─── Claude Code v2.1.170 ─────────────────────────────────────────────────────╮
+│                                                    │ Tips for getting        │
+│                    Welcome back!                   │ started                 │
+│                                                    │ Run /init to create a … │
+│                       ▐▛███▜▌                      │ ─────────────────────── │
+│                      ▝▜█████▛▘                     │ What's new              │
+│                        ▘▘ ▝▝                       │ Introducing Claude Fab… │
+│                                                    │ Fixed sessions not sav… │
+│            Opus 4.7 · API Usage Billing            │ Self-hosted runner: ad… │
+│  ~/Sources/repos/creative-work/kuti-studio-system  │ /release-notes for more │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+● Update(kuti-backend/src/lib/paths.ts)
+  ⎿  Added 28 lines
+      135    return `/projects/${projectId}/generation/character_images/$
+           {fileName}`;
+      136  }
+      137  
+      138 +/**                                                           
+      139 + * Retourne le répertoire des panels de génération pour un pro
+          +jet (projectId-based)                                         
+      140 + */                                                           
+      141 +export function getGenerationPanelsDir(projectId: string): str
+          +ing {                                                         
+      142 +  return `public/projects/${projectId}/generation/panels`;    
+      143 +}                                                             
+      144 +                                                              
+      145 +/**                                                           
+      146 + * Génère l'URL publique statique pour un panel de génération 
+      147 + */                                                           
+      148 +export function getGenerationPanelStaticUrl(projectId: string,
+          + fileName: string): string {                                  
+      149 +  return `/projects/${projectId}/generation/panels/${fileName}
+          +`;                                                            
+      150 +}                                                             
+      151 +                                                              
+      152 +/**                                                           
+      153 + * Retourne le répertoire des exports pour un projet (projectI
+          +d-based)                                                      
+      154 + */                                                           
+      155 +export function getExportsPublicDir(projectId: string): string
+          + {                                                            
+      156 +  return `public/projects/${projectId}/exports`;              
+      157 +}                                                             
+      158 +                                                              
+      159 +/**                                                           
+      160 + * Génère l'URL publique statique pour un export              
+      161 + */                                                           
+      162 +export function getExportPublicUrl(projectId: string, fileName
+          +: string): string {                                           
+      163 +  return `/projects/${projectId}/exports/${fileName}`;        
+      164 +}                                                             
+      165 +                                                              
+      166  // ===========================================================
+           =================
+      167  // Helpers pour créer les répertoires
+      168  // ===========================================================
+           =================
+
+● Phase 2 : Ajouter les fonctions de sauvegarde dans filesystem.ts.
+
+  Read 1 file (ctrl+o to expand)
+  ⎿  Read kuti-backend/src/lib/paths.ts (224 lines)
+  ⎿  Referenced file kuti-backend/src/modules/story/controller.ts
+  ⎿  Referenced file kuti-frontend/app/routes/scene.tsx
+  ⎿  Read kuti-frontend/app/lib/story-search.ts (374 lines)
+  ⎿  Read kuti-frontend/app/components/story/SceneTypeCombobox.tsx (79 lines)
+  ⎿  Plan file referenced (~/.claude/plans/idempotent-whistling-clarke.md)
+  ⎿  Skills restored (react-spectrum-s2)
+
+● Les fonctions saveGenerationPanel() et saveExportFile() existent déjà dans
+  filesystem.ts mais utilisent les anciennes fonctions de paths.ts
+  (getGenerationBoardDir, getProjectExportsDir). Je dois les mettre à jour pour
+  utiliser les nouvelles fonctions public/-based.
+
+● Update(kuti-backend/src/lib/filesystem.ts)
+  ⎿  File must be read first
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/filesystem.ts)
+  ⎿  Added 18 lines, removed 19 lines
+      200  }
+      201  
+      202  /**
+      203 - * Sauvegarde un panel de génération (board)                  
+      203 + * Sauvegarde un panel de génération (nouveau format projectId
+          +-based dans public/)                                          
+      204   */
+      205  export async function saveGenerationPanel(
+      206 -  projectSlug: string,                                        
+      206 +  projectId: string,                                          
+      207    jobId: string,
+      208    panelIndex: number,
+      209    imageData: Buffer,
+      210 -  mimeType: string                                            
+      211 -): Promise<{ filePath: string; fileName: string }> {          
+      212 -  const { getGenerationBoardDir } = require("./paths");       
+      210 +  fileExtension: string = ".png"                              
+      211 +): Promise<{                                                  
+      212 +  filePath: string;                                           
+      213 +  publicUrl: string;                                          
+      214 +  fileName: string;                                           
+      215 +  fileSize: number;                                           
+      216 +}> {                                                          
+      217 +  const { getGenerationPanelsDir, getGenerationPanelStaticUrl 
+          +} = require("./paths");                                       
+      218  
+      214 -  // Déterminer l'extension selon le mime type                
+      215 -  const extMap: Record<string, string> = {                    
+      216 -    "image/png": ".png",                                      
+      217 -    "image/jpeg": ".jpg",                                     
+      218 -    "image/webp": ".webp",                                    
+      219 -    "image/svg+xml": ".svg",                                  
+      220 -    "video/mp4": ".mp4",                                      
+      221 -  };                                                          
+      219 +  const dir = getGenerationPanelsDir(projectId);              
+      220 +  const fileName = `panel_${jobId}_${panelIndex}_${randomUUIDv
+          +7("base64url")}${fileExtension}`;                             
+      221 +  const fullPath = `${dir}/${fileName}`;                      
+      222  
+      223 -  const ext = extMap[mimeType] || ".bin";                     
+      224 -  const fileName = `panel-${panelIndex}${ext}`;               
+      225 -  const filePath = `${getGenerationBoardDir(projectSlug, jobId
+          -)}/${fileName}`;                                              
+      223 +  await writeFile(fullPath, imageData);                       
+      224 +  const stats = await getFileStats(fullPath);                 
+      225  
+      227 -  await writeFile(filePath, imageData);                       
+      228 -                                                              
+      226    return {
+      230 -    filePath,                                                 
+      227 +    filePath: `projects/${projectId}/generation/panels/${fileN
+          +ame}`,                                                        
+      228 +    publicUrl: getGenerationPanelStaticUrl(projectId, fileName
+          +),                                                            
+      229      fileName,
+      230 +    fileSize: stats.size,                                     
+      231    };
+      232  }
+      233  
+
+● Update(kuti-backend/src/lib/filesystem.ts)
+  ⎿  Added 17 lines, removed 21 lines
+      232  }
+      233  
+      234  /**
+      235 - * Sauvegarde un fichier d'export                             
+      235 + * Sauvegarde un fichier d'export (nouveau format projectId-ba
+          +sed dans public/)                                             
+      236   */
+      237  export async function saveExportFile(
+      238 -  projectSlug: string,                                        
+      238 +  projectId: string,                                          
+      239    exportId: string,
+      240    data: Buffer,
+      241 -  format: "json" | "tree" | "zip"                             
+      242 -): Promise<{ filePath: string; fileName: string; fileSize: num
+          -ber }> {                                                      
+      243 -  const { getProjectExportsDir } = require("./paths");        
+      241 +  extension: string                                           
+      242 +): Promise<{                                                  
+      243 +  filePath: string;                                           
+      244 +  publicUrl: string;                                          
+      245 +  fileName: string;                                           
+      246 +  fileSize: number;                                           
+      247 +}> {                                                          
+      248 +  const { getExportsPublicDir, getExportPublicUrl } = require(
+          +"./paths");                                                   
+      249  
+      245 -  const extMap = {                                            
+      246 -    json: ".json",                                            
+      247 -    tree: ".zip",                                             
+      248 -    zip: ".zip",                                              
+      249 -    paged_images: ".zip",                                     
+      250 -    pdf: ".pdf",                                              
+      251 -    cbz: ".cbz",                                              
+      252 -    epub: ".epub",                                            
+      253 -  };                                                          
+      250 +  const dir = getExportsPublicDir(projectId);                 
+      251 +  const fileName = `export_${exportId}${extension}`;          
+      252 +  const fullPath = `${dir}/${fileName}`;                      
+      253  
+      255 -  const fileName = `export_${exportId}${extMap[format]}`;     
+      256 -  const filePath = `${getProjectExportsDir(projectSlug)}/${fil
+          -eName}`;                                                      
+      254 +  await writeFile(fullPath, data);                            
+      255 +  const stats = await getFileStats(fullPath);                 
+      256  
+      258 -  await writeFile(filePath, data);                            
+      259 -                                                              
+      260 -  const stats = await getFileStats(filePath);                 
+      261 -                                                              
+      257    return {
+      263 -    filePath,                                                 
+      258 +    filePath: `projects/${projectId}/exports/${fileName}`,    
+      259 +    publicUrl: getExportPublicUrl(projectId, fileName),       
+      260      fileName,
+      261      fileSize: stats.size,
+      262    };
+
+● Phase 3 : Ajouter le champ publicUrl aux modèles Prisma.
+
+  Read 1 file (ctrl+o to expand)
+
+● J'ajoute publicUrl à GenerationBoardPanel et ExportRecord.
+
+● Update(kuti-backend/prisma/schema.prisma)
+  ⎿  Added 1 line
+      526    prompt        String              @default("")
+      527    status        GenerationPanelStatus @default(draft)
+      528    imagePath     String              @map("image_path")
+      529 +  publicUrl     String?             @map("public_url")        
+      530    imageName     String              @map("image_name")
+      531    metadataJson  Json                @default("{}") @map("metad
+           ata_json")
+      532    createdAt     DateTime            @default(now()) @map("crea
+           ted_at")
+
+● Update(kuti-backend/prisma/schema.prisma)
+  ⎿  Added 1 line
+      709    label         String
+      710    summary       String        @default("")
+      711    artifactPath  String?       @map("artifact_path")
+      712 +  publicUrl     String?       @map("public_url")              
+      713    artifactName  String?       @map("artifact_name")
+      714    metadataJson  Json          @default("{}") @map("metadata_js
+           on")
+      715    sizeBytes     Int?          @map("size_bytes")
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Il y a une valeur NULL existante dans target_page_count. Je vais créer la
+  migration manuellement puis l'ajuster.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Le mode non-interactif est requis. Je vais utiliser --force ou exécuter
+  manuellement l'update SQL.
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Phase 4 : Modifier generate-scene-manga.ts pour utiliser le nouveau système de
+  stockage.
+
+  Read 1 file (ctrl+o to expand)
+● Je vois le code qui sauvegarde les panels. Je vais lire un peu plus pour voir
+  la création des SceneMangaPage aussi.
+
+  Read 1 file (ctrl+o to expand)
+
+● Maintenant je vais lire les imports pour voir ce qui est utilisé.
+
+  Read 1 file (ctrl+o to expand)
+
+● Je vois que saveCharacterImage est déjà importé mais saveGenerationPanel ne
+  l'est pas. Je vais modifier le code.
+
+● Update(kuti-backend/src/lib/inngest/generate-scene-manga.ts)
+  ⎿  Added 1 line, removed 3 lines
+       3   * Remplace le background thread de génération de scène du back
+          end v1
+       4   */
+       5  
+       6 -import { randomUUIDv7 } from "bun";                            
+       6  import slugify from "slugify";
+       7  import { db } from "../db";
+       8  import type { GenerationJobStatus, GenerationSourceKind, Genera
+          tionStepStatus } from "../db/generated/enums";
+      10 -import { getFileStats, saveCharacterImage, writeFile } from "..
+         -/filesystem";                                                  
+       9 +import { saveCharacterImage, saveGenerationPanel } from "../fil
+         +esystem";                                                      
+      10  import { generateImage } from "../model-providers";
+      12 -import { getProjectDir } from "../paths";                      
+      11  import {
+      12    buildCharacterImagePrompt,
+      13    buildScenePanelPrompt,
+
+● Maintenant, je modifie le code de sauvegarde des panels (lignes 626-646).
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/generate-scene-manga.ts)
+  ⎿  Added 15 lines, removed 13 lines
+      621              timeoutSeconds: 180,
+      622            });
+      623  
+      624 -          // Sauvegarder l'image                              
+      625 -          const fileName = `panel-${panel.orderIndex}_${random
+          -UUIDv7("base64url")}${generatedImage.fileExtension}`;         
+      626 -          const filePath = `${getProjectDir(project.slug)}/gen
+          -eration/${job.id}/${fileName}`;                               
+      624 +          // Sauvegarder l'image avec le nouveau système (publ
+          +ic/)                                                          
+      625 +          const saved = await saveGenerationPanel(            
+      626 +            project.id,                                       
+      627 +            job.id,                                           
+      628 +            panel.orderIndex,                                 
+      629 +            generatedImage.content,                           
+      630 +            generatedImage.fileExtension                      
+      631 +          );                                                  
+      632  
+      628 -          await writeFile(filePath, generatedImage.content);  
+      629 -                                                              
+      630 -          const stats = await getFileStats(filePath);         
+      631 -                                                              
+      633            // Mettre à jour le panel
+      634            await db.generationBoardPanel.update({
+      635              where: { id: panel.id },
+      636              data: {
+      636 -              imagePath: filePath,                            
+      637 -              imageName: fileName,                            
+      637 +              imagePath: saved.filePath,                      
+      638 +              publicUrl: saved.publicUrl,                     
+      639 +              imageName: saved.fileName,                      
+      640                metadataJson: {
+      641                  ...(panel.metadataJson as Record<string, unkno
+           wn>),
+      642                  mimeType: generatedImage.mimeType,
+      641 -                sizeBytes: stats.size,                        
+      643 +                sizeBytes: saved.fileSize,                    
+      644                },
+      645              },
+      646            });
+     ...
+      651                where: { id: stepRecord.id },
+      652                data: {
+      653                  status: "ready" as GenerationStepStatus,
+      652 -                artifactPath: filePath,                       
+      653 -                artifactName: fileName,                       
+      654 +                artifactPath: saved.filePath,                 
+      655 +                artifactName: saved.fileName,                 
+      656                  metadataJson: {
+      657                    ...(stepRecord.metadataJson as Record<string
+           , unknown>),
+      658                    mimeType: generatedImage.mimeType,
+      657 -                  sizeBytes: stats.size,                      
+      659 +                  sizeBytes: saved.fileSize,                  
+      660                  },
+      661                  completedAt: new Date(),
+      662                },
+
+● Maintenant je modifie la création des SceneMangaPage pour utiliser publicUrl.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/generate-scene-manga.ts)
+  ⎿  Added 2 lines, removed 2 lines
+      702  
+      703        for (let i = 0; i < updatedPanels.length; i++) {
+      704          const panel = updatedPanels[i];
+      705 -        if (panel.imagePath) {                                
+      705 +        if (panel.imagePath || panel.publicUrl) {             
+      706            await db.sceneMangaPage.create({
+      707              data: {
+      708                projectId,
+     ...
+      715                pageNumber: i + 1,
+      716                label: panel.title,
+      717                status: "draft",
+      718 -              imageUrl: panel.imagePath,                      
+      718 +              imageUrl: panel.publicUrl ?? panel.imagePath,   
+      719                caption: panel.caption,
+      720                prompt: panel.prompt,
+      721                metadataJson: {
+
+● Phase 6 : Modifier le controller de génération pour supporter les deux formats
+  de chemins.
+
+  Read 1 file (ctrl+o to expand)
+
+● Je dois modifier getGenerationPanelImage pour supporter les deux formats de
+  chemins (ancien kuti-data et nouveau public/).
+
+● Update(kuti-backend/src/modules/generation/controller.ts)
+  ⎿  Added 11 lines, removed 2 lines
+      303      where: { id: panelId, boardId },
+      304    });
+      305  
+      306 -  if (!panel) return null;                                    
+      306 +  if (!panel || !panel.imagePath) return null;                
+      307  
+      308    const { readFile } = await import("@lib/filesystem");
+      309 -  const buffer = await readFile(panel.imagePath);             
+      309  
+      310 +  // Support des deux formats de chemins :                    
+      311 +  // - Ancien : chemin absolu vers kuti-data/                 
+      312 +  // - Nouveau : chemin relatif (projects/...) vers public/   
+      313 +  let filePath = panel.imagePath;                             
+      314 +  if (!filePath.startsWith("/") && !filePath.startsWith("./"))
+          + {                                                            
+      315 +    filePath = `public/${filePath}`;                          
+      316 +  }                                                           
+      317 +                                                              
+      318 +  const buffer = await readFile(filePath);                    
+      319 +                                                              
+      320    // Essayer de détecter le mime type depuis les metadata
+      321    const metadata = panel.metadataJson as Record<string, unknow
+           n>;
+      322    const mimeType = typeof metadata.mimeType === "string"
+
+● Je fais la même chose pour getBoardArtifact.
+
+● Update(kuti-backend/src/modules/generation/controller.ts)
+  ⎿  Added 8 lines, removed 1 line
+      343    if (!board || !board.artifactPath) return null;
+      344  
+      345    const { readFile } = await import("@lib/filesystem");
+      346 -  const buffer = await readFile(board.artifactPath);          
+      346  
+      347 +  // Support des deux formats de chemins                      
+      348 +  let filePath = board.artifactPath;                          
+      349 +  if (!filePath.startsWith("/") && !filePath.startsWith("./"))
+          + {                                                            
+      350 +    filePath = `public/${filePath}`;                          
+      351 +  }                                                           
+      352 +                                                              
+      353 +  const buffer = await readFile(filePath);                    
+      354 +                                                              
+      355    return {
+      356      buffer,
+      357      fileName: board.artifactName || "board.json",
+
+● Je dois aussi ajouter publicUrl dans le serializer de panel.
+
+● Update(kuti-backend/src/modules/generation/controller.ts)
+  ⎿  Added 1 line
+      51      prompt: panel.prompt,
+      52      status: panel.status,
+      53      imagePath: panel.imagePath,
+      54 +    publicUrl: panel.publicUrl,                                
+      55      imageName: panel.imageName,
+      56      metadataJson: panel.metadataJson as Record<string, unknown>
+          ,
+      57      createdAt: panel.createdAt.toISOString(),
+
+● Phase 7 : Modifier le controller scene-generation.
+
+  Read 1 file (ctrl+o to expand)
+
+● Je dois modifier publicMangaPageImageUrl pour prioriser les URLs statiques.
+
+● Update(kuti-backend/src/modules/scene-generation/controller.ts)
+  ⎿  Added 10 lines, removed 1 line
+      573  
+      574  function publicMangaPageImageUrl(projectId: string, page: { im
+           ageUrl: string | null; boardId: string; panelId: string }) {
+      575    if (!page.imageUrl) return null;
+      576 -  if (page.imageUrl.startsWith("http://") || page.imageUrl.sta
+          -rtsWith("https://") || page.imageUrl.startsWith("/api/")) {   
+      576 +                                                              
+      577 +  // Si c'est déjà une URL complète (http, https, /projects/, 
+          +/api/)                                                        
+      578 +  if (                                                        
+      579 +    page.imageUrl.startsWith("http://") ||                    
+      580 +    page.imageUrl.startsWith("https://") ||                   
+      581 +    page.imageUrl.startsWith("/projects/") ||                 
+      582 +    page.imageUrl.startsWith("/api/")                         
+      583 +  ) {                                                         
+      584      return page.imageUrl;
+      585    }
+      586 +                                                              
+      587 +  // Fallback vers l'API pour les anciens panels (chemin kuti-
+          +data)                                                         
+      588    return `/api/projects/${projectId}/generation/boards/${page.
+           boardId}/panels/${page.panelId}/image`;
+      589  }
+      590  
+
+● Je remarque aussi une référence à scene.notes qui n'existe plus dans le
+  schéma. Je vais le corriger.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+● Update(kuti-backend/src/modules/scene-generation/controller.ts)
+  ⎿  Removed 1 line
+      531      title: scene.title,
+      532      location: scene.location,
+      533      content: sceneContent,
+      534 -    notes: scene.notes,                                       
+      534      tomeTitle: scene.tome?.title ?? null,
+      535      chapterTitle: scene.chapter?.title ?? null,
+      536    };
+● Phase 8 : Modifier export-project.ts pour utiliser le nouveau système de
+  stockage.
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+● Le fichier est long. Je vois qu'il utilise getProjectDir pour stocker les
+  exports. Je dois modifier pour utiliser le nouveau système. Les exports
+  utilisent saveExportFile qui a été importé mais pas utilisé - ils utilisent
+  directement writeFile avec getProjectDir. Je vais modifier ces fonctions pour
+  utiliser saveExportFile qui maintenant écrit vers public/.
+
+  C'est un changement significatif car tous les exports sont dans ce fichier. Le
+  pattern à suivre est de :
+  1. Utiliser saveExportFile au lieu de writeFile direct
+  2. Retourner les chemins relatifs et URLs publiques
+
+  Cependant, saveExportFile est déjà importé mais pas utilisé. En regardant de
+  plus près, les fonctions d'export retournent { filePath, fileName, fileSize }
+  et le fichier est ensuite stocké dans ExportRecord. Je dois refactorer pour
+  utiliser saveExportFile.
+
+  La migration est assez complexe car chaque fonction d'export génère son propre
+  fichier. Je vais créer une approche plus simple : modifier les fonctions pour
+  utiliser le nouveau système de stockage.
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 2 lines, removed 2 lines
+      10  import { PDFDocument } from "pdf-lib";
+      11  import { db } from "../db";
+      12  import type { ExportStatus } from "../db/generated/enums";
+      13 -import { saveExportFile, writeFile } from "../filesystem";     
+      13 +import { writeFile } from "../filesystem";                     
+      14  import { inngest } from "./client";
+      15  import { config } from "../config";
+      16 -import { getProjectDir } from "../paths";                      
+      16 +import { getExportsPublicDir, getExportPublicUrl, getProjectDir
+         + } from "../paths";                                            
+      17  
+      18  type ZipWriterLike = {
+      19    add(path: string, data: Buffer): void;
+
+● Maintenant, je vais ajouter une fonction helper pour sauvegarder les exports
+  avec le nouveau système et l'utiliser dans toutes les fonctions d'export. Cela
+  sera plus propre que de modifier chaque fonction individuellement.
+
+  Read 1 file (ctrl+o to expand)
+
+● Je vais ajouter une fonction writeExportFile qui utilise le nouveau système de
+  chemins.
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 20 lines
+      173    return slugify(value, { lower: true, strict: true, replaceme
+           nt: "_" }) || "export";
+      174  }
+      175  
+      176 +async function writeExportToPublic(                           
+      177 +  projectId: string,                                          
+      178 +  fileName: string,                                           
+      179 +  content: Buffer | string                                    
+      180 +): Promise<{ filePath: string; publicUrl: string; fileName: st
+          +ring; fileSize: number }> {                                   
+      181 +  const dir = getExportsPublicDir(projectId);                 
+      182 +  const fullPath = `${dir}/${fileName}`;                      
+      183 +  const data = typeof content === "string" ? Buffer.from(conte
+          +nt) : content;                                                
+      184 +                                                              
+      185 +  await writeFile(fullPath, data);                            
+      186 +  const stats = await stat(fullPath);                         
+      187 +                                                              
+      188 +  return {                                                    
+      189 +    filePath: `projects/${projectId}/exports/${fileName}`,    
+      190 +    publicUrl: getExportPublicUrl(projectId, fileName),       
+      191 +    fileName,                                                 
+      192 +    fileSize: stats.size,                                     
+      193 +  };                                                          
+      194 +}                                                             
+      195 +                                                              
+      196  function normalizedPath(value: string): string {
+      197    return value.trim().replace(/\\/g, "/");
+      198  }
+
+● Maintenant je vais modifier les fonctions d'export pour utiliser
+  writeExportToPublic. Commençons par exportAsJson.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 9 lines
+      713  
+      714    const jsonContent = JSON.stringify(exportData, null, 2);
+      715    const fileName = `export_${label.toLowerCase().replace(/\s+/
+           g, "_")}_${Date.now()}.json`;
+      716 -  const filePath = `${getProjectDir(project.slug as string)}/e
+          -xports/${fileName}`;                                          
+      716  
+      718 -  await writeFile(filePath, jsonContent);                     
+      719 -  const stats = await stat(filePath);                         
+      720 -                                                              
+      721 -  return {                                                    
+      722 -    filePath,                                                 
+      723 -    fileName,                                                 
+      724 -    fileSize: stats.size,                                     
+      725 -  };                                                          
+      717 +  return await writeExportToPublic(project.id as string, fileN
+          +ame, jsonContent);                                            
+      718  }
+      719  
+      720  // ===========================================================
+           =================
+
+● Maintenant les autres fonctions. Je vais lire et modifier exportAsTree.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Removed 4 lines
+      793  
+      794    // Créer un ZIP de l'arborescence
+      795    const zipFileName = `export_tree_${label.toLowerCase().repla
+           ce(/\s+/g, "_")}_${Date.now()}.zip`;
+      796 -  const zipFilePath = `${getProjectDir(project.slug as string)
+          -}/exports/${zipFileName}`;                                    
+      796  
+      797    const zip = new StoreZipWriter();
+      798    await addDirectoryToZip(zip, exportDir, "");
+      799    const zipBuffer = await zip.end();
+      801 -  await writeFile(zipFilePath, zipBuffer);                    
+      800  
+      803 -  const stats = await stat(zipFilePath);                      
+      804 -                                                              
+      801    return {
+      802      filePath: zipFilePath,
+      803      fileName: zipFileName,
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 5 lines
+      798    await addDirectoryToZip(zip, exportDir, "");
+      799    const zipBuffer = await zip.end();
+      800  
+      801 -  return {                                                    
+      802 -    filePath: zipFilePath,                                    
+      803 -    fileName: zipFileName,                                    
+      804 -    fileSize: stats.size,                                     
+      805 -  };                                                          
+      801 +  return await writeExportToPublic(project.id as string, zipFi
+          +leName, zipBuffer);                                           
+      802  }
+      803  
+      804  // ===========================================================
+           =================
+
+● Maintenant exportAsZip.
+
+  Read 1 file (ctrl+o to expand)
+
+● Je dois refactorer cette fonction pour utiliser writeExportToPublic à la fin.
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 11 lines, removed 16 lines
+      812    sourceSnapshot: ExportSourceSnapshot | null,
+      813  ): Promise<{ filePath: string; fileName: string; fileSize: num
+           ber }> {
+      814    const zipFileName = `export_${label.toLowerCase().replace(/\
+           s+/g, "_")}_${Date.now()}.zip`;
+      815 -  const zipFilePath = `${getProjectDir(project.slug as string)
+          -}/exports/${zipFileName}`;                                    
+      815 +  let zipBuffer: Buffer;                                      
+      816  
+      817    if (kind === "work") {
+      818      // Export travail: données JSON + assets
+     ...
+      852  
+      853      // Ajouter les fichiers d'assets si disponibles
+      854      const assets = project.assets as Array<Record<string, unkn
+           own>>;
+      855 -    await mkdir(`${getProjectDir(project.slug as string)}/expo
+          -rts`, { recursive: true });                                   
+      855  
+      856      for (const asset of assets) {
+      857        const storagePath = asset.storagePath as string;
+     ...
+      870      for (const char of characters) {
+      871        const images = (char.images || []) as Array<Record<strin
+           g, unknown>>;
+      872        for (const image of images) {
+      874 -        const filePath = image.filePath as string;            
+      875 -        if (filePath) {                                       
+      873 +        const imagePath = image.filePath as string;           
+      874 +        if (imagePath) {                                      
+      875            try {
+      877 -            const buffer = await Bun.file(filePath).arrayBuffe
+          -r();                                                          
+      876 +            // Support des deux formats de chemins (ancien et 
+          +nouveau)                                                      
+      877 +            const resolvedPath = imagePath.startsWith("/") || 
+          +imagePath.startsWith("./")                                    
+      878 +              ? imagePath                                     
+      879 +              : `public/${imagePath}`;                        
+      880 +            const buffer = await Bun.file(resolvedPath).arrayB
+          +uffer();                                                      
+      881              zip.add(`characters/${char.slug}/${image.fileName}
+           `, Buffer.from(buffer));
+      882            } catch {
+      883              // Ignorer si le fichier n'existe pas
+     ...
+      886        }
+      887      }
+      888  
+      886 -    const zipBuffer = await zip.end();                        
+      887 -    await writeFile(zipFilePath, zipBuffer);                  
+      889 +    zipBuffer = await zip.end();                              
+      890    } else {
+      891      // Export publication: uniquement les pages manga en forma
+           t lisible
+      892      const publication = await collectPublicationAssets(project
+           , label, sourceSnapshot);
+     ...
+      911        }
+      912      }
+      913  
+      912 -    const zipBuffer = await zip.end();                        
+      913 -    await writeFile(zipFilePath, zipBuffer);                  
+      914 +    zipBuffer = await zip.end();                              
+      915    }
+      916  
+      916 -  const stats = await stat(zipFilePath);                      
+      917 -                                                              
+      918 -  return {                                                    
+      919 -    filePath: zipFilePath,                                    
+      920 -    fileName: zipFileName,                                    
+      921 -    fileSize: stats.size,                                     
+      922 -  };                                                          
+      917 +  return await writeExportToPublic(project.id as string, zipFi
+          +leName, zipBuffer);                                           
+      918  }
+      919  
+      920  // ===========================================================
+           =================
+
+● Maintenant les fonctions de publication. Je vais lire les dernières.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 8 lines
+      974    }
+      975  
+      976    const fileName = `publication_${publication.labelStem}_${Dat
+           e.now()}.zip`;
+      977 -  const filePath = `${getProjectDir(project.slug as string)}/e
+          -xports/${fileName}`;                                          
+      977    const zipBuffer = await zip.end();
+      979 -  await writeFile(filePath, zipBuffer);                       
+      978  
+      981 -  const stats = await stat(filePath);                         
+      982 -  return {                                                    
+      983 -    filePath,                                                 
+      984 -    fileName,                                                 
+      985 -    fileSize: stats.size,                                     
+      986 -  };                                                          
+      979 +  return await writeExportToPublic(project.id as string, fileN
+          +ame, zipBuffer);                                              
+      980  }
+      981  
+      982  async function exportPublicationAsCbz(
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 8 lines
+      1023    }
+      1024  
+      1025    const fileName = `publication_${publication.labelStem}_${Da
+            te.now()}.cbz`;
+      1026 -  const filePath = `${getProjectDir(project.slug as string)}/
+           -exports/${fileName}`;                                        
+      1026    const zipBuffer = await zip.end();
+      1028 -  await writeFile(filePath, zipBuffer);                      
+      1027  
+      1030 -  const stats = await stat(filePath);                        
+      1031 -  return {                                                   
+      1032 -    filePath,                                                
+      1033 -    fileName,                                                
+      1034 -    fileSize: stats.size,                                    
+      1035 -  };                                                         
+      1028 +  return await writeExportToPublic(project.id as string, file
+           +Name, zipBuffer);                                            
+      1029  }
+      1030  
+      1031  async function exportPublicationAsPdf(
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 8 lines
+      1056    }
+      1057  
+      1058    const fileName = `publication_${publication.labelStem}_${Da
+            te.now()}.pdf`;
+      1059 -  const filePath = `${getProjectDir(project.slug as string)}/
+           -exports/${fileName}`;                                        
+      1059    const pdfBytes = await pdf.save();
+      1061 -  await writeFile(filePath, Buffer.from(pdfBytes));          
+      1060  
+      1063 -  const stats = await stat(filePath);                        
+      1064 -  return {                                                   
+      1065 -    filePath,                                                
+      1066 -    fileName,                                                
+      1067 -    fileSize: stats.size,                                    
+      1068 -  };                                                         
+      1061 +  return await writeExportToPublic(project.id as string, file
+           +Name, Buffer.from(pdfBytes));                                
+      1062  }
+      1063  
+      1064  async function exportPublicationAsEpub(
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 8 lines
+      1158  img { display: block; width: 100%; height: auto; }`));
+      1159  
+      1160    const fileName = `publication_${publication.labelStem}_${Da
+            te.now()}.epub`;
+      1161 -  const filePath = `${getProjectDir(project.slug as string)}/
+           -exports/${fileName}`;                                        
+      1161    const epubBuffer = await zip.end();
+      1163 -  await writeFile(filePath, epubBuffer);                     
+      1162  
+      1165 -  const stats = await stat(filePath);                        
+      1166 -  return {                                                   
+      1167 -    filePath,                                                
+      1168 -    fileName,                                                
+      1169 -    fileSize: stats.size,                                    
+      1170 -  };                                                         
+      1163 +  return await writeExportToPublic(project.id as string, file
+           +Name, epubBuffer);                                           
+      1164  }
+      1165  
+      1166  // ==========================================================
+            ==================
+● Aussi, je dois aussi modifier readBinarySource pour supporter les nouveaux
+  chemins relatifs.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 11 lines, removed 1 line
+      237      };
+      238    }
+      239  
+      240 +  // Support des deux formats de chemins :                    
+      241 +  // - Ancien : chemin absolu vers kuti-data/                 
+      242 +  // - Nouveau : chemin relatif (projects/...) vers public/, o
+          +u URL statique (/projects/...)                                
+      243 +  let resolvedPath = path;                                    
+      244 +  if (path.startsWith("/projects/")) {                        
+      245 +    resolvedPath = `public${path}`;                           
+      246 +  } else if (!path.startsWith("/") && !path.startsWith("./")) 
+          +{                                                             
+      247 +    resolvedPath = `public/${path}`;                          
+      248 +  }                                                           
+      249 +                                                              
+      250    return {
+      241 -    buffer: Buffer.from(await Bun.file(path).arrayBuffer()),  
+      251 +    buffer: Buffer.from(await Bun.file(resolvedPath).arrayBuff
+          +er()),                                                        
+      252      mimeType: mimeTypeFromPath(path),
+      253    };
+      254  }
+
+● Phase 9 : Modifier le controller d'exports pour supporter les deux formats.
+
+  Read 1 file (ctrl+o to expand)
+
+● Je dois modifier getExportDownload pour supporter les deux formats de chemins.
+
+● Update(kuti-backend/src/modules/exports/controller.ts)
+  ⎿  Added 10 lines, removed 2 lines
+      168    const { readFile } = await import("node:fs/promises");
+      169    const { existsSync } = await import("node:fs");
+      170  
+      171 -  if (!existsSync(exportRecord.artifactPath)) {               
+      171 +  // Support des deux formats de chemins :                    
+      172 +  // - Ancien : chemin absolu vers kuti-data/                 
+      173 +  // - Nouveau : chemin relatif (projects/...) vers public/   
+      174 +  let filePath = exportRecord.artifactPath;                   
+      175 +  if (!filePath.startsWith("/") && !filePath.startsWith("./"))
+          + {                                                            
+      176 +    filePath = `public/${filePath}`;                          
+      177 +  }                                                           
+      178 +                                                              
+      179 +  if (!existsSync(filePath)) {                                
+      180      return null;
+      181    }
+      182  
+      175 -  const buffer = await readFile(exportRecord.artifactPath);   
+      183 +  const buffer = await readFile(filePath);                    
+      184    const mimeType = (() => {
+      185      switch (exportRecord.format) {
+      186        case "json":
+
+● Je dois aussi ajouter publicUrl dans le serializer et les DTOs.
+
+● Update(kuti-backend/src/modules/exports/controller.ts)
+  ⎿  Added 2 lines
+      28    label: string;
+      29    summary: string;
+      30    artifactPath: string | null;
+      31 +  publicUrl: string | null;                                    
+      32    artifactName: string | null;
+      33    metadataJson: unknown;
+      34    sizeBytes: number | null;
+     ...
+      47      label: exportRecord.label,
+      48      summary: exportRecord.summary,
+      49      artifactPath: exportRecord.artifactPath,
+      50 +    publicUrl: exportRecord.publicUrl,                         
+      51      artifactName: exportRecord.artifactName,
+      52      metadataJson: exportRecord.metadataJson as Record<string, u
+          nknown>,
+      53      sizeBytes: exportRecord.sizeBytes,
+
+  Searched for 1 pattern, read 2 files (ctrl+o to expand)
+
+● Update(kuti-backend/src/modules/exports/dto/index.ts)
+  ⎿  Added 1 line
+      74    label: z.string(),
+      75    summary: z.string(),
+      76    artifactPath: z.string().nullable(),
+      77 +  publicUrl: z.string().nullable(),                            
+      78    artifactName: z.string().nullable(),
+      79    metadataJson: z.record(z.string(), z.unknown()),
+      80    sizeBytes: z.number().nullable(),
+
+● Je dois aussi mettre à jour export-project.ts pour stocker le publicUrl dans
+  ExportRecord lors de la finalisation.
+
+  Read 1 file (ctrl+o to expand)
+
+● Le type de result doit inclure publicUrl. Je vais regarder la finalisation.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 1 line, removed 1 line
+      549        // =====================================================
+           =======================
+      550        // Step 3: Générer l'export selon le format
+      551        // =====================================================
+           =======================
+      552 -      let result: { filePath: string; fileName: string; fileSi
+          -ze: number };                                                 
+      552 +      let result: { filePath: string; publicUrl: string; fileN
+          +ame: string; fileSize: number };                              
+      553  
+      554        switch (format) {
+      555          case "json":
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 2 lines
+      607            data: {
+      608              status: "ready" as ExportStatus,
+      609              artifactPath: result.filePath,
+      610 +            publicUrl: result.publicUrl,                      
+      611              artifactName: result.fileName,
+      612              sizeBytes: result.fileSize,
+      613              completedAt: new Date(),
+     ...
+      632          format,
+      633          kind,
+      634          filePath: result.filePath,
+      635 +        publicUrl: result.publicUrl,                          
+      636          fileName: result.fileName,
+      637          fileSize: result.fileSize,
+      638        };
+
+● Phase 10 : Marquer les anciennes fonctions comme deprecated. Je vais ajouter
+  des JSDoc aux fonctions qui utilisent l'ancien système kuti-data.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(kuti-backend/src/lib/paths.ts)
+  ⎿  Added 2 lines
+      38  
+      39  /**
+      40   * Retourne le répertoire d'un projet spécifique
+      41 + * @deprecated Utilisez getProjectPublicDir() avec projectId po
+         +ur les nouveaux fichiers.                                      
+      42 + * Cette fonction reste nécessaire pour la rétrocompatibilité a
+         +vec les fichiers existants dans kuti-data.                     
+      43   */
+      44  export function getProjectDir(projectSlug: string): string {
+      45    return `${config.dataDir}/projects/${projectSlug}`;
+
+● Update(kuti-backend/src/lib/paths.ts)
+  ⎿  Added 2 lines, removed 1 line
+      71  }
+      72  
+      73  /**
+      74 - * Retourne le répertoire des exports d'un projet              
+      74 + * Retourne le répertoire des exports d'un projet (ancien systè
+         +me kuti-data)                                                  
+      75 + * @deprecated Utilisez getExportsPublicDir() avec projectId po
+         +ur les nouveaux fichiers.                                      
+      76   */
+      77  export function getProjectExportsDir(projectSlug: string): stri
+          ng {
+      78    return `${getProjectDir(projectSlug)}/exports`;
+
+● Update(kuti-backend/src/lib/paths.ts)
+  ⎿  Added 6 lines, removed 3 lines
+      79  }
+      80  
+      81  /**
+      82 - * Retourne le répertoire de génération d'un projet            
+      82 + * Retourne le répertoire de génération d'un projet (ancien sys
+         +tème kuti-data)                                                
+      83 + * @deprecated Utilisez getGenerationPanelsDir() avec projectId
+         + pour les nouveaux fichiers.                                   
+      84   */
+      85  export function getProjectGenerationDir(projectSlug: string): s
+          tring {
+      86    return `${getProjectDir(projectSlug)}/generation`;
+      87  }
+      88  
+      89  /**
+      89 - * Retourne le répertoire d'un job de génération spécifique    
+      90 + * Retourne le répertoire d'un job de génération spécifique (an
+         +cien système kuti-data)                                        
+      91 + * @deprecated Les nouveaux panels sont stockés dans public/ vi
+         +a saveGenerationPanel().                                       
+      92   */
+      93  export function getGenerationJobDir(
+      94    projectSlug: string,
+     ...
+       98  }
+       99  
+      100  /**
+       99 - * Retourne le répertoire board d'un job de génération        
+      101 + * Retourne le répertoire board d'un job de génération (ancien
+          + système kuti-data)                                           
+      102 + * @deprecated Les nouveaux panels sont stockés dans public/ v
+          +ia saveGenerationPanel().                                     
+      103   */
+      104  export function getGenerationBoardDir(
+      105    projectSlug: string,
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Il y a plusieurs erreurs. Je vais les corriger :
+
+  1. Les fonctions d'export dans Inngest retournent un type avec JsonifyObject
+  qui n'inclut pas publicUrl - c'est un problème de type retour des steps.
+  2. Les références à summary et notes qui n'existent plus sur Scene.
+
+  Commençons par les erreurs d'export. Le problème est que Inngest step.run()
+  retourne un type sérialisé. Je vais modifier le type de result.
+
+  Read 1 file (ctrl+o to expand)
+● Le problème est que step.run() de Inngest retourne un type sérialisé. Je vais
+  utiliser un cast as pour corriger.
+
+● Update(kuti-backend/src/lib/inngest/export-project.ts)
+  ⎿  Added 9 lines, removed 7 lines
+      551        // =====================================================
+           =======================
+      552        let result: { filePath: string; publicUrl: string; fileN
+           ame: string; fileSize: number };
+      553  
+      554 +      type ExportResult = { filePath: string; publicUrl: strin
+          +g; fileName: string; fileSize: number };                      
+      555 +                                                              
+      556        switch (format) {
+      557          case "json":
+      558            result = await step.run("export-json", async () => {
+      559              return await exportAsJson(project, exportRecord.la
+           bel, kind, sourceSnapshot);
+      558 -          });                                                 
+      560 +          }) as ExportResult;                                 
+      561            break;
+      562  
+      563          case "tree":
+      564            result = await step.run("export-tree", async () => {
+      565              return await exportAsTree(project, exportRecord.la
+           bel, kind, sourceSnapshot);
+      564 -          });                                                 
+      566 +          }) as ExportResult;                                 
+      567            break;
+      568  
+      569          case "zip":
+      570            result = await step.run("export-zip", async () => {
+      571              return await exportAsZip(project, exportRecord.lab
+           el, kind, sourceSnapshot);
+      570 -          });                                                 
+      572 +          }) as ExportResult;                                 
+      573            break;
+      574  
+      575          case "paged_images":
+      576            result = await step.run("export-paged-images", async
+            () => {
+      577              return await exportPublicationAsPagedImages(projec
+           t, exportRecord.label, sourceSnapshot);
+      576 -          });                                                 
+      578 +          }) as ExportResult;                                 
+      579            break;
+      580  
+      581          case "pdf":
+      582            result = await step.run("export-pdf", async () => {
+      583              return await exportPublicationAsPdf(project, expor
+           tRecord.label, sourceSnapshot);
+      582 -          });                                                 
+      584 +          }) as ExportResult;                                 
+      585            break;
+      586  
+      587          case "cbz":
+      588            result = await step.run("export-cbz", async () => {
+      589              return await exportPublicationAsCbz(project, expor
+           tRecord.label, sourceSnapshot);
+      588 -          });                                                 
+      590 +          }) as ExportResult;                                 
+      591            break;
+      592  
+      593          case "epub":
+      594            result = await step.run("export-epub", async () => {
+      595              return await exportPublicationAsEpub(project, expo
+           rtRecord.label, sourceSnapshot);
+      594 -          });                                                 
+      596 +          }) as ExportResult;                                 
+      597            break;
+      598  
+      599          default:
+
+● API Error: 400 
+  {"error":{"type":"invalid_request_error","message":"555420: Your 
+  resource has been blocked because we detected unusual behavior."}}

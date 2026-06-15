@@ -28,6 +28,7 @@ function serializeExport(exportRecord: {
   label: string;
   summary: string;
   artifactPath: string | null;
+  publicUrl: string | null;
   artifactName: string | null;
   metadataJson: unknown;
   sizeBytes: number | null;
@@ -46,6 +47,7 @@ function serializeExport(exportRecord: {
     label: exportRecord.label,
     summary: exportRecord.summary,
     artifactPath: exportRecord.artifactPath,
+    publicUrl: exportRecord.publicUrl,
     artifactName: exportRecord.artifactName,
     metadataJson: exportRecord.metadataJson as Record<string, unknown>,
     sizeBytes: exportRecord.sizeBytes,
@@ -168,11 +170,19 @@ export async function getExportDownload(
   const { readFile } = await import("node:fs/promises");
   const { existsSync } = await import("node:fs");
 
-  if (!existsSync(exportRecord.artifactPath)) {
+  // Support des deux formats de chemins :
+  // - Ancien : chemin absolu vers kuti-data/
+  // - Nouveau : chemin relatif (projects/...) vers public/
+  let filePath = exportRecord.artifactPath;
+  if (!filePath.startsWith("/") && !filePath.startsWith("./")) {
+    filePath = `public/${filePath}`;
+  }
+
+  if (!existsSync(filePath)) {
     return null;
   }
 
-  const buffer = await readFile(exportRecord.artifactPath);
+  const buffer = await readFile(filePath);
   const mimeType = (() => {
     switch (exportRecord.format) {
       case "json":

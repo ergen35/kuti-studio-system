@@ -330,15 +330,13 @@ model Scene {
   chapterId       String      @map("chapter_id")
   title           String
   slug            String
-  sceneType       String      @default("") @map("scene_type")
+  sceneType       String      @default("free") @map("scene_type")
   location        String      @default("")
-  summary         String      @default("")
   content         String      @default("")
-  notes           String      @default("")
   charactersJson  Json        @default("[]") @map("characters_json")
   tagsJson        Json        @default("[]") @map("tags_json")
   metadataJson    Json        @default("{}") @map("metadata_json")
-  targetPageCount Int?        @map("target_page_count")
+  targetPageCount Int         @default(1) @map("target_page_count")
   status          StoryStatus @default(draft)
   orderIndex      Int         @default(0) @map("order_index")
   createdAt       DateTime    @default(now()) @map("created_at")
@@ -528,6 +526,7 @@ model GenerationBoardPanel {
   prompt        String              @default("")
   status        GenerationPanelStatus @default(draft)
   imagePath     String              @map("image_path")
+  publicUrl     String?             @map("public_url")
   imageName     String              @map("image_name")
   metadataJson  Json                @default("{}") @map("metadata_json")
   createdAt     DateTime            @default(now()) @map("created_at")
@@ -710,6 +709,7 @@ model ExportRecord {
   label         String
   summary       String        @default("")
   artifactPath  String?       @map("artifact_path")
+  publicUrl     String?       @map("public_url")
   artifactName  String?       @map("artifact_name")
   metadataJson  Json          @default("{}") @map("metadata_json")
   sizeBytes     Int?          @map("size_bytes")

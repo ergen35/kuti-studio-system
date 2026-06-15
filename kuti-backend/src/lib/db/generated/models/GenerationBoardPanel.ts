@@ -44,6 +44,7 @@ export type GenerationBoardPanelMinAggregateOutputType = {
   prompt: string | null
   status: $Enums.GenerationPanelStatus | null
   imagePath: string | null
+  publicUrl: string | null
   imageName: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,6 +60,7 @@ export type GenerationBoardPanelMaxAggregateOutputType = {
   prompt: string | null
   status: $Enums.GenerationPanelStatus | null
   imagePath: string | null
+  publicUrl: string | null
   imageName: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -74,6 +76,7 @@ export type GenerationBoardPanelCountAggregateOutputType = {
   prompt: number
   status: number
   imagePath: number
+  publicUrl: number
   imageName: number
   metadataJson: number
   createdAt: number
@@ -100,6 +103,7 @@ export type GenerationBoardPanelMinAggregateInputType = {
   prompt?: true
   status?: true
   imagePath?: true
+  publicUrl?: true
   imageName?: true
   createdAt?: true
   updatedAt?: true
@@ -115,6 +119,7 @@ export type GenerationBoardPanelMaxAggregateInputType = {
   prompt?: true
   status?: true
   imagePath?: true
+  publicUrl?: true
   imageName?: true
   createdAt?: true
   updatedAt?: true
@@ -130,6 +135,7 @@ export type GenerationBoardPanelCountAggregateInputType = {
   prompt?: true
   status?: true
   imagePath?: true
+  publicUrl?: true
   imageName?: true
   metadataJson?: true
   createdAt?: true
@@ -233,6 +239,7 @@ export type GenerationBoardPanelGroupByOutputType = {
   prompt: string
   status: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl: string | null
   imageName: string
   metadataJson: runtime.JsonValue
   createdAt: Date
@@ -272,6 +279,7 @@ export type GenerationBoardPanelWhereInput = {
   prompt?: Prisma.StringFilter<"GenerationBoardPanel"> | string
   status?: Prisma.EnumGenerationPanelStatusFilter<"GenerationBoardPanel"> | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFilter<"GenerationBoardPanel"> | string
+  publicUrl?: Prisma.StringNullableFilter<"GenerationBoardPanel"> | string | null
   imageName?: Prisma.StringFilter<"GenerationBoardPanel"> | string
   metadataJson?: Prisma.JsonFilter<"GenerationBoardPanel">
   createdAt?: Prisma.DateTimeFilter<"GenerationBoardPanel"> | Date | string
@@ -289,6 +297,7 @@ export type GenerationBoardPanelOrderByWithRelationInput = {
   prompt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imagePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageName?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -309,6 +318,7 @@ export type GenerationBoardPanelWhereUniqueInput = Prisma.AtLeast<{
   prompt?: Prisma.StringFilter<"GenerationBoardPanel"> | string
   status?: Prisma.EnumGenerationPanelStatusFilter<"GenerationBoardPanel"> | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFilter<"GenerationBoardPanel"> | string
+  publicUrl?: Prisma.StringNullableFilter<"GenerationBoardPanel"> | string | null
   imageName?: Prisma.StringFilter<"GenerationBoardPanel"> | string
   metadataJson?: Prisma.JsonFilter<"GenerationBoardPanel">
   createdAt?: Prisma.DateTimeFilter<"GenerationBoardPanel"> | Date | string
@@ -326,6 +336,7 @@ export type GenerationBoardPanelOrderByWithAggregationInput = {
   prompt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imagePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageName?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -350,6 +361,7 @@ export type GenerationBoardPanelScalarWhereWithAggregatesInput = {
   prompt?: Prisma.StringWithAggregatesFilter<"GenerationBoardPanel"> | string
   status?: Prisma.EnumGenerationPanelStatusWithAggregatesFilter<"GenerationBoardPanel"> | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringWithAggregatesFilter<"GenerationBoardPanel"> | string
+  publicUrl?: Prisma.StringNullableWithAggregatesFilter<"GenerationBoardPanel"> | string | null
   imageName?: Prisma.StringWithAggregatesFilter<"GenerationBoardPanel"> | string
   metadataJson?: Prisma.JsonWithAggregatesFilter<"GenerationBoardPanel">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"GenerationBoardPanel"> | Date | string
@@ -365,6 +377,7 @@ export type GenerationBoardPanelCreateInput = {
   prompt?: string
   status?: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl?: string | null
   imageName: string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -382,6 +395,7 @@ export type GenerationBoardPanelUncheckedCreateInput = {
   prompt?: string
   status?: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl?: string | null
   imageName: string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -397,6 +411,7 @@ export type GenerationBoardPanelUpdateInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -414,6 +429,7 @@ export type GenerationBoardPanelUncheckedUpdateInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -430,6 +446,7 @@ export type GenerationBoardPanelCreateManyInput = {
   prompt?: string
   status?: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl?: string | null
   imageName: string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -445,6 +462,7 @@ export type GenerationBoardPanelUpdateManyMutationInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -461,6 +479,7 @@ export type GenerationBoardPanelUncheckedUpdateManyInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -487,6 +506,7 @@ export type GenerationBoardPanelCountOrderByAggregateInput = {
   prompt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imagePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   imageName?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -507,6 +527,7 @@ export type GenerationBoardPanelMaxOrderByAggregateInput = {
   prompt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imagePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   imageName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -522,6 +543,7 @@ export type GenerationBoardPanelMinOrderByAggregateInput = {
   prompt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   imagePath?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   imageName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -586,6 +608,7 @@ export type GenerationBoardPanelCreateWithoutBoardInput = {
   prompt?: string
   status?: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl?: string | null
   imageName: string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -601,6 +624,7 @@ export type GenerationBoardPanelUncheckedCreateWithoutBoardInput = {
   prompt?: string
   status?: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl?: string | null
   imageName: string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -646,6 +670,7 @@ export type GenerationBoardPanelScalarWhereInput = {
   prompt?: Prisma.StringFilter<"GenerationBoardPanel"> | string
   status?: Prisma.EnumGenerationPanelStatusFilter<"GenerationBoardPanel"> | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFilter<"GenerationBoardPanel"> | string
+  publicUrl?: Prisma.StringNullableFilter<"GenerationBoardPanel"> | string | null
   imageName?: Prisma.StringFilter<"GenerationBoardPanel"> | string
   metadataJson?: Prisma.JsonFilter<"GenerationBoardPanel">
   createdAt?: Prisma.DateTimeFilter<"GenerationBoardPanel"> | Date | string
@@ -661,6 +686,7 @@ export type GenerationBoardPanelCreateManyBoardInput = {
   prompt?: string
   status?: $Enums.GenerationPanelStatus
   imagePath: string
+  publicUrl?: string | null
   imageName: string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -676,6 +702,7 @@ export type GenerationBoardPanelUpdateWithoutBoardInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -691,6 +718,7 @@ export type GenerationBoardPanelUncheckedUpdateWithoutBoardInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -706,6 +734,7 @@ export type GenerationBoardPanelUncheckedUpdateManyWithoutBoardInput = {
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumGenerationPanelStatusFieldUpdateOperationsInput | $Enums.GenerationPanelStatus
   imagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageName?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -724,6 +753,7 @@ export type GenerationBoardPanelSelect<ExtArgs extends runtime.Types.Extensions.
   prompt?: boolean
   status?: boolean
   imagePath?: boolean
+  publicUrl?: boolean
   imageName?: boolean
   metadataJson?: boolean
   createdAt?: boolean
@@ -741,6 +771,7 @@ export type GenerationBoardPanelSelectCreateManyAndReturn<ExtArgs extends runtim
   prompt?: boolean
   status?: boolean
   imagePath?: boolean
+  publicUrl?: boolean
   imageName?: boolean
   metadataJson?: boolean
   createdAt?: boolean
@@ -758,6 +789,7 @@ export type GenerationBoardPanelSelectUpdateManyAndReturn<ExtArgs extends runtim
   prompt?: boolean
   status?: boolean
   imagePath?: boolean
+  publicUrl?: boolean
   imageName?: boolean
   metadataJson?: boolean
   createdAt?: boolean
@@ -775,13 +807,14 @@ export type GenerationBoardPanelSelectScalar = {
   prompt?: boolean
   status?: boolean
   imagePath?: boolean
+  publicUrl?: boolean
   imageName?: boolean
   metadataJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type GenerationBoardPanelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "boardId" | "stepId" | "orderIndex" | "title" | "caption" | "prompt" | "status" | "imagePath" | "imageName" | "metadataJson" | "createdAt" | "updatedAt", ExtArgs["result"]["generationBoardPanel"]>
+export type GenerationBoardPanelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "boardId" | "stepId" | "orderIndex" | "title" | "caption" | "prompt" | "status" | "imagePath" | "publicUrl" | "imageName" | "metadataJson" | "createdAt" | "updatedAt", ExtArgs["result"]["generationBoardPanel"]>
 export type GenerationBoardPanelInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   board?: boolean | Prisma.GenerationBoardDefaultArgs<ExtArgs>
 }
@@ -807,6 +840,7 @@ export type $GenerationBoardPanelPayload<ExtArgs extends runtime.Types.Extension
     prompt: string
     status: $Enums.GenerationPanelStatus
     imagePath: string
+    publicUrl: string | null
     imageName: string
     metadataJson: runtime.JsonValue
     createdAt: Date
@@ -1244,6 +1278,7 @@ export interface GenerationBoardPanelFieldRefs {
   readonly prompt: Prisma.FieldRef<"GenerationBoardPanel", 'String'>
   readonly status: Prisma.FieldRef<"GenerationBoardPanel", 'GenerationPanelStatus'>
   readonly imagePath: Prisma.FieldRef<"GenerationBoardPanel", 'String'>
+  readonly publicUrl: Prisma.FieldRef<"GenerationBoardPanel", 'String'>
   readonly imageName: Prisma.FieldRef<"GenerationBoardPanel", 'String'>
   readonly metadataJson: Prisma.FieldRef<"GenerationBoardPanel", 'Json'>
   readonly createdAt: Prisma.FieldRef<"GenerationBoardPanel", 'DateTime'>

@@ -38,6 +38,8 @@ export function getDatabasePath(): string {
 
 /**
  * Retourne le répertoire d'un projet spécifique
+ * @deprecated Utilisez getProjectPublicDir() avec projectId pour les nouveaux fichiers.
+ * Cette fonction reste nécessaire pour la rétrocompatibilité avec les fichiers existants dans kuti-data.
  */
 export function getProjectDir(projectSlug: string): string {
   return `${config.dataDir}/projects/${projectSlug}`;
@@ -69,21 +71,24 @@ export function getProjectAssetsDir(projectSlug: string): string {
 }
 
 /**
- * Retourne le répertoire des exports d'un projet
+ * Retourne le répertoire des exports d'un projet (ancien système kuti-data)
+ * @deprecated Utilisez getExportsPublicDir() avec projectId pour les nouveaux fichiers.
  */
 export function getProjectExportsDir(projectSlug: string): string {
   return `${getProjectDir(projectSlug)}/exports`;
 }
 
 /**
- * Retourne le répertoire de génération d'un projet
+ * Retourne le répertoire de génération d'un projet (ancien système kuti-data)
+ * @deprecated Utilisez getGenerationPanelsDir() avec projectId pour les nouveaux fichiers.
  */
 export function getProjectGenerationDir(projectSlug: string): string {
   return `${getProjectDir(projectSlug)}/generation`;
 }
 
 /**
- * Retourne le répertoire d'un job de génération spécifique
+ * Retourne le répertoire d'un job de génération spécifique (ancien système kuti-data)
+ * @deprecated Les nouveaux panels sont stockés dans public/ via saveGenerationPanel().
  */
 export function getGenerationJobDir(
   projectSlug: string,
@@ -93,7 +98,8 @@ export function getGenerationJobDir(
 }
 
 /**
- * Retourne le répertoire board d'un job de génération
+ * Retourne le répertoire board d'un job de génération (ancien système kuti-data)
+ * @deprecated Les nouveaux panels sont stockés dans public/ via saveGenerationPanel().
  */
 export function getGenerationBoardDir(
   projectSlug: string,
@@ -133,6 +139,34 @@ export function getCharacterImagesDir(projectId: string): string {
  */
 export function getCharacterImagePublicUrl(projectId: string, fileName: string): string {
   return `/projects/${projectId}/generation/character_images/${fileName}`;
+}
+
+/**
+ * Retourne le répertoire des panels de génération pour un projet (projectId-based)
+ */
+export function getGenerationPanelsDir(projectId: string): string {
+  return `public/projects/${projectId}/generation/panels`;
+}
+
+/**
+ * Génère l'URL publique statique pour un panel de génération
+ */
+export function getGenerationPanelStaticUrl(projectId: string, fileName: string): string {
+  return `/projects/${projectId}/generation/panels/${fileName}`;
+}
+
+/**
+ * Retourne le répertoire des exports pour un projet (projectId-based)
+ */
+export function getExportsPublicDir(projectId: string): string {
+  return `public/projects/${projectId}/exports`;
+}
+
+/**
+ * Génère l'URL publique statique pour un export
+ */
+export function getExportPublicUrl(projectId: string, fileName: string): string {
+  return `/projects/${projectId}/exports/${fileName}`;
 }
 
 // ============================================================================

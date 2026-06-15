@@ -172,12 +172,10 @@ describe("story controller scene reference sync", () => {
       chapterId: "chapter-1",
       title: "Scene with references",
       sceneType: "action",
-      summary: "Summary with @chapter:chapter-1 and @tome:tome-zero",
-      content: "Content with @file:reference-card",
-      notes: "Notes with @environment:main-hall and duplicate @file:reference-card",
+      content: "Content with @file:reference-card and @chapter:chapter-1 and @tome:tome-zero and @environment:main-hall",
       charactersJson: ["lemillion"],
       tagsJson: ["combat"],
-      metadataJson: { tone: "noir" },
+      metadataJson: { narrativeIntent: "test" },
       status: "active",
       orderIndex: 2,
     });
@@ -269,10 +267,8 @@ describe("story controller scene reference sync", () => {
 
     const updated = await updateScene("project-1", "scene-1", {
       title: "Scene one revised",
-      summary: "Updated @chapter:chapter-1",
-      content: "Updated @file:reference-card and @environment:main-hall",
-      notes: "Also @tome:tome-zero",
-      metadataJson: { tone: "tense" },
+      content: "Updated @file:reference-card and @environment:main-hall and @chapter:chapter-1 and @tome:tome-zero",
+      metadataJson: { narrativeIntent: "updated" },
     });
 
     expect(updated?.title).toBe("Scene one revised");

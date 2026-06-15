@@ -46,6 +46,7 @@ import {
   listStoryCompletionModels,
   completeStoryField,
 } from "./controller";
+import { SCENE_TYPES, sceneTypesResponseSchema } from "./scene-types";
 
 const projectIdParamsSchema = z.object({ projectId: z.string() });
 const referenceParamsSchema = z.object({ projectId: z.string(), type: z.string() });
@@ -65,6 +66,12 @@ export const storyModule = new Elysia({
   .get("/story", ({ params: { projectId } }) => getStorySummary(projectId), {
     response: storySummaryResponseSchema,
     detail: { operationId: "getStorySummary", summary: "Get story summary" },
+  })
+
+  // Scene types
+  .get("/story/scene-types", () => [...SCENE_TYPES], {
+    response: sceneTypesResponseSchema,
+    detail: { operationId: "listSceneTypes", summary: "List available scene types" },
   })
 
   // Story completion models

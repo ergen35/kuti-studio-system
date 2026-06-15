@@ -47,7 +47,6 @@ export type ScenePromptContext = {
   title: string;
   location?: string | null;
   content?: string | null;
-  notes?: string | null;
   tomeTitle?: string | null;
   chapterTitle?: string | null;
 };
@@ -264,7 +263,6 @@ function buildSceneContextBlock(context: ScenePromptContext): string {
       lines: [
         `Story path: ${[context.tomeTitle, context.chapterTitle, context.title].filter(Boolean).join(" > ")}`,
         context.location ? `Location: ${compactText(context.location)}` : null,
-        context.notes ? `Notes: ${compactText(context.notes)}` : null,
       ],
     }),
     context.content

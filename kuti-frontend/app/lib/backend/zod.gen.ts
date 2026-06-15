@@ -1031,23 +1031,15 @@ export const zGetStorySummaryResponse = z.object({
         slug: z.string(),
         sceneType: z.string(),
         location: z.string(),
-        summary: z.string(),
         content: z.string(),
-        notes: z.string(),
         charactersJson: z.array(z.string()),
         tagsJson: z.array(z.string()),
         metadataJson: z.object({
             narrativeIntent: z.string().optional(),
-            duration: z.string().optional(),
-            tone: z.string().optional(),
-            rhythm: z.string().optional(),
             visualConstraints: z.string().optional(),
             stagingNotes: z.string().optional()
         }),
-        targetPageCount: z.union([
-            z.number(),
-            z.unknown()
-        ]),
+        targetPageCount: z.number(),
         status: z.enum([
             'active',
             'draft',
@@ -1080,6 +1072,21 @@ export const zGetStorySummaryResponse = z.object({
     }))
 });
 
+export const zListSceneTypesPath = z.object({
+    projectId: z.string()
+});
+
+/**
+ * Response for status 200
+ */
+export const zListSceneTypesResponse = z.array(z.object({
+    value: z.string(),
+    label: z.object({
+        en: z.string(),
+        fr: z.string()
+    })
+}));
+
 export const zListStoryCompletionModelsPath = z.object({
     projectId: z.string()
 });
@@ -1106,9 +1113,7 @@ export const zCompleteStoryFieldBody = z.object({
         'sceneType',
         'location',
         'synopsis',
-        'summary',
         'content',
-        'notes',
         'charactersJson',
         'tagsJson'
     ]),
@@ -1136,9 +1141,7 @@ export const zCompleteStoryFieldResponse = z.object({
         'sceneType',
         'location',
         'synopsis',
-        'summary',
         'content',
-        'notes',
         'charactersJson',
         'tagsJson'
     ]),
@@ -1389,23 +1392,15 @@ export const zCreateSceneBody = z.object({
     title: z.string().min(1),
     sceneType: z.string().optional(),
     location: z.string().optional(),
-    summary: z.string().optional(),
     content: z.string().optional(),
-    notes: z.string().optional(),
     charactersJson: z.array(z.string()).optional(),
     tagsJson: z.array(z.string()).optional(),
     metadataJson: z.object({
         narrativeIntent: z.string().optional(),
-        duration: z.string().optional(),
-        tone: z.string().optional(),
-        rhythm: z.string().optional(),
         visualConstraints: z.string().optional(),
         stagingNotes: z.string().optional()
     }).optional(),
-    targetPageCount: z.union([
-        z.number().int().gte(1).lte(10),
-        z.unknown()
-    ]).optional(),
+    targetPageCount: z.number().int().gte(1).lte(10).optional(),
     status: z.enum([
         'active',
         'draft',
@@ -1430,23 +1425,15 @@ export const zCreateSceneResponse = z.object({
     slug: z.string(),
     sceneType: z.string(),
     location: z.string(),
-    summary: z.string(),
     content: z.string(),
-    notes: z.string(),
     charactersJson: z.array(z.string()),
     tagsJson: z.array(z.string()),
     metadataJson: z.object({
         narrativeIntent: z.string().optional(),
-        duration: z.string().optional(),
-        tone: z.string().optional(),
-        rhythm: z.string().optional(),
         visualConstraints: z.string().optional(),
         stagingNotes: z.string().optional()
     }),
-    targetPageCount: z.union([
-        z.number(),
-        z.unknown()
-    ]),
+    targetPageCount: z.number(),
     status: z.enum([
         'active',
         'draft',
@@ -1468,23 +1455,15 @@ export const zUpdateSceneBody = z.object({
     title: z.string().min(1).optional(),
     sceneType: z.string().optional(),
     location: z.string().optional(),
-    summary: z.string().optional(),
     content: z.string().optional(),
-    notes: z.string().optional(),
     charactersJson: z.array(z.string()).optional(),
     tagsJson: z.array(z.string()).optional(),
     metadataJson: z.object({
         narrativeIntent: z.string().optional(),
-        duration: z.string().optional(),
-        tone: z.string().optional(),
-        rhythm: z.string().optional(),
         visualConstraints: z.string().optional(),
         stagingNotes: z.string().optional()
     }).optional(),
-    targetPageCount: z.union([
-        z.number().int().gte(1).lte(10),
-        z.unknown()
-    ]).optional(),
+    targetPageCount: z.number().int().gte(1).lte(10).optional(),
     status: z.enum([
         'active',
         'draft',
@@ -1510,23 +1489,15 @@ export const zUpdateSceneResponse = z.object({
     slug: z.string(),
     sceneType: z.string(),
     location: z.string(),
-    summary: z.string(),
     content: z.string(),
-    notes: z.string(),
     charactersJson: z.array(z.string()),
     tagsJson: z.array(z.string()),
     metadataJson: z.object({
         narrativeIntent: z.string().optional(),
-        duration: z.string().optional(),
-        tone: z.string().optional(),
-        rhythm: z.string().optional(),
         visualConstraints: z.string().optional(),
         stagingNotes: z.string().optional()
     }),
-    targetPageCount: z.union([
-        z.number(),
-        z.unknown()
-    ]),
+    targetPageCount: z.number(),
     status: z.enum([
         'active',
         'draft',

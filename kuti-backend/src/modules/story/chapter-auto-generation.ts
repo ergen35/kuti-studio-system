@@ -28,9 +28,7 @@ export type ChapterSceneGenerationPromptInput = {
 
 export type ChapterSceneDraft = {
   title: string;
-  summary: string;
   content: string;
-  notes: string;
   sceneType: string;
   location: string;
   charactersJson: string[];
@@ -136,22 +134,17 @@ function buildSceneSchemaExample(sceneCount: number): string {
     {
       scenes: Array.from({ length: Math.max(1, sceneCount) }, () => ({
         title: "Titre de scene",
-        summary: "Resume en prose de la scene avec references canoniques si utiles.",
         content: [
           "DIALOGUE: @chara:asha On y va.",
           "THOUGHT: @chara:kairo Je dois rester calme.",
           "NARRATION: Le vent se leve sur le quai.",
         ].join("\n"),
-        sceneType: "action",
+        sceneType: "free",
         location: "Quai",
-        notes: "Notes de continuité ou de mise en scene.",
         charactersJson: ["asha", "kairo"],
         tagsJson: ["ouverture", "tension"],
         metadataJson: {
           narrativeIntent: "",
-          duration: "",
-          tone: "",
-          rhythm: "",
           visualConstraints: "",
           stagingNotes: "",
         },
@@ -257,10 +250,8 @@ function normalizeSceneDraft(draft: Record<string, unknown>): ChapterSceneDraft 
 
   return {
     title: compactText(draft.title as TextLike),
-    summary: compactText(draft.summary as TextLike),
     content: preserveMultilineText(draft.content as TextLike),
-    notes: compactText(draft.notes as TextLike),
-    sceneType: compactText(draft.sceneType as TextLike),
+    sceneType: compactText(draft.sceneType as TextLike) || "free",
     location: compactText(draft.location as TextLike),
     charactersJson: normalizeCharacterTokens(draft.charactersJson),
     tagsJson: normalizeStringArray(draft.tagsJson),
@@ -292,7 +283,7 @@ function parseChapterScenePayload(payload: unknown, sceneCount: number): Generat
   }
 
   for (const scene of scenes) {
-    if (!scene.title || !scene.summary || !scene.content) {
+    if (!scene.title || !scene.content) {
       throw new ChapterSceneGenerationError(
         "Generated scene is missing required fields",
         "generation_provider_invalid_response",
@@ -326,12 +317,12 @@ export function buildChapterSceneGenerationPrompt(input: ChapterSceneGenerationP
     "",
     "Contraintes de sortie:",
     `- Retourne exactement ${input.sceneCount} scenes dans un tableau JSON nomme scenes.`,
-    "- Chaque scene doit contenir les cles: title, summary, content, sceneType, location, notes, charactersJson, tagsJson, metadataJson.",
-    "- summary doit etre redige en prose.",
+    "- Chaque scene doit contenir les cles: title, content, sceneType, location, charactersJson, tagsJson, metadataJson.",
     "- content doit etre un script de scene ligne par ligne avec les prefixes DIALOGUE:, THOUGHT: et NARRATION:.",
+    "- sceneType doit etre l'un de: free, dialogue, action, reveal, transition, confrontation, flashback, quiet_beat, climax, resolution.",
     "- charactersJson doit lister les slugs canoniques des personnages principaux, sans prefixe @.",
     "- tagsJson doit contenir des tags courts et coherents.",
-    "- metadataJson peut contenir narrativeIntent, duration, tone, rhythm, visualConstraints et stagingNotes.",
+    "- metadataJson peut contenir narrativeIntent, visualConstraints et stagingNotes.",
     "- Garde la coherence de ton, de lieu et de progression entre les scenes.",
     "- N'invente pas de scene de remplissage: chaque scene doit faire avancer le chapitre.",
     "",
@@ -449,13 +440,11 @@ export async function createSceneRecord(
     title: string;
     sceneType?: string;
     location?: string;
-    summary?: string;
     content?: string;
-    notes?: string;
     charactersJson?: string[];
     tagsJson?: string[];
     metadataJson?: Prisma.InputJsonValue;
-    targetPageCount?: number | null;
+    targetPageCount?: number;
     status?: "active" | "draft" | "archived";
     orderIndex?: number;
     createdAt?: Date;
@@ -472,15 +461,13 @@ export async function createSceneRecord(
       chapterId: input.chapterId,
       slug: input.slug,
       title: input.title,
-      sceneType: input.sceneType ?? "",
+      sceneType: input.sceneType ?? "free",
       location: input.location ?? "",
-      summary: input.summary ?? "",
       content: input.content ?? "",
-      notes: input.notes ?? "",
       charactersJson: input.charactersJson ?? [],
       tagsJson: input.tagsJson ?? [],
       metadataJson: (input.metadataJson ?? {}) as Prisma.InputJsonValue,
-      targetPageCount: input.targetPageCount ?? null,
+      targetPageCount: input.targetPageCount ?? 1,
       status: input.status ?? "draft",
       orderIndex: input.orderIndex ?? 0,
       createdAt: now,
@@ -489,9 +476,7 @@ export async function createSceneRecord(
   });
 
   await syncSceneReferences(scene.id, input.projectId, {
-    summary: scene.summary,
     content: scene.content,
-    notes: scene.notes,
   }, client);
 
   return scene;
@@ -562,9 +547,7 @@ export async function replaceChapterScenesWithDrafts(
         title: draft.title,
         sceneType: draft.sceneType,
         location: draft.location,
-        summary: draft.summary,
         content: draft.content,
-        notes: draft.notes,
         charactersJson: draft.charactersJson,
         tagsJson: draft.tagsJson,
         metadataJson: {

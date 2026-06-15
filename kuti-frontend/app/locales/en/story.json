@@ -46,7 +46,7 @@
       "count_plural": "{{count}} references",
       "empty": {
         "title": "No references in this scene",
-        "description": "Add typed references in content, summary, or notes to index them."
+        "description": "Add typed references in content to index them."
       },
       "resolved": "Resolved",
       "orphan": "Orphan",
@@ -55,7 +55,7 @@
     },
     "metadata": {
       "title": "Metadata",
-      "description": "Narrative intent, pacing, tone, and staging notes attached to this scene."
+      "description": "Narrative intent, visual constraints, and staging notes attached to this scene."
     }
   },
   "tree": {
@@ -130,15 +130,10 @@
     "type": "Type",
     "location": "Location",
     "targetPageCount": "Target pages",
-    "summary": "Summary",
     "content": "Content",
     "characters": "Characters",
     "tags": "Tags",
-    "notes": "Notes",
     "narrativeIntent": "Narrative intent",
-    "duration": "Duration",
-    "tone": "Tone",
-    "rhythm": "Rhythm",
     "visualConstraints": "Visual constraints",
     "stagingNotes": "Staging notes"
   },
@@ -249,14 +244,9 @@
       "type": "dialogue, action, reveal...",
       "location": "Rooftop, classroom, station...",
       "targetPageCount": "1-10",
-      "summary": "Scene summary...",
       "characters": "@character:jean, @character:marie...",
       "tags": "romance, fight, reveal...",
-      "notes": "Internal notes...",
       "narrativeIntent": "What this scene must accomplish...",
-      "duration": "Approx. duration or page count...",
-      "tone": "Tense, calm, bittersweet...",
-      "rhythm": "Fast, steady, fragmented...",
       "visualConstraints": "Camera, framing, continuity, or production limits...",
       "stagingNotes": "Blocking, gestures, props, or spatial cues..."
     },

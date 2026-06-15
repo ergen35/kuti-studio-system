@@ -200,68 +200,63 @@ export async function saveCharacterImage(
 }
 
 /**
- * Sauvegarde un panel de génération (board)
+ * Sauvegarde un panel de génération (nouveau format projectId-based dans public/)
  */
 export async function saveGenerationPanel(
-  projectSlug: string,
+  projectId: string,
   jobId: string,
   panelIndex: number,
   imageData: Buffer,
-  mimeType: string
-): Promise<{ filePath: string; fileName: string }> {
-  const { getGenerationBoardDir } = require("./paths");
+  fileExtension: string = ".png"
+): Promise<{
+  filePath: string;
+  publicUrl: string;
+  fileName: string;
+  fileSize: number;
+}> {
+  const { getGenerationPanelsDir, getGenerationPanelStaticUrl } = require("./paths");
 
-  // Déterminer l'extension selon le mime type
-  const extMap: Record<string, string> = {
-    "image/png": ".png",
-    "image/jpeg": ".jpg",
-    "image/webp": ".webp",
-    "image/svg+xml": ".svg",
-    "video/mp4": ".mp4",
-  };
+  const dir = getGenerationPanelsDir(projectId);
+  const fileName = `panel_${jobId}_${panelIndex}_${randomUUIDv7("base64url")}${fileExtension}`;
+  const fullPath = `${dir}/${fileName}`;
 
-  const ext = extMap[mimeType] || ".bin";
-  const fileName = `panel-${panelIndex}${ext}`;
-  const filePath = `${getGenerationBoardDir(projectSlug, jobId)}/${fileName}`;
-
-  await writeFile(filePath, imageData);
+  await writeFile(fullPath, imageData);
+  const stats = await getFileStats(fullPath);
 
   return {
-    filePath,
+    filePath: `projects/${projectId}/generation/panels/${fileName}`,
+    publicUrl: getGenerationPanelStaticUrl(projectId, fileName),
     fileName,
+    fileSize: stats.size,
   };
 }
 
 /**
- * Sauvegarde un fichier d'export
+ * Sauvegarde un fichier d'export (nouveau format projectId-based dans public/)
  */
 export async function saveExportFile(
-  projectSlug: string,
+  projectId: string,
   exportId: string,
   data: Buffer,
-  format: "json" | "tree" | "zip"
-): Promise<{ filePath: string; fileName: string; fileSize: number }> {
-  const { getProjectExportsDir } = require("./paths");
+  extension: string
+): Promise<{
+  filePath: string;
+  publicUrl: string;
+  fileName: string;
+  fileSize: number;
+}> {
+  const { getExportsPublicDir, getExportPublicUrl } = require("./paths");
 
-  const extMap = {
-    json: ".json",
-    tree: ".zip",
-    zip: ".zip",
-    paged_images: ".zip",
-    pdf: ".pdf",
-    cbz: ".cbz",
-    epub: ".epub",
-  };
+  const dir = getExportsPublicDir(projectId);
+  const fileName = `export_${exportId}${extension}`;
+  const fullPath = `${dir}/${fileName}`;
 
-  const fileName = `export_${exportId}${extMap[format]}`;
-  const filePath = `${getProjectExportsDir(projectSlug)}/${fileName}`;
-
-  await writeFile(filePath, data);
-
-  const stats = await getFileStats(filePath);
+  await writeFile(fullPath, data);
+  const stats = await getFileStats(fullPath);
 
   return {
-    filePath,
+    filePath: `projects/${projectId}/exports/${fileName}`,
+    publicUrl: getExportPublicUrl(projectId, fileName),
     fileName,
     fileSize: stats.size,
   };
